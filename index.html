@@ -1085,7 +1085,7 @@ var spMode = 'ne2en';
 var convoDir = 'ne2en';
 var convoHistory = [];
 
-/* ---- Mic permission handling (Patch 1) ---- */
+/* ---- Mic permission handling ---- */
 var micPermissionGranted = false;
 
 function requestMicAccess(){
@@ -1196,6 +1196,31 @@ function doStartRec(opts, resolve, reject){
   try{ r.start(); }catch(e){ activeRec=null; reject(e); }
 }
 
+/* ---- STT language fallback (Nepali uses hi-IN because Chrome doesn't ship ne-NP) ---- */
+var STT_FALLBACK = {
+  'ne': ['ne-NP', 'hi-IN', 'hi'],
+  'en': ['en-US', 'en-GB', 'en-IN', 'en']
+};
+function startRecAuto(langKey, opts){
+  var cands = STT_FALLBACK[langKey] || [langKey];
+  var i = 0;
+  function attempt(){
+    if(i >= cands.length) return Promise.reject(new Error('language-not-supported'));
+    var lang = cands[i++];
+    var o = {};
+    for(var k in opts){ if(Object.prototype.hasOwnProperty.call(opts,k)) o[k] = opts[k]; }
+    o.lang = lang;
+    return startRec(o).catch(function(e){
+      var m = (e && e.message) || '';
+      if(m.indexOf('language-not-supported') >= 0 && i < cands.length){
+        return attempt();
+      }
+      throw e;
+    });
+  }
+  return attempt();
+}
+
 function setRecUI(on){
   recActive = on;
   var btn = $('#micBig'); if(btn) btn.classList.toggle('rec', on);
@@ -1265,15 +1290,14 @@ if(convoClearEl) convoClearEl.addEventListener('click', function(){
   drawConvo();
 }, false);
 
-/* ---- Single-turn speak flow (Patch 2) ---- */
+/* ---- Single-turn speak flow ---- */
 async function runSpeakTurn(){
-  var lang = (spMode === 'ne2en') ? 'ne-NP' : 'en-US';
+  var langKey = (spMode === 'ne2en') ? 'ne' : 'en';
   setRecUI(true);
   var live = $('#micLive');
   if(live){ live.hidden = false; live.innerHTML = '<b>🎙️ सुन्दैछु…</b><br><span style="color:var(--mut)">बोल्नुहोस्…</span>'; }
   try{
-    var text = await startRec({
-      lang: lang,
+    var text = await startRecAuto(langKey, {
       onInterim: function(t){ if(live) live.innerHTML = '<b>🎙️ सुन्दै…</b><br>'+esc(t); }
     });
     setRecUI(false);
@@ -1541,15 +1565,15 @@ function localAnalyze(text){
   return {corrected:corrected, natural:corrected, score:score, mistakes:mistakes, tips:tips, offline:true};
 }
 
-/* ---- Two-way conversation (Patch 3) ---- */
+/* ---- Two-way conversation ---- */
 async function runConvoTurn(){
-  var lang = (convoDir === 'ne2en') ? 'ne-NP' : 'en-US';
-  setRecUI(true);
+  var langKey = (convoDir === 'ne2en') ? 'ne' : 'en';
   var isNe = (convoDir === 'ne2en');
+  setRecUI(true);
   var cm = $('#convoMic');
   if(cm) cm.textContent = isNe ? '🔴 सुन्दै… (tap to stop)' : '🔴 Listening… (tap to stop)';
   try{
-    var text = await startRec({ lang: lang });
+    var text = await startRecAuto(langKey, {});
     setRecUI(false);
     if(!text){ toast('केही सुनिएन'); paintSpMode(); return; }
     await processConvoTurn(text);
@@ -1635,7 +1659,7 @@ function drawConvo(){
 
 setMicLabel();
 
-/* ============ progress (Patch 4) ============ */
+/* ============ progress ============ */
 function renderPg(){
   var d=S.d,acc=d.hwT?Math.round(d.hwR/d.hwT*100):null,w=Object.keys(d.words),days=Object.keys(d.days).length;
   $('#pgo').innerHTML=
@@ -1668,7 +1692,7 @@ function renderPg(){
     }
     info.textContent='🎙️ परीक्षण गर्दै… कृपया "नमस्ते" भन्नुहोस्';
     try{
-      var r = await startRec({lang:'ne-NP'});
+      var r = await startRecAuto('ne', {});
       info.innerHTML = r ? '✅ Nepali STT काम गर्यो: <b>'+esc(r)+'</b>' : '⚠️ केही सुनिएन — फेरि प्रयास गर्नुहोस्';
     }catch(e){
       var m=(e.message||'').toString();
