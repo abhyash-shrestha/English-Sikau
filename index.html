@@ -46,6 +46,11 @@ img{max-width:100%}
 .peak i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:linear-gradient(90deg,var(--saffron),var(--gold-light));transition:width 1s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px rgba(255,153,51,.6)}
 .peak b{position:absolute;top:-14px;left:0;transform:translateX(-50%);transition:left 1s cubic-bezier(.4,0,.2,1);font-size:14px}
 .hero-foot{display:flex;justify-content:space-between;font-size:11.5px;opacity:.9;font-weight:500}
+.live-stats{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;color:#fff}
+.live-stats span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.live-stats b{font-size:13px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 0 rgba(74,222,128,.65);animation:livePulse 1.8s infinite}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.55)}70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
 .content{padding:0 16px}
 .card{background:var(--card);border-radius:var(--r-lg);padding:16px;margin:12px 0;box-shadow:var(--shadow-1);border:1px solid var(--line)}
 .card.color-crimson{border-left:4px solid var(--crimson)}
@@ -254,6 +259,10 @@ textarea.writeArea{min-height:180px;font-size:16px;line-height:1.7}
     </div>
     <div class="peak"><i id="fill"></i><b id="climber">🧗</b></div>
     <div class="hero-foot"><span id="goalTxt">आज: 0/20 XP</span><span id="levelTxt">Level 2</span></div>
+    <div class="live-stats" id="visitorStats" hidden data-norz>
+      <span><i class="live-dot"></i><b id="onlineNow">—</b> online now</span>
+      <span>👥 <b id="visitorTotal">—</b> unique visitors</span>
+    </div>
   </div>
 </header>
 
@@ -635,6 +644,71 @@ function srcLabel(s){return s==='dict'?'📖 Dictionary':s==='google'?'🌐 Goog
 function cacheKey(t,a,b){return a+'>'+b+'|'+String(t).trim().toLowerCase()}
 function cached(k,v){if(arguments.length>1){TR_CACHE.set(k,v);if(TR_CACHE.size>100)TR_CACHE.delete(TR_CACHE.keys().next().value)}return TR_CACHE.get(k)}
 function romanNormalize(t){return String(t||'').trim().replace(/\bxaina\b/gi,'chhaina').replace(/\bxa\b/gi,'chha').replace(/\bchaina\b/gi,'chhaina').replace(/\btapai\b/gi,'tapaaee').replace(/\bmalai\b/gi,'malaai').replace(/\bk\b/gi,'ke')}
+/* ============ LIVE VISITOR STATS ============ */
+/*
+  Works after hosting when Supabase is configured.
+  Use the PUBLIC anon/publishable key only — never a service-role key.
+  Run visitor_stats_setup.sql once, then paste your project URL + anon key below.
+*/
+var VISITOR_STATS_CONFIG={
+  supabaseUrl:'',
+  anonKey:''
+};
+var _visitorStats={hb:null,refresh:null};
+function visitorStatsConfigured(){
+  var u=String(VISITOR_STATS_CONFIG.supabaseUrl||'').trim();
+  var k=String(VISITOR_STATS_CONFIG.anonKey||'').trim();
+  return /^https:\/\//i.test(u)&&k.length>20;
+}
+function visitorId(){
+  var storageKey='sikau_visitor_id_v1',id='';
+  try{id=localStorage.getItem(storageKey)||''}catch(e){}
+  if(!id){
+    try{var m=document.cookie.match(/(?:^|; )sikau_vid=([^;]+)/);if(m)id=decodeURIComponent(m[1])}catch(e){}
+  }
+  if(!id){
+    try{id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'v-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)}catch(e){id='v-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}
+    try{localStorage.setItem(storageKey,id)}catch(e){}
+    try{document.cookie='sikau_vid='+encodeURIComponent(id)+'; Max-Age=31536000; Path=/; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'')}catch(e){}
+  }
+  return id;
+}
+async function statsRpc(name,args){
+  var base=String(VISITOR_STATS_CONFIG.supabaseUrl||'').replace(/\/$/,'');
+  var key=String(VISITOR_STATS_CONFIG.anonKey||'').trim();
+  var r=await fetch(base+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(args||{}),cache:'no-store'});
+  if(!r.ok)throw new Error('stats HTTP '+r.status);
+  var txt=await r.text();
+  return txt?JSON.parse(txt):null;
+}
+async function sendVisitorHeartbeat(){
+  if(!visitorStatsConfigured()||document.hidden)return;
+  try{await statsRpc('sikau_heartbeat',{p_visitor_id:visitorId()})}catch(e){}
+}
+async function refreshVisitorStats(){
+  if(!visitorStatsConfigured())return;
+  try{
+    var data=await statsRpc('sikau_stats',{}),row=Array.isArray(data)?data[0]:data;
+    if(!row)return;
+    var on=document.getElementById('onlineNow'),tot=document.getElementById('visitorTotal');
+    var online=Number(row.online_count||0),total=Number(row.total_visitors||0);
+    if(on)on.textContent=online.toLocaleString('en-US');
+    if(tot)tot.textContent=total.toLocaleString('en-US');
+  }catch(e){}
+}
+function initVisitorStats(){
+  var box=document.getElementById('visitorStats');
+  if(!visitorStatsConfigured()){if(box)box.hidden=true;return}
+  if(box)box.hidden=false;
+  sendVisitorHeartbeat().then(refreshVisitorStats);
+  if(_visitorStats.hb)clearInterval(_visitorStats.hb);
+  if(_visitorStats.refresh)clearInterval(_visitorStats.refresh);
+  _visitorStats.hb=setInterval(sendVisitorHeartbeat,30000);
+  _visitorStats.refresh=setInterval(refreshVisitorStats,15000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){sendVisitorHeartbeat();refreshVisitorStats()}},false);
+  window.addEventListener('focus',function(){sendVisitorHeartbeat();refreshVisitorStats()},false);
+}
+
 function translit(t){var q=romanNormalize(t),u='https://inputtools.google.com/request?text='+encodeURIComponent(q)+'&itc=ne-t-i0-und&num=3&cp=0&cs=1&ie=utf-8&oe=utf-8';return fetchJSON(u,7000).then(function(j){if(!j||j[0]!=='SUCCESS')throw new Error('Roman Nepali conversion failed');return j[1].map(function(x){return x[1]&&x[1][0]||x[0]||''}).join(' ').trim()})}
 async function googleTranslate(text,sl,tl){try{var u='https://translate.googleapis.com/translate_a/single?client=gtx&sl='+encodeURIComponent(sl)+'&tl='+encodeURIComponent(tl)+'&dt=t&q='+encodeURIComponent(text),j=await fetchJSON(u,9000);return Array.isArray(j)&&j[0]?j[0].map(function(x){return x[0]||''}).join('').trim():null}catch(e){return null}}
 async function myMemoryTranslate(text,sl,tl){try{var from=sl==='roman-ne'?'ne':sl,u='https://api.mymemory.translated.net/get?q='+encodeURIComponent(String(text).slice(0,500))+'&langpair='+from+'|'+tl,j=await fetchJSON(u,10000);return j&&j.responseStatus===200&&j.responseData?String(j.responseData.translatedText||'').trim():null}catch(e){return null}}
@@ -644,58 +718,39 @@ var AI_CFG={
   key:(function(){try{return localStorage.getItem('sikau_ai_key')||''}catch(e){return ''}})(),
   endpoint:'https://gen.pollinations.ai/v1/chat/completions',
   model:'openai/gpt-5.4-mini',
-  puterModel:'gpt-5.6-luna',
   live:false
 };
 function setAIKey(k){AI_CFG.key=String(k||'').trim();try{AI_CFG.key?localStorage.setItem('sikau_ai_key',AI_CFG.key):localStorage.removeItem('sikau_ai_key')}catch(e){}paintAIStatus()}
-function puterAllowed(){return location.protocol==='https:'||location.protocol==='http:'}
-function puterReady(){return puterAllowed()&&!!(window.puter&&window.puter.ai&&typeof window.puter.ai.chat==='function')}
-function ensurePuter(ms){
-  if(!puterAllowed())return Promise.reject(new Error('Puter AI requires http/https'));
-  if(puterReady())return Promise.resolve(true);
-  return new Promise(function(ok,fail){
-    var end=Date.now()+(ms||7000),s=document.getElementById('puterSdk');
-    if(!s){
-      s=document.createElement('script');s.id='puterSdk';s.async=true;s.src='https://js.puter.com/v2/';
-      s.onerror=function(){fail(new Error('Puter AI unavailable'))};
-      document.head.appendChild(s)
-    }
-    function check(){if(puterReady())return ok(true);if(Date.now()>=end)return fail(new Error('Puter AI unavailable'));setTimeout(check,120)}
-    check()
-  })
-}
 function paintAIStatus(msg){
   var e=$('#writeAiStatus');if(!e)return;if(msg){e.innerHTML=msg;return}
   var manage='<button type="button" class="linkBtn" id="aiManageBtn">AI settings</button>';
   if(AI_CFG.live)e.innerHTML='🟢 Online AI + grammar active · '+manage;
-  else if(AI_CFG.key)e.innerHTML='🟢 Backup AI connected · '+manage;
-  else if(!puterAllowed())e.innerHTML='🟡 Online grammar active · AI available when hosted · '+manage;
-  else if(puterReady()||document.getElementById('puterSdk'))e.innerHTML='🟡 Online AI ready · grammar active · '+manage;
-  else e.innerHTML='🟡 Online grammar active · '+manage;
+  else if(AI_CFG.key)e.innerHTML='🟢 AI key connected · online grammar active · '+manage;
+  else e.innerHTML='🟢 Online grammar + smart context checker active · '+manage;
   var b=$('#aiManageBtn');if(b)b.onclick=openAISetup
 }
 function openAISetup(){
-  var localNote=!puterAllowed()?'<div style="background:var(--bg-2);border-radius:12px;padding:11px 13px;margin:0 0 12px;font-size:13px;line-height:1.5"><b>Local file mode:</b> You opened this app directly from a file. The app will not load Puter here, so you will not see the unsupported-origin popup. Grammar and the built-in context checker still work. Puter AI becomes available automatically after the app is hosted on http:// or https://.</div>':'';
-  openSheet('<h2 style="padding:0;margin:0 0 8px;border:0">🤖 Online AI Writing Coach</h2>'+localNote+'<p style="color:var(--mut);font-size:13px;line-height:1.55;margin:0 0 12px"><b>Hosted mode:</b> when this app runs from http:// or https://, it can use Puter.js for online AI without storing a secret key in the HTML. LanguageTool and the built-in checker remain independent verification.</p><p style="color:var(--mut);font-size:13px;line-height:1.55;margin:0 0 12px"><b>Optional backup:</b> you can save a Pollinations key here.</p><input class="ans" id="aiKeyInput" type="password" autocomplete="off" placeholder="Optional Pollinations API key" value="'+esc(AI_CFG.key)+'"><div class="row" style="margin-top:12px"><button class="btn primary grow" id="aiSaveBtn" type="button">Save backup key</button><button class="btn ghost" id="aiClearBtn" type="button">Clear</button></div><p style="font-size:11.5px;color:var(--mut);margin:12px 0 0">For best security, never hard-code a private API key into a public HTML file.</p>');
-  $('#aiSaveBtn').onclick=function(){var v=$('#aiKeyInput').value.trim();setAIKey(v);closeSheet();toast(v?'✅ Backup AI key saved':(puterAllowed()?'Automatic AI will be used':'✅ Settings saved'))};
-  $('#aiClearBtn').onclick=function(){setAIKey('');closeSheet();toast('Backup AI key cleared')}
+  openSheet('<h2 style="padding:0;margin:0 0 8px;border:0">🤖 Writing Coach settings</h2><div style="background:var(--bg-2);border-radius:12px;padding:11px 13px;margin:0 0 12px;font-size:13px;line-height:1.55"><b>No sign-in required.</b> No external sign-in is used. LanguageTool and the built-in context checker work automatically. The app can also try a no-popup online AI route when available.</div><p style="color:var(--mut);font-size:13px;line-height:1.55;margin:0 0 12px"><b>Optional:</b> add a Pollinations API key for more reliable AI feedback. This is not required for normal checking.</p><input class="ans" id="aiKeyInput" type="password" autocomplete="off" placeholder="Optional Pollinations API key" value="'+esc(AI_CFG.key)+'"><div class="row" style="margin-top:12px"><button class="btn primary grow" id="aiSaveBtn" type="button">Save optional key</button><button class="btn ghost" id="aiClearBtn" type="button">Clear</button></div><p style="font-size:11.5px;color:var(--mut);margin:12px 0 0">Never hard-code a private API key into a public HTML file.</p>');
+  $('#aiSaveBtn').onclick=function(){var v=$('#aiKeyInput').value.trim();setAIKey(v);closeSheet();toast(v?'✅ AI key saved':'✅ Settings saved')};
+  $('#aiClearBtn').onclick=function(){setAIKey('');closeSheet();toast('AI key cleared')}
 }
 function withTimeout(p,ms,label){return new Promise(function(ok,fail){var done=false,t=setTimeout(function(){if(done)return;done=true;fail(new Error((label||'request')+' timeout'))},ms||15000);Promise.resolve(p).then(function(v){if(done)return;done=true;clearTimeout(t);ok(v)},function(e){if(done)return;done=true;clearTimeout(t);fail(e)})})}
-function puterText(r){if(!r)return'';if(typeof r==='string')return cleanAIText(r);var c=r.message&&r.message.content;if(typeof c==='string')return cleanAIText(c);if(Array.isArray(c))return cleanAIText(c.map(function(x){return x&&x.text||''}).join(''));if(r.text)return cleanAIText(r.text);return''}
-async function callPuterAI(messages,ms){await ensurePuter(7000);try{var r=await withTimeout(window.puter.ai.chat(messages,{model:AI_CFG.puterModel,normalize:true,temperature:.12,reasoning_effort:'medium',max_tokens:1800}),ms||18000,'AI'),t=puterText(r);if(!t)throw new Error('AI returned empty response');AI_CFG.live=true;paintAIStatus();return t}catch(e){AI_CFG.live=false;paintAIStatus();throw e}}
-async function callKeyAI(messages,ms){if(!AI_CFG.key)throw new Error('AI_KEY_NOT_SET');var body=JSON.stringify({model:AI_CFG.model,messages:messages,temperature:.12});var raw=await fetchText(AI_CFG.endpoint,ms||16000,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_CFG.key},body:body}),v=extractAIText(raw);if(v)return v;throw new Error('Backup AI returned empty response')}
-async function callAI(messages,ms,allowLegacy){
-  /* Automatic no-key AI first. It can show Puter's sign-in/consent flow on first use. */
-  try{return await callPuterAI(messages,ms||18000)}catch(e){}
-  if(AI_CFG.key){try{return await callKeyAI(messages,ms||16000)}catch(e){}}
-  if(!allowLegacy)throw new Error('AI_UNAVAILABLE');
-  /* Last best-effort compatibility fallback. Callers must still have non-AI fallbacks. */
-  try{var legacy=await fetchText('https://text.pollinations.ai/',Math.min(ms||8000,8000),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:messages,model:'openai',private:true,referrer:'english-sikau'})}),lv=extractAIText(legacy);if(lv)return lv}catch(e){}
+async function callKeyAI(messages,ms){if(!AI_CFG.key)throw new Error('AI_KEY_NOT_SET');var body=JSON.stringify({model:AI_CFG.model,messages:messages,temperature:.12});var raw=await fetchText(AI_CFG.endpoint,ms||16000,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_CFG.key},body:body}),v=extractAIText(raw);if(v){AI_CFG.live=true;paintAIStatus();return v}throw new Error('AI returned empty response')}
+async function callAnonymousAI(messages,ms){
+  try{
+    var raw=await fetchText('https://text.pollinations.ai/',Math.min(ms||10000,10000),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:messages,model:'openai',private:true,referrer:'english-sikau'})}),v=extractAIText(raw);
+    if(v){AI_CFG.live=true;paintAIStatus();return v}
+  }catch(e){}
   throw new Error('AI_UNAVAILABLE')
+}
+async function callAI(messages,ms,allowAnonymous){
+  if(AI_CFG.key){try{return await callKeyAI(messages,ms||16000)}catch(e){}}
+  if(allowAnonymous!==false){try{return await callAnonymousAI(messages,ms||10000)}catch(e){}}
+  AI_CFG.live=false;paintAIStatus();throw new Error('AI_UNAVAILABLE')
 }
 async function freeAI(prompt,ms){try{return await callAI([{role:'system',content:'Follow the user instruction precisely. Return only the requested result.'},{role:'user',content:prompt}],ms||12000,true)}catch(e){return null}}
 function parseAIJSON(raw){var c=String(raw||'').trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/\s*```$/,'');var m=c.match(/\{[\s\S]*\}/);return JSON.parse(m?m[0]:c)}
-async function aiJSON(system,user,ms){var messages=[{role:'system',content:system},{role:'user',content:user}];return parseAIJSON(await callAI(messages,ms||18000,false))}
+async function aiJSON(system,user,ms){var messages=[{role:'system',content:system},{role:'user',content:user}];return parseAIJSON(await callAI(messages,ms||18000,true))}
 
 /* Nepal-aware writing knowledge. Keep this conservative: protect names; do not invent facts. */
 var NEPAL_CONTEXT='Nepal proper nouns/context: Pokhara is a city in Nepal. Nepal Tourism Board uses Phewa Lake in Pokhara; Fewa Lake is also a common English transliteration, so preserve Fewa if the student wrote Fewa. Other common names include Kathmandu, Lalitpur/Patan, Bhaktapur, Chitwan, Lumbini, Janakpur, Bandipur, Ilam, Mustang, Ghandruk, Nagarkot, Annapurna, Machhapuchhre (Fishtail), Sagarmatha/Mount Everest, Pashupatinath, Swayambhunath and Boudhanath. Common Nepal terms include momo, dal bhat, sel roti, yomari, dhido, gundruk, Dashain, Tihar, Teej, Indra Jatra, Lhosar, Sherpa, Gurung, Magar, Newar/Newari, Tamang, Tharu and Thakali. Never change a real Nepal name into a random English word merely because a generic spell-checker suggests it.';
@@ -1078,7 +1133,7 @@ $('#writeCheck').addEventListener('click',async function(){
   var wc=countWords(text);if(wc<5){toast('कम्तीमा ५ शब्द लेख्नुहोस्');return}
   var btn=this;btn.disabled=true;btn.textContent='⏳ Analyzing…';
   var res=$('#writeResult');
-  res.innerHTML='<div class="card rise color-purple"><div class="ai-loading"><div class="spinner"></div><div class="txt">🎯 Online AI + grammar engine ले तपाईंको लेखाइ जाँच्दैछ…<br><span style="font-size:12px;opacity:.7">AI unavailable भए online grammar + smart checker तुरुन्त प्रयोग हुन्छ</span></div></div></div>';
+  res.innerHTML='<div class="card rise color-purple"><div class="ai-loading"><div class="spinner"></div><div class="txt">🎯 Writing Coach ले तपाईंको लेखाइ जाँच्दैछ…<br><span style="font-size:12px;opacity:.7">Grammar + context checker सधैं चल्छ; online AI उपलब्ध भए थप feedback दिन्छ</span></div></div></div>';
   try{var result=await checkWriting(text,currentTopic,wc);renderWriteResult(text,result,currentTopic);addXp(15);S.d.hwT=(S.d.hwT||0)+1;if((result.score||0)>=70)S.d.hwR=(S.d.hwR||0)+1;save();}
   catch(e){res.innerHTML='<div class="card bad color-crimson">😕 जाँच हुन सकेन।<br><span style="color:var(--mut);font-size:13px">'+esc(e.message||'')+'</span></div>'}
   btn.disabled=false;btn.textContent='🎯 Check my writing';
@@ -1522,7 +1577,7 @@ var thBtn=$('#th');if(thBtn)thBtn.addEventListener('click',function(){setTheme(d
 var bc=0;var brandEl=$('#brand');
 if(brandEl)brandEl.addEventListener('click',function(){if(++bc>=5){bc=0;openSheet('<h2 style="padding:0;margin:0 0 12px;border:0">⚙️ About</h2><p style="color:var(--mut);font-size:15px;line-height:1.55">English Sikau · <span data-norz>अभ्यास · Abhyash</span><br>Made with ❤️ in Nepal 🇳🇵<br><br><b>Engine:</b> '+Object.keys(MINI_NE_EN).length+'-phrase dictionary + Nepali-first Google translation + Roman Nepali understanding + auto-focused Nepali OCR + smart OCR correction.</p><div class="row" style="margin-top:16px"><button type="button" class="btn primary grow" id="aboutOk">ठीक छ</button></div>');var ok=$('#aboutOk');if(ok)ok.addEventListener('click',closeSheet,false)}},false);
 
-try{touchDay();head();renderFestivals();renderWords();initWrite();paintAIStatus();rz(document.body);if(window.MutationObserver){try{_ob.observe(document.body,{childList:true,subtree:true})}catch(e){}}setMicLabel();var bo=document.getElementById('boot');if(bo){bo.className='ok';bo.textContent='✓ नमस्ते! App चालु छ';setTimeout(function(){bo.style.display='none'},2000)}}catch(e){showErr('Boot error: '+(e.message||e))}
+try{touchDay();head();renderFestivals();renderWords();initWrite();paintAIStatus();initVisitorStats();rz(document.body);if(window.MutationObserver){try{_ob.observe(document.body,{childList:true,subtree:true})}catch(e){}}setMicLabel();var bo=document.getElementById('boot');if(bo){bo.className='ok';bo.textContent='✓ नमस्ते! App चालु छ';setTimeout(function(){bo.style.display='none'},2000)}}catch(e){showErr('Boot error: '+(e.message||e))}
 
 })();
 </script>
