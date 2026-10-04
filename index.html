@@ -249,7 +249,7 @@ textarea.writeArea{min-height:180px;font-size:16px;line-height:1.7}
   </div>
   <div class="hero-stats">
     <div class="hero-top">
-      <div><div class="rank" id="rank">—</div><div class="alt"><b id="alt">0</b> m · Everest 8,849 m</div></div>
+      <div><div class="rank" id="rank">—</div><div class="alt"><b id="alt">2,860</b> m · Everest 8,849 m</div></div>
       <div class="streak"><b id="st">0</b><span>🔥 streak</span></div>
     </div>
     <div class="peak"><i id="fill"></i><b id="climber">🧗</b></div>
@@ -764,10 +764,10 @@ var _tm=null;
 var _ob=new MutationObserver(function(){if(_tm)clearTimeout(_tm);_tm=setTimeout(function(){try{_ob.disconnect()}catch(e){}rz(document.body);try{_ob.observe(document.body,{childList:true,subtree:true})}catch(e){}},150)});
 
 /* ============ RANKS ============ */
-var RANKS=[[0,'Terai Walker 🌾'],[900,'Hill Hiker 🥾'],[2000,'Pokhara Explorer 🚣'],[3440,'Namche Climber 🧗'],[5364,'Base Camp Hero ⛺'],[7000,'High Camp 🏔️'],[8849,'EVEREST SUMMIT 🎉🇳🇵']];
+var RANKS=[[2860,'Lukla Trailhead ✈️'],[3440,'Namche Climber 🧗'],[3867,'Tengboche Trekker 🥾'],[4410,'Dingboche Adventurer 🏔️'],[4940,'Lobuche Climber 🧗'],[5364,'Everest Base Camp ⛺'],[6065,'Camp I · Icefall Conqueror 🧊'],[6400,'Camp II · Western Cwm 🏕️'],[7162,'Camp III · High Climber ⛰️'],[7906,'South Col · Summit Team 🔥'],[8400,'Summit Push ⚡'],[8849,'EVEREST SUMMIT 👑🇳🇵']];
 var LVN=['','Starter','Basic','Middle','Upper','Advanced'];
 var LD=['','very short present-tense sentences','simple everyday sentences','connectors + mixed tenses','complex sentences + idioms','advanced formal + phrasal verbs'];
-function head(){var d=S.d,a=Math.min(8849,Math.round(d.xp*10));var rk=RANKS.filter(function(r){return a>=r[0]});rk=rk[rk.length-1];var e=$('#rank');if(e)e.textContent=rk[1];e=$('#alt');if(e)e.textContent=a.toLocaleString('en-US');var pct=a/8849*100;e=$('#fill');if(e)e.style.width=pct+'%';e=$('#climber');if(e)e.style.left=Math.max(2,Math.min(98,pct))+'%';e=$('#st');if(e)e.textContent=d.streak||0;e=$('#goalTxt');if(e)e.textContent='आज: '+Math.min(20,d.xpToday||0)+'/20 XP';e=$('#levelTxt');if(e)e.textContent='Level '+d.L;var hr=new Date().getHours();var g=$('#greetSub');if(g){if(hr<12)g.textContent='शुभ प्रभात! अंग्रेजी सिकौं 🌅';else if(hr<17)g.textContent='शुभ दिन! अंग्रेजी सिकौं ☀️';else g.textContent='शुभ साँझ! अंग्रेजी सिकौं 🌆';}}
+function head(){var d=S.d,start=2860,a=Math.min(8849,start+Math.round(d.xp*10));var rk=RANKS.filter(function(r){return a>=r[0]});rk=rk[rk.length-1]||RANKS[0];var e=$('#rank');if(e)e.textContent=rk[1];e=$('#alt');if(e)e.textContent=a.toLocaleString('en-US');var pct=(a-start)/(8849-start)*100;pct=Math.max(0,Math.min(100,pct));e=$('#fill');if(e)e.style.width=pct+'%';e=$('#climber');if(e){e.style.left=Math.max(2,Math.min(98,pct))+'%';e.textContent=a>=8849?'🏆':'🧗'}e=$('#st');if(e)e.textContent=d.streak||0;e=$('#goalTxt');if(e)e.textContent='आज: '+Math.min(20,d.xpToday||0)+'/20 XP';e=$('#levelTxt');if(e)e.textContent=a>=8849?'SUMMIT!':'Level '+d.L;var hr=new Date().getHours();var g=$('#greetSub');if(g){if(hr<12)g.textContent='शुभ प्रभात! अंग्रेजी सिकौं 🌅';else if(hr<17)g.textContent='शुभ दिन! अंग्रेजी सिकौं ☀️';else g.textContent='शुभ साँझ! अंग्रेजी सिकौं 🌆';}}
 
 function go(t){$$('.nav button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-t')===t)});['tr','words','hw','rd','sp','pg'].forEach(function(id){var e=$('#'+id);if(e)e.hidden=(id!==t)});if(t==='pg')renderPg();if(t==='words'){renderWords();drawPB(false);}if(t==='rd'&&!R)loadRead(S.d.L,true);if(t==='sp')paintSpMode();if(t==='hw')initWrite();toTop();}
 $$('.nav button').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-t'))},false)});
