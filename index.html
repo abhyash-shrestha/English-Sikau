@@ -6,271 +6,646 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#c8102e">
-<title>English Sikau · अंग्रेजी सिकौं</title>
+<meta name="theme-color" content="#DC143C">
+<title>English Sikau · नेपाली</title>
 <style>
-:root{--bg:#fdf7f1;--card:#fff;--ink:#241812;--mut:#8a7268;--line:#f1e3d7;--red:#c8102e;--red2:#e63950;--blue:#1b4f9c;--blue2:#2f74d0;--gold:#e8a317;--ok:#0f9b6c;--bad:#d3402f;--sel:rgba(200,16,46,.10);--nav:rgba(255,255,255,.92);--r:22px}
-[data-theme=dark]{--bg:#15100d;--card:#221a16;--ink:#f7ece2;--mut:#b09a8c;--line:#3a2b23;--red:#ff5b73;--red2:#ff8296;--blue:#7cb2ff;--blue2:#a5c9ff;--gold:#f0b43a;--ok:#3fd39a;--bad:#ff7f6e;--sel:rgba(255,91,115,.16);--nav:rgba(26,19,16,.94)}
-*{box-sizing:border-box}
+:root{
+  --crimson:#DC143C; --crimson-dark:#A50E2D; --crimson-light:#FF4D6D;
+  --saffron:#FF9933; --saffron-light:#FFB366;
+  --deep-blue:#003893; --deep-blue-light:#3465C4;
+  --bg:#FFF8F0; --bg-2:#FFF0E0;
+  --card:#FFFFFF; --card-2:#FFFDFA;
+  --ink:#1A0F0A; --ink-2:#4A342A;
+  --mut:#9A7B6B; --mut-2:rgba(154,123,107,0.4);
+  --line:#F0E0D0;
+  --green:#10B981; --green-dark:#059669;
+  --gold:#E8A317; --gold-light:#FFD873;
+  --purple:#8B5CF6;
+  --shadow-1:0 2px 8px rgba(140,20,50,0.06);
+  --shadow-2:0 4px 16px rgba(140,20,50,0.08);
+  --shadow-3:0 8px 28px rgba(140,20,50,0.14);
+  --r:16px; --r-lg:22px; --r-xl:28px;
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+}
+[data-theme=dark]{
+  --bg:#0F0A0A; --bg-2:#1A1210;
+  --card:#1C1412; --card-2:#241A16;
+  --ink:#FFF0E0; --ink-2:#E0C8B8;
+  --mut:#A08070; --mut-2:rgba(160,128,112,0.4);
+  --line:#2E2018;
+  --shadow-1:0 2px 8px rgba(0,0,0,0.3);
+  --shadow-2:0 4px 16px rgba(0,0,0,0.4);
+  --shadow-3:0 8px 28px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{background:radial-gradient(1100px 560px at 8% -12%,#ffe7d2 0%,transparent 58%),radial-gradient(900px 520px at 104% -6%,#e0ebff 0%,transparent 55%),var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI","Nirmala UI","Noto Sans Devanagari",Mukta,Roboto,sans-serif;max-width:680px;margin:0 auto;padding:12px 14px 104px;padding:12px 14px calc(104px + env(safe-area-inset-bottom,0px));overflow-x:hidden;word-wrap:break-word;-webkit-text-size-adjust:100%;min-height:100vh}
-[data-theme=dark] body{background:radial-gradient(1100px 560px at 8% -12%,#3a1a1c 0%,transparent 58%),radial-gradient(900px 520px at 104% -6%,#122236 0%,transparent 55%),var(--bg)}
-button{font:inherit;cursor:pointer;border:0;background:transparent;color:inherit;padding:0;-webkit-tap-highlight-color:rgba(0,0,0,.08);-webkit-appearance:button;appearance:button}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Devanagari",system-ui,sans-serif;
+  font-size:16px; line-height:1.5; letter-spacing:-0.015em;
+  -webkit-font-smoothing:antialiased;
+  max-width:680px; margin:0 auto;
+  padding:0 0 calc(90px + var(--safe-bot));
+  overflow-x:hidden; word-wrap:break-word; min-height:100vh;
+}
+[data-theme=dark] body{background:var(--bg)}
+button{font:inherit;cursor:pointer;border:0;background:transparent;color:inherit;padding:0;-webkit-appearance:button;appearance:button;transition:transform .15s ease,opacity .15s ease}
+button:active{transform:scale(.97)}
 button:focus{outline:none}
-textarea,input{-webkit-appearance:none;appearance:none;font-size:16px;font-family:inherit;border-radius:15px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}
-.brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-.brand svg{width:44px;height:44px;border-radius:13px;flex:none;pointer-events:none}
-.brand b{display:block;font-size:16px;line-height:1.15}
-.brand span{font-size:11.5px;color:var(--mut)}
-.head-btns{display:flex;gap:8px}
-.icon{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:19px;display:grid;place-items:center}
-.icon.on{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;border-color:transparent}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:12px 0}
-.card.tight{padding:13px}
-h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
-.hero{border:0;color:#fff;padding:18px;background:linear-gradient(150deg,#c8102e 0%,#8c1231 46%,#1b4f9c 100%);box-shadow:0 16px 38px rgba(140,20,50,.32)}
-.hero-top{display:flex;justify-content:space-between;gap:10px}
-.rank{font-size:17px;font-weight:800}
-.alt{font-size:12px;opacity:.85}
+textarea,input{-webkit-appearance:none;appearance:none;font-size:16px;font-family:inherit}
+
+/* ========== APP HEADER ========== */
+.app-header{
+  background:linear-gradient(135deg,var(--crimson) 0%,var(--crimson-dark) 40%,var(--deep-blue) 100%);
+  color:#fff; padding:calc(env(safe-area-inset-top,0px) + 24px) 20px 28px;
+  border-radius:0 0 32px 32px;
+  position:relative; overflow:hidden;
+  box-shadow:0 12px 32px rgba(220,20,60,0.28);
+  margin-bottom:20px;
+}
+.app-header::before{
+  content:""; position:absolute; top:-60px; right:-60px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,153,51,0.4),transparent 70%);
+  pointer-events:none;
+}
+.app-header::after{
+  content:""; position:absolute; bottom:-40px; left:-40px;
+  width:180px; height:180px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.12),transparent 70%);
+  pointer-events:none;
+}
+.app-header-top{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin-bottom:16px; position:relative; z-index:1;
+}
+.app-brand{display:flex; align-items:center; gap:10px}
+.app-brand svg{width:40px; height:40px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.app-brand b{display:block; font-size:15px; font-weight:800; letter-spacing:-0.3px; line-height:1.15}
+.app-brand span{font-size:11px; opacity:.85; font-weight:500}
+.header-btns{display:flex; gap:8px}
+.hdr-btn{
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(255,255,255,0.18); color:#fff;
+  font-size:16px; display:grid; place-items:center;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+.hdr-btn.on{background:rgba(255,255,255,0.35)}
+.greeting{position:relative; z-index:1}
+.greeting .namaste{font-size:22px; font-weight:800; letter-spacing:-0.4px; margin-bottom:4px}
+.greeting .sub{font-size:13px; opacity:.85; font-weight:500}
+.greeting .flag{display:inline-block; margin-right:6px}
+
+/* ========== HERO STATS ========== */
+.hero-stats{
+  background:rgba(255,255,255,0.16);
+  border-radius:var(--r-lg);
+  padding:16px;
+  margin-top:16px;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.18);
+  position:relative; z-index:1;
+}
+.hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
+.rank{font-size:17px; font-weight:800; letter-spacing:-0.3px}
+.alt{font-size:12px; opacity:.85; margin-top:2px; font-weight:500}
 .streak{text-align:right}
-.streak b{font-size:22px;font-weight:800;display:block}
-.streak span{font-size:11px;opacity:.85}
-.peak{position:relative;height:13px;border-radius:9px;background:rgba(255,255,255,.24);margin:20px 0 8px}
-.peak i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:9px;background:linear-gradient(90deg,#ffe08a,#e8a317);transition:width .9s}
-.peak b{position:absolute;top:-15px;left:0;transform:translateX(-50%);transition:left .9s}
-.hero-foot{display:flex;justify-content:space-between;font-size:11.5px;opacity:.9}
-.btn{min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:650;padding:10px 16px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-.btn:active{opacity:.85}
-.btn.primary{background:linear-gradient(135deg,var(--red),var(--red2));border:0;color:#fff}
-.btn.ghost{background:var(--card)}
-.btn.sm{min-height:38px;padding:6px 13px;font-size:14px}
+.streak b{font-size:26px; font-weight:800; display:block; line-height:1; letter-spacing:-0.5px}
+.streak span{font-size:10.5px; opacity:.85; font-weight:500}
+.peak{position:relative; height:10px; border-radius:5px; background:rgba(255,255,255,0.22); margin:18px 0 8px}
+.peak i{position:absolute; left:0; top:0; bottom:0; width:0; border-radius:5px; background:linear-gradient(90deg,var(--saffron),var(--gold-light)); transition:width 1s cubic-bezier(.4,0,.2,1); box-shadow:0 0 10px rgba(255,153,51,0.6)}
+.peak b{position:absolute; top:-14px; left:0; transform:translateX(-50%); transition:left 1s cubic-bezier(.4,0,.2,1); font-size:14px}
+.hero-foot{display:flex; justify-content:space-between; font-size:11.5px; opacity:.9; font-weight:500}
+
+/* ========== CONTENT AREA ========== */
+.content{padding:0 16px}
+
+/* ========== CARDS ========== */
+.card{
+  background:var(--card); border-radius:var(--r-lg);
+  padding:16px; margin:12px 0;
+  box-shadow:var(--shadow-1);
+  border:1px solid var(--line);
+}
+.card.color-crimson{border-left:4px solid var(--crimson)}
+.card.color-saffron{border-left:4px solid var(--saffron)}
+.card.color-blue{border-left:4px solid var(--deep-blue-light)}
+.card.color-green{border-left:4px solid var(--green)}
+.card.tight{padding:0; overflow:hidden}
+h2{font-size:16px; font-weight:800; letter-spacing:-0.3px; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+.card.tight h2{padding:14px 16px; margin:0; border-bottom:1px solid var(--line)}
+
+/* ========== FESTIVAL CARD ========== */
+.festival-card{
+  background:linear-gradient(135deg,#FFF8E7 0%,#FFF0D9 100%);
+  border:1.5px solid var(--saffron-light);
+  border-radius:var(--r-lg); padding:16px; margin:12px 0;
+  box-shadow:var(--shadow-1); position:relative; overflow:hidden;
+}
+[data-theme=dark] .festival-card{background:linear-gradient(135deg,#2A1E10 0%,#1E1408 100%); border-color:#5A3A18}
+.festival-card::before{
+  content:""; position:absolute; top:-20px; right:-20px;
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,153,51,0.25),transparent 70%);
+}
+.festival-header{
+  display:flex; align-items:center; gap:8px;
+  font-size:13px; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--crimson);
+  margin-bottom:12px;
+}
+[data-theme=dark] .festival-header{color:var(--saffron)}
+.festival-item{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 0; border-bottom:1px dashed var(--line);
+  position:relative; z-index:1;
+}
+.festival-item:last-child{border-bottom:0}
+.festival-icon{
+  width:44px; height:44px; border-radius:14px;
+  display:grid; place-items:center; font-size:22px;
+  flex:none; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+}
+.festival-icon.f1{background:linear-gradient(135deg,#FFB6C1,#FF6B9D)}
+.festival-icon.f2{background:linear-gradient(135deg,#FFD873,#FFA94D)}
+.festival-icon.f3{background:linear-gradient(135deg,#A5D8FF,#4DABF7)}
+.festival-icon.f4{background:linear-gradient(135deg,#B2F2BB,#51CF66)}
+.festival-icon.f5{background:linear-gradient(135deg,#D0BFFF,#9775FA)}
+.festival-icon.f6{background:linear-gradient(135deg,#FFC9C9,#FF6B6B)}
+.festival-info{flex:1; min-width:0}
+.festival-info .name{font-weight:700; font-size:15px; letter-spacing:-0.2px; line-height:1.25}
+.festival-info .name small{font-weight:500; color:var(--mut); font-size:12px; display:block; margin-top:2px}
+.festival-info .name small.rm-inline{display:inline; margin:0; font-style:italic}
+.festival-date{
+  font-size:11px; font-weight:700; color:var(--crimson);
+  background:rgba(220,20,60,0.1); padding:4px 10px;
+  border-radius:999px; flex:none; white-space:nowrap;
+}
+[data-theme=dark] .festival-date{background:rgba(220,20,60,0.2); color:var(--saffron-light)}
+
+/* ========== SEGMENTED ========== */
+.seg{
+  display:flex; gap:4px; background:var(--bg-2);
+  border-radius:14px; padding:4px; margin-bottom:14px;
+}
+.seg button{
+  flex:1; color:var(--mut); border-radius:11px; min-height:38px;
+  font-weight:700; font-size:13px; padding:0 6px;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+.seg button.on{
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-light));
+  color:#fff; box-shadow:0 4px 10px rgba(220,20,60,0.3);
+}
+
+/* ========== BUTTONS ========== */
+.btn{
+  min-height:46px; border-radius:14px; border:0;
+  background:var(--bg-2); color:var(--ink); font-weight:700; font-size:15px;
+  padding:10px 18px; display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  transition:transform .15s ease,box-shadow .2s ease;
+}
+.btn.primary{
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-light));
+  color:#fff; box-shadow:0 6px 18px rgba(220,20,60,0.3);
+}
+.btn.primary:active{box-shadow:0 3px 10px rgba(220,20,60,0.4)}
+.btn.ghost{background:var(--bg-2); color:var(--crimson); font-weight:600}
+.btn.sm{min-height:36px; padding:7px 14px; font-size:13.5px; border-radius:11px}
 .btn:disabled{opacity:.5}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 .row.between{justify-content:space-between}
 .grow{flex:1}
-.seg{display:flex;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:10px}
-.seg button{flex:1;color:var(--mut);border-radius:11px;min-height:38px;font-weight:650;font-size:13.5px;padding:0 4px}
-.seg button.on{background:var(--card);color:var(--red)}
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
-.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 13px;font-size:13.5px;min-height:36px}
-.chip.on{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;border-color:transparent}
-.pill{background:var(--sel);color:var(--red);border-radius:999px;padding:3px 11px;font-size:12px;font-weight:750}
-.tag{display:inline-block;background:linear-gradient(135deg,#ffd873,var(--gold));color:#3a2405;border-radius:8px;padding:2px 9px;font-size:11.5px;font-weight:800}
-.tag.blue{background:linear-gradient(135deg,#a5d8ff,#2f74d0);color:#fff}
-.tag.green{background:linear-gradient(135deg,#a8e6ce,#0f9b6c);color:#043b25}
-textarea,input.ans{width:100%;border:2px solid var(--line);padding:13px;background:var(--bg);color:var(--ink);outline:none}
-textarea{min-height:96px;resize:vertical;line-height:1.6}
-textarea:focus,input.ans:focus{border-color:var(--red)}
-input.ans{min-height:48px}
-.src{font-size:13.5px;color:var(--mut);margin-bottom:4px}
-.ne{font-size:16px;font-weight:600;display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
-.en{font-size:22px;font-weight:800;color:var(--blue);line-height:1.35}
-[data-theme=dark] .en{color:var(--blue2)}
-.speaker{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:14px;flex:none;padding:0}
-.speaker:active{opacity:.7}
-.speaker.playing{background:var(--red);color:#fff;border-color:transparent}
-.speaker.np{background:linear-gradient(135deg,#0f9b6c,#3fd39a);color:#fff;border-color:transparent}
-.pron{font-size:13px;color:var(--mut);margin-top:6px}
-.wd{cursor:pointer;border-bottom:1.5px dotted var(--mut);padding-bottom:1px}
-.w{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:5px 10px;margin:3px 3px 0 0;font-size:13.5px;cursor:pointer}
-.rm{display:block;font-size:.74em;font-style:italic;color:var(--mut);white-space:normal}
-.ok{border-left:5px solid var(--ok)}.bad{border-left:5px solid var(--bad)}
-.spin{animation:p 1.1s infinite}@keyframes p{50%{opacity:.45}}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.rise{animation:rise .35s both}
-.rs{font-size:18.5px;line-height:2;margin:8px 0}
-.ctrl{display:inline-flex;gap:5px;margin-left:6px;vertical-align:middle}
-.nz{background:var(--bg);border:1px dashed var(--line);border-radius:13px;padding:9px 12px;margin:6px 0}
-.nz .nd{font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:680px;z-index:60;display:flex;gap:2px;padding:7px 8px 8px;padding:7px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--nav);border-top:1px solid var(--line)}
-.nav button{flex:1;color:var(--mut);font-size:10px;font-weight:650;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:14px;min-height:52px}
-.nav button i{font-size:19px;font-style:normal;line-height:1;pointer-events:none}
-.nav button.on{color:var(--red);background:var(--sel)}
-.sheet{position:fixed;top:0;right:0;bottom:0;left:0;z-index:90;background:rgba(20,10,5,.45);display:flex;align-items:flex-end}
-.sheet-in{width:100%;max-width:680px;margin:0 auto;background:var(--card);border-radius:26px 26px 0 0;padding:18px 18px 22px;padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px))}
+
+/* ========== CHIPS ========== */
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.chip{
+  border:1.5px solid var(--line); background:var(--card);
+  color:var(--ink); border-radius:999px; padding:7px 14px;
+  font-size:13.5px; min-height:36px; font-weight:600;
+  transition:all .2s ease;
+}
+.chip.on{
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-light));
+  color:#fff; border-color:transparent;
+  box-shadow:0 4px 12px rgba(220,20,60,0.3);
+}
+
+/* ========== PILLS / TAGS ========== */
+.pill{
+  background:rgba(220,20,60,0.1); color:var(--crimson);
+  border-radius:999px; padding:3px 12px;
+  font-size:11.5px; font-weight:800;
+}
+.tag{
+  display:inline-flex; align-items:center; gap:3px;
+  background:linear-gradient(135deg,var(--saffron),var(--gold));
+  color:#3A2405; border-radius:8px;
+  padding:2px 9px; font-size:11px; font-weight:800;
+}
+.tag.blue{background:linear-gradient(135deg,#A5D8FF,#4DABF7); color:#0B3A6B}
+.tag.green{background:linear-gradient(135deg,#B2F2BB,#51CF66); color:#0A3D1A}
+.tag.crimson{background:linear-gradient(135deg,#FFB6C1,#FF6B9D); color:#5C0A1E}
+
+/* ========== INPUTS ========== */
+textarea,input.ans{
+  width:100%; border:2px solid var(--line); padding:14px 16px;
+  background:var(--bg-2); color:var(--ink); outline:none;
+  border-radius:14px; transition:border-color .2s ease,background .2s ease;
+  font-size:16px;
+}
+textarea{min-height:100px; resize:vertical; line-height:1.55}
+textarea:focus,input.ans:focus{border-color:var(--crimson); background:var(--card)}
+input.ans{min-height:50px}
+
+/* ========== TEXT ========== */
+.src{font-size:13px; color:var(--mut); margin-bottom:5px; font-weight:600}
+.ne{font-size:16px; font-weight:600; display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap; line-height:1.4}
+.en{font-size:22px; font-weight:800; color:var(--deep-blue-light); line-height:1.3; letter-spacing:-0.4px}
+[data-theme=dark] .en{color:#A5C9FF}
+.pron{font-size:12.5px; color:var(--mut); margin-top:8px}
+.rm{display:block; font-size:0.76em; font-style:italic; color:var(--mut); white-space:normal; font-weight:400}
+
+/* ========== SPEAKER ========== */
+.speaker{
+  display:inline-grid; place-items:center;
+  width:36px; height:36px; border-radius:11px;
+  background:var(--bg-2); border:1.5px solid var(--line);
+  color:var(--crimson); font-size:14px; flex:none; padding:0;
+  transition:transform .15s ease,background .2s ease;
+}
+.speaker.playing{background:var(--crimson); color:#fff; border-color:transparent}
+.speaker.np{
+  background:linear-gradient(135deg,var(--green),#34D399);
+  color:#fff; border-color:transparent;
+  box-shadow:0 3px 10px rgba(16,185,129,0.3);
+}
+
+/* ========== WORD ========== */
+.wd{cursor:pointer; border-bottom:1.5px dotted var(--mut-2); padding-bottom:1px; transition:color .15s ease}
+.wd:hover{color:var(--crimson)}
+.w{
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--bg-2); border:1.5px solid var(--line);
+  border-radius:11px; padding:6px 11px; margin:3px 3px 0 0;
+  font-size:13.5px; cursor:pointer; font-weight:600;
+  transition:all .2s ease;
+}
+.w:active{transform:scale(.95)}
+
+/* ========== FEEDBACK ========== */
+.ok{border-left:5px solid var(--green)}
+.bad{border-left:5px solid var(--crimson)}
+
+/* ========== ANIMATIONS ========== */
+.spin{animation:pulse 1.1s infinite}@keyframes pulse{50%{opacity:.45}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rise{animation:rise .3s cubic-bezier(.4,0,.2,1) both}
+@keyframes glow{0%,100%{box-shadow:0 10px 30px rgba(220,20,60,0.32)}50%{box-shadow:0 10px 44px rgba(220,20,60,0.5)}}
+
+/* ========== READING ========== */
+.rs{font-size:17.5px; line-height:1.95; margin:10px 0; font-weight:500}
+.ctrl{display:inline-flex; gap:5px; margin-left:6px; vertical-align:middle}
+.nz{background:var(--bg-2); border:1.5px dashed var(--line); border-radius:13px; padding:10px 13px; margin:7px 0}
+.nz .nd{font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+
+/* ========== NAV ========== */
+.nav{
+  position:fixed; left:50%; transform:translateX(-50%); bottom:0;
+  width:100%; max-width:680px; z-index:60;
+  display:flex; gap:0; padding:6px 4px calc(6px + var(--safe-bot));
+  background:var(--card);
+  border-top:1px solid var(--line);
+  box-shadow:0 -4px 20px rgba(140,20,50,0.06);
+}
+.nav button{
+  flex:1; color:var(--mut); font-size:10px; font-weight:700;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:6px 2px; border-radius:14px; min-height:52px;
+  transition:color .2s ease;
+  letter-spacing:0.01em;
+}
+.nav button i{
+  font-size:21px; font-style:normal; line-height:1;
+  pointer-events:none;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  display:grid; place-items:center;
+  width:38px; height:28px; border-radius:10px;
+}
+.nav button.on{color:var(--crimson)}
+.nav button.on i{
+  background:linear-gradient(135deg,rgba(220,20,60,0.12),rgba(255,153,51,0.12));
+  transform:scale(1.05);
+}
+
+/* ========== SHEET ========== */
+.sheet{position:fixed; inset:0; z-index:90; background:rgba(20,5,10,0.5); display:flex; align-items:flex-end; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px)}
+.sheet-in{
+  width:100%; max-width:680px; margin:0 auto;
+  background:var(--card); border-radius:26px 26px 0 0;
+  padding:10px 20px calc(24px + var(--safe-bot));
+  animation:sheetUp .35s cubic-bezier(.32,.72,0,1);
+  max-height:88vh; overflow-y:auto;
+}
+.sheet-in::before{
+  content:""; display:block; width:40px; height:5px; border-radius:3px;
+  background:var(--mut-2); margin:0 auto 14px;
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 [hidden]{display:none!important}
-footer{text-align:center;color:var(--mut);font-size:12.5px;margin:20px 0 6px}
-footer b{color:var(--red)}
-a{color:var(--blue)}
-#boot{border-radius:12px;padding:8px 12px;font-size:13px;margin:6px 0;display:none}
-#boot.err{display:block;background:#fee;color:#900;border:1px solid #fbb}
-#boot.ok{display:block;background:#e6f8f0;color:#0a6b48;border:1px solid #a8e6ce}
-.micBig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;min-height:150px;border-radius:24px;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-weight:800;font-size:15px;transition:transform .15s, box-shadow .25s;box-shadow:0 10px 30px rgba(200,16,46,.28);margin-top:12px}
-.micBig .micIcon{font-size:52px;line-height:1}
-.micBig:active{transform:scale(.98)}
-.micBig.rec{animation:recPulse 1.2s infinite;background:linear-gradient(135deg,#0f9b6c,#3fd39a)}
-@keyframes recPulse{0%,100%{transform:scale(1);box-shadow:0 10px 30px rgba(15,155,108,.3)}50%{transform:scale(1.03);box-shadow:0 10px 50px rgba(15,155,108,.6)}}
-.micLive{margin-top:12px;padding:12px 14px;background:var(--bg);border:1px dashed var(--line);border-radius:14px;font-size:15px;min-height:48px;line-height:1.55}
-.micLive b{color:var(--red)}
-.bubble{max-width:88%;padding:10px 14px;border-radius:18px;margin:8px 0;word-wrap:break-word;line-height:1.5;display:flex;flex-direction:column;position:relative;font-size:15px}
-.bubble .who{font-size:10.5px;opacity:.72;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.bubble .body{display:flex;align-items:flex-start;gap:6px}
-.bubble .body span{flex:1;min-width:0}
-.bubble.me{background:var(--sel);color:var(--ink);margin-left:auto;border-bottom-right-radius:6px;border:1px solid var(--line)}
-.bubble.them{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;margin-right:auto;border-bottom-left-radius:6px}
-.bubble.them .speaker{background:rgba(255,255,255,.18);color:#fff;border-color:transparent}
-.bubble.them .who{opacity:.85}
-.mistake{background:var(--bg);border-left:4px solid var(--bad);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px}
-.mistake .wrong{color:var(--bad);text-decoration:line-through;font-weight:600}
-.mistake .right{color:var(--ok);font-weight:700}
-.scoreBadge{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:800;font-size:13px}
-.scoreBadge.good{background:#e6f8f0;color:#0a6b48}
-.scoreBadge.mid{background:#fff5e0;color:#8a5605}
-.scoreBadge.bad{background:#ffe8e4;color:#8a2a1e}
-[data-theme=dark] .scoreBadge.good{background:#0a3d2a;color:#3fd39a}
-[data-theme=dark] .scoreBadge.mid{background:#4a3510;color:#f0b43a}
-[data-theme=dark] .scoreBadge.bad{background:#4a1a12;color:#ff7f6e}
-.convoMicBig{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:64px;border-radius:18px;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-weight:800;font-size:16px;box-shadow:0 8px 24px rgba(200,16,46,.25);transition:transform .15s}
-.convoMicBig:active{transform:scale(.98)}
-.convoMicBig.rec{animation:recPulse 1.2s infinite;background:linear-gradient(135deg,#0f9b6c,#3fd39a)}
-.liveBox{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:14px;margin-top:10px;font-size:17px;min-height:70px;line-height:1.55}
-.liveBox .placeholder{color:var(--mut);font-style:italic}
-.liveBox .listening{color:var(--ok);font-weight:700}
-.unsupported{background:linear-gradient(135deg,#fff8e6,#ffe8cc);border:2px solid #f0b43a;border-radius:16px;padding:18px;margin:12px 0;text-align:center}
-.unsupported .icon{font-size:44px;margin-bottom:8px;line-height:1}
-.unsupported h3{margin:0 0 10px;font-size:16px;color:#8a5605}
-.unsupported p{margin:0 0 12px;font-size:14px;color:#6b4a1a;line-height:1.6}
-.unsupported b{color:#6b4a1a}
-[data-theme=dark] .unsupported{background:linear-gradient(135deg,#3a2a10,#4a3510);border-color:#8a6a20}
-[data-theme=dark] .unsupported h3{color:#f0b43a}
-[data-theme=dark] .unsupported p,[data-theme=dark] .unsupported b{color:#e0c090}
+footer{text-align:center; color:var(--mut); font-size:12.5px; margin:24px 0 8px; font-weight:500; padding:0 16px}
+footer b{color:var(--crimson); font-weight:800}
+a{color:var(--deep-blue-light)}
+#boot{border-radius:12px; padding:9px 14px; font-size:13px; margin:10px 16px; display:none; font-weight:600}
+#boot.err{display:block; background:#FEE; color:#900; border:1px solid #FBB}
+#boot.ok{display:block; background:#E6F8F0; color:#0A6B48; border:1px solid #A8E6CE}
+
+/* ========== MIC ========== */
+.micBig{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  width:100%; min-height:180px; border-radius:26px;
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-dark));
+  color:#fff; font-weight:800; font-size:15px;
+  box-shadow:0 12px 32px rgba(220,20,60,0.3);
+  margin-top:14px; animation:glow 3s ease-in-out infinite;
+  transition:transform .15s ease;
+}
+.micBig .micIcon{font-size:54px; line-height:1}
+.micBig.rec{
+  animation:recPulse 1.4s infinite;
+  background:linear-gradient(135deg,var(--green),#34D399);
+}
+@keyframes recPulse{
+  0%,100%{transform:scale(1); box-shadow:0 12px 32px rgba(16,185,129,0.35)}
+  50%{transform:scale(1.02); box-shadow:0 12px 44px rgba(16,185,129,0.55)}
+}
+.micLive{
+  margin-top:12px; padding:14px; background:var(--bg-2);
+  border:1.5px dashed var(--line); border-radius:14px;
+  font-size:15px; min-height:52px; line-height:1.5;
+}
+.micLive b{color:var(--crimson)}
+
+/* ========== CHAT BUBBLES ========== */
+.bubble{
+  max-width:86%; padding:11px 15px; border-radius:20px;
+  margin:8px 0; word-wrap:break-word; line-height:1.5;
+  display:flex; flex-direction:column; font-size:15px;
+  animation:rise .25s ease both;
+}
+.bubble .who{font-size:10px; opacity:.75; margin-bottom:4px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px}
+.bubble .body{display:flex; align-items:flex-start; gap:7px}
+.bubble .body span{flex:1; min-width:0}
+.bubble.me{
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-light));
+  color:#fff; margin-left:auto; border-bottom-right-radius:6px;
+  box-shadow:0 4px 12px rgba(220,20,60,0.25);
+}
+.bubble.them{
+  background:linear-gradient(135deg,var(--deep-blue-light),#5B87E0);
+  color:#fff; margin-right:auto; border-bottom-left-radius:6px;
+  box-shadow:0 4px 12px rgba(52,101,196,0.25);
+}
+.bubble .speaker{background:rgba(255,255,255,0.2); color:#fff; border-color:transparent}
+
+/* ========== FIX ========== */
+.mistake{
+  background:var(--bg-2); border-left:4px solid var(--crimson);
+  border-radius:12px; padding:11px 14px; margin:8px 0; font-size:14px;
+}
+.mistake .wrong{color:var(--crimson); text-decoration:line-through; font-weight:700; opacity:.7}
+.mistake .right{color:var(--green-dark); font-weight:700}
+.scoreBadge{display:inline-flex; align-items:center; padding:4px 14px; border-radius:999px; font-weight:800; font-size:13px}
+.scoreBadge.good{background:rgba(16,185,129,0.15); color:var(--green-dark)}
+.scoreBadge.mid{background:rgba(255,153,51,0.18); color:#8A5605}
+.scoreBadge.bad{background:rgba(220,20,60,0.13); color:var(--crimson-dark)}
+[data-theme=dark] .scoreBadge.good{color:#6EE3B7}
+[data-theme=dark] .scoreBadge.mid{color:#FFB84D}
+[data-theme=dark] .scoreBadge.bad{color:var(--crimson-light)}
+
+/* ========== CONVO MIC ========== */
+.convoMicBig{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; min-height:60px; border-radius:16px;
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-light));
+  color:#fff; font-weight:800; font-size:16px;
+  box-shadow:0 8px 22px rgba(220,20,60,0.3);
+  transition:transform .15s ease;
+}
+.convoMicBig.rec{background:linear-gradient(135deg,var(--green),#34D399); animation:recPulse 1.4s infinite}
+
+/* ========== LIVE BOX ========== */
+.liveBox{
+  background:var(--bg-2); border:2px dashed var(--line); border-radius:14px;
+  padding:14px; margin-top:12px; font-size:16px; min-height:76px; line-height:1.5;
+  transition:border-color .2s ease;
+}
+.liveBox .placeholder{color:var(--mut); font-style:italic}
+.liveBox .listening{color:var(--green); font-weight:700}
+
+/* ========== UNSUPPORTED ========== */
+.unsupported{
+  background:linear-gradient(135deg,#FFF8E7,#FFE8CC);
+  border:2px solid var(--saffron-light); border-radius:18px;
+  padding:20px; margin:14px 0; text-align:center;
+}
+.unsupported .icon{font-size:48px; margin-bottom:10px; line-height:1}
+.unsupported h3{margin:0 0 10px; font-size:17px; color:#8A5605; font-weight:800}
+.unsupported p{margin:0 0 12px; font-size:14px; color:#6B4A1A; line-height:1.55}
+.unsupported b{color:#6B4A1A}
+[data-theme=dark] .unsupported{background:linear-gradient(135deg,#3A2A10,#4A3510); border-color:#8A6A20}
+[data-theme=dark] .unsupported h3{color:var(--saffron)}
+[data-theme=dark] .unsupported p,[data-theme=dark] .unsupported b{color:#E0C090}
+
+/* ========== PAGE TITLE ========== */
+.page-title{
+  font-size:26px; font-weight:800; letter-spacing:-0.6px;
+  padding:22px 4px 4px; margin:0; color:var(--ink);
+}
+.page-title::after{
+  content:""; display:block; width:36px; height:3px; border-radius:2px;
+  background:linear-gradient(90deg,var(--crimson),var(--saffron));
+  margin-top:10px;
+}
+.page-sub{font-size:14px; color:var(--mut); font-weight:500; padding:6px 4px 12px}
 </style>
 </head>
 <body>
 
 <div id="boot"></div>
 
-<header class="top">
-  <div class="brand" id="brand">
-    <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#c8102e"/><path d="M0 64 24 22l10 14 8-10 22 38z" fill="#1b4f9c"/><path d="M24 22l-6 9 6-3 4 5 6-3z" fill="#fff"/><text x="32" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="800" fill="#e8a317">A</text></svg>
-    <div><b>English Sikau</b><span data-norz>अभ्यास · Abhyash</span></div>
+<header class="app-header">
+  <div class="app-header-top">
+    <div class="app-brand" id="brand">
+      <svg viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD873"/><stop offset="1" stop-color="#FF9933"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#lg)"/><path d="M0 64 24 22l10 14 8-10 22 38z" fill="#A50E2D" opacity=".85"/><text x="32" y="58" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="16" font-weight="800" fill="#fff">A</text></svg>
+      <div><b>English Sikau</b><span data-norz>अभ्यास · Abhyash</span></div>
+    </div>
+    <div class="header-btns">
+      <button class="hdr-btn" id="gender" type="button">👩</button>
+      <button class="hdr-btn" id="th" type="button">🌙</button>
+    </div>
   </div>
-  <div class="head-btns">
-    <button class="icon" id="gender" type="button">👩</button>
-    <button class="icon" id="th" type="button">🌙</button>
+
+  <div class="greeting">
+    <div class="namaste"><span class="flag">🇳🇵</span>नमस्ते!</div>
+    <div class="sub" id="greetSub">आज पनि अंग्रेजी सिकौं</div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-top">
+      <div><div class="rank" id="rank">—</div><div class="alt"><b id="alt">0</b> m · Everest 8,849 m</div></div>
+      <div class="streak"><b id="st">0</b><span>🔥 streak</span></div>
+    </div>
+    <div class="peak"><i id="fill"></i><b id="climber">🧗</b></div>
+    <div class="hero-foot"><span id="goalTxt">आज: 0/20 XP</span><span id="levelTxt">Level 2</span></div>
   </div>
 </header>
 
-<div class="card hero">
-  <div class="hero-top">
-    <div><div class="rank" id="rank">—</div><div class="alt"><b id="alt">0</b> m · Everest 8,849 m</div></div>
-    <div class="streak"><b id="st">0</b><span>🔥 streak</span></div>
-  </div>
-  <div class="peak"><i id="fill"></i><b id="climber">🧗</b></div>
-  <div class="hero-foot"><span id="goalTxt">आज: 0/20 XP</span><span id="levelTxt">Level 2</span></div>
-</div>
-
 <section id="tr">
-  <div class="card tight" id="tipCard"></div>
-  <div class="card">
-    <div class="seg" id="dirSel">
-      <button type="button" data-d="ne" class="on">🇳🇵 नेपाली → English</button>
-      <button type="button" data-d="en">English → 🇳🇵 नेपाली</button>
+  <div class="content">
+    <div id="festivalBox"></div>
+
+    <div class="card color-crimson">
+      <div class="seg" id="dirSel">
+        <button type="button" data-d="ne" class="on">🇳🇵 → English</button>
+        <button type="button" data-d="en">English → 🇳🇵</button>
+      </div>
+      <textarea id="inp" placeholder="नेपाली वा Roman Nepali मा लेख्नुहोस्…&#10;जस्तै: k gardai ho / tapai ko nam k ho"></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary grow" id="bt" type="button">✨ Translate</button>
+        <button class="btn ghost" id="ex" type="button">🎲</button>
+        <button class="btn ghost" id="clr" type="button">✕</button>
+      </div>
+      <div class="chips" id="quick"></div>
     </div>
-    <textarea id="inp" placeholder="नेपाली वा Roman Nepali मा लेख्नुहोस्…&#10;जस्तै: k gardai ho / tapai ko nam k ho"></textarea>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary grow" id="bt" type="button">✨ अनुवाद गर्नुहोस्</button>
-      <button class="btn ghost" id="ex" type="button">🎲</button>
-      <button class="btn ghost" id="clr" type="button">✕</button>
-    </div>
-    <div class="chips" id="quick"></div>
+
+    <div class="card tight color-saffron" id="tipCard"></div>
+    <div id="out"></div>
   </div>
-  <div id="out"></div>
 </section>
 
 <section id="words" hidden>
-  <div class="card tight">
-    <h2>📚 मेरो शब्दकोश <span class="pill" id="wc">0 शब्द</span></h2>
-    <div id="wordBox" style="margin-top:10px"></div>
-  </div>
-  <div class="card">
-    <div class="row between">
-      <h2 style="margin:0">🧺 वाक्यांश · Phrasebook</h2>
-      <button class="btn ghost sm" id="pbDice" type="button">🎲</button>
+  <div class="content">
+    <h1 class="page-title">Dictionary</h1>
+    <div class="page-sub">तपाईंको शब्दकोश</div>
+
+    <div class="card tight color-green">
+      <h2>📚 मेरो शब्दकोश <span class="pill" id="wc">0</span></h2>
+      <div id="wordBox" style="padding:12px 16px 16px"></div>
     </div>
-    <div class="chips" id="pbCat"></div>
-    <div id="pbList" style="margin-top:12px"></div>
+
+    <div class="card tight color-saffron">
+      <div style="padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line)">
+        <h2 style="padding:0; margin:0; border:0">🧺 Phrasebook</h2>
+        <button class="btn ghost sm" id="pbDice" type="button">🎲</button>
+      </div>
+      <div style="padding:12px 16px 0"><div class="chips" id="pbCat"></div></div>
+      <div id="pbList" style="padding:12px 12px 12px"></div>
+    </div>
   </div>
 </section>
 
 <section id="hw" hidden>
-  <div class="card">
-    <h2>📝 अभ्यास</h2>
-    <div class="chips" id="tp"></div>
-    <button class="btn primary" id="mk" type="button" style="width:100%;margin-top:12px">📝 Homework बनाउनुहोस्</button>
+  <div class="content">
+    <h1 class="page-title">Practice</h1>
+    <div class="page-sub">अभ्यास गर्नुहोस्</div>
+
+    <div class="card color-blue">
+      <div class="chips" id="tp"></div>
+      <button class="btn primary" id="mk" type="button" style="width:100%; margin-top:14px">📝 Homework बनाउनुहोस्</button>
+    </div>
+    <div id="hwo"></div>
   </div>
-  <div id="hwo"></div>
 </section>
 
 <section id="rd" hidden>
-  <div class="card tight">
-    <h2>📖 Reading <span class="tag" id="rlv">Level 1</span></h2>
-    <div class="chips" id="rdCat"></div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary grow" id="nr" type="button">📖 नयाँ reading</button>
-      <button class="btn ghost" id="rdDice" type="button">🎲</button>
-      <button class="btn ghost" id="bEz" type="button">⬇️</button>
-      <button class="btn ghost" id="bHd" type="button">⬆️</button>
+  <div class="content">
+    <h1 class="page-title">Reading</h1>
+    <div class="page-sub">पढ्नुहोस् · Practice</div>
+
+    <div class="card tight color-green">
+      <div style="padding:14px 16px 10px; display:flex; align-items:center; gap:8px">
+        <h2 style="padding:0; margin:0; border:0">📖 Reading</h2>
+        <span class="tag">Level <span id="rlv">1</span></span>
+      </div>
+      <div style="padding:0 16px 12px"><div class="chips" id="rdCat"></div></div>
+      <div style="padding:0 16px 16px" class="row">
+        <button class="btn primary grow" id="nr" type="button">📖 नयाँ reading</button>
+        <button class="btn ghost" id="rdDice" type="button">🎲</button>
+        <button class="btn ghost" id="bEz" type="button">⬇️</button>
+        <button class="btn ghost" id="bHd" type="button">⬆️</button>
+      </div>
     </div>
+    <div id="rbox"></div>
   </div>
-  <div id="rbox"></div>
 </section>
 
 <section id="sp" hidden>
-  <div class="card tight">
-    <div class="seg" id="spMode">
-      <button type="button" data-m="auto" class="on">🎙️ Auto</button>
-      <button type="button" data-m="en2fix">✏️ Fix</button>
-      <button type="button" data-m="convo">💬 Chat</button>
-    </div>
+  <div class="content">
+    <h1 class="page-title">Speak</h1>
+    <div class="page-sub">बोल्नुहोस् · Voice translate</div>
 
-    <div id="spSingle">
-      <div class="seg" id="speakDirSeg" style="margin-bottom:10px">
-        <button type="button" data-sd="en2ne" class="on">🇬🇧 English बोल्नुहोस्</button>
-        <button type="button" data-sd="ne2en">🇳🇵 नेपाली बोल्नुहोस्</button>
+    <div class="card color-crimson">
+      <div class="seg" id="spMode">
+        <button type="button" data-m="auto" class="on">🎙️ Auto</button>
+        <button type="button" data-m="en2fix">✏️ Fix</button>
+        <button type="button" data-m="convo">💬 Chat</button>
       </div>
-      <button type="button" class="micBig" id="micBig">
-        <span class="micIcon">🎙️</span>
-        <span class="micLabel" id="micLabel">English बोल्नुहोस् (tap to start)</span>
-      </button>
-      <div class="src" style="margin-top:10px;text-align:center;font-size:12.5px">
-        🎤 Tap → बोल्नुहोस् → auto translate + auto speak · फेरि tap गरे रोकिन्छ
-      </div>
-    </div>
 
-    <div id="spConvo" hidden>
-      <div class="row between" style="margin:4px 0 8px">
-        <span><b>💬 Chat</b></span>
-        <span class="pill" id="convoDirLbl">🇬🇧 → 🇳🇵</span>
+      <div id="spSingle">
+        <div class="seg" id="speakDirSeg">
+          <button type="button" data-sd="en2ne" class="on">🇬🇧 English</button>
+          <button type="button" data-sd="ne2en">🇳🇵 नेपाली</button>
+        </div>
+        <button type="button" class="micBig" id="micBig">
+          <span class="micIcon">🎙️</span>
+          <span class="micLabel" id="micLabel">English बोल्नुहोस् (tap to start)</span>
+        </button>
+        <div class="src" style="margin-top:12px; text-align:center; font-size:12px">
+          Tap गरेपछि बोल्नुहोस् · auto translate · फेरि tap गरे रोकिन्छ
+        </div>
       </div>
-      <div class="seg" id="convoDirSeg" style="margin-bottom:10px">
-        <button type="button" data-cd="en2ne" class="on">🇬🇧→🇳🇵</button>
-        <button type="button" data-cd="ne2en">🇳🇵→🇬🇧</button>
-      </div>
-      <div class="row" style="margin-bottom:10px">
-        <button type="button" class="btn ghost sm" id="convoClear">🗑 Clear</button>
-      </div>
-      <div id="convoChat"></div>
-      <div style="margin-top:12px">
-        <button type="button" class="convoMicBig" id="convoMic">🎙️ Speak English</button>
+
+      <div id="spConvo" hidden>
+        <div class="row between" style="margin:4px 0 10px">
+          <span style="font-weight:800; font-size:15px; letter-spacing:-0.3px">💬 Chat</span>
+          <span class="pill" id="convoDirLbl">🇬🇧 → 🇳🇵</span>
+        </div>
+        <div class="seg" id="convoDirSeg">
+          <button type="button" data-cd="en2ne" class="on">🇬🇧 → 🇳🇵</button>
+          <button type="button" data-cd="ne2en">🇳🇵 → 🇬🇧</button>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <button type="button" class="btn ghost sm" id="convoClear">🗑 Clear</button>
+        </div>
+        <div id="convoChat"></div>
+        <div style="margin-top:14px">
+          <button type="button" class="convoMicBig" id="convoMic">🎙️ Speak English</button>
+        </div>
       </div>
     </div>
+    <div id="spOut"></div>
   </div>
-  <div id="spOut"></div>
 </section>
 
-<section id="pg" hidden><div id="pgo"></div></section>
+<section id="pg" hidden>
+  <div class="content">
+    <h1 class="page-title">Progress</h1>
+    <div class="page-sub">तपाईंको प्रगति</div>
+    <div id="pgo"></div>
+  </div>
+</section>
 
 <footer>Made with ❤️ in Nepal by <b>Abhyash</b></footer>
 
 <nav class="nav">
-  <button type="button" data-t="tr" class="on"><i>🔤</i>अनुवाद</button>
-  <button type="button" data-t="words"><i>📚</i>शब्द</button>
-  <button type="button" data-t="hw"><i>📝</i>अभ्यास</button>
-  <button type="button" data-t="rd"><i>📖</i>पढाइ</button>
-  <button type="button" data-t="sp"><i>🎤</i>बोल</button>
-  <button type="button" data-t="pg"><i>📊</i>प्रगति</button>
+  <button type="button" data-t="tr" class="on"><i>🔤</i>Translate</button>
+  <button type="button" data-t="words"><i>📚</i>Words</button>
+  <button type="button" data-t="hw"><i>📝</i>Practice</button>
+  <button type="button" data-t="rd"><i>📖</i>Read</button>
+  <button type="button" data-t="sp"><i>🎙️</i>Speak</button>
+  <button type="button" data-t="pg"><i>📊</i>Progress</button>
 </nav>
 
 <div class="sheet" id="sheet" hidden><div class="sheet-in" id="sheetIn"></div></div>
@@ -306,6 +681,33 @@ function addXp(n){touchDay();var d=S.d;if(d.day!==today()){d.day=today();d.xpTod
 var bump=function(o,k){if(!k)return;k=String(k).toLowerCase().slice(0,40);o[k]=(o[k]||0)+1;save()};
 function track(text){if(!text)return;try{String(text).toLowerCase().replace(/[^a-z\u0900-\u097F\s]/g,' ').split(/\s+/).filter(function(w){return w.length>2}).forEach(function(w){bump(S.d.asked,w)})}catch(e){}}
 
+/* ============ FESTIVAL DATA ============ */
+/* Data source: Nepal Government Public Holidays 2083 BS (2026-2027 AD) */
+var FESTIVALS=[
+  {n:'दशैं',en:'Dashain',d:'Oct 11–21, 2026',i:'🌾',c:'f1'},
+  {n:'तिहार',en:'Tihar',d:'Nov 6–11, 2026',i:'🪔',c:'f2'},
+  {n:'छठ',en:'Chhath',d:'Nov 15, 2026',i:'🌅',c:'f3'},
+  {n:'माघे संक्रान्ति',en:'Maghe Sankranti',d:'Jan 15, 2027',i:'🔥',c:'f4'},
+  {n:'सोनाम ल्होसार',en:'Sonam Lhosar',d:'Feb 7, 2027',i:'🏔️',c:'f5'},
+  {n:'महा शिवरात्रि',en:'Maha Shivaratri',d:'Mar 6, 2027',i:'🕉️',c:'f6'}
+];
+
+function renderFestivals(){
+  var box=$('#festivalBox');if(!box)return;
+  box.innerHTML='<div class="festival-card rise">'+
+    '<div class="festival-header">🎉 आउँदो नेपाली चाडपर्व · Upcoming Festivals</div>'+
+    FESTIVALS.map(function(f){
+      return '<div class="festival-item">'+
+        '<div class="festival-icon '+f.c+'">'+f.i+'</div>'+
+        '<div class="festival-info"><div class="name">'+esc(f.n)+'<small>'+esc(f.en)+'</small></div></div>'+
+        '<div class="festival-date">'+esc(f.d)+'</div>'+
+      '</div>';
+    }).join('')+
+    '<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--mut);font-weight:500">📅 स्रोत: वि.सं. २०८३ सार्वजनिक विदा</div>'+
+  '</div>';
+}
+
+/* ============ SPEECH ============ */
 var Speech={
   voices:[],
   gender:(function(){try{return localStorage.getItem('sikau_gender')||'female'}catch(e){return 'female'}})(),
@@ -558,35 +960,23 @@ function best(text,sl,tl){
   });
 }
 
-/* ===== New helper: translate Nepali→English with online-first + offline fallback ===== */
 async function translateNeToEn(neText){
-  /* Returns {text, src} */
   var dev = neText;
   var offlineHit = null;
-
   if(!DEV.test(neText)){
-    /* Roman Nepali — try to convert to Devanagari for online engines */
     var off = romanOffline(neText);
     if(off.english) offlineHit = off.english;
     try{ dev = await translit(off.normalized); }
     catch(e){ dev = off.normalized; }
   }
-
-  /* 1st choice: online */
   try{
     var r = await best(dev, 'ne', 'en');
     if(r && r.text && r.text.trim()) return { text: r.text, src: r.src || 'online' };
-  }catch(e){ /* fall through to offline */ }
-
-  /* 2nd choice: MINI_NE_EN dictionary (only exact matches) */
+  }catch(e){ }
   if(MINI_NE_EN[String(dev).trim()]){
     return { text: MINI_NE_EN[String(dev).trim()], src: 'mini' };
   }
-
-  /* 3rd choice: offline Roman phrasebook (if we had one) */
   if(offlineHit) return { text: offlineHit, src: 'offline' };
-
-  /* Nothing worked */
   throw new Error('no-translation');
 }
 
@@ -615,6 +1005,14 @@ function head(){
   e=$('#st');if(e)e.textContent=d.streak||0;
   e=$('#goalTxt');if(e)e.textContent='आज: '+Math.min(20,d.xpToday||0)+'/20 XP';
   e=$('#levelTxt');if(e)e.textContent='Level '+d.L;
+  // Greeting by time of day
+  var hr=new Date().getHours();
+  var g=$('#greetSub');
+  if(g){
+    if(hr<12) g.textContent='शुभ प्रभात! अंग्रेजी सिकौं 🌅';
+    else if(hr<17) g.textContent='शुभ दिन! अंग्रेजी सिकौं ☀️';
+    else g.textContent='शुभ साँझ! अंग्रेजी सिकौं 🌆';
+  }
 }
 
 function go(t){
@@ -631,7 +1029,7 @@ $$('.nav button').forEach(function(b){b.addEventListener('click',function(){go(b
 function openSheet(html){var s=$('#sheetIn');if(s)s.innerHTML=html;var sh=$('#sheet');if(sh)sh.hidden=false}
 function closeSheet(){var sh=$('#sheet');if(sh)sh.hidden=true}
 var sheetEl=$('#sheet');if(sheetEl)sheetEl.addEventListener('click',function(e){if(e.target.id==='sheet')closeSheet()});
-function toast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;left:50%;bottom:118px;transform:translateX(-50%);background:#241812;color:#fdf7f1;padding:11px 20px;border-radius:14px;font-size:14px;font-weight:650;z-index:99;pointer-events:none;max-width:90%;text-align:center';document.body.appendChild(t);setTimeout(function(){t.remove()},1800)}
+function toast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#1A0F0A;color:#FFF8F0;padding:12px 22px;border-radius:16px;font-size:14px;font-weight:700;z-index:99;pointer-events:none;max-width:88%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:rise .25s ease both';document.body.appendChild(t);setTimeout(function(){t.remove()},1800)}
 
 function paintGender(){var g=Speech.gender;var e=$('#gender');if(e){e.textContent=g==='male'?'👨':'👩';e.classList.toggle('on',g==='male')}}
 paintGender();
@@ -741,10 +1139,10 @@ if(btBtn)btBtn.addEventListener('click',function(){
       }
       S.d.tr++;addXp(2);
     }catch(e){
-      $('#out').innerHTML='<div class="card bad">😕 अनुवाद हुन सकेन।<br><span style="color:var(--mut);font-size:13.5px">'+esc(e.message||'')+'</span><div class="row" style="margin-top:10px"><button type="button" class="btn ghost sm" id="retryBtn">🔁 फेरि</button></div></div>';
+      $('#out').innerHTML='<div class="card bad">😕 अनुवाद हुन सकेन।<br><span style="color:var(--mut);font-size:13.5px">'+esc(e.message||'')+'</span><div class="row" style="margin-top:12px"><button type="button" class="btn ghost sm" id="retryBtn">🔁 फेरि</button></div></div>';
       var rb=$('#retryBtn');if(rb)rb.addEventListener('click',function(){btBtn.click()},false);
     }
-    btBtn.disabled=false;btBtn.textContent='✨ अनुवाद गर्नुहोस्';
+    btBtn.disabled=false;btBtn.textContent='✨ Translate';
   })();
 },false);
 
@@ -756,27 +1154,22 @@ function renderOut(o){
   var neText=isNe?small:big;
   var enText=isNe?big:small;
   var srcTag = '';
-  if(o.srcUsed==='online' || o.srcUsed==='ai'){
-    srcTag = '<span class="tag green">🌐 online</span>';
-  } else if(o.srcUsed==='mini'){
-    srcTag = '<span class="tag">📖 offline</span>';
-  } else if(o.srcUsed==='offline'){
-    srcTag = '<span class="tag">📖 offline</span>';
-  }
-  $('#out').innerHTML='<div class="card rise" id="'+id+'">'+
+  if(o.srcUsed==='online' || o.srcUsed==='ai'){ srcTag = '<span class="tag green">🌐 online</span>'; }
+  else if(o.srcUsed==='mini' || o.srcUsed==='offline'){ srcTag = '<span class="tag">📖 offline</span>'; }
+  $('#out').innerHTML='<div class="card rise color-crimson" id="'+id+'">'+
     (isNe&&o.roman?'<div class="src">Normalized → <b>'+esc(o.normalized)+'</b> '+srcTag+'</div>':'')+
     (isNe&&!o.roman?'<div class="src">नेपाली → English '+srcTag+'</div>':'')+
     (!isNe?'<div class="src">English → नेपाली '+srcTag+'</div>':'')+
     '<div class="ne"><span style="flex:1;min-width:0">'+wordsHTML(small,'')+'</span><button type="button" class="speaker '+(smallLang==='ne'?'np':'')+'" data-say="'+smallLang+'">🔊</button></div>'+
-    '<div class="en" style="margin-top:8px;display:flex;align-items:flex-start;gap:8px"><span style="flex:1;min-width:0">'+wordsHTML(big,'big')+'</span><button type="button" class="speaker" data-say="'+bigLang+'" style="margin-top:3px">🔊</button></div>'+
+    '<div class="en" style="margin-top:10px;display:flex;align-items:flex-start;gap:8px"><span style="flex:1;min-width:0">'+wordsHTML(big,'big')+'</span><button type="button" class="speaker" data-say="'+bigLang+'" style="margin-top:3px">🔊</button></div>'+
     '<div class="pron">🔈 कुनै शब्द थिचे अर्थ आउँछ</div>'+
-    '<div class="row" style="margin-top:12px">'+
+    '<div class="row" style="margin-top:14px">'+
       '<button type="button" class="btn primary sm" data-a="s1">🔊 English</button>'+
       '<button type="button" class="btn ghost sm" data-a="s2">🐢 ढिलो</button>'+
       '<button type="button" class="btn ghost sm" data-a="sn">🇳🇵 नेपाली</button>'+
-      '<button type="button" class="btn ghost sm" data-a="sv">⭐ शब्दकोश</button>'+
+      '<button type="button" class="btn ghost sm" data-a="sv">⭐ Save</button>'+
     '</div>'+
-    '<div id="'+id+'m" style="margin-top:8px;font-size:13.5px;color:var(--mut)"></div>'+
+    '<div id="'+id+'m" style="margin-top:10px;font-size:13px;color:var(--mut)"></div>'+
   '</div>';
   var box=document.getElementById(id);
   $$('.speaker',box).forEach(function(sp){sp.addEventListener('click',function(){var lang=sp.getAttribute('data-say');speak(lang==='en'?enText:neText,lang==='ne'?.88:.92,lang,sp)},false)});
@@ -790,7 +1183,7 @@ function renderOut(o){
   },false);
   $$('.wd',box).forEach(function(sp){sp.addEventListener('click',async function(){
     var w=sp.textContent.replace(/[^A-Za-z\u0900-\u097F']/g,'');if(!w)return;
-    openSheet('<div style="text-align:center"><div class="en">'+esc(w)+' <button type="button" class="speaker" id="shEnSay">🔊</button></div><div style="color:var(--mut);margin:12px 0" id="shMean">⏳ खोज्दै…</div></div><div class="row" style="justify-content:center"><button type="button" class="btn primary sm" id="shSave">⭐ शब्दकोशमा थप्नुहोस्</button></div>');
+    openSheet('<div style="text-align:center"><div class="en">'+esc(w)+' <button type="button" class="speaker" id="shEnSay">🔊</button></div><div style="color:var(--mut);margin:14px 0" id="shMean">⏳ खोज्दै…</div></div><div class="row" style="justify-content:center"><button type="button" class="btn primary sm" id="shSave">⭐ Save to Dictionary</button></div>');
     var se=$('#shEnSay');if(se)se.addEventListener('click',function(){speak(w,.85,'en')},false);
     try{
       var r=await best(w,'en','ne');
@@ -801,7 +1194,7 @@ function renderOut(o){
   },false)});
 }
 function saveSheet(en,ne){
-  openSheet('<div style="text-align:center"><div class="en">'+esc(en)+' <button type="button" class="speaker" id="shEnSay">🔊</button></div><div style="text-align:center;color:var(--mut);margin:12px 0;font-size:16px">'+esc(ne)+' <button type="button" class="speaker np" id="shNeSay">🔊</button></div><div class="row" style="justify-content:center"><button type="button" class="btn primary sm" id="shSave">⭐ शब्दकोशमा थप्नुहोस्</button></div>');
+  openSheet('<div style="text-align:center"><div class="en">'+esc(en)+' <button type="button" class="speaker" id="shEnSay">🔊</button></div><div style="text-align:center;color:var(--mut);margin:14px 0;font-size:16px">'+esc(ne)+' <button type="button" class="speaker np" id="shNeSay">🔊</button></div><div class="row" style="justify-content:center"><button type="button" class="btn primary sm" id="shSave">⭐ Save to Dictionary</button></div>');
   var se=$('#shEnSay');if(se)se.addEventListener('click',function(){speak(en,.85,'en')},false);
   var sn=$('#shNeSay');if(sn)sn.addEventListener('click',function(){speak(ne,.85,'ne')},false);
   var sv=$('#shSave');if(sv)sv.addEventListener('click',function(){addWord(en,ne);closeSheet();toast('⭐ थपियो!')},false);
@@ -812,11 +1205,11 @@ var NM=function(t){return String(t).toLowerCase().replace(/[’']/g,'').replace(
 function addWord(en,ne){var d=S.d,k=String(en).toLowerCase().trim();if(!k)return;d.words[k]={ne:ne||'—',box:0,t:Date.now()};save();if(!$('#words').hidden)renderWords()}
 function renderWords(){
   var w=S.d.words,keys=Object.keys(w);
-  $('#wc').textContent=keys.length+' शब्द';
-  $('#wordBox').innerHTML=keys.length?'<div class="chips">'+keys.slice(-80).map(function(k){return '<span class="w" data-w="'+esc(k)+'"><b>'+esc(k)+'</b></span>'}).join('')+'</div>':'<div style="color:var(--mut);text-align:center">अझै शब्द छैन। अनुवाद गर्दा ⭐ थिच्नुहोस्।</div>';
+  $('#wc').textContent=keys.length;
+  $('#wordBox').innerHTML=keys.length?'<div class="chips">'+keys.slice(-80).map(function(k){return '<span class="w" data-w="'+esc(k)+'"><b>'+esc(k)+'</b></span>'}).join('')+'</div>':'<div style="color:var(--mut);text-align:center;padding:20px 0;font-size:14px">अझै शब्द छैन। अनुवाद गर्दा ⭐ थिच्नुहोस्।</div>';
   $$('#wordBox .w').forEach(function(e){e.addEventListener('click',function(){
     var k=e.getAttribute('data-w'),v=w[k];
-    openSheet('<div style="text-align:center"><div class="en">'+esc(k)+' <button type="button" class="speaker" id="swEn">🔊</button></div><div style="margin:12px 0;font-size:16px">'+esc(v.ne)+' <button type="button" class="speaker np" id="swNe">🔊</button><span class="rm">'+esc(rom(v.ne))+'</span></div></div><div class="row" style="justify-content:center"><button type="button" class="btn ghost sm" id="sd">🗑 हटाउनुहोस्</button></div>');
+    openSheet('<div style="text-align:center"><div class="en">'+esc(k)+' <button type="button" class="speaker" id="swEn">🔊</button></div><div style="margin:14px 0;font-size:16px">'+esc(v.ne)+' <button type="button" class="speaker np" id="swNe">🔊</button><span class="rm">'+esc(rom(v.ne))+'</span></div></div><div class="row" style="justify-content:center"><button type="button" class="btn ghost sm" id="sd">🗑 हटाउनुहोस्</button></div>');
     var a=$('#swEn');if(a)a.addEventListener('click',function(){speak(k,.85,'en')},false);
     var b=$('#swNe');if(b)b.addEventListener('click',function(){speak(v.ne,.85,'ne')},false);
     var c=$('#sd');if(c)c.addEventListener('click',function(){delete S.d.words[k];save();closeSheet();renderWords()},false);
@@ -850,7 +1243,7 @@ if(pbDice)pbDice.addEventListener('click',function(){
 function drawPB(){
   var list=PBDATA[pbIdx].p;
   $('#pbList').innerHTML=list.map(function(p,i){
-    return '<div class="card tight" style="margin:8px 0"><div style="display:flex;gap:10px;align-items:flex-start"><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14.5px;display:flex;gap:6px;flex-wrap:wrap"><span>'+esc(p[0])+'</span><button type="button" class="speaker np" data-ns="'+i+'">🔊</button></div><div class="en" style="font-size:16.5px;margin-top:4px;display:flex;gap:6px;flex-wrap:wrap"><span>'+esc(p[1])+'</span><button type="button" class="speaker" data-es="'+i+'">🔊</button></div></div><button type="button" class="speaker" data-v="'+i+'">⭐</button></div></div>';
+    return '<div class="card tight" style="margin:8px 0;box-shadow:none;background:var(--bg-2);border:0"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>'+esc(p[0])+'</span><button type="button" class="speaker np" data-ns="'+i+'">🔊</button></div><div style="color:var(--deep-blue-light);font-weight:600;font-size:15px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>'+esc(p[1])+'</span><button type="button" class="speaker" data-es="'+i+'">🔊</button></div></div><button type="button" class="speaker" data-v="'+i+'">⭐</button></div></div>';
   }).join('');
   $$('#pbList [data-es]').forEach(function(b){b.addEventListener('click',function(){speak(list[+b.getAttribute('data-es')][1],.9,'en',b)},false)});
   $$('#pbList [data-ns]').forEach(function(b){b.addEventListener('click',function(){speak(list[+b.getAttribute('data-ns')][0],.85,'ne',b)},false)});
@@ -874,12 +1267,12 @@ var hw=null;
 var mkBtn=$('#mk');
 if(mkBtn)mkBtn.addEventListener('click',function(){
   var L=S.d.L,a=BANK[L-1].slice().sort(function(){return Math.random()-.5}).slice(0,5);
-  hw={title:'Level '+L+' अभ्यास 📚',items:a.map(function(p){return {q:p[0],acc:[p[1]],hint:'English मा लगभग '+p[1].split(' ').length+' शब्द'}})};
+  hw={title:'Level '+L+' Practice',items:a.map(function(p){return {q:p[0],acc:[p[1]],hint:'English मा लगभग '+p[1].split(' ').length+' शब्द'}})};
   drawHW();
 },false);
 function drawHW(){
-  $('#hwo').innerHTML='<div class="card tight"><h2>'+esc(hw.title)+' <span class="tag">Level '+S.d.L+'</span></h2></div>'+
-    hw.items.map(function(it,i){return '<div class="card rise" id="c'+i+'"><div style="color:var(--mut);font-size:12.5px">'+(i+1)+'. English मा लेख्नुहोस्</div><div style="font-size:18px;margin:8px 0;font-weight:600;display:flex;gap:6px;flex-wrap:wrap"><span>'+esc(it.q)+'</span><button type="button" class="speaker np" data-np="'+i+'">🔊</button></div><div style="color:var(--mut);font-size:13.5px">💭 '+esc(it.hint)+'</div><input class="ans" id="a'+i+'" placeholder="तपाईंको उत्तर…" style="margin-top:9px"></div>'}).join('')+
+  $('#hwo').innerHTML='<div class="card tight color-blue" style="padding:14px 16px"><div style="font-weight:800;font-size:15px;letter-spacing:-0.3px">'+esc(hw.title)+' <span class="tag blue">Level '+S.d.L+'</span></div></div>'+
+    hw.items.map(function(it,i){return '<div class="card rise" id="c'+i+'"><div style="color:var(--mut);font-size:12.5px;font-weight:700">'+(i+1)+'. English मा लेख्नुहोस्</div><div style="font-size:17px;margin:9px 0;font-weight:600;display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span>'+esc(it.q)+'</span><button type="button" class="speaker np" data-np="'+i+'">🔊</button></div><div style="color:var(--mut);font-size:13px">💭 '+esc(it.hint)+'</div><input class="ans" id="a'+i+'" placeholder="तपाईंको उत्तर…" style="margin-top:10px"></div>'}).join('')+
     '<button type="button" class="btn primary" id="ck" style="width:100%">✅ जाँच गर्नुहोस्</button><div id="res"></div>';
   $$('#hwo [data-np]').forEach(function(b){b.addEventListener('click',function(){speak(hw.items[+b.getAttribute('data-np')].q,.88,'ne',b)},false)});
   var ck=$('#ck');if(ck)ck.addEventListener('click',check,false);
@@ -903,14 +1296,14 @@ function check(){
     S.d.hwT++;if(x.ok)S.d.hwR++;
     (x.weak||[]).forEach(function(w){bump(S.d.missed,w)});
     c.classList.add(x.ok?'ok':'bad');
-    var extra=x.ok?'':' → <span class="en" style="font-size:17px">'+esc(x.correct)+'</span> <button type="button" class="speaker" data-anssay="'+i+'">🔊</button>';
-    c.insertAdjacentHTML('beforeend','<p style="margin:10px 0 0"><b>'+(x.ok?'✅ सही!':'❌ फेरि हेरौं')+'</b>'+extra+'<br><span style="color:var(--mut);font-size:13.5px">'+esc(x.feedback)+'</span></p>');
+    var extra=x.ok?'':' → <span style="color:var(--deep-blue-light);font-size:17px;font-weight:700">'+esc(x.correct)+'</span> <button type="button" class="speaker" data-anssay="'+i+'">🔊</button>';
+    c.insertAdjacentHTML('beforeend','<p style="margin:12px 0 0"><b>'+(x.ok?'✅ सही!':'❌ फेरि हेरौं')+'</b>'+extra+'<br><span style="color:var(--mut);font-size:13px">'+esc(x.feedback)+'</span></p>');
     $('#a'+i).disabled=true;
   });
   $$('#hwo [data-anssay]').forEach(function(b){b.addEventListener('click',function(){speak(res.items[+b.getAttribute('data-anssay')].correct,.88,'en',b)},false)});
   var gain=n*10;addXp(gain);if(n>=3)touchDay();
   $('#ck').hidden=true;
-  $('#res').innerHTML='<div class="card hero rise"><div style="font-size:30px;font-weight:800">'+n+'/'+hw.items.length+' '+(n===5?'🏆':n>=3?'🎉':'💪')+'</div><p>+'+gain+' XP · +'+(gain*10)+' मिटर 🧗</p><p>'+esc(res.overall)+'</p><button type="button" class="btn ghost sm" id="nextHw">अर्को →</button></div>';
+  $('#res').innerHTML='<div class="card rise" style="text-align:center;background:linear-gradient(135deg,var(--crimson),var(--deep-blue));color:#fff;border:0"><div style="font-size:34px;font-weight:800;letter-spacing:-0.6px">'+n+'/'+hw.items.length+' '+(n===5?'🏆':n>=3?'🎉':'💪')+'</div><p style="margin:10px 0 0;font-size:15px;opacity:.92">+'+gain+' XP · +'+(gain*10)+' मिटर 🧗</p><p style="margin:8px 0 0;font-size:14px;opacity:.88">'+esc(res.overall)+'</p><button type="button" class="btn sm" id="nextHw" style="margin-top:14px;background:rgba(255,255,255,.22);color:#fff;font-weight:700">अर्को →</button></div>';
   var nh=$('#nextHw');if(nh)nh.addEventListener('click',function(){mkBtn.click();toTop()},false);
 }
 
@@ -974,11 +1367,11 @@ function T_desc(l,p){
 }
 var TPLS={story:T_story,dialog:T_dialog,news:T_news,letter:T_letter,desc:T_desc};
 var CATS=[
-  {id:'story',icon:'📖',name:'कथा Story'},
-  {id:'dialog',icon:'💬',name:'संवाद Dialogue'},
-  {id:'news',icon:'📰',name:'समाचार News'},
-  {id:'letter',icon:'✉️',name:'चिठी Letter'},
-  {id:'desc',icon:'🌄',name:'वर्णन Description'}
+  {id:'story',icon:'📖',name:'कथा'},
+  {id:'dialog',icon:'💬',name:'संवाद'},
+  {id:'news',icon:'📰',name:'समाचार'},
+  {id:'letter',icon:'✉️',name:'चिठी'},
+  {id:'desc',icon:'🌄',name:'वर्णन'}
 ];
 var rCat='story';
 var R=null,rl=2;
@@ -999,24 +1392,24 @@ function paintCats(){
   },false)});
 }
 function loadRead(l,fresh){
-  $('#rbox').innerHTML='<div class="card spin">⏳ reading तयार हुँदैछ…</div>';
+  $('#rbox').innerHTML='<div class="card spin">⏳ Loading…</div>';
   try{
     var p={n:pk(NA)[0],g:pk(NA)[1],pl:pk(PL),f:pk(FD),j:pk(JB)};
     var fn=TPLS[rCat]||T_story;
     var x=fn(l,p);
     R={lv:l,p:p,cat:rCat,title:x.t,s:x.s.map(function(en){return {en:en}}),qa:x.qa};
     rl=l;
-    var rlv=$('#rlv');if(rlv)rlv.textContent='Level '+l;
+    var rlv=$('#rlv');if(rlv)rlv.textContent=l;
     drawRead();
     R.s.forEach(function(s,i){toNe(s.en).then(function(ne){s.ne=ne}).catch(function(){})});
   }catch(e){$('#rbox').innerHTML='<div class="card bad">Reading बन्न सकेन। फेरि थिच्नुहोस्।</div>'}
 }
 function drawRead(){
   var catInfo=CATS.filter(function(c){return c.id===R.cat})[0]||CATS[0];
-  $('#rbox').innerHTML='<div class="card" id="pas" data-norz><div class="row between" style="margin-bottom:10px"><span><span class="tag">Level '+R.lv+'</span> <span class="tag blue">'+catInfo.icon+' '+catInfo.name+'</span> <b>'+esc(R.title)+'</b></span><button type="button" class="speaker" id="readAll">🔊</button></div>'+
+  $('#rbox').innerHTML='<div class="card color-green" id="pas" data-norz><div class="row between" style="margin-bottom:12px;gap:8px"><span style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:700;font-size:15px">'+catInfo.icon+' '+esc(R.title)+'</span><button type="button" class="speaker" id="readAll">🔊</button></div>'+
     R.s.map(function(x,i){return '<div><div class="rs">'+x.en.split(' ').map(function(w){return '<span class="wd">'+esc(w)+'</span>'}).join(' ')+' <span class="ctrl"><button type="button" class="speaker" data-en="'+i+'">🔊</button><button type="button" class="speaker np" data-ne="'+i+'">🇳🇵</button></span></div><div class="nz" id="nz'+i+'" hidden></div></div>'}).join('')+
-    '<div id="wm" style="color:var(--mut);font-size:13.5px;margin-top:10px"></div></div>'+
-    '<div class="card tight"><button type="button" class="btn primary" id="udone" style="width:100%">✅ म बुझ्छु — परीक्षा दिन्छु</button></div><div id="qz"></div>';
+    '<div id="wm" style="color:var(--mut);font-size:13px;margin-top:12px"></div></div>'+
+    '<div class="card tight color-blue" style="padding:12px"><button type="button" class="btn primary" id="udone" style="width:100%">✅ म बुझ्छु — परीक्षा दिन्छु</button></div><div id="qz"></div>';
   var ra=$('#readAll');if(ra)ra.addEventListener('click',function(e){Speech.stop();speak(R.s.map(function(s){return s.en}).join(' '),.9,'en',e.currentTarget)},false);
   $$('#pas [data-en]').forEach(function(b){b.addEventListener('click',function(){speak(R.s[+b.getAttribute('data-en')].en,.88,'en',b)},false)});
   $$('#pas [data-ne]').forEach(function(b){b.addEventListener('click',async function(){
@@ -1044,9 +1437,9 @@ function drawRead(){
     }
   },false);
   var ud=$('#udone');if(ud)ud.addEventListener('click',function(){
-    $('#qz').innerHTML='<div class="card rise"><h2>❓ बुझ्यौ कि?</h2>'+
-      R.qa.map(function(q,i){return '<p style="margin:10px 0">'+esc(q[0])+' <button type="button" class="speaker" data-qq="'+i+'">🔊</button><input class="ans" id="q'+i+'" style="margin-top:6px"></p>'}).join('')+
-      '<p style="margin-top:14px"><b>✍️ आज के सिक्यौ?</b></p><textarea id="sm" placeholder="Today I learned that..."></textarea><button type="button" class="btn primary" id="qc" style="margin-top:10px;width:100%">जाँच गर्नुहोस्</button><div id="qr"></div></div>';
+    $('#qz').innerHTML='<div class="card rise color-blue"><h2 style="padding:0;margin-bottom:14px;border:0">❓ बुझ्यौ कि?</h2>'+
+      R.qa.map(function(q,i){return '<p style="margin:12px 0">'+esc(q[0])+' <button type="button" class="speaker" data-qq="'+i+'">🔊</button><input class="ans" id="q'+i+'" style="margin-top:8px"></p>'}).join('')+
+      '<p style="margin-top:16px;font-weight:800;letter-spacing:-0.2px">✍️ आज के सिक्यौ?</p><textarea id="sm" placeholder="Today I learned that..."></textarea><button type="button" class="btn primary" id="qc" style="margin-top:12px;width:100%">जाँच गर्नुहोस्</button><div id="qr"></div></div>';
     $$('#qz [data-qq]').forEach(function(b){b.addEventListener('click',function(){speak(R.qa[+b.getAttribute('data-qq')][0],.88,'en',b)},false)});
     var qc=$('#qc');if(qc)qc.addEventListener('click',checkRead,false);
     toEl($('#qz'));
@@ -1074,10 +1467,10 @@ function checkRead(){
   var fb='';
   if(sm){
     var f=[];if(!/^[A-Z]/.test(sm))f.push('Capital letter बाट सुरु गर्नुहोस्।');if(!/[.!?]$/.test(sm))f.push('Full stop लगाउनुहोस्।');if(/\bi\b/.test(sm))f.push('"I" सधैं capital।');
-    fb='<p style="margin-top:10px">✍️ <b>Feedback</b><br><span style="color:var(--mut)">'+(f.length?f.join(' '):'एकदम राम्रो! 🎉')+'</span></p>';
+    fb='<p style="margin-top:12px">✍️ <b>Feedback</b><br><span style="color:var(--mut)">'+(f.length?f.join(' '):'एकदम राम्रो! 🎉')+'</span></p>';
   }
   var g=n*10+(sm?5:0);addXp(g);S.d.rd++;save();
-  $('#qr').innerHTML=h+fb+'<p style="margin-top:10px"><b>+'+g+' XP 🎉</b> — <a style="cursor:pointer" id="nxr">अर्को reading →</a></p>';
+  $('#qr').innerHTML=h+fb+'<p style="margin-top:12px"><b>+'+g+' XP 🎉</b> — <a style="cursor:pointer;color:var(--crimson);font-weight:700" id="nxr">अर्को reading →</a></p>';
   var nx=$('#nxr');if(nx)nx.addEventListener('click',function(){loadRead(rl,true);toTop()},false);
 }
 paintCats();
@@ -1113,15 +1506,15 @@ function requestMicAccess(){
 
 function showMicPermissionSheet(){
   openSheet(
-    '<h2>🎤 Mic अनुमति चाहिन्छ</h2>' +
-    '<p style="color:var(--mut);font-size:14px;line-height:1.6">यो feature प्रयोग गर्न Microphone अनुमति दिनुहोस्।</p>' +
-    '<div style="background:var(--bg);border-radius:12px;padding:12px;margin:10px 0;font-size:13.5px;line-height:1.75">' +
+    '<h2 style="padding:0;margin:0 0 10px;border:0">🎤 Mic अनुमति चाहिन्छ</h2>' +
+    '<p style="color:var(--mut);font-size:14px;line-height:1.55">यो feature प्रयोग गर्न Microphone अनुमति दिनुहोस्।</p>' +
+    '<div style="background:var(--bg-2);border-radius:12px;padding:14px;margin:12px 0;font-size:14px;line-height:1.75">' +
       '<b>📱 Android Chrome:</b><br>' +
       '१. URL bar को बायाँ 🔒 icon थिच्नुहोस्<br>' +
       '२. <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b><br>' +
       '३. Page reload गर्नुहोस्' +
     '</div>' +
-    '<div class="row" style="margin-top:14px">' +
+    '<div class="row" style="margin-top:16px">' +
       '<button type="button" class="btn primary grow" id="micTryAgain">🔁 फेरि प्रयास</button>' +
       '<button type="button" class="btn ghost" id="micCancelBtn">रद्द</button>' +
     '</div>'
@@ -1217,8 +1610,8 @@ function setRecUI(on){
   if(lab){
     if(on){
       lab.textContent = speakDir === 'ne2en'
-        ? '🔴 सुन्दैछु… नेपाली बोल्नुहोस् (tap to stop)'
-        : '🔴 सुन्दैछु… English बोल्नुहोस् (tap to stop)';
+        ? '🔴 सुन्दैछु… नेपाली बोल्नुहोस्'
+        : '🔴 सुन्दैछु… English बोल्नुहोस्';
     } else setMicLabel();
   }
   var cb = $('#convoMic'); if(cb) cb.classList.toggle('rec', on);
@@ -1303,7 +1696,7 @@ function showKeyboardFallback(){
     +   '<div class="icon">⌨️🎤</div>'
     +   '<h3>Keyboard को 🎤 mic प्रयोग गर्नुहोस्</h3>'
     +   '<p><b>यो device को browser भित्र mic काम गर्दैन।</b> तर keyboard मा आफ्नै 🎤 mic button हुन्छ — त्यो प्रयोग गर्नुहोस्।</p>'
-    +   '<div style="text-align:left;background:var(--bg);border-radius:12px;padding:12px;margin:12px 0;font-size:13.5px;line-height:1.9">'
+    +   '<div style="text-align:left;background:#FFF8E7;border-radius:12px;padding:14px;margin:14px 0;font-size:13.5px;line-height:1.85;color:#6B4A1A">'
     +     '<b>कसरी:</b><br>'
     +     '१. तलको box मा tap गर्नुहोस् (keyboard खुल्छ)<br>'
     +     '२. Keyboard को तल्लो दायाँ <b>🎤</b> icon थिच्नुहोस्<br>'
@@ -1312,11 +1705,8 @@ function showKeyboardFallback(){
     +   '</div>'
     + '</div>'
     + '<div class="card">'
-    +   '<textarea id="spFallbackInput" placeholder="यहाँ tap गर्नुहोस्, त्यसपछि keyboard को 🎤 थिच्नुहोस्…" style="min-height:110px;font-size:16px"></textarea>'
-    +   '<button type="button" class="btn primary" id="spFallbackGo" style="width:100%;margin-top:10px">✨ Translate</button>'
-    +   '<div class="src" style="text-align:center;margin-top:8px;font-size:12px">'
-    +     '⌨️ Keyboard मा 🎤 नभए → Settings → General → Keyboard → Enable Dictation'
-    +   '</div>'
+    +   '<textarea id="spFallbackInput" placeholder="यहाँ tap गर्नुहोस्, त्यसपछि keyboard को 🎤 थिच्नुहोस्…" style="min-height:110px"></textarea>'
+    +   '<button type="button" class="btn primary" id="spFallbackGo" style="width:100%;margin-top:12px">✨ Translate</button>'
     + '</div>';
   var inp = document.getElementById('spFallbackInput');
   var go  = document.getElementById('spFallbackGo');
@@ -1331,7 +1721,6 @@ function showKeyboardFallback(){
   }, false);
 }
 
-/* ===== AUTO continuous flow — online-first for BOTH directions ===== */
 async function runSpeakTurn(){
   if(!CAN_SPEAK){ showKeyboardFallback(); return; }
   if(spMode === 'en2fix'){ return runFixTurn(); }
@@ -1344,12 +1733,12 @@ async function runSpeakTurn(){
   setRecUI(true);
   var out = $('#spOut');
   out.innerHTML =
-    '<div class="card rise" id="liveCard">'
-    + '<div class="src">🎙️ सुन्दैछु… ' + srcName + ' बोल्नुहोस् · auto → ' + tgtName + '</div>'
-    + '<div class="liveBox" id="liveTranscript"><span class="placeholder">🎤 Tap गरेपछि ' + srcName + ' बोल्न सुरु गर्नुहोस्…</span></div>'
-    + '<div class="row" style="margin-top:10px;justify-content:space-between">'
+    '<div class="card rise color-crimson" id="liveCard">'
+    + '<div class="src" style="font-weight:700">🎙️ सुन्दैछु… ' + srcName + ' → ' + tgtName + '</div>'
+    + '<div class="liveBox" id="liveTranscript"><span class="placeholder">Tap गरेपछि ' + srcName + ' बोल्न सुरु गर्नुहोस्…</span></div>'
+    + '<div class="row" style="margin-top:12px;justify-content:space-between">'
     + '<span class="pill" id="liveCount">0 sentences</span>'
-    + '<span class="src" style="margin:0">रोक्न: 🎙️ फेरि tap</span>'
+    + '<span style="color:var(--mut);font-size:12.5px">रोक्न: 🎙️ फेरि tap</span>'
     + '</div>'
     + '</div>'
     + '<div id="liveResults"></div>';
@@ -1370,7 +1759,7 @@ async function runSpeakTurn(){
         var cnt = document.getElementById('liveCount');
         if(cnt) cnt.textContent = sentenceCount + ' sentence' + (sentenceCount===1?'':'s');
         var el = document.getElementById('liveTranscript');
-        if(el) el.innerHTML = '<span style="color:var(--ok);font-weight:700">✓ ' + esc(text) + '</span>';
+        if(el) el.innerHTML = '<span style="color:var(--green);font-weight:700">✓ ' + esc(text) + '</span>';
 
         (async function(){
           var translated = null;
@@ -1378,18 +1767,15 @@ async function runSpeakTurn(){
 
           try{
             if(srcLang === 'ne'){
-              /* ONLINE-FIRST Nepali → English (offline only as fallback) */
               var r = await translateNeToEn(text);
               translated = r.text;
               usedSrc = r.src;
             } else {
-              /* English → Nepali (always online) */
               var r2 = await best(text, 'en', 'ne');
               translated = r2.text;
               usedSrc = r2.src || 'online';
             }
           }catch(e){
-            /* last-ditch fallback */
             if(srcLang === 'ne'){
               var off = romanOffline(text);
               translated = off.english || null;
@@ -1419,7 +1805,7 @@ async function runSpeakTurn(){
     else if(m.indexOf('no-device')>=0) toast('🎤 Mic भेटिएन');
     else if(m.indexOf('mic-busy')>=0) toast('🎤 Mic अरू app ले प्रयोग गर्दै छ');
     else if(m.indexOf('aborted')>=0 || m.indexOf('no-speech')>=0){}
-    else if(m.indexOf('language-not-supported')>=0) toast('यो भाषा device मा समर्थित छैन — English mode प्रयोग गर्नुहोस्');
+    else if(m.indexOf('language-not-supported')>=0) toast('यो भाषा device मा समर्थित छैन');
     else toast('🎤 '+(m||'error'));
   } finally {
     setRecUI(false);
@@ -1439,25 +1825,25 @@ function appendLiveResult(srcText, tgtText, srcLang, tgtLang, usedSrc){
   } else if(usedSrc === 'offline' || usedSrc === 'mini'){
     srcTag = ' <span class="tag">📖 offline</span>';
   } else if(usedSrc === 'fail'){
-    srcTag = ' <span class="tag" style="background:var(--bad);color:#fff">❌</span>';
+    srcTag = ' <span class="tag" style="background:var(--crimson);color:#fff">❌</span>';
   }
 
   var card = document.createElement('div');
-  card.className = 'card rise';
+  card.className = 'card rise color-blue';
   card.innerHTML =
-    '<div class="src">' + srcLabel + srcTag + '</div>'
+    '<div class="src" style="font-weight:700">' + srcLabel + srcTag + '</div>'
     + '<div class="ne" style="display:flex;gap:8px;align-items:flex-start">'
     + '<span style="flex:1;min-width:0">' + wordsHTML(srcText) + '</span>'
     + '<button type="button" class="speaker ' + (srcIsNe ? 'np' : '') + '" data-say-src>🔊</button></div>'
     + (srcIsNe ? '<div class="rm" style="margin-top:4px">' + esc(rom(srcText)) + '</div>' : '')
-    + '<hr style="border:0;border-top:1px dashed var(--line);margin:10px 0">'
-    + '<div class="src">' + tgtLabel + '</div>'
+    + '<hr style="border:0;border-top:1.5px dashed var(--line);margin:12px 0">'
+    + '<div class="src" style="font-weight:700">' + tgtLabel + '</div>'
     + '<div class="en" style="display:flex;gap:8px;align-items:flex-start">'
     + '<span style="flex:1;min-width:0">' + wordsHTML(tgtText) + '</span>'
-    + '<button type="button" class="speaker ' + (tgtIsNe ? 'np' : '') + '" data-say-tgt>🔊</button></div>'
+    + '<button type="button" class="speaker ' + (tgtIsNe ? 'np' : '') + '" data-say-tgt style="margin-top:3px">🔊</button></div>'
     + (tgtIsNe ? '<div class="rm" style="margin-top:4px">' + esc(rom(tgtText)) + '</div>' : '')
-    + '<div class="row" style="margin-top:10px">'
-    + '<button type="button" class="btn ghost sm" data-save>⭐ शब्दकोश</button>'
+    + '<div class="row" style="margin-top:12px">'
+    + '<button type="button" class="btn ghost sm" data-save>⭐ Save</button>'
     + '<button type="button" class="btn ghost sm" data-edit>✏️ Edit</button>'
     + '</div>';
   res.appendChild(card);
@@ -1512,7 +1898,7 @@ async function runFixTurn(){
     if(live) live.hidden = true;
     if(!text){ toast('केही सुनिएन · फेरि प्रयास'); return; }
     S.d.sp++; save();
-    $('#spOut').innerHTML = '<div class="card spin">✏️ तपाईंको English जाँच्दै…</div>';
+    $('#spOut').innerHTML = '<div class="card spin">✏️ Checking…</div>';
     var res = await analyzeEnglish(text);
     renderFixCard(text, res);
     try{ track(text); }catch(e){}
@@ -1533,20 +1919,19 @@ async function runFixTurn(){
   }
 }
 
-/* ===== CHAT — online-first for BOTH directions ===== */
 async function runConvoTurn(){
   if(!CAN_SPEAK){
     $('#convoChat').innerHTML = '<div class="unsupported">'
       + '<div class="icon">⌨️🎤</div>'
-      + '<h3>Keyboard को 🎤 mic प्रयोग गर्नुहोस्</h3>'
-      + '<p>यो device मा browser mic काम गर्दैन। कृपया <b>अनुवाद</b> tab खोलेर keyboard को 🎤 button प्रयोग गर्नुहोस्।</p>'
+      + '<h3>Keyboard 🎤 प्रयोग गर्नुहोस्</h3>'
+      + '<p>यो device मा browser mic काम गर्दैन। कृपया <b>Translate</b> tab खोलेर keyboard को 🎤 button प्रयोग गर्नुहोस्।</p>'
       + '</div>';
     return;
   }
   var srcLang = convoDir === 'ne2en' ? 'ne' : 'en';
   setRecUI(true);
   var cm = $('#convoMic');
-  if(cm) cm.textContent = srcLang === 'ne' ? '🔴 सुन्दै… (tap to stop)' : '🔴 Listening… (tap to stop)';
+  if(cm) cm.textContent = srcLang === 'ne' ? '🔴 सुन्दै…' : '🔴 Listening…';
   try{
     var text = await startRecAuto(srcLang, {});
     setRecUI(false);
@@ -1578,18 +1963,15 @@ async function processConvoTurn(text){
   var usedSrc = 'online';
   try{
     if(srcLang === 'ne'){
-      /* ONLINE-FIRST for Nepali → English */
       var r = await translateNeToEn(text);
       translated = r.text;
       usedSrc = r.src;
     } else {
-      /* English → Nepali always online */
       var r2 = await best(text, 'en', 'ne');
       translated = r2.text;
       usedSrc = r2.src || 'online';
     }
   }catch(e){
-    /* last-ditch offline fallback */
     if(srcLang === 'ne'){
       var off = romanOffline(text);
       translated = off.english || '—';
@@ -1610,7 +1992,7 @@ function drawConvo(){
   var chat = $('#convoChat');
   if(!chat) return;
   if(!convoHistory.length){
-    chat.innerHTML = '<div class="card" style="text-align:center;color:var(--mut);font-size:13.5px;padding:20px 14px">'
+    chat.innerHTML = '<div class="card" style="text-align:center;color:var(--mut);font-size:14px;padding:22px 14px;background:var(--bg-2);border:0;box-shadow:none">'
                    + '💬 कुराकानी सुरु गर्नुहोस्</div>';
     return;
   }
@@ -1620,13 +2002,13 @@ function drawConvo(){
     var who = m.lang === 'ne' ? '🇳🇵 नेपाली' : '🇬🇧 English';
     var tag = '';
     if(!isMe && m.src){
-      if(m.src === 'online' || m.src === 'ai') tag = ' <span class="tag green" style="font-size:9px;padding:1px 6px">online</span>';
-      else if(m.src === 'offline' || m.src === 'mini') tag = ' <span class="tag" style="font-size:9px;padding:1px 6px">offline</span>';
+      if(m.src === 'online' || m.src === 'ai') tag = ' <span class="tag green" style="font-size:9px;padding:1px 6px;margin-left:4px">online</span>';
+      else if(m.src === 'offline' || m.src === 'mini') tag = ' <span class="tag" style="font-size:9px;padding:1px 6px;margin-left:4px">offline</span>';
     }
     return '<div class="'+cls+'">'
          + '<div class="who">'+who+tag+'</div>'
          + '<div class="body"><span>'+esc(m.text)+'</span>'
-         + '<button type="button" class="speaker '+(m.lang==='ne'?'np':'')+'" data-convo-say="'+i+'" style="width:30px;height:30px;font-size:12px">🔊</button></div>'
+         + '<button type="button" class="speaker" data-convo-say="'+i+'" style="width:28px;height:28px;font-size:12px">🔊</button></div>'
          + '</div>';
   }).join('');
   $$('#convoChat [data-convo-say]').forEach(function(b){
@@ -1641,45 +2023,44 @@ function drawConvo(){
 
 setMicLabel();
 
-/* ============ FIX card ============ */
 function renderFixCard(original, res){
   var id = 'fx' + Date.now();
   var score = Math.max(0, Math.min(100, +res.score || 70));
   var sc = score >= 85 ? 'good' : score >= 60 ? 'mid' : 'bad';
-  var html = '<div class="card rise" id="'+id+'">';
-  html += '<div class="row between" style="margin-bottom:8px"><b>✏️ English Feedback</b><span class="scoreBadge '+sc+'">'+score+'/100</span></div>';
-  html += '<div class="src">तपाईंले भन्नुभयो</div>';
-  html += '<div style="font-style:italic;color:var(--mut);margin-bottom:10px;display:flex;gap:6px;align-items:flex-start">'
+  var html = '<div class="card rise color-saffron" id="'+id+'">';
+  html += '<div class="row between" style="margin-bottom:12px"><b style="font-size:16px;letter-spacing:-0.3px">✏️ Feedback</b><span class="scoreBadge '+sc+'">'+score+'</span></div>';
+  html += '<div class="src" style="font-weight:700">तपाईंले भन्नुभयो</div>';
+  html += '<div style="font-style:italic;color:var(--mut);margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;font-size:15px">'
         + '<span style="flex:1;min-width:0">'+esc(original)+'</span>'
         + '<button type="button" class="speaker" data-fsay="orig">🔊</button></div>';
-  html += '<div class="src">✅ सही रूप</div>';
-  html += '<div class="en" style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px">'
+  html += '<div class="src" style="font-weight:700">✅ सही रूप</div>';
+  html += '<div class="en" style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px">'
         + '<span style="flex:1;min-width:0">'+esc(res.corrected)+'</span>'
         + '<button type="button" class="speaker" data-fsay="corr" style="margin-top:3px">🔊</button></div>';
   if(res.natural && res.natural !== res.corrected){
-    html += '<div class="src">🌟 अझ natural</div>';
-    html += '<div style="color:var(--blue);font-weight:700;margin-bottom:10px;display:flex;gap:6px;align-items:flex-start">'
+    html += '<div class="src" style="font-weight:700">🌟 अझ natural</div>';
+    html += '<div style="color:var(--deep-blue-light);font-weight:700;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;font-size:16px">'
           + '<span style="flex:1;min-width:0">'+esc(res.natural)+'</span>'
           + '<button type="button" class="speaker" data-fsay="nat">🔊</button></div>';
   }
   if(res.mistakes && res.mistakes.length){
-    html += '<div class="src" style="margin-top:12px">📋 गल्तीहरू ('+res.mistakes.length+')</div>';
+    html += '<div class="src" style="margin-top:14px;font-weight:700">📋 गल्तीहरू ('+res.mistakes.length+')</div>';
     res.mistakes.forEach(function(m){
       html += '<div class="mistake"><span class="wrong">'+esc(m.wrong||'')+'</span> → <span class="right">'+esc(m.right||'')+'</span>'
-            + (m.why ? '<div style="color:var(--mut);font-size:12.5px;margin-top:4px">'+esc(m.why)+'</div>' : '')
+            + (m.why ? '<div style="color:var(--mut);font-size:12.5px;margin-top:5px">'+esc(m.why)+'</div>' : '')
             + '</div>';
     });
   } else {
-    html += '<div class="mistake" style="border-left-color:var(--ok)"><b style="color:var(--ok)">🎉 कुनै स्पष्ट गल्ती भेटिएन!</b></div>';
+    html += '<div class="mistake" style="border-left-color:var(--green)"><b style="color:var(--green-dark)">🎉 कुनै स्पष्ट गल्ती भेटिएन!</b></div>';
   }
   if(res.tips && res.tips.length){
-    html += '<div class="src" style="margin-top:12px">💡 सुझाव</div>';
+    html += '<div class="src" style="margin-top:14px;font-weight:700">💡 सुझाव</div>';
     res.tips.forEach(function(t){
-      html += '<div style="background:var(--bg);border-radius:10px;padding:8px 12px;margin:6px 0;font-size:13.5px">💡 '+esc(t)+'</div>';
+      html += '<div style="background:var(--bg-2);border-radius:10px;padding:9px 13px;margin:5px 0;font-size:13.5px">💡 '+esc(t)+'</div>';
     });
   }
-  html += '<div class="row" style="margin-top:12px"><button type="button" class="btn primary sm" data-replay="1">🎙️ फेरि बोल्नुहोस्</button>'
-        + '<button type="button" class="btn ghost sm" data-savefix="1">⭐ शब्दकोश</button></div>';
+  html += '<div class="row" style="margin-top:14px"><button type="button" class="btn primary sm" data-replay="1">🎙️ फेरि बोल्नुहोस्</button>'
+        + '<button type="button" class="btn ghost sm" data-savefix="1">⭐ Save</button></div>';
   html += '</div>';
   $('#spOut').innerHTML = html;
   var box = document.getElementById(id);
@@ -1761,17 +2142,16 @@ function localAnalyze(text){
   return {corrected:corrected, natural:corrected, score:score, mistakes:mistakes, tips:tips, offline:true};
 }
 
-/* ============ PROGRESS ============ */
 function renderPg(){
   var d=S.d,acc=d.hwT?Math.round(d.hwR/d.hwT*100):null,w=Object.keys(d.words),days=Object.keys(d.days).length;
   $('#pgo').innerHTML=
-  '<div class="card tight"><h2>📊 प्रगति</h2><div class="chips"><span class="w">📅 '+days+' दिन</span><span class="w">🔤 '+d.tr+' अनुवाद</span><span class="w">🎤 '+(d.sp||0)+' voice</span><span class="w">📝 '+(acc==null?'–':acc+'%')+' सही</span><span class="w">📖 '+d.rd+' reading</span><span class="w">📚 '+w.length+' शब्द</span></div></div>'+
-  '<div class="card tight"><h2>🎚️ Level</h2><div class="chips" id="levelBox"></div><p style="color:var(--mut);font-size:13.5px;margin:10px 0 0">'+esc(LVN[d.L])+' — '+esc(LD[d.L])+'</p></div>'+
-  '<div class="card tight"><h2>🔊 आवाज</h2><div class="row"><button type="button" class="btn ghost sm" id="vFem">👩 महिला</button><button type="button" class="btn ghost sm" id="vMale">👨 पुरुष</button><button type="button" class="btn ghost sm" id="vTest">🔊 Test</button></div><p style="color:var(--mut);font-size:12.5px;margin:10px 0 0" id="vInfo"></p></div>'+
-  '<div class="card tight"><h2>🎤 Voice जाँच</h2><p style="color:var(--mut);font-size:13px;margin:6px 0 10px">यो device मा voice input समर्थित छ कि छैन?</p><button type="button" class="btn ghost sm" id="sttTest">🎙️ Test STT</button><div id="sttInfo" style="margin-top:8px;font-size:13px;color:var(--mut)"></div></div>'+
-  '<div class="card tight"><h2>⚙️ सेटिङ</h2><div class="row"><button type="button" class="btn ghost sm" id="rst">🗑 Reset</button></div></div>';
+  '<div class="card tight color-crimson"><h2>📊 Stats</h2><div style="padding:0 16px 16px"><div class="chips"><span class="pill">📅 '+days+' दिन</span><span class="pill">🔤 '+d.tr+'  अनुवाद</span><span class="pill">🎤 '+(d.sp||0)+' voice</span><span class="pill">📝 '+(acc==null?'–':acc+'%')+'</span><span class="pill">📖 '+d.rd+' reading</span><span class="pill">📚 '+w.length+' शब्द</span></div></div></div>'+
+  '<div class="card tight color-saffron"><h2>🎚️ Level</h2><div style="padding:0 16px 16px"><div class="chips" id="levelBox"></div><p style="color:var(--mut);font-size:13px;margin:12px 0 0">'+esc(LVN[d.L])+' — '+esc(LD[d.L])+'</p></div></div>'+
+  '<div class="card tight color-blue"><h2>🔊 Voice</h2><div style="padding:0 16px 16px"><div class="row"><button type="button" class="btn ghost sm" id="vFem">👩 Female</button><button type="button" class="btn ghost sm" id="vMale">👨 Male</button><button type="button" class="btn ghost sm" id="vTest">🔊 Test</button></div><p style="color:var(--mut);font-size:12.5px;margin:12px 0 0" id="vInfo"></p></div></div>'+
+  '<div class="card tight color-green"><h2>🎤 Voice Check</h2><div style="padding:0 16px 16px"><button type="button" class="btn ghost sm" id="sttTest">🎙️ Test STT</button><div id="sttInfo" style="margin-top:10px;font-size:13px;color:var(--mut)"></div></div></div>'+
+  '<div class="card tight" style="border-left:4px solid var(--mut)"><h2>⚙️ Settings</h2><div style="padding:0 16px 16px"><div class="row"><button type="button" class="btn ghost sm" id="rst">🗑 Reset</button></div></div></div>';
   var box=$('#levelBox');
-  box.innerHTML=[1,2,3,4,5].map(function(i){return '<button type="button" class="chip '+(i===d.L?'on':'')+'" data-l="'+i+'">L'+i+' · '+['','सजिलो','दैनिक','जोड्ने','जटिल','Advanced'][i]+'</button>'}).join('');
+  box.innerHTML=[1,2,3,4,5].map(function(i){return '<button type="button" class="chip '+(i===d.L?'on':'')+'" data-l="'+i+'">L'+i+'</button>'}).join('');
   $$('#levelBox .chip').forEach(function(b){b.addEventListener('click',function(){S.d.L=+b.getAttribute('data-l');save();renderPg();head()},false)});
   var paintV=function(){
     var en=Speech.pick('en',Speech.gender),ne=Speech.pick('ne',Speech.gender);
@@ -1790,18 +2170,18 @@ function renderPg(){
       return;
     }
     if(!CAN_SPEAK){
-      info.innerHTML='⌨️🎤 <b>Keyboard को mic प्रयोग गर्नुहोस्</b>';
+      info.innerHTML='⌨️🎤 <b>Keyboard 🎤 प्रयोग गर्नुहोस्</b>';
       return;
     }
-    info.textContent='🎙️ परीक्षण गर्दै… "Hello" भन्नुहोस्';
+    info.textContent='🎙️ Testing… "Hello" भन्नुहोस्';
     try{
       var r = await startRecAuto('en', {});
-      info.innerHTML = r ? '✅ English STT काम गर्यो: <b>'+esc(r)+'</b>' : '⚠️ केही सुनिएन';
+      info.innerHTML = r ? '✅ English STT: <b>'+esc(r)+'</b>' : '⚠️ केही सुनिएन';
     }catch(e){
       var m=(e.message||'').toString();
       if(m.indexOf('permission-denied')>=0 || m.indexOf('not-allowed')>=0 || m.indexOf('no-stt')>=0){
         CAN_SPEAK = false;
-        info.innerHTML='⌨️🎤 <b>Keyboard को mic प्रयोग गर्नुहोस्</b>';
+        info.innerHTML='⌨️🎤 <b>Keyboard 🎤 प्रयोग गर्नुहोस्</b>';
       } else info.textContent='⚠️ '+m;
     }
   },false);
@@ -1812,12 +2192,14 @@ function renderPg(){
   },false);
 }
 
-var TIPS=['❌ I am agree → ✅ I agree.','❌ He go → ✅ He goes.','❌ Where you are going? → ✅ Where are you going?','❌ More better → ✅ Much better.','💡 "कति पर्छ?" = How much does it cost?','🎤 English वा नेपाली बोल्नुहोस् — auto translate online!'];
-var tipEl=$('#tipCard');if(tipEl)tipEl.innerHTML='💡 <b>आजको tip</b><br><span style="font-size:14.5px">'+esc(rnd(TIPS))+'</span>';
+var TIPS=['❌ I am agree → ✅ I agree.','❌ He go → ✅ He goes.','❌ Where you are going? → ✅ Where are you going?','❌ More better → ✅ Much better.','💡 "कति पर्छ?" = How much does it cost?','🎤 English वा नेपाली बोल्नुहोस् — auto translate!'];
+var tipEl=$('#tipCard');if(tipEl)tipEl.innerHTML='<div style="padding:14px 16px"><span style="color:var(--crimson);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em">💡 आजको Tip</span><br><span style="font-size:14.5px;margin-top:4px;display:inline-block;font-weight:500">'+esc(rnd(TIPS))+'</span></div>';
 var setTheme=function(t){
   document.documentElement.setAttribute('data-theme',t);
   try{localStorage.setItem('sikau_theme',t)}catch(e){}
   var th=$('#th');if(th)th.textContent=t==='dark'?'☀️':'🌙';
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(m)m.setAttribute('content',t==='dark'?'#0F0A0A':'#DC143C');
 };
 var initTheme='light';
 try{initTheme=localStorage.getItem('sikau_theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}catch(e){}
@@ -1830,7 +2212,7 @@ var brandEl=$('#brand');
 if(brandEl)brandEl.addEventListener('click',function(){
   if(++bc>=5){
     bc=0;
-    openSheet('<h2>⚙️ About</h2><p style="color:var(--mut);font-size:13.5px">English Sikau · <span data-norz>अभ्यास · Abhyash</span> · Made with ❤️ in Nepal.</p><div class="row" style="margin-top:10px"><button type="button" class="btn primary grow" id="aboutOk">ठीक छ</button></div>');
+    openSheet('<h2 style="padding:0;margin:0 0 12px;border:0">⚙️ About</h2><p style="color:var(--mut);font-size:15px;line-height:1.55">English Sikau · <span data-norz>अभ्यास · Abhyash</span><br>Made with ❤️ in Nepal 🇳🇵</p><div class="row" style="margin-top:16px"><button type="button" class="btn primary grow" id="aboutOk">ठीक छ</button></div>');
     var ok=$('#aboutOk');if(ok)ok.addEventListener('click',closeSheet,false);
   }
 },false);
@@ -1838,6 +2220,7 @@ if(brandEl)brandEl.addEventListener('click',function(){
 try{
   touchDay();
   head();
+  renderFestivals();
   renderWords();
   rz(document.body);
   if(window.MutationObserver){
@@ -1845,7 +2228,7 @@ try{
   }
   setMicLabel();
   var bo=document.getElementById('boot');
-  if(bo){bo.className='ok';bo.textContent='✓ चालु छ';setTimeout(function(){bo.style.display='none'},2000)}
+  if(bo){bo.className='ok';bo.textContent='✓ नमस्ते! App चालु छ';setTimeout(function(){bo.style.display='none'},2000)}
 }catch(e){
   showErr('Boot error: '+(e.message||e));
 }
