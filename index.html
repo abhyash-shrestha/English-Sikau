@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="ne" class="sikau-locked">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
@@ -700,6 +700,25 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 #brand .brand-flag-badge{display:flex;align-items:center;justify-content:center;box-sizing:border-box;overflow:hidden;padding:6px;background:linear-gradient(145deg,#fffefa 0%,#ffedd2 100%);border:1.5px solid rgba(255,237,189,.95);box-shadow:0 9px 24px rgba(45,4,32,.25),inset 0 1px 0 rgba(255,255,255,.96)}
 #brand .brand-flag-art{width:100%;height:100%;display:block;object-fit:contain;filter:drop-shadow(0 1.5px 1px rgba(0,34,80,.12))}
 
+/* ACCESS GATE: hide lessons, navigation, and content until a verified login.
+   This client-side guest gate is a UI restriction, NOT server-side access control. */
+.sikau-locked body > :not(#authModal):not(script):not(style){visibility:hidden!important;pointer-events:none!important}
+.sikau-locked body{max-width:none!important;margin:0!important;padding:0!important;min-height:100dvh}
+.sikau-locked .auth-modal{background:linear-gradient(135deg,#180e31 0%,#63153d 52%,#0b367c 100%);backdrop-filter:none;place-items:center;padding:16px}
+.sikau-locked .auth-panel{width:min(100%,560px);max-height:calc(100dvh - 32px);border-radius:25px}
+.sikau-locked .auth-x{display:none!important}
+.auth-entry-grid{display:grid;gap:10px;margin:14px 0 8px}
+.auth-entry-choice{width:100%;min-height:74px;display:flex;align-items:center;gap:14px;text-align:left;padding:15px;border:1.5px solid var(--line);border-radius:16px;background:var(--bg-2);color:var(--ink)}
+.auth-entry-choice:hover,.auth-entry-choice:focus-visible{border-color:var(--crimson);background:var(--card)}
+.auth-entry-icon{font-size:27px;flex:none;display:grid;place-items:center;width:45px;height:45px;background:var(--card);border-radius:13px}
+.auth-entry-choice strong{font-size:16px;font-weight:850;display:block}
+.auth-entry-choice small{display:block;font-size:12px;line-height:1.4;color:var(--mut);margin-top:3px}
+.auth-entry-arrow{font-size:21px;font-weight:900;margin-left:auto;color:var(--crimson)}
+.auth-gate-note{font-size:12px;color:var(--mut);line-height:1.55;text-align:center;margin:15px 0 0}
+.auth-guest-btn{display:block;width:100%;margin-top:16px;background:var(--bg-2);border:1.5px solid var(--line);color:var(--ink);border-radius:12px;padding:13px;font-weight:800;font-size:14px;text-align:center}
+.auth-back-row{display:flex;gap:9px;justify-content:center;margin:12px 0 0}
+.auth-gate-brand{text-align:center;font-size:13px;font-weight:750;color:var(--mut);margin:4px 0 17px}
+@media(max-width:640px){.sikau-locked .auth-modal{place-items:center;padding:12px}.sikau-locked .auth-panel{width:100%;border-radius:23px;max-height:calc(100dvh - 24px)}.auth-entry-choice{padding:12px;min-height:68px}}
 /* === English Sikau account experience: responsive, accessible, bilingual === */
 .auth-header-btn{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);border-radius:12px;min-height:38px;color:white;font-size:12px;font-weight:800;padding:7px 13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;backdrop-filter:blur(8px)}
 .auth-header-btn:hover{background:rgba(255,255,255,.27)}
@@ -741,6 +760,14 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 .auth-divider{height:1px;background:var(--line);margin:17px 0}
 .auth-guest{display:block;text-align:center;width:100%;font-size:13px;font-weight:800;text-decoration:underline;color:var(--mut);padding:13px 8px;min-height:44px}
 .auth-topline{margin:0 0 12px;font-size:13px;color:var(--mut)}
+.auth-config-note{font-size:12px;color:var(--mut);line-height:1.55;padding:10px 12px;background:var(--bg-2);border-radius:12px;margin:12px 0 0}
+.auth-config-note strong{color:var(--ink)}
+.auth-setup-heading{font-size:15px;font-weight:850;line-height:1.45;margin:12px 0}
+.auth-setup-steps{padding-left:20px;font-size:13px;line-height:1.7;color:var(--ink-2)}
+.auth-setup-steps li{padding-bottom:6px}
+.auth-setup-footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:11px 0}
+.auth-setup-footer .auth-link{min-height:38px}
+.auth-field input:disabled{opacity:.65;cursor:not-allowed}
 @media(max-width:640px){.auth-modal{padding:0;align-items:end;place-items:end center}.auth-panel{width:100%;border-radius:24px 24px 0 0;max-height:96dvh}.auth-cover{padding:23px 20px 17px}.auth-inner{padding:20px 19px calc(22px + env(safe-area-inset-bottom,0px))}.auth-header-btn{max-width:155px}.auth-names{gap:9px}}
 @media(max-width:360px){.auth-names{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.auth-panel,.auth-modal{animation:none}}
@@ -1038,8 +1065,8 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 </nav>
 
 
-<!-- One-time welcome / account panel. Authentication is always processed by Supabase, never by local mock accounts. -->
-<div class="auth-modal" id="authModal" hidden>
+<!-- Login required: email accounts use Supabase; guest demo uses a shared client-side passcode. -->
+<div class="auth-modal" id="authModal">
   <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
     <div class="auth-cover">
       <button type="button" class="auth-x" id="authClose" aria-label="Close account screen">×</button>
@@ -3222,19 +3249,48 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
    4. Authentication > Email Templates > Confirm sign up: include {{ .Token }}.
    5. Authentication > URL Configuration: enter your hosted website's URL.
    6. For public production signups, set up an SMTP service for reliable delivery.
-   Login is optional; existing offline guest learning is preserved.
+   Login is required: email verified Supabase session OR guest ID and password.
 */
 (function(){
   'use strict';
+  // These two values may be embedded in the published HTML (public/anon ONLY).
+  // The owner can also add them in the Setup screen for a local preview.
   const AUTH_CONFIG={
     supabaseUrl:'',
     publishableKey:''
   };
+  // Do not store user passwords, OTPs, or any secret/service_role key in HTML.
+  try{
+    if(!AUTH_CONFIG.supabaseUrl && !AUTH_CONFIG.publishableKey){
+      const saved=JSON.parse(localStorage.getItem('sikau_public_auth_setup_v1')||'null');
+      if(saved&&typeof saved.url==='string'&&typeof saved.key==='string'){
+        AUTH_CONFIG.supabaseUrl=saved.url;
+        AUTH_CONFIG.publishableKey=saved.key;
+      }
+    }
+  }catch(_){}
   const modal=document.getElementById('authModal');
   const content=document.getElementById('authContent');
   const closeBtn=document.getElementById('authClose');
   const accountBtn=document.getElementById('accountOpen');
-  let client=null,clientPromise=null,currentUser=null,mode='signup',busy=false,lastFocus=null;
+  let client=null,clientPromise=null,currentUser=null,mode='welcome',busy=false,lastFocus=null;
+  // Shared guest code is local-only and visible in the HTML source. Server-side
+  // authentication must replace it before using this for protected content.
+  const GUEST_ID='Nepal',GUEST_PASSWORD='@HamroNepal';
+  const GUEST_SESSION_KEY='english-sikau-guest-session-v1';
+  let guestSession=false;
+  try{guestSession=sessionStorage.getItem(GUEST_SESSION_KEY)==='active'}catch(_){}
+  function hasAccess(){return !!currentUser||guestSession}
+  function setGate(locked){
+    document.documentElement.classList.toggle('sikau-locked',locked);
+    for(const child of document.body.children){
+      if(child!==modal&&child.tagName!=='SCRIPT'&&child.tagName!=='STYLE')child.inert=locked;
+    }
+    if(locked){document.body.style.overflow='hidden';modal.hidden=false}
+  }
+  function grantAccess(){setGate(false);close()}
+  function requireAccess(){setGate(true);mode='welcome';notification=null;render();window.requestAnimationFrame(()=>{const btn=content.querySelector('button');if(btn)btn.focus()})}
+
   let emailToVerify='',resendUntil=0,notification=null;
   const clean=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function configured(){return /^https:\/\/[a-z0-9.-]+\/?.*$/i.test(AUTH_CONFIG.supabaseUrl.trim())&&AUTH_CONFIG.publishableKey.trim().length>20;}
@@ -3245,13 +3301,46 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
   function tabBar(){return '<div class="auth-tabs" role="tablist" aria-label="Account options"><button class="auth-tab" data-auth-mode="signup" role="tab" aria-selected="'+(mode==='signup')+'">Create account<br><span class="auth-help" style="color:inherit">खाता बनाउनुहोस्</span></button><button class="auth-tab" data-auth-mode="signin" role="tab" aria-selected="'+(mode==='signin')+'">Sign in<br><span class="auth-help" style="color:inherit">लगइन गर्नुहोस्</span></button></div>'}
   function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" name="email" type="email" autocomplete="email" spellcheck="false" placeholder="you@gmail.com" required maxlength="254" value="'+clean(value||'')+'"><small class="auth-help">Gmail, Yahoo, Outlook, or any valid email · कुनै पनि इमेल</small></div>'}
   function passwordField(autocomplete){return '<div class="auth-field"><label for="authPassword">Password · पासवर्ड</label><div class="auth-pass-row"><input id="authPassword" name="password" type="password" autocomplete="'+autocomplete+'" required minlength="10" placeholder="Enter password"><button type="button" class="auth-toggle" data-auth-show="authPassword" aria-label="Show or hide password">Show</button></div></div>'}
-  function ghostGuest(){return '<button type="button" class="auth-guest" data-auth-mode="guest">Continue learning without an account · खाता बिना सिक्नुहोस् →</button>'}
+  function ghostGuest(){return '<button type="button" class="auth-guest-btn" data-auth-mode="guest">🔑 Guest login · अतिथि लगइन (ID + password)</button>'}
   function render(){
     if(!modal||!content)return;
     let title='',subtitle='',body='';
     const unconfigured=!configured();
     if(currentUser&&mode!=='reset')mode='profile';
-    if(mode==='profile'&&currentUser){
+    if(mode==='welcome'&&!hasAccess()){
+      title='Welcome to English Sikau!';
+      subtitle='स्वागत छ! · Sign in to start learning English';
+      body='<p class="auth-gate-brand">🇳🇵 Learn English, anytime · जहाँसुकै, जुनसुकै बेला</p>'+wrapNotice()+
+        '<div class="auth-entry-grid">'+
+        '<button type="button" class="auth-entry-choice" data-auth-mode="signup"><span class="auth-entry-icon">✨</span><span><strong>Create account</strong><small>नयाँ खाता बनाउनुहोस् · Email and verification code</small></span><span class="auth-entry-arrow">→</span></button>'+
+        '<button type="button" class="auth-entry-choice" data-auth-mode="signin"><span class="auth-entry-icon">👤</span><span><strong>Sign in</strong><small>लगइन गर्नुहोस् · Use your email and password</small></span><span class="auth-entry-arrow">→</span></button>'+
+        '<button type="button" class="auth-entry-choice" data-auth-mode="guest"><span class="auth-entry-icon">🔑</span><span><strong>Guest login</strong><small>अतिथि लगइन · Guest ID and password required</small></span><span class="auth-entry-arrow">→</span></button></div>'+
+        '<p class="auth-gate-note">An account or valid guest login is required to open lessons.<br>पाठहरू हेर्न खाता वा अतिथि लगइन अनिवार्य छ।</p>';
+    }else if(mode==='guest'&&!hasAccess()){
+      title='Guest login · अतिथि लगइन';
+      subtitle='Enter your guest User ID and password · अतिथि विवरण राख्नुहोस्';
+      body=wrapNotice()+'<form class="auth-form" id="authGuestForm">'+
+        '<div class="auth-field"><label for="guestUserId">Guest User ID · अतिथि प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Enter guest User ID" required></div>'+
+        '<div class="auth-field"><label for="guestPassword">Guest password · अतिथि पासवर्ड</label><div class="auth-pass-row"><input id="guestPassword" type="password" autocomplete="current-password" placeholder="Enter guest password" required><button type="button" class="auth-toggle" data-auth-show="guestPassword">Show</button></div></div>'+
+        '<button class="auth-submit" type="submit">🔓 Unlock learning · सिकाइ सुरु गर्नुहोस्</button></form>'+
+        '<p class="auth-gate-note">Ask the app owner for your guest login details.<br>अतिथि लगइन विवरणका लागि एप सञ्चालकलाई सोध्नुहोस्।</p>'+
+        '<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← Other login options · अन्य विकल्प</button></div>';
+    }else if(mode==='guestprofile'&&guestSession){
+      title='Guest account · अतिथि खाता';subtitle='You are learning in Guest Mode · अतिथि मोड';
+      body='<div class="auth-profile"><strong>🔑 Guest · Nepal</strong><small>Shared guest access · स्थानीय उपकरणमा प्रगति सुरक्षित</small></div>'+ 
+        '<p class="auth-help">Lessons work without a personal account. Learning progress stays on this device and is not synced between learners.</p>'+
+        '<button type="button" class="auth-submit" data-auth-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button class="auth-link" type="button" data-auth-mode="signout">Sign out · लगआउट</button></div>';
+    }else if(mode==='setup'){
+      title='Activate email accounts · इमेल खाता सक्रिय गर्नुहोस्';
+      subtitle='One-time app-owner setup · एप सञ्चालकका लागि';
+      body=wrapNotice()+'<p class="auth-setup-heading">Connect a Supabase authentication project to send genuine verification emails.</p>'+
+       '<ol class="auth-setup-steps"><li>Visit <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase Dashboard ↗</a> and create a project.</li><li>From Project Settings → API Keys, copy the <b>Project URL</b> and <b>publishable / anon key</b> (never a secret or service_role key).</li><li>Turn on email confirmation, and put <code>{{ .Token }}</code> in the sign-up confirmation email template.</li><li>Configure an email provider (SMTP) so codes can reach Gmail, Yahoo and other inboxes.</li></ol>'+
+       '<form class="auth-form" id="authSetupForm"><div class="auth-field"><label for="authProjectUrl">Supabase Project URL</label><input id="authProjectUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://your-project.supabase.co" value="'+clean(AUTH_CONFIG.supabaseUrl)+'" required></div>'+
+       '<div class="auth-field"><label for="authPublicKey">Publishable / anon key (PUBLIC only)</label><input id="authPublicKey" type="text" autocomplete="off" spellcheck="false" placeholder="sb_publishable_..." value="'+clean(AUTH_CONFIG.publishableKey)+'" required><small class="auth-help">Never paste service_role, secret keys, SMTP credentials or passwords here.</small></div>'+
+       '<button type="submit" class="auth-submit">Save configuration on this device</button></form>'+
+       '<div class="auth-config-note"><strong>Important:</strong> Saving here activates only this browser. Before sharing your app, put these same two PUBLIC values into AUTH_CONFIG in the HTML file and host it on HTTPS. Supabase must also be configured to send email. Learners do not need Supabase accounts of their own.</div>'+
+       '<div class="auth-setup-footer"><button type="button" class="auth-link" data-auth-mode="signup">← Back to account</button><a href="https://supabase.com/docs/guides/auth/auth-email" target="_blank" rel="noopener noreferrer">Email setup help ↗</a></div>'+ghostGuest();
+    }else if(mode==='profile'&&currentUser){
       const md=currentUser.user_metadata||{};
       const first=String(md.first_name||''),last=String(md.last_name||'');
       const name=(first+' '+last).trim()||String(md.full_name||'').trim()||'Learner';
@@ -3271,15 +3360,19 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       title=isSignup?'Create your free account':'Welcome back!';
       subtitle=isSignup?'निःशुल्क खाता बनाउनुहोस् · Learn English at your own pace.':'फेरि स्वागत छ · Sign in to keep learning.';
       body=tabBar()+wrapNotice();
-      if(unconfigured)body+='<div class="auth-notice"><strong>Account activation needed.</strong> Registration and email delivery will work after the app owner connects a Supabase project. You can keep learning as a guest meanwhile.<br><span class="auth-help">अहिले खाता सेवा जोडिएको छैन। खाता बिना पढ्न सक्नुहुन्छ।</span></div>';
+
       body+='<form class="auth-form" id="'+(isSignup?'authSignupForm':'authSigninForm')+'">';
       if(isSignup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" name="given-name" type="text" autocomplete="given-name" maxlength="60" placeholder="First name" required></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" name="family-name" type="text" autocomplete="family-name" maxlength="60" placeholder="Last name" required></div></div>';
       body+=emailField(emailToVerify)+passwordField(isSignup?'new-password':'current-password');
       if(isSignup)body+='<div class="auth-field"><label for="authConfirm">Confirm password · पुष्टि गर्नुहोस्</label><div class="auth-pass-row"><input id="authConfirm" type="password" autocomplete="new-password" required minlength="10" placeholder="Confirm your password"><button class="auth-toggle" type="button" data-auth-show="authConfirm">Show</button></div><small class="auth-help">At least 10 characters, including a letter and a number. Passwords are handled by the authentication service and are never stored in this HTML.</small></div>';
-      body+='<button type="submit" class="auth-submit">'+(isSignup?'Create account & email my code':'Sign in with email & password')+'</button></form>';
+      if(unconfigured){
+        body+='</form><div class="auth-config-note"><strong>Email accounts await activation.</strong> Guest login is available with a guest ID and password.</div><button type="button" class="auth-submit" data-auth-mode="setup">⚙️ App owner: activate email accounts</button>';
+      }else{
+        body+='<button type="submit" class="auth-submit">'+(isSignup?'Create account & email my code':'Sign in with email & password')+'</button></form>';
+      }
       if(!isSignup)body+='<div class="auth-actions"><button class="auth-link" data-auth-mode="forgot" type="button">Forgot password? · पासवर्ड बिर्सनुभयो?</button></div>';
-      else body+='<p class="auth-quiet">After signing up, verify the one-time code sent to your email. Next time, log in using your email and password.</p>';
-      body+=ghostGuest();
+      else if(!unconfigured)body+='<p class="auth-quiet">After signing up, verify the one-time code sent to your email. Next time, log in using your email and password.</p>';
+      body+=ghostGuest()+'<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← All login options</button></div>';
     }
     document.getElementById('authTitle').textContent=title;
     document.getElementById('authSubtitle').textContent=subtitle;
@@ -3292,19 +3385,34 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     const verify=document.getElementById('authVerifyForm');if(verify)verify.addEventListener('submit',confirmCode);
     const forgot=document.getElementById('authForgotForm');if(forgot)forgot.addEventListener('submit',sendReset);
     const reset=document.getElementById('authResetForm');if(reset)reset.addEventListener('submit',updatePassword);
+    const setup=document.getElementById('authSetupForm');if(setup)setup.addEventListener('submit',savePublicSetup);
+    const guest=document.getElementById('authGuestForm');if(guest)guest.addEventListener('submit',loginGuest);
   }
   function open(target){
-    lastFocus=document.activeElement;mode=target||(currentUser?'profile':(emailToVerify?'verify':'signup'));
+    lastFocus=document.activeElement;mode=target||(currentUser?'profile':(guestSession?'guestprofile':(emailToVerify?'verify':'welcome')));
     notification=null;render();modal.hidden=false;document.body.style.overflow='hidden';rememberWelcome();
     window.requestAnimationFrame(()=>{const e=content.querySelector('input,button');if(e)e.focus()});
   }
-  function close(){modal.hidden=true;document.body.style.overflow='';rememberWelcome();notification=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+  function close(){if(!hasAccess())return;modal.hidden=true;document.body.style.overflow='';rememberWelcome();notification=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
   function choose(next){
     if(busy)return;
-    if(next==='guest'||next==='close'){close();return}
+    if(next==='close'){close();return}
     if(next==='signout'){signout();return}
     if(next==='resend'){resend();return}
     mode=next;notification=null;render();
+  }
+  function loginGuest(event){
+    event.preventDefault();
+    if(busy)return;
+    const id=document.getElementById('guestUserId').value.trim();
+    const pass=document.getElementById('guestPassword').value;
+    if(id!==GUEST_ID||pass!==GUEST_PASSWORD){
+      setStatus('Incorrect guest ID or password. · अतिथि ID वा पासवर्ड मिलेन।','error');
+      return;
+    }
+    guestSession=true;
+    try{sessionStorage.setItem(GUEST_SESSION_KEY,'active')}catch(_){}
+    mode='guestprofile';updateHeader();grantAccess();
   }
   function errors(error){
     const s=String(error&&error.message||error||'Unable to complete this request.').replace(/\s+/g,' ').slice(0,240);
@@ -3312,9 +3420,31 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     if(/rate limit|too many/i.test(s))return 'Too many attempts. Please try again later. · केही समयपछि प्रयास गर्नुहोस्।';
     return s;
   }
+  async function savePublicSetup(ev){
+    ev.preventDefault();if(busy)return;
+    const url=document.getElementById('authProjectUrl').value.trim().replace(/\/$/,'');
+    const key=document.getElementById('authPublicKey').value.trim();
+    if(!/^https:\/\/[a-z0-9.-]+\/?.*$/i.test(url)||key.length<21){
+      setStatus('Enter a valid HTTPS project URL and public / anon key.','error');return;
+    }
+    if(/service_role|sb_secret_/i.test(key)){
+      setStatus('Stop: this is a secret key. Use only a publishable / anon key.','error');return;
+    }
+    try{
+      setBusy(true);
+      const res=await fetch(url+'/auth/v1/settings',{headers:{'apikey':key},mode:'cors'});
+      if(!res.ok)throw Error('Could not connect to this Supabase project ('+res.status+'). Check the project URL and publishable key.');
+      AUTH_CONFIG.supabaseUrl=url;
+      AUTH_CONFIG.publishableKey=key;
+      try{localStorage.setItem('sikau_public_auth_setup_v1',JSON.stringify({url,key}))}catch(_){}
+      client=null;clientPromise=null;
+      mode='signup';busy=false;
+      setStatus('Project connected on this browser. Email delivery needs Supabase confirmation settings and SMTP. To publish for everyone, add your public settings to the HTML file.','success');
+    }catch(err){setBusy(false);setStatus(errors(err),'error')}
+  }
   function setBusy(state){busy=state;content.querySelectorAll('button[type="submit"],button[data-auth-mode="resend"]').forEach(b=>b.disabled=state)}
   function loadClient(){
-    if(!configured())return Promise.reject(new Error('The app owner must configure Supabase to enable real email accounts.'));
+    if(!configured())return Promise.reject(new Error('Email sign-up is not activated. Please use the activation setup first.'));
     if(client)return Promise.resolve(client);
     if(clientPromise)return clientPromise;
     clientPromise=new Promise((resolve,reject)=>{
@@ -3323,7 +3453,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
         client=window.supabase.createClient(AUTH_CONFIG.supabaseUrl.trim().replace(/\/$/,''),AUTH_CONFIG.publishableKey.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storageKey:'english-sikau-auth-v1'}});
         client.auth.onAuthStateChange((event,session)=>{
           // Do not call other auth functions synchronously in this callback.
-          currentUser=session&&session.user||null;updateHeader();
+          currentUser=session&&session.user||null;updateHeader();if(currentUser){grantAccess()}else if(!guestSession){requireAccess()}
           if(event==='PASSWORD_RECOVERY')queueMicrotask(()=>open('reset'));
         });
         resolve(client);
@@ -3366,7 +3496,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       if(error)throw error;
       if(!data||!data.user||!data.session)throw Error('Could not finish verification. Please try signing in.');
       try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}
-      emailToVerify='';currentUser=data.user;updateHeader();mode='profile';busy=false;
+      emailToVerify='';currentUser=data.user;updateHeader();mode='profile';busy=false;grantAccess();
       setStatus('Email verified. Your account is ready! · इमेल प्रमाणित भयो।','success');
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
@@ -3389,7 +3519,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       setBusy(true);const api=await loadClient();
       const {data,error}=await api.auth.signInWithPassword({email,password});if(error)throw error;
       if(!data||!data.user)throw Error('Unable to sign in.');
-      currentUser=data.user;emailToVerify='';try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}updateHeader();mode='profile';busy=false;
+      currentUser=data.user;emailToVerify='';try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}updateHeader();mode='profile';busy=false;grantAccess();
       setStatus('Welcome back! · पुनः स्वागत छ।','success');
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
@@ -3414,19 +3544,24 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
   async function signout(){
+    if(guestSession&&!currentUser){
+      guestSession=false;
+      try{sessionStorage.removeItem(GUEST_SESSION_KEY)}catch(_){}
+      busy=false;updateHeader();requireAccess();return;
+    }
     try{setBusy(true);const api=await loadClient();const {error}=await api.auth.signOut();if(error)throw error;
-      currentUser=null;emailToVerify='';mode='signin';busy=false;updateHeader();setStatus('You have signed out. · लगआउट भयो।','success');
+      currentUser=null;emailToVerify='';guestSession=false;try{sessionStorage.removeItem(GUEST_SESSION_KEY)}catch(_){}mode='welcome';busy=false;updateHeader();requireAccess();
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
   function updateHeader(){
     const meta=currentUser&&(currentUser.user_metadata||{});
     const first=meta&&meta.first_name?String(meta.first_name).trim():'';
-    accountBtn.textContent=currentUser?'👤 '+(first||'My account'):'👤 Sign in';
-    accountBtn.setAttribute('aria-label',currentUser?'Open my account':'Sign in or create an account');
-    accountBtn.title=currentUser?'My account · मेरो खाता':'Sign up / Sign in · खाता';
+    accountBtn.textContent=currentUser?'👤 '+(first||'My account'):(guestSession?'🔑 Guest':'👤 Sign in');
+    accountBtn.setAttribute('aria-label',currentUser?'Open my account':(guestSession?'Open guest account':'Sign in or create an account'));
+    accountBtn.title=currentUser?'My account · मेरो खाता':(guestSession?'Guest account · अतिथि खाता':'Sign up / Sign in · खाता');
     const greet=document.getElementById('greetSub');
     if(greet){
-      if(currentUser&&first){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent='Welcome, '+first+'! · स्वागत छ '+first+'!'}
+      if((currentUser&&first)||guestSession){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent=guestSession&&!currentUser?'Welcome, Guest! · अतिथिलाई स्वागत छ!':'Welcome, '+first+'! · स्वागत छ '+first+'!'}
       else if(greet.dataset.originalGreeting)greet.textContent=greet.dataset.originalGreeting;
     }
   }
@@ -3445,9 +3580,11 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
   });
   try{emailToVerify=sessionStorage.getItem('sikau_email_verification_pending')||''}catch(_){}
   updateHeader();
-  if(!welcomeSeen())open(emailToVerify?'verify':'signup');
+  // Login is always required on new visits. A previous guest session is tab-scoped.
+  if(guestSession){setGate(false);modal.hidden=true;document.body.style.overflow='';updateHeader()}
+  else requireAccess();
   if(configured())loadClient().then(api=>api.auth.getSession()).then(({data})=>{
-    if(data&&data.session&&data.session.user){currentUser=data.session.user;updateHeader();if(!modal.hidden){mode='profile';render()}}
+    if(data&&data.session&&data.session.user){currentUser=data.session.user;updateHeader();grantAccess()}
   }).catch(err=>{console.warn('Email account initialization:',errors(err))});
 })();
 </script>
