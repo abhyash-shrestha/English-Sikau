@@ -3383,12 +3383,12 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       title='Check your email · आफ्नो इमेल जाँच्नुहोस्';
       subtitle='Tap the confirmation link in your email · इमेलमा आएको लिङ्क खोल्नुहोस्';
       body=wrapNotice()+
-        '<p class="auth-topline">We requested a confirmation email for <strong>'+clean(emailToVerify||'your email')+'</strong>. Also check Spam/Junk.</p>'+
+        '<p class="auth-topline">Signup was submitted for <strong>'+clean(emailToVerify||'your email')+'</strong>. New account? Check your inbox and Spam/Junk. Already verified this email? Sign in instead. · पहिले खाता बनाइसक्नुभएको छ भने लगइन गर्नुहोस्।</p>'+
         '<div class="auth-confirm-guide" role="note"><strong>📩 What to do next · अब के गर्ने?</strong>'+
-        '<ol><li>Open the email from <b>Supabase Auth</b>.</li><li>Tap <b>Confirm email address</b> inside the message.</li><li>Your browser will return to English Sikau. Then continue learning or sign in with your password.</li></ol>'+
+        '<ol><li><b>Already confirmed this email?</b> Tap <b>Sign in</b> below. You do not need to sign up again.</li><li><b>New account?</b> If you receive an email from <b>Supabase Auth</b>, tap <b>Confirm email address</b>.</li><li>If you opened the confirmation link on another device, return here and sign in with your original password.</li></ol>'+
         '<span class="auth-help">इमेलमा “Confirm email address” थिच्नुहोस्। त्यसपछि English Sikau वेबसाइट खुल्छ।</span></div>'+
-        '<button class="auth-submit" type="button" data-auth-mode="signin">I confirmed my email — Sign in · लगइन गर्नुहोस्</button>'+
-        '<div class="auth-actions"><button class="auth-link" data-auth-mode="resend" type="button">Resend confirmation email · फेरि पठाउनुहोस्</button><button class="auth-link" data-auth-mode="signup" type="button">Change email</button></div>'+
+        '<button class="auth-submit" type="button" data-auth-mode="signin">Already have an account? Sign in · लगइन गर्नुहोस्</button>'+
+        '<p class="auth-help" style="margin-top:12px"><b>Not receiving emails?</b> Supabase built-in sender is restricted to project-team addresses. The site owner must configure SMTP to email other students. · अन्य विद्यार्थीलाई इमेल पठाउन SMTP चाहिन्छ।</p>'+'<div class="auth-actions"><button class="auth-link" data-auth-mode="resend" type="button">Resend confirmation email · फेरि पठाउनुहोस्</button><button class="auth-link" data-auth-mode="signup" type="button">Change email</button></div>'+
         '<button type="button" class="auth-secondary-toggle" data-auth-mode="verifycode">Have a 6-digit code instead? · ६ अंकको कोड छ?</button>'+ghostGuest();
     }else if(mode==='verifycode'){
       title='Enter your email code · इमेल कोड राख्नुहोस्';
@@ -3417,7 +3417,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
         body+='<div class="auth-actions"><button class="auth-link" data-auth-mode="forgot" type="button">Forgot password? · पासवर्ड बिर्सनुभयो?</button></div>';
         body+='<p class="auth-lockout-help">🔒 Six failed attempts pause sign-in in this browser for 30 minutes. This is a device-only limit, not an account-wide security lock. · ६ प्रयासपछि यो ब्राउजरमा ३० मिनेट रोक्छ।</p>';
       }else{
-        body+='<p class="auth-quiet">After signing up, tap the confirmation link in your email. Return here to sign in with your email and password.</p>';
+        body+='<p class="auth-quiet">New account? Check your email for a confirmation link. Already signed up? Select <b>Sign in</b> above instead of creating another account. Public email delivery requires the owner to configure SMTP in Supabase.</p>';
       }
       body+=ghostGuest()+'<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← All login options</button></div>';
     }
@@ -3470,6 +3470,8 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     if(/failed to fetch|network|load failed/i.test(s))return 'Network unavailable. Connect to the internet and try again. · इन्टरनेट जाँच्नुहोस्।';
     if(/email address not authorized|email not authorized/i.test(s))return 'Supabase default email delivery only allows authorized project-team addresses. Public student signup requires a custom SMTP provider. · नयाँ विद्यार्थीलाई इमेल पठाउन SMTP सेवा चाहिन्छ।';
     if(/rate limit|too many/i.test(s))return 'Too many attempts. Please try again later. · केही समयपछि प्रयास गर्नुहोस्।';
+    if(/user already registered|already registered/i.test(s))return 'This email may already have an account. Select Sign in and use your existing password, or Forgot password if needed. · पहिले दर्ता गर्नुभएको छ भने लगइन गर्नुहोस्।';
+    if(/email not confirmed/i.test(s))return 'Email is not confirmed yet. Open the latest confirmation email. If no email arrives, ask the app owner to configure SMTP. · इमेल प्रमाणित भएको छैन।';
     return s;
   }
   function setBusy(state){busy=state;content.querySelectorAll('button[type="submit"],button[data-auth-mode="resend"]').forEach(b=>b.disabled=state)}
@@ -3518,7 +3520,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       if(error)throw error;
       if(data&&data.session){await api.auth.signOut();throw Error('Email confirmation must be enabled before new accounts can be verified. Please contact support.');}
       persistPending(email);mode='verify';busy=false;
-      setStatus('Confirmation email requested. Open the email and tap “Confirm email address.” If no email arrives, check Spam/Junk. · इमेलको पुष्टि लिङ्क खोल्नुहोस्।','success');
+      setStatus('Signup request submitted. If this is a new account, check your email (including Spam/Junk). If you previously verified this address, choose Sign in instead; Supabase may not send a new signup email. · पहिले खाता छ भने लगइन गर्नुहोस्।','info');
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
   async function confirmCode(ev){
@@ -3543,7 +3545,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       if(!emailToVerify)throw Error('Enter your email address first.');
       const {error}=await api.auth.resend({type:'signup',email:emailToVerify,options:{emailRedirectTo:AUTH_CONFIG.siteUrl}});if(error)throw error;
       resendUntil=Date.now()+60000;setBusy(false);
-      setStatus('A new confirmation email has been requested. Open its confirmation link; check Spam/Junk too.','success');
+      setStatus('Resend request submitted. If this is an unconfirmed account and delivery is configured, check Inbox/Spam. An already confirmed account may not receive another signup email: use Sign in.','info');
     }catch(err){setBusy(false);setStatus(errors(err),'error')}
   }
   async function login(ev){
