@@ -1092,7 +1092,7 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
   <button type="button" data-t="sp"><i>🎙️</i>Speak</button>
   <button type="button" data-t="pg"><i>📊</i>Progress</button>
   <button type="button" id="navMore" class="nav-more" aria-label="More learning modes / थप विकल्पहरू" aria-expanded="false" aria-controls="mobileModes"><i>☷</i>More</button>
-  <div class="nav-note">🇳🇵 Made in Nepal · Lifetime access after payment; guest demonstration is free.</div>
+  <div class="nav-note">🇳🇵 Made in Nepal · रु. ९९९ once · Learn English for a lifetime.</div>
 </nav>
 
 
@@ -3334,7 +3334,7 @@ function status(message,type='info'){notice=message?{message,type}:null;render()
 function noticeHTML(){return notice?'<div class="auth-notice '+escapeHTML(notice.type)+'" role="status">'+escapeHTML(notice.message)+'</div>':''}
 function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" type="email" autocomplete="email" required maxlength="254" value="'+escapeHTML(value||'')+'" placeholder="you@gmail.com"><small class="auth-help">Gmail, Yahoo, Outlook, or any email provider · कुनै पनि इमेल</small></div>'}
 function passwordFields(confirm){return '<div class="auth-field"><label for="authPassword">'+(confirm?'Create password · पासवर्ड बनाउनुहोस्':'Password · पासवर्ड')+'</label><input id="authPassword" type="password" autocomplete="'+(confirm?'new-password':'current-password')+'" minlength="8" maxlength="256" required placeholder="At least 8 characters"><small class="auth-help">At least 8 characters. Avoid sharing your password. · कम्तीमा ८ अक्षर</small></div>'+(confirm?'<div class="auth-field"><label for="authPasswordConfirm">Confirm password · पासवर्ड फेरि राख्नुहोस्</label><input id="authPasswordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="256" required placeholder="Enter the same password again"></div>':'')}
-function guestLink(){return '<button class="auth-guest-btn" type="button" data-mode="guest">🔑 Guest login · अतिथि लगइन (ID + password)</button>'}
+function guestLink(){return '<button class="auth-guest-btn" type="button" data-mode="guest">🔑 Sign in with ID · ID बाट लगइन</button>'}
 function backLink(){return '<div class="auth-back-row"><button class="auth-link" type="button" data-mode="welcome">← Other login options · अन्य विकल्पहरू</button></div>'}
 function attemptsKey(identity){let hash=2166136261;for(const c of String(identity).trim().toLowerCase()){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619)}return 'sikau-appwrite-attempts-'+(hash>>>0).toString(16)}
 function attempts(identity){try{const key=attemptsKey(identity),s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.updated+LOCKOUT_MS>Date.now())return s;localStorage.removeItem(key)}catch(_){}return {failures:0,updated:0,lockedUntil:0}}
@@ -3360,16 +3360,16 @@ function render(){
  if(currentUser&&!guestSession&&mode!=='guest')mode=isPaidUser()?'profile':'payment';else if(guestSession)mode='guestprofile';
  if(mode==='welcome'&&!hasAccess()){
    title='Welcome to English Sikau!';sub='स्वागत छ! · Learn English at your own pace';
-   body=noticeHTML()+'<p class="auth-gate-brand">🇳🇵 One-time lifetime access: रु. ९९९ · Guest login remains free</p><div class="auth-entry-grid">'+
+   body=noticeHTML()+'<p class="auth-gate-brand">🇳🇵 रु. ९९९ one time · Lifetime English learning · आजीवन पहुँच</p><div class="auth-entry-grid">'+
    '<button class="auth-entry-choice" type="button" data-mode="signup"><span class="auth-entry-icon">✨</span><span><strong>Create account</strong><small>खाता बनाउनुहोस् · Receive a 6-digit email code</small></span><span class="auth-entry-arrow">→</span></button>'+
    '<button class="auth-entry-choice" type="button" data-mode="signin"><span class="auth-entry-icon">✉️</span><span><strong>Sign in</strong><small>इमेल र पासवर्डले लगइन गर्नुहोस्</small></span><span class="auth-entry-arrow">→</span></button>'+
-   '<button class="auth-entry-choice" type="button" data-mode="guest"><span class="auth-entry-icon">🔑</span><span><strong>Guest login</strong><small>अतिथि लगइन · ID and password required</small></span><span class="auth-entry-arrow">→</span></button></div>'+
-   '<p class="auth-gate-note">Create a password, verify your email, and pay रु. ९९९ once for lifetime student access. Bank verification is required before lessons unlock. Free guest login remains available. · एकपटक शुल्क तिरेपछि आजीवन पहुँच।</p>';
+   '</div>'+
+   '<p class="auth-gate-note">Create a password, verify your email, and pay रु. ९९९ once for lifetime student access. Bank verification is required before lessons unlock. · एकपटक शुल्क तिरेपछि आजीवन पहुँच।</p>';
  }else if(mode==='guest'&&!hasAccess()){
-   title='Guest login · अतिथि लगइन';sub='Enter the guest ID and password';
-   body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">Guest ID · अतिथि ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Guest password · पासवर्ड</label><input id="guestPassword" type="password" autocomplete="current-password" required></div><button class="auth-submit" type="submit">Start free guest learning · नि:शुल्क सिकाइ</button></form><p class="auth-gate-note">Ask the owner for guest credentials. This shared guest login is for demonstrations only.</p>'+backLink();
+   title='Sign in with ID · ID बाट लगइन';sub='Enter your ID and password · ID र पासवर्ड राख्नुहोस्';
+   body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">User ID · प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Password · पासवर्ड</label><input id="guestPassword" type="password" autocomplete="current-password" required></div><button class="auth-submit" type="submit">Sign in · लगइन गर्नुहोस्</button></form><p class="auth-gate-note">Enter the ID and password supplied by the account administrator.</p>'+backLink();
  }else if(mode==='guestprofile'&&guestSession){
-   title='Guest · अतिथि';sub='Your guest learning session';body='<div class="auth-profile"><strong>🔑 Guest learner</strong><small>Learning progress stays on this device.</small></div><button class="auth-submit" type="button" data-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button type="button" class="auth-link" data-mode="signout">Sign out · लगआउट</button></div>';
+   title='My learning session · मेरो सत्र';sub='Continue your English learning';body='<div class="auth-profile"><strong>🔑 Signed in</strong><small>Learning progress stays on this device.</small></div><button class="auth-submit" type="button" data-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button type="button" class="auth-link" data-mode="signout">Sign out · लगआउट</button></div>';
  }else if(mode==='payment'&&currentUser&&!guestSession&&!isPaidUser()){
    title='Unlock lifetime access · आजीवन पहुँच';sub='रु. ९९९ एकपटक मात्र · NPR 999 one-time payment';
    const claim=submittedClaim();
@@ -3391,7 +3391,7 @@ function render(){
       '<small class="auth-help">Enter the reference only AFTER paying. The owner verifies it independently in the bank.</small></div>'+ 
       '<button class="auth-submit" type="submit">Submit payment reference · कारोबार नम्बर बुझाउनुहोस्</button></form>'}
    body+='<button class="auth-submit" type="button" data-mode="refreshpayment">🔄 Check approval · भुक्तानी जाँच गर्नुहोस्</button>'+paymentSupportHTML(claim)+
-    '<div class="auth-actions"><button class="auth-link" type="button" data-mode="signout">Sign out</button><button class="auth-link" type="button" data-mode="guest">Use free guest login · निःशुल्क अतिथि</button></div>';
+    '<div class="auth-actions"><button class="auth-link" type="button" data-mode="signout">Sign out · लगआउट</button></div>';
  }else if(mode==='profile'&&currentUser){
    const full=[currentFirst(),currentLast()].filter(Boolean).join(' ')||'Learner';
    title='My account · मेरो खाता';sub='Signed in securely · सुरक्षित रूपमा लगइन भयो';
@@ -3400,7 +3400,7 @@ function render(){
    title='Verify your email · इमेल प्रमाणित गर्नुहोस्';sub='Enter the 6-digit code · ६ अंकको कोड राख्नुहोस्';
    body=noticeHTML()+'<p class="auth-topline">Enter the six-digit code sent to <strong>'+escapeHTML(pendingEmail)+'</strong>. Check Spam/Junk too. · आफ्नो इमेल जाँच्नुहोस्।</p>'+ 
    '<form id="authVerifyForm" class="auth-form"><div class="auth-field"><label for="authOtp">Email verification code · प्रमाणिकरण कोड</label><input id="authOtp" class="auth-code-input" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" minlength="6" autocomplete="one-time-code" placeholder="6-digit email code" required><small class="auth-help">Never share your code. · आफ्नो कोड कसैलाई नदिनुहोस्।</small></div><button class="auth-submit" type="submit">Verify email · इमेल प्रमाणित गर्नुहोस्</button></form>'+ 
-   '<div class="auth-actions"><button class="auth-link" type="button" data-mode="resend">Send another code · फेरि कोड पठाउनुहोस्</button><button class="auth-link" type="button" data-mode="signin">Change email · इमेल बदल्नुहोस्</button></div>'+guestLink();
+   '<div class="auth-actions"><button class="auth-link" type="button" data-mode="resend">Send another code · फेरि कोड पठाउनुहोस्</button><button class="auth-link" type="button" data-mode="signin">Change email · इमेल बदल्नुहोस्</button></div>';
  }else if(mode==='recover'){
    title='Forgot your password?';sub='पासवर्ड बिर्सनुभयो? · Recover your account by email';
    body=noticeHTML()+'<p class="auth-topline">We will email you a secure password-reset link. · पासवर्ड रिसेट गर्ने लिङ्क पठाउँछौँ।</p><form class="auth-form" id="authRecoverForm">'+emailField('')+'<button class="auth-submit" type="submit">Send password reset email · रिसेट इमेल पठाउनुहोस्</button></form>'+backLink();
@@ -3414,9 +3414,9 @@ function render(){
    if(signup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" type="text" autocomplete="given-name" maxlength="60" required placeholder="First name"></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" type="text" autocomplete="family-name" maxlength="60" required placeholder="Last name"></div></div>';
    body+=emailField(pendingEmail);
    if(!codeSignIn)body+=passwordFields(signup);
-   body+=(signup?'<p class="auth-quiet">Verify your email with a 6-digit code, then pay रु. ९९९ once by bank QR for lifetime learning. Access opens after manual bank verification. Guest login remains free. · एकपटक तिर्नुहोस्, आजीवन सिक्नुहोस्।</p>':codeSignIn?'<p class="auth-quiet">For accounts created with email code before passwords were added. · पुरानो इमेल-कोड खाताका लागि।</p>':'<p class="auth-quiet">Use the password you created during signup. · खाता बनाउँदा राखेको पासवर्ड प्रयोग गर्नुहोस्।</p>')+
+   body+=(signup?'<p class="auth-quiet">Verify your email with a 6-digit code, then pay रु. ९९९ once by bank QR for lifetime learning. Access opens after manual bank verification. · एकपटक तिर्नुहोस्, आजीवन सिक्नुहोस्।</p>':codeSignIn?'<p class="auth-quiet">For accounts created with email code before passwords were added. · पुरानो इमेल-कोड खाताका लागि।</p>':'<p class="auth-quiet">Use the password you created during signup. · खाता बनाउँदा राखेको पासवर्ड प्रयोग गर्नुहोस्।</p>')+
    '<button class="auth-submit" type="submit">'+(signup?'Create account & send verification code · खाता र कोड':codeSignIn?'Send 6-digit sign-in code · इमेल कोड पठाउनुहोस्':'Sign in with password · पासवर्डले लगइन')+'</button></form>'+
-   (signup?'':codeSignIn?'<div class="auth-actions"><button type="button" class="auth-link" data-mode="signin">← Sign in with password</button></div>':'<div class="auth-actions"><button type="button" class="auth-link" data-mode="recover">Forgot password? · पासवर्ड बिर्सनुभयो?</button><button type="button" class="auth-link" data-mode="emailcode">Sign in with email code · इमेल कोड</button></div>')+guestLink()+backLink();
+   (signup?'':codeSignIn?'<div class="auth-actions"><button type="button" class="auth-link" data-mode="signin">← Sign in with password</button></div>':'<div class="auth-actions"><button type="button" class="auth-link" data-mode="recover">Forgot password? · पासवर्ड बिर्सनुभयो?</button><button type="button" class="auth-link" data-mode="emailcode">Sign in with email code · इमेल कोड</button></div>')+(mode==='signin'?guestLink():'')+backLink();
  }
 
  document.getElementById('authTitle').textContent=title;document.getElementById('authSubtitle').textContent=sub;
@@ -3557,10 +3557,10 @@ async function signOut(){
  catch(e){setBusy(false);status(friendlyError(e),'error')}
 }
 function updateHeader(){
- const first=currentFirst();accountBtn.textContent=guestSession&&!isPaidUser()?'🔑 Guest':currentUser?(isPaidUser()?'👤 ':'🔒 ')+(first||'My account'):'👤 Sign in';
- accountBtn.setAttribute('aria-label',guestSession&&!isPaidUser()?'Open guest account':currentUser?(isPaidUser()?'Open my account':'View pending payment'):'Sign in or create an account');
+ const first=currentFirst();accountBtn.textContent=guestSession&&!isPaidUser()?'🔑 Signed in':currentUser?(isPaidUser()?'👤 ':'🔒 ')+(first||'My account'):'👤 Sign in';
+ accountBtn.setAttribute('aria-label',guestSession&&!isPaidUser()?'Open my learning session':currentUser?(isPaidUser()?'Open my account':'View pending payment'):'Sign in or create an account');
  const greet=document.getElementById('greetSub');
- if(greet){if((currentUser&&first)||guestSession){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent=guestSession&&!isPaidUser()?'Welcome, Guest! · स्वागत छ!':'Welcome, '+first+'! · स्वागत छ!'}else if(greet.dataset.originalGreeting)greet.textContent=greet.dataset.originalGreeting}
+ if(greet){if((currentUser&&first)||guestSession){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent=guestSession&&!isPaidUser()?'Welcome back! · स्वागत छ!':'Welcome, '+first+'! · स्वागत छ!'}else if(greet.dataset.originalGreeting)greet.textContent=greet.dataset.originalGreeting}
 }
 accountBtn.addEventListener('click',()=>open());
 closeBtn.addEventListener('click',close);
