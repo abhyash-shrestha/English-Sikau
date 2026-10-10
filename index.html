@@ -1075,7 +1075,7 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 </nav>
 
 
-<!-- Login required: email accounts use Supabase; guest demo uses a shared client-side passcode. -->
+<!-- Login required: Stytch Email OTP or a shared guest-demo passcode. -->
 <div class="auth-modal" id="authModal">
   <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
     <div class="auth-cover">
@@ -1365,9 +1365,9 @@ function cached(k,v){if(arguments.length>1){TR_CACHE.set(k,v);if(TR_CACHE.size>1
 function romanNormalize(t){return String(t||'').trim().replace(/\bxaina\b/gi,'chhaina').replace(/\bxa\b/gi,'chha').replace(/\bchaina\b/gi,'chhaina').replace(/\btapai\b/gi,'tapaaee').replace(/\bmalai\b/gi,'malaai').replace(/\bk\b/gi,'ke')}
 /* ============ LIVE VISITOR STATS ============ */
 /*
-  Works after hosting when Supabase is configured.
+  Optional visitor statistics use Supabase REST only when separately configured (currently disabled).
   Use the PUBLIC anon/publishable key only — never a service-role key.
-  Run visitor_stats_setup.sql once, then paste your project URL + anon key below.
+  This is separate from the Stytch authentication code below.
 */
 var VISITOR_STATS_CONFIG={
   supabaseUrl:'',
@@ -3252,403 +3252,205 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
 </script>
 
 <script>
-/* ========= ENGLISH SIKAU · VERIFIED EMAIL ACCOUNT SYSTEM =========
-   1. Create a free Supabase project: https://supabase.com/dashboard
-   2. The public Project URL and publishable key are configured below (NEVER service_role).
-   3. Supabase admin: Authentication > Providers > Email: enable email confirmations.
-   4. Default Supabase emails contain confirmation links. A 6-digit code requires
-      configuring a custom email template and a working email delivery provider.
-   5. Authentication > URL Configuration: enter your hosted website's URL.
-   6. For public production signups, set up an SMTP service for reliable delivery.
-   Login is required: email verified Supabase session OR guest ID and password.
+/* ENGLISH SIKAU — Stytch Consumer Auth, 6-digit Email OTP
+   Browser-only SDK. The public token is meant to be in frontend code.
+   Never put a Stytch secret, Supabase service-role key, or SMTP password here.
+   Production setup: Frontend SDK > Authorized domains must include
+   https://abhyash-shrestha.github.io and Email OTP Log in or create + Send must be ON.
+   Password authentication is intentionally NOT offered while Stytch Passwords is OFF.
+   Guest credentials are browser-visible demo credentials, not protected access control.
 */
 (function(){
-  'use strict';
-  // Supabase publishable credentials are designed to be public: HTML source is NOT secret.
-  // NEVER place a service_role key, secret API key, SMTP password, or user password here.
-  const AUTH_CONFIG={
-    supabaseUrl:'https://rlkctvtfmdzhcozcohua.supabase.co',
-    publishableKey:'sb_publishable_RTGfz6UFCaxViDLrTmB--g_QzdGU2nO',
-    // Matches the Site URL and Redirect URLs in Supabase Authentication settings.
-    siteUrl:'https://abhyash-shrestha.github.io/English-Sikau/'
-  };
-  const modal=document.getElementById('authModal');
-  const content=document.getElementById('authContent');
-  const closeBtn=document.getElementById('authClose');
-  const accountBtn=document.getElementById('accountOpen');
-  let client=null,clientPromise=null,currentUser=null,mode='welcome',busy=false,lastFocus=null;
-  // Shared guest code is local-only and visible in the HTML source. Server-side
-  // authentication must replace it before using this for protected content.
-  const GUEST_ID='Nepal',GUEST_PASSWORD='@HamroNepal';
-  const GUEST_SESSION_KEY='english-sikau-guest-session-v1';
-  let guestSession=false;
-  try{guestSession=sessionStorage.getItem(GUEST_SESSION_KEY)==='active'}catch(_){}
-  function hasAccess(){return !!currentUser||guestSession}
-  function setGate(locked){
-    document.documentElement.classList.toggle('sikau-locked',locked);
-    for(const child of document.body.children){
-      if(child!==modal&&child.tagName!=='SCRIPT'&&child.tagName!=='STYLE')child.inert=locked;
-    }
-    if(locked){document.body.style.overflow='hidden';modal.hidden=false}
-  }
-  function grantAccess(){setGate(false);close()}
-  function requireAccess(){setGate(true);mode='welcome';notification=null;render();window.requestAnimationFrame(()=>{const btn=content.querySelector('button');if(btn)btn.focus()})}
-
-  let emailToVerify='',resendUntil=0,notification=null;
-  const clean=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function configured(){return /^https:\/\/[a-z0-9.-]+\/?.*$/i.test(AUTH_CONFIG.supabaseUrl.trim())&&AUTH_CONFIG.publishableKey.trim().length>20;}
-  function welcomeSeen(){try{return localStorage.getItem('sikau_account_welcome_v1')==='yes'}catch(_){return false}}
-  function rememberWelcome(){try{localStorage.setItem('sikau_account_welcome_v1','yes')}catch(_){}}
-  function setStatus(message,type){notification=message?{message:String(message),type:type||'info'}:null;render()}
-  function wrapNotice(){if(!notification)return '';return '<div class="auth-notice '+clean(notification.type)+'" role="status">'+clean(notification.message)+'</div>'}
-  function tabBar(){return '<div class="auth-tabs" role="tablist" aria-label="Account options"><button class="auth-tab" data-auth-mode="signup" role="tab" aria-selected="'+(mode==='signup')+'">Create account<br><span class="auth-help" style="color:inherit">खाता बनाउनुहोस्</span></button><button class="auth-tab" data-auth-mode="signin" role="tab" aria-selected="'+(mode==='signin')+'">Sign in<br><span class="auth-help" style="color:inherit">लगइन गर्नुहोस्</span></button></div>'}
-  function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" name="email" type="email" autocomplete="email" spellcheck="false" placeholder="you@gmail.com" required maxlength="254" value="'+clean(value||'')+'"><small class="auth-help">Gmail, Yahoo, Outlook, or any valid email · कुनै पनि इमेल</small></div>'}
-  function passwordField(autocomplete){return '<div class="auth-field"><label for="authPassword">Password · पासवर्ड</label><div class="auth-pass-row"><input id="authPassword" name="password" type="password" autocomplete="'+autocomplete+'" required minlength="10" placeholder="Enter password"><button type="button" class="auth-toggle" data-auth-show="authPassword" aria-label="Show or hide password">Show</button></div></div>'}
-  function ghostGuest(){return '<button type="button" class="auth-guest-btn" data-auth-mode="guest">🔑 Guest login · अतिथि लगइन (ID + password)</button>'}
-  // Client-side lock is per browser, not a server-side account lock.
-  // A real cross-device six-attempt lock requires a protected server endpoint.
-  const MAX_BAD_LOGINS=6, LOCKOUT_MS=30*60*1000;
-  const ATTEMPTS_KEY_PREFIX='english_sikau_failed_login_v2_';
-  function loginStorageKey(identifier){
-    // Short deterministic ID; do not store entered passwords or tokens here.
-    const normalized=String(identifier||'').trim().toLowerCase();
-    let h=2166136261;
-    for(let i=0;i<normalized.length;i++){h^=normalized.charCodeAt(i);h=Math.imul(h,16777619)}
-    return ATTEMPTS_KEY_PREFIX+(h>>>0).toString(16);
-  }
-  function getLoginAttempts(identifier){
-    const key=loginStorageKey(identifier);
-    try{
-      const r=JSON.parse(localStorage.getItem(key)||'null');
-      if(!r||!Number.isFinite(r.failures)||!Number.isFinite(r.updated))return {failures:0,lockedUntil:0};
-      if((r.lockedUntil||0)>0&&Date.now()>=r.lockedUntil){localStorage.removeItem(key);return {failures:0,lockedUntil:0}}
-      if(!r.lockedUntil&&Date.now()-r.updated>LOCKOUT_MS){localStorage.removeItem(key);return {failures:0,lockedUntil:0}}
-      return r;
-    }catch(_){return {failures:0,lockedUntil:0}}
-  }
-  function clearLoginAttempts(identifier){try{localStorage.removeItem(loginStorageKey(identifier))}catch(_){}}
-  function recordInvalidLogin(identifier){
-    const previous=getLoginAttempts(identifier), failures=Math.min(MAX_BAD_LOGINS,(previous.failures||0)+1);
-    const state={failures,updated:Date.now(),lockedUntil:failures>=MAX_BAD_LOGINS?Date.now()+LOCKOUT_MS:0};
-    try{localStorage.setItem(loginStorageKey(identifier),JSON.stringify(state))}catch(_){}
-    return state;
-  }
-  function lockoutMessage(state){
-    if(state.lockedUntil>Date.now()){
-      const mins=Math.ceil((state.lockedUntil-Date.now())/60000);
-      return 'Too many incorrect attempts. Sign-in on this device is locked for '+mins+' minute'+(mins===1?'':'s')+'. You can reset your password using Forgot password. · धेरै प्रयास भयो, केही समयपछि प्रयास गर्नुहोस्।';
-    }
-    const left=MAX_BAD_LOGINS-(state.failures||0);
-    return 'Incorrect email or password. '+left+' attempt'+(left===1?'':'s')+' remaining before a 30-minute lock. · इमेल वा पासवर्ड गलत छ।';
-  }
-  function isWrongPassword(err){
-    const code=String(err&&err.code||'').toLowerCase();
-    const message=String(err&&err.message||'').toLowerCase();
-    return code==='invalid_credentials'||/invalid login credentials|invalid email or password|invalid password|wrong password|incorrect password/.test(message);
-  }
-  function render(){
-    if(!modal||!content)return;
-    let title='',subtitle='',body='';
-    if(currentUser&&mode!=='reset')mode='profile';
-    if(mode==='welcome'&&!hasAccess()){
-      title='Welcome to English Sikau!';
-      subtitle='स्वागत छ! · Sign in to start learning English';
-      body='<p class="auth-gate-brand">🇳🇵 Learn English, anytime · जहाँसुकै, जुनसुकै बेला</p>'+wrapNotice()+
-        '<div class="auth-entry-grid">'+
-        '<button type="button" class="auth-entry-choice" data-auth-mode="signup"><span class="auth-entry-icon">✨</span><span><strong>Create account</strong><small>नयाँ खाता बनाउनुहोस् · Email confirmation link</small></span><span class="auth-entry-arrow">→</span></button>'+
-        '<button type="button" class="auth-entry-choice" data-auth-mode="signin"><span class="auth-entry-icon">👤</span><span><strong>Sign in</strong><small>लगइन गर्नुहोस् · Use your email and password</small></span><span class="auth-entry-arrow">→</span></button>'+
-        '<button type="button" class="auth-entry-choice" data-auth-mode="guest"><span class="auth-entry-icon">🔑</span><span><strong>Guest login</strong><small>अतिथि लगइन · Guest ID and password required</small></span><span class="auth-entry-arrow">→</span></button></div>'+
-        '<p class="auth-gate-note">An account or valid guest login is required to open lessons.<br>पाठहरू हेर्न खाता वा अतिथि लगइन अनिवार्य छ।</p>';
-    }else if(mode==='guest'&&!hasAccess()){
-      title='Guest login · अतिथि लगइन';
-      subtitle='Enter your guest User ID and password · अतिथि विवरण राख्नुहोस्';
-      body=wrapNotice()+'<form class="auth-form" id="authGuestForm">'+
-        '<div class="auth-field"><label for="guestUserId">Guest User ID · अतिथि प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Enter guest User ID" required></div>'+
-        '<div class="auth-field"><label for="guestPassword">Guest password · अतिथि पासवर्ड</label><div class="auth-pass-row"><input id="guestPassword" type="password" autocomplete="current-password" placeholder="Enter guest password" required><button type="button" class="auth-toggle" data-auth-show="guestPassword">Show</button></div></div>'+
-        '<button class="auth-submit" type="submit">🔓 Unlock learning · सिकाइ सुरु गर्नुहोस्</button></form>'+
-        '<p class="auth-gate-note">Ask the app owner for your guest login details. After six wrong tries, guest access is locked on this device for 30 minutes.<br>अतिथि लगइन विवरणका लागि एप सञ्चालकलाई सोध्नुहोस्।</p>'+
-        '<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← Other login options · अन्य विकल्प</button></div>';
-    }else if(mode==='guestprofile'&&guestSession){
-      title='Guest account · अतिथि खाता';subtitle='You are learning in Guest Mode · अतिथि मोड';
-      body='<div class="auth-profile"><strong>🔑 Guest · Nepal</strong><small>Shared guest access · स्थानीय उपकरणमा प्रगति सुरक्षित</small></div>'+ 
-        '<p class="auth-help">Lessons work without a personal account. Learning progress stays on this device and is not synced between learners.</p>'+
-        '<button type="button" class="auth-submit" data-auth-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button class="auth-link" type="button" data-auth-mode="signout">Sign out · लगआउट</button></div>';
-    }else if(mode==='profile'&&currentUser){
-      const md=currentUser.user_metadata||{};
-      const first=String(md.first_name||''),last=String(md.last_name||'');
-      const name=(first+' '+last).trim()||String(md.full_name||'').trim()||'Learner';
-      title='My account · मेरो खाता';subtitle='Your English Sikau learning account';
-      body='<p class="auth-topline">✅ Signed in successfully · लगइन सफल भयो</p><div class="auth-profile"><strong>👤 '+clean(name)+'</strong><small>'+clean(currentUser.email||'')+'</small></div><p class="auth-help">Your account works with your email and password. Lessons and existing progress remain saved on this device; cloud progress sync is not configured.</p><button type="button" class="auth-submit" data-auth-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button type="button" class="auth-link" data-auth-mode="signout">Sign out · लगआउट</button></div>';
-    }else if(mode==='verify'){
-      title='Check your email · आफ्नो इमेल जाँच्नुहोस्';
-      subtitle='Tap the confirmation link in your email · इमेलमा आएको लिङ्क खोल्नुहोस्';
-      body=wrapNotice()+
-        '<p class="auth-topline">Signup was submitted for <strong>'+clean(emailToVerify||'your email')+'</strong>. New account? Check your inbox and Spam/Junk. Already verified this email? Sign in instead. · पहिले खाता बनाइसक्नुभएको छ भने लगइन गर्नुहोस्।</p>'+
-        '<div class="auth-confirm-guide" role="note"><strong>📩 What to do next · अब के गर्ने?</strong>'+
-        '<ol><li><b>Already confirmed this email?</b> Tap <b>Sign in</b> below. You do not need to sign up again.</li><li><b>New account?</b> If you receive an email from <b>Supabase Auth</b>, tap <b>Confirm email address</b>.</li><li>If you opened the confirmation link on another device, return here and sign in with your original password.</li></ol>'+
-        '<span class="auth-help">इमेलमा “Confirm email address” थिच्नुहोस्। त्यसपछि English Sikau वेबसाइट खुल्छ।</span></div>'+
-        '<button class="auth-submit" type="button" data-auth-mode="signin">Already have an account? Sign in · लगइन गर्नुहोस्</button>'+
-        '<p class="auth-help" style="margin-top:12px"><b>Not receiving emails?</b> Supabase built-in sender is restricted to project-team addresses. The site owner must configure SMTP to email other students. · अन्य विद्यार्थीलाई इमेल पठाउन SMTP चाहिन्छ।</p>'+'<div class="auth-actions"><button class="auth-link" data-auth-mode="resend" type="button">Resend confirmation email · फेरि पठाउनुहोस्</button><button class="auth-link" data-auth-mode="signup" type="button">Change email</button></div>'+
-        '<button type="button" class="auth-secondary-toggle" data-auth-mode="verifycode">Have a 6-digit code instead? · ६ अंकको कोड छ?</button>'+ghostGuest();
-    }else if(mode==='verifycode'){
-      title='Enter your email code · इमेल कोड राख्नुहोस्';
-      subtitle='Only use this if your email contains a numeric code · इमेलमा कोड आएको भए मात्र';
-      body=wrapNotice()+'<p class="auth-topline">Verify <strong>'+clean(emailToVerify||'your email')+'</strong> using the 6-digit code from the email.</p>'+
-        '<form id="authVerifyForm" class="auth-form"><div class="auth-field"><label for="authOtp">6-digit verification code · ६ अंकको कोड</label><input class="auth-code-input" id="authOtp" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" placeholder="6-digit email code" required aria-describedby="authOtpHelp"><small id="authOtpHelp" class="auth-help">The default Supabase email contains a link, not a code. Use this only when your email has six digits. Never share your code.</small></div><button class="auth-submit" type="submit">Verify and start learning · प्रमाणित गर्नुहोस्</button></form>'+
-        '<div class="auth-actions"><button class="auth-link" data-auth-mode="verify" type="button">← Email link instructions</button><button class="auth-link" data-auth-mode="resend" type="button">Resend email</button></div>'+ghostGuest();
-    }else if(mode==='forgot'){
-      title='Reset password · पासवर्ड रिसेट';subtitle='We will email you a secure password-reset link.';
-      body=wrapNotice()+'<form id="authForgotForm" class="auth-form">'+emailField(emailToVerify)+'<button class="auth-submit" type="submit">Send reset email · इमेल पठाउनुहोस्</button></form><div class="auth-actions"><button class="auth-link" data-auth-mode="signin">Back to sign in</button></div>'+ghostGuest();
-    }else if(mode==='reset'){
-      title='Create a new password · नयाँ पासवर्ड';subtitle='Choose a strong password for your account.';
-      body=wrapNotice()+'<form id="authResetForm" class="auth-form">'+passwordField('new-password')+'<div class="auth-field"><label for="authConfirm">Confirm new password</label><input id="authConfirm" type="password" autocomplete="new-password" minlength="10" required></div><button class="auth-submit" type="submit">Update password</button></form>';
-    }else{
-      const isSignup=mode!=='signin';mode=isSignup?'signup':'signin';
-      title=isSignup?'Create your free account':'Welcome back!';
-      subtitle=isSignup?'निःशुल्क खाता बनाउनुहोस् · Learn English at your own pace.':'फेरि स्वागत छ · Sign in to keep learning.';
-      body=tabBar()+wrapNotice();
-
-      body+='<form class="auth-form" id="'+(isSignup?'authSignupForm':'authSigninForm')+'">';
-      if(isSignup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" name="given-name" type="text" autocomplete="given-name" maxlength="60" placeholder="First name" required></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" name="family-name" type="text" autocomplete="family-name" maxlength="60" placeholder="Last name" required></div></div>';
-      body+=emailField(emailToVerify)+passwordField(isSignup?'new-password':'current-password');
-      if(isSignup)body+='<div class="auth-field"><label for="authConfirm">Confirm password · पुष्टि गर्नुहोस्</label><div class="auth-pass-row"><input id="authConfirm" type="password" autocomplete="new-password" required minlength="10" placeholder="Confirm your password"><button class="auth-toggle" type="button" data-auth-show="authConfirm">Show</button></div><small class="auth-help">At least 10 characters, including a letter and a number. Passwords are handled by the authentication service and are never stored in this HTML.</small></div>';
-      body+='<button type="submit" class="auth-submit">'+(isSignup?'Create account & send confirmation email':'Sign in with email & password')+'</button></form>';
-      if(!isSignup){
-        body+='<div class="auth-actions"><button class="auth-link" data-auth-mode="forgot" type="button">Forgot password? · पासवर्ड बिर्सनुभयो?</button></div>';
-        body+='<p class="auth-lockout-help">🔒 Six failed attempts pause sign-in in this browser for 30 minutes. This is a device-only limit, not an account-wide security lock. · ६ प्रयासपछि यो ब्राउजरमा ३० मिनेट रोक्छ।</p>';
-      }else{
-        body+='<p class="auth-quiet">New account? Check your email for a confirmation link. Already signed up? Select <b>Sign in</b> above instead of creating another account. Public email delivery requires the owner to configure SMTP in Supabase.</p>';
-      }
-      body+=ghostGuest()+'<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← All login options</button></div>';
-    }
-    document.getElementById('authTitle').textContent=title;
-    document.getElementById('authSubtitle').textContent=subtitle;
-    content.innerHTML=body;
-    if(busy)content.querySelectorAll('button[type="submit"],button[data-auth-mode="resend"]').forEach(b=>{b.disabled=true});
-    content.querySelectorAll('[data-auth-mode]').forEach(button=>button.addEventListener('click',()=>choose(button.dataset.authMode)));
-    content.querySelectorAll('[data-auth-show]').forEach(button=>button.addEventListener('click',()=>{const input=document.getElementById(button.dataset.authShow);input.type=input.type==='password'?'text':'password';button.textContent=input.type==='password'?'Show':'Hide'}));
-    const signup=document.getElementById('authSignupForm');if(signup)signup.addEventListener('submit',register);
-    const signin=document.getElementById('authSigninForm');if(signin)signin.addEventListener('submit',login);
-    const verify=document.getElementById('authVerifyForm');if(verify)verify.addEventListener('submit',confirmCode);
-    const forgot=document.getElementById('authForgotForm');if(forgot)forgot.addEventListener('submit',sendReset);
-    const reset=document.getElementById('authResetForm');if(reset)reset.addEventListener('submit',updatePassword);
-    const guest=document.getElementById('authGuestForm');if(guest)guest.addEventListener('submit',loginGuest);
-  }
-  function open(target){
-    lastFocus=document.activeElement;mode=target||(currentUser?'profile':(guestSession?'guestprofile':(emailToVerify?'verify':'welcome')));
-    notification=null;render();modal.hidden=false;document.body.style.overflow='hidden';rememberWelcome();
-    window.requestAnimationFrame(()=>{const e=content.querySelector('input,button');if(e)e.focus()});
-  }
-  function close(){if(!hasAccess())return;modal.hidden=true;document.body.style.overflow='';rememberWelcome();notification=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
-  function choose(next){
-    if(busy)return;
-    if(next==='close'){close();return}
-    if(next==='signout'){signout();return}
-    if(next==='resend'){resend();return}
-    if(next==='setup')return;
-    mode=next;notification=null;render();
-  }
-  function loginGuest(event){
-    event.preventDefault();
-    if(busy)return;
-    const id=document.getElementById('guestUserId').value.trim();
-    const pass=document.getElementById('guestPassword').value;
-    const guestLock=getLoginAttempts('guest-access');
-    if(guestLock.lockedUntil>Date.now()){
-      setStatus(lockoutMessage(guestLock),'error');return;
-    }
-    if(id!==GUEST_ID||pass!==GUEST_PASSWORD){
-      setStatus(lockoutMessage(recordInvalidLogin('guest-access')),'error');return;
-    }
-    clearLoginAttempts('guest-access');
-    guestSession=true;
-    try{sessionStorage.setItem(GUEST_SESSION_KEY,'active')}catch(_){}
-    mode='guestprofile';updateHeader();grantAccess();
-  }
-  function errors(error){
-    const s=String(error&&error.message||error||'Unable to complete this request.').replace(/\s+/g,' ').slice(0,240);
-    if(/failed to fetch|network|load failed/i.test(s))return 'Network unavailable. Connect to the internet and try again. · इन्टरनेट जाँच्नुहोस्।';
-    if(/email address not authorized|email not authorized/i.test(s))return 'Supabase default email delivery only allows authorized project-team addresses. Public student signup requires a custom SMTP provider. · नयाँ विद्यार्थीलाई इमेल पठाउन SMTP सेवा चाहिन्छ।';
-    if(/rate limit|too many/i.test(s))return 'Too many attempts. Please try again later. · केही समयपछि प्रयास गर्नुहोस्।';
-    if(/user already registered|already registered/i.test(s))return 'This email may already have an account. Select Sign in and use your existing password, or Forgot password if needed. · पहिले दर्ता गर्नुभएको छ भने लगइन गर्नुहोस्।';
-    if(/email not confirmed/i.test(s))return 'Email is not confirmed yet. Open the latest confirmation email. If no email arrives, ask the app owner to configure SMTP. · इमेल प्रमाणित भएको छैन।';
-    return s;
-  }
-  function setBusy(state){busy=state;content.querySelectorAll('button[type="submit"],button[data-auth-mode="resend"]').forEach(b=>b.disabled=state)}
-  function loadClient(){
-    if(!configured())return Promise.reject(new Error('Email authentication is temporarily unavailable. Please try again later.'));
-    if(client)return Promise.resolve(client);
-    if(clientPromise)return clientPromise;
-    clientPromise=new Promise((resolve,reject)=>{
-      function init(){try{
-        if(!window.supabase||typeof window.supabase.createClient!=='function')throw new Error('Authentication library did not load.');
-        client=window.supabase.createClient(AUTH_CONFIG.supabaseUrl.trim().replace(/\/$/,''),AUTH_CONFIG.publishableKey.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storageKey:'english-sikau-auth-v1'}});
-        client.auth.onAuthStateChange((event,session)=>{
-          // Do not call other auth functions synchronously in this callback.
-          const previouslySignedIn=!!currentUser;
-          currentUser=session&&session.user||null;updateHeader();
-          if(currentUser){
-            try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}
-            emailToVerify='';grantAccess();
-          }else if(!guestSession&&(event==='SIGNED_OUT'||previouslySignedIn)){requireAccess()}
-          if(event==='PASSWORD_RECOVERY')queueMicrotask(()=>open('reset'));
-        });
-        resolve(client);
-      }catch(err){reject(err)}}
-      if(window.supabase){init();return}
-      const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';script.crossOrigin='anonymous';script.onload=init;script.onerror=()=>reject(new Error('Could not load the authentication service. Check internet connection.'));document.head.appendChild(script);
-    }).catch(err=>{clientPromise=null;throw err});
-    return clientPromise;
-  }
-  function checkPassword(password,confirm){
-    if(password.length<10||!/[a-z\u00C0-\u024F]/i.test(password)||!/\d/.test(password))throw new Error('Use at least 10 characters including one letter and one number.');
-    if(confirm!==undefined&&password!==confirm)throw new Error('Passwords do not match. · पासवर्ड मिलेन।');
-  }
-  function persistPending(email){emailToVerify=email;try{sessionStorage.setItem('sikau_email_verification_pending',email)}catch(_){}}
-  async function register(ev){
-    ev.preventDefault();if(busy)return;
-    const first=document.getElementById('authFirst').value.trim().replace(/\s+/g,' ');
-    const last=document.getElementById('authLast').value.trim().replace(/\s+/g,' ');
-    const email=document.getElementById('authEmail').value.trim().toLowerCase();
-    const password=document.getElementById('authPassword').value;
-    const confirm=document.getElementById('authConfirm').value;
-    try{
-      if(!first||!last)throw Error('Please enter both your first and last name.');
-      checkPassword(password,confirm);setBusy(true);
-      const api=await loadClient();
-      const {data,error}=await api.auth.signUp({email,password,options:{emailRedirectTo:AUTH_CONFIG.siteUrl,data:{first_name:first,last_name:last,full_name:first+' '+last}}});
-      if(error)throw error;
-      if(data&&data.session){await api.auth.signOut();throw Error('Email confirmation must be enabled before new accounts can be verified. Please contact support.');}
-      persistPending(email);mode='verify';busy=false;
-      setStatus('Signup request submitted. If this is a new account, check your email (including Spam/Junk). If you previously verified this address, choose Sign in instead; Supabase may not send a new signup email. · पहिले खाता छ भने लगइन गर्नुहोस्।','info');
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
-  }
-  async function confirmCode(ev){
-    ev.preventDefault();if(busy)return;
-    const token=document.getElementById('authOtp').value.trim();
-    if(!/^\d{6}$/.test(token)){setStatus('Enter the 6-digit numeric code shown in your email.','error');return}
-    try{
-      setBusy(true);const api=await loadClient();
-      const {data,error}=await api.auth.verifyOtp({email:emailToVerify,token,type:'email'});
-      if(error)throw error;
-      if(!data||!data.user||!data.session)throw Error('Could not finish verification. Please try signing in.');
-      try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}
-      emailToVerify='';currentUser=data.user;updateHeader();mode='profile';busy=false;grantAccess();
-      setStatus('Email verified. Your account is ready! · इमेल प्रमाणित भयो।','success');
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
-  }
-  async function resend(){
-    if(busy)return;
-    if(Date.now()<resendUntil){setStatus('Please wait a minute before requesting another code.','error');return}
-    try{
-      setBusy(true);const api=await loadClient();
-      if(!emailToVerify)throw Error('Enter your email address first.');
-      const {error}=await api.auth.resend({type:'signup',email:emailToVerify,options:{emailRedirectTo:AUTH_CONFIG.siteUrl}});if(error)throw error;
-      resendUntil=Date.now()+60000;setBusy(false);
-      setStatus('Resend request submitted. If this is an unconfirmed account and delivery is configured, check Inbox/Spam. An already confirmed account may not receive another signup email: use Sign in.','info');
-    }catch(err){setBusy(false);setStatus(errors(err),'error')}
-  }
-  async function login(ev){
-    ev.preventDefault();if(busy)return;
-    const email=document.getElementById('authEmail').value.trim().toLowerCase();
-    const password=document.getElementById('authPassword').value;
-    emailToVerify=email;
-    const lock=getLoginAttempts(email);
-    if(lock.lockedUntil>Date.now()){setStatus(lockoutMessage(lock),'error');return;}
-    try{
-      setBusy(true);const api=await loadClient();
-      const {data,error}=await api.auth.signInWithPassword({email,password});if(error)throw error;
-      if(!data||!data.user)throw Error('Unable to sign in.');
-      clearLoginAttempts(email);
-      currentUser=data.user;emailToVerify='';try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}updateHeader();mode='profile';busy=false;grantAccess();
-      setStatus('Welcome back! · पुनः स्वागत छ।','success');
-    }catch(error){
-      setBusy(false);
-      if(isWrongPassword(error)){setStatus(lockoutMessage(recordInvalidLogin(email)),'error')}
-      else setStatus(errors(error),'error');
-    }
-  }
-  async function sendReset(ev){
-    ev.preventDefault();if(busy)return;
-    const email=document.getElementById('authEmail').value.trim().toLowerCase();
-    emailToVerify=email;
-    try{
-      setBusy(true);const api=await loadClient();
-      // Never send reset links to file://, localhost, or an arbitrary preview URL.
-      const options={redirectTo:AUTH_CONFIG.siteUrl};
-      const {error}=await api.auth.resetPasswordForEmail(email,options);if(error)throw error;
-      setBusy(false);setStatus('If this address is registered, a password reset email will arrive. Open the link to create a new password.','success');
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
-  }
-  async function updatePassword(ev){
-    ev.preventDefault();if(busy)return;
-    const password=document.getElementById('authPassword').value;
-    try{
-      checkPassword(password,document.getElementById('authConfirm').value);setBusy(true);
-      const api=await loadClient();const {error}=await api.auth.updateUser({password});if(error)throw error;
-      if(currentUser&&currentUser.email)clearLoginAttempts(currentUser.email);
-      if(emailToVerify)clearLoginAttempts(emailToVerify);
-      mode='profile';busy=false;setStatus('Password updated successfully.','success');
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
-  }
-  async function signout(){
-    if(guestSession&&!currentUser){
-      guestSession=false;
-      try{sessionStorage.removeItem(GUEST_SESSION_KEY)}catch(_){}
-      busy=false;updateHeader();requireAccess();return;
-    }
-    try{setBusy(true);const api=await loadClient();const {error}=await api.auth.signOut();if(error)throw error;
-      currentUser=null;emailToVerify='';guestSession=false;try{sessionStorage.removeItem(GUEST_SESSION_KEY)}catch(_){}mode='welcome';busy=false;updateHeader();requireAccess();
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
-  }
-  function updateHeader(){
-    const meta=currentUser&&(currentUser.user_metadata||{});
-    const first=meta&&meta.first_name?String(meta.first_name).trim():'';
-    accountBtn.textContent=currentUser?'👤 '+(first||'My account'):(guestSession?'🔑 Guest':'👤 Sign in');
-    accountBtn.setAttribute('aria-label',currentUser?'Open my account':(guestSession?'Open guest account':'Sign in or create an account'));
-    accountBtn.title=currentUser?'My account · मेरो खाता':(guestSession?'Guest account · अतिथि खाता':'Sign up / Sign in · खाता');
-    const greet=document.getElementById('greetSub');
-    if(greet){
-      if((currentUser&&first)||guestSession){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent=guestSession&&!currentUser?'Welcome, Guest! · अतिथिलाई स्वागत छ!':'Welcome, '+first+'! · स्वागत छ '+first+'!'}
-      else if(greet.dataset.originalGreeting)greet.textContent=greet.dataset.originalGreeting;
-    }
-  }
-  accountBtn.addEventListener('click',()=>open());
-  closeBtn.addEventListener('click',close);
-  modal.addEventListener('click',event=>{if(event.target===modal&&!busy)close()});
-  document.addEventListener('keydown',event=>{
-    if(modal.hidden)return;
-    if(event.key==='Escape'&&!busy){event.preventDefault();close()}
-    if(event.key==='Tab'){
-      const focusable=Array.from(modal.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled)')).filter(el=>el.getClientRects().length);
-      if(!focusable.length)return;
-      if(event.shiftKey&&document.activeElement===focusable[0]){event.preventDefault();focusable[focusable.length-1].focus()}
-      if(!event.shiftKey&&document.activeElement===focusable[focusable.length-1]){event.preventDefault();focusable[0].focus()}
-    }
-  });
-  try{emailToVerify=sessionStorage.getItem('sikau_email_verification_pending')||''}catch(_){}
-  // Supabase may redirect after a token expires/was already consumed. Show an
-  // actionable message instead of returning users to an unexplained login page.
-  let callbackError=false;
-  try{
-    const query=new URLSearchParams(window.location.search);
-    const fragment=new URLSearchParams(window.location.hash.replace(/^#/,''));
-    callbackError=Boolean(query.get('error')||fragment.get('error'));
-  }catch(_){}
-  updateHeader();
-  // Login is always required on new visits. A previous guest session is tab-scoped.
-  if(guestSession){setGate(false);modal.hidden=true;document.body.style.overflow='';updateHeader()}
-  else requireAccess();
-  if(callbackError&&!currentUser){
-    mode=emailToVerify?'verify':'signin';
-    notification={message:'The confirmation or reset link has expired or is invalid. Request a new email or try signing in. · इमेल लिङ्कको म्याद सकिएको हुन सक्छ। फेरि इमेल माग्नुहोस्।',type:'error'};
-    render();
-    // Discard error query parameters only; never remove a valid auth token.
-    try{history.replaceState(null,document.title,location.pathname)}catch(_){}
-  }
-  if(configured())loadClient().then(api=>api.auth.getSession()).then(({data})=>{
-    if(data&&data.session&&data.session.user){currentUser=data.session.user;updateHeader();grantAccess()}
-  }).catch(err=>{console.warn('Email account initialization:',errors(err))});
+'use strict';
+const STYTCH_PUBLIC_TOKEN='public-token-live-4dd4a905-91ee-47dc-be76-73a37888cc98';
+const STYTCH_SDK_URL='https://esm.sh/@stytch/vanilla-js@6.3.0?bundle';
+const STYTCH_SDK_FALLBACK='https://cdn.jsdelivr.net/npm/@stytch/vanilla-js@6.3.0/+esm';
+const modal=document.getElementById('authModal');
+const content=document.getElementById('authContent');
+const closeBtn=document.getElementById('authClose');
+const accountBtn=document.getElementById('accountOpen');
+if(!modal||!content||!closeBtn||!accountBtn)return;
+let sdk=null, sdkPromise=null, currentUser=null, mode='welcome', busy=false, lastFocus=null;
+let pendingEmail='', pendingMethodId='', firstName='', lastName='', resendUntil=0, notice=null;
+const GUEST_ID='Nepal',GUEST_PASSWORD='@HamroNepal';
+const GUEST_KEY='english-sikau-guest-session-v1';
+const OTP_KEY='english-sikau-stytch-otp-pending-v1';
+const MAX_ATTEMPTS=6,LOCKOUT_MS=30*60*1000;
+let guestSession=false;
+try{guestSession=sessionStorage.getItem(GUEST_KEY)==='active'}catch(_){}
+const escapeHTML=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function savePending(){try{sessionStorage.setItem(OTP_KEY,JSON.stringify({email:pendingEmail,method_id:pendingMethodId,first:firstName,last:lastName,expires:Date.now()+10*60*1000}))}catch(_){}}
+function clearPending(){pendingEmail='';pendingMethodId='';firstName='';lastName='';try{sessionStorage.removeItem(OTP_KEY)}catch(_){}}
+try{const p=JSON.parse(sessionStorage.getItem(OTP_KEY)||'null');if(p&&p.expires>Date.now()&&/^email-/.test(p.method_id||'')){pendingEmail=p.email||'';pendingMethodId=p.method_id;firstName=p.first||'';lastName=p.last||'';}else sessionStorage.removeItem(OTP_KEY)}catch(_){}
+function hasAccess(){return !!currentUser||guestSession}
+function gate(locked){
+  document.documentElement.classList.toggle('sikau-locked',locked);
+  for(const child of document.body.children){if(child!==modal&&child.tagName!=='SCRIPT'&&child.tagName!=='STYLE')child.inert=locked;}
+  document.body.style.overflow=locked?'hidden':'';
+  if(locked)modal.hidden=false;
+}
+function grantAccess(){gate(false);close()}
+function requireAccess(){gate(true);mode='welcome';notice=null;render();}
+function status(message,type='info'){notice=message?{message,type}:null;render()}
+function noticeHTML(){return notice?'<div class="auth-notice '+escapeHTML(notice.type)+'" role="status">'+escapeHTML(notice.message)+'</div>':''}
+function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" type="email" autocomplete="email" required maxlength="254" value="'+escapeHTML(value||'')+'" placeholder="you@gmail.com"><small class="auth-help">Gmail, Yahoo, Outlook, or any email provider · कुनै पनि इमेल</small></div>'}
+function guestLink(){return '<button class="auth-guest-btn" type="button" data-mode="guest">🔑 Guest login · अतिथि लगइन (ID + password)</button>'}
+function backLink(){return '<div class="auth-back-row"><button class="auth-link" type="button" data-mode="welcome">← Other login options · अन्य विकल्पहरू</button></div>'}
+function attemptsKey(identity){let hash=2166136261;for(const c of String(identity).trim().toLowerCase()){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619)}return 'sikau-stytch-attempts-'+(hash>>>0).toString(16)}
+function attempts(identity){try{const key=attemptsKey(identity),s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.updated+LOCKOUT_MS>Date.now())return s;localStorage.removeItem(key);}catch(_){}return {failures:0,updated:0,lockedUntil:0}}
+function fail(identity){const prev=attempts(identity),failures=Math.min(MAX_ATTEMPTS,prev.failures+1),s={failures,updated:Date.now(),lockedUntil:failures>=MAX_ATTEMPTS?Date.now()+LOCKOUT_MS:0};try{localStorage.setItem(attemptsKey(identity),JSON.stringify(s))}catch(_){}return s}
+function clearAttempts(identity){try{localStorage.removeItem(attemptsKey(identity))}catch(_){}}
+function lockMessage(s){return s.lockedUntil>Date.now()?'Too many attempts. Wait '+Math.ceil((s.lockedUntil-Date.now())/60000)+' minutes before trying again. · धेरै प्रयास भयो, कृपया पर्खनुहोस्।':'Incorrect code or credentials. '+(MAX_ATTEMPTS-s.failures)+' tries remaining on this device. · गलत कोड वा विवरण।'}
+function friendlyError(e){let s=String(e&&(e.error_message||e.message)||e||'Unable to complete request.').replace(/\s+/g,' ').slice(0,220);
+  if(/rate.?limit|too many|429/i.test(s))return 'Too many requests. Please wait before trying again. · केही बेर पर्खनुहोस्।';
+  if(/invalid.*(otp|code)|otp.*(expired|invalid)|code.*(expired|wrong)|otp_code_not_found/i.test(s))return 'The code is incorrect or expired. Check the latest email or request another code. · कोड मिलेन वा म्याद सकियो।';
+  if(/unauthorized|endpoint_not_authorized_for_sdk|sdk.*not.*enabled|forbidden/i.test(s))return 'Stytch access is not enabled for this website. Check Production → Frontend SDK → Authorized domains and Email OTP permissions.';
+  if(/failed to fetch|network|load failed|importing a module|fetch dynamically imported/i.test(s))return 'Could not connect to Stytch. Check your internet connection and whether the email service is available.';
+  return s;
+}
+function currentEmail(){return String(currentUser?.emails?.find(e=>e.verified)?.email||currentUser?.emails?.[0]?.email||'')}
+function savedName(){try{return JSON.parse(localStorage.getItem('sikau-stytch-name:'+currentUser?.user_id)||'null')||{}}catch(_){return {}}}
+function currentFirst(){return String(currentUser?.name?.first_name||savedName().first_name||'').trim()}
+function currentLast(){return String(currentUser?.name?.last_name||savedName().last_name||'').trim()}
+function render(){
+ let title='',sub='',body='';
+ if(currentUser)mode='profile';
+ if(mode==='welcome'&&!hasAccess()){
+  title='Welcome to English Sikau!';sub='स्वागत छ! · Learn English at your own pace';
+  body=noticeHTML()+'<p class="auth-gate-brand">🇳🇵 Free English learning · निःशुल्क अंग्रेजी सिकाइ</p><div class="auth-entry-grid">'+
+   '<button class="auth-entry-choice" type="button" data-mode="signup"><span class="auth-entry-icon">✨</span><span><strong>Create account</strong><small>खाता बनाउनुहोस् · Receive a 6-digit email code</small></span><span class="auth-entry-arrow">→</span></button>'+
+   '<button class="auth-entry-choice" type="button" data-mode="signin"><span class="auth-entry-icon">✉️</span><span><strong>Sign in with email code</strong><small>६ अंकको कोडले लगइन गर्नुहोस् · No password needed</small></span><span class="auth-entry-arrow">→</span></button>'+
+   '<button class="auth-entry-choice" type="button" data-mode="guest"><span class="auth-entry-icon">🔑</span><span><strong>Guest login</strong><small>अतिथि लगइन · ID and password required</small></span><span class="auth-entry-arrow">→</span></button></div>'+
+   '<p class="auth-gate-note">Enter a code sent to your email to start learning. · सिक्न इमेल कोड प्रयोग गर्नुहोस्।</p>';
+ }else if(mode==='guest'&&!hasAccess()){
+  title='Guest login · अतिथि लगइन';sub='Enter the guest ID and password';
+  body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">Guest ID · अतिथि ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Guest password · पासवर्ड</label><input id="guestPassword" type="password" autocomplete="current-password" required></div><button class="auth-submit" type="submit">Unlock learning · सिकाइ सुरु गर्नुहोस्</button></form><p class="auth-gate-note">Ask the owner for guest credentials. This shared guest login is for demonstrations only.</p>'+backLink();
+ }else if(mode==='guestprofile'&&guestSession){
+  title='Guest · अतिथि';sub='Your guest learning session';body='<div class="auth-profile"><strong>🔑 Guest learner</strong><small>Learning progress stays on this device.</small></div><button class="auth-submit" type="button" data-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button type="button" class="auth-link" data-mode="signout">Sign out · लगआउट</button></div>';
+ }else if(mode==='profile'&&currentUser){
+  const full=[currentFirst(),currentLast()].filter(Boolean).join(' ')||'Learner';
+  title='My account · मेरो खाता';sub='Email verified with Stytch · इमेल प्रमाणित भयो';
+  body=noticeHTML()+'<div class="auth-profile"><strong>👤 '+escapeHTML(full)+'</strong><small>'+escapeHTML(currentEmail())+'</small></div><p class="auth-help">Your learning progress remains stored on this device. Cloud progress synchronization is not enabled.</p><button class="auth-submit" type="button" data-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button class="auth-link" type="button" data-mode="signout">Sign out · लगआउट</button></div>';
+ }else if(mode==='verify'){
+  title='Verify your email · इमेल प्रमाणित गर्नुहोस्';sub='Enter the 6-digit code · ६ अंकको कोड राख्नुहोस्';
+  body=noticeHTML()+'<p class="auth-topline">We requested a verification code for <strong>'+escapeHTML(pendingEmail)+'</strong>. Check Inbox and Spam/Junk. · आफ्नो इमेल जाँच्नुहोस्।</p>'+
+  '<form id="authVerifyForm" class="auth-form"><div class="auth-field"><label for="authOtp">One-time verification code · एकपटक प्रयोग हुने कोड</label><input id="authOtp" class="auth-code-input" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" minlength="6" autocomplete="one-time-code" placeholder="6-digit email code" required><small class="auth-help">Use the newest Stytch code. Never share it. · नयाँ कोड मात्र प्रयोग गर्नुहोस्।</small></div><button class="auth-submit" type="submit">Verify and start learning · प्रमाणित गर्नुहोस्</button></form>'+
+  '<div class="auth-actions"><button class="auth-link" type="button" data-mode="resend">Send another code · फेरि पठाउनुहोस्</button><button class="auth-link" type="button" data-mode="signin">Change email · इमेल बदल्नुहोस्</button></div>'+guestLink();
+ }else{
+  const signup=mode==='signup'; mode=signup?'signup':'signin';
+  title=signup?'Create your free account':'Welcome back!';
+  sub=signup?'निःशुल्क खाता बनाउनुहोस् · Email verification':'फेरि स्वागत छ · Sign in with a 6-digit email code';
+  body='<div class="auth-tabs" role="tablist"><button class="auth-tab" type="button" data-mode="signup" role="tab" aria-selected="'+signup+'">Create account<br><span class="auth-help" style="color:inherit">खाता बनाउनुहोस्</span></button><button class="auth-tab" type="button" data-mode="signin" role="tab" aria-selected="'+!signup+'">Sign in<br><span class="auth-help" style="color:inherit">लगइन गर्नुहोस्</span></button></div>'+noticeHTML()+
+    '<form class="auth-form" id="authEmailForm">';
+  if(signup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" type="text" autocomplete="given-name" maxlength="60" required placeholder="First name"></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" type="text" autocomplete="family-name" maxlength="60" required placeholder="Last name"></div></div>';
+  body+=emailField(pendingEmail)+(signup?'<p class="auth-quiet">We verify ownership of your email before activating your account. No password is required in this email-code version.</p>':'<p class="auth-quiet">Forgot your old password? No problem: enter your email and use the new code. Supabase passwords do not transfer to Stytch.</p>')+
+   '<button class="auth-submit" type="submit">'+(signup?'Create account & send code · कोड पठाउनुहोस्':'Send sign-in code · लगइन कोड पठाउनुहोस्')+'</button></form>'+guestLink()+backLink();
+ }
+ document.getElementById('authTitle').textContent=title;document.getElementById('authSubtitle').textContent=sub;
+ content.innerHTML=body;
+ if(busy)content.querySelectorAll('button[type="submit"],button[data-mode="resend"]').forEach(b=>b.disabled=true);
+ content.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.mode)));
+ content.querySelector('#authEmailForm')?.addEventListener('submit',requestCode);
+ content.querySelector('#authVerifyForm')?.addEventListener('submit',verifyCode);
+ content.querySelector('#authGuestForm')?.addEventListener('submit',loginGuest);
+}
+function open(target){lastFocus=document.activeElement;mode=target||(currentUser?'profile':guestSession?'guestprofile':pendingMethodId?'verify':'welcome');notice=null;render();modal.hidden=false;document.body.style.overflow='hidden';requestAnimationFrame(()=>content.querySelector('input,button')?.focus())}
+function close(){if(!hasAccess())return;modal.hidden=true;document.body.style.overflow='';notice=null;lastFocus?.focus?.()}
+function choose(next){if(busy)return;if(next==='close')return close();if(next==='signout')return signOut();if(next==='resend')return resendCode();if(next==='signin'||next==='signup')clearPending();mode=next;notice=null;render()}
+function setBusy(value){busy=value;content.querySelectorAll('button[type="submit"],button[data-mode="resend"]').forEach(b=>b.disabled=value)}
+function loginGuest(ev){ev.preventDefault();if(busy)return;const key='guest-access',lock=attempts(key);if(lock.lockedUntil>Date.now())return status(lockMessage(lock),'error');
+  const id=document.getElementById('guestUserId').value.trim(),pass=document.getElementById('guestPassword').value;
+  if(id!==GUEST_ID||pass!==GUEST_PASSWORD)return status(lockMessage(fail(key)),'error');
+  clearAttempts(key);guestSession=true;try{sessionStorage.setItem(GUEST_KEY,'active')}catch(_){}mode='guestprofile';updateHeader();grantAccess();}
+function validEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)&&email.length<=254}
+async function loadSDK(){
+ if(sdk)return sdk;
+ if(sdkPromise)return sdkPromise;
+ sdkPromise=import(STYTCH_SDK_URL).catch(()=>import(STYTCH_SDK_FALLBACK)).then(m=>{
+   if(typeof m.StytchClient!=='function')throw Error('Stytch SDK could not be initialized.');
+   sdk=new m.StytchClient(STYTCH_PUBLIC_TOKEN);
+   sdk.session.onChange(session=>{
+     if(session&&session.expires_at&&Date.parse(session.expires_at)<=Date.now())session=null;
+     currentUser=session?sdk.user.getSync():null;
+     if(session&&!currentUser){sdk.user.get().then(user=>{currentUser=user?.user||user||null;updateHeader();if(currentUser)grantAccess()}).catch(()=>{});}
+     updateHeader();
+     if(currentUser)grantAccess();else if(!guestSession)requireAccess();
+   });
+   sdk.user.onChange(user=>{const validSession=!!sdk.session.getSync();currentUser=validSession?user:null;updateHeader();if(currentUser)grantAccess();else if(!guestSession&&modal.hidden)requireAccess()});
+   // Session is validated asynchronously; do not trust the UI local state as a backend authorization check.
+   return sdk;
+ }).catch(err=>{sdkPromise=null;throw err});
+ return sdkPromise;
+}
+function stashCode(email,result){
+ const method=String(result?.method_id||result?.email_id||'');
+ if(!/^email-/.test(method))throw Error('Stytch did not return an email method ID. Please try again.');
+ pendingEmail=email;pendingMethodId=method;savePending();
+}
+async function sendEmailCode(email){const api=await loadSDK();return await api.otps.email.loginOrCreate(email,{expiration_minutes:5})}
+async function requestCode(ev){ev.preventDefault();if(busy)return;
+ const email=document.getElementById('authEmail').value.trim().toLowerCase();
+ const isSignup=mode==='signup';
+ if(!validEmail(email))return status('Please enter a valid email address. · सही इमेल लेख्नुहोस्।','error');
+ let first='',last='';
+ if(isSignup){first=document.getElementById('authFirst').value.trim().replace(/\s+/g,' ');last=document.getElementById('authLast').value.trim().replace(/\s+/g,' ');if(!first||!last)return status('Please enter first and last name. · नाम र थर राख्नुहोस्।','error')}
+ if(Date.now()<resendUntil)return status('Please wait before requesting another code. · केही समय पर्खनुहोस्।','error');
+ try{setBusy(true);const r=await sendEmailCode(email);firstName=first;lastName=last;stashCode(email,r);resendUntil=Date.now()+60000;mode='verify';busy=false;status('Stytch accepted your email-code request. Check Inbox/Spam. Delivery depends on your Stytch account settings. · इमेल जाँच्नुहोस्।','success')}
+ catch(e){setBusy(false);status(friendlyError(e),'error')}
+}
+async function resendCode(){if(busy)return;if(!pendingEmail)return status('Enter your email to request a code.','error');if(Date.now()<resendUntil)return status('Wait about 60 seconds before requesting another code.','error');
+ try{setBusy(true);const r=await sendEmailCode(pendingEmail);stashCode(pendingEmail,r);resendUntil=Date.now()+60000;mode='verify';busy=false;status('New code requested. Check your email and use the newest code. · नयाँ कोड पठाउन अनुरोध गरियो।','info')}
+ catch(e){setBusy(false);status(friendlyError(e),'error')}
+}
+async function verifyCode(ev){ev.preventDefault();if(busy)return;
+ const code=document.getElementById('authOtp').value.trim();
+ if(!/^\d{6}$/.test(code))return status('Enter the six digits from your email. · ६ अंकको कोड राख्नुहोस्।','error');
+ if(!pendingMethodId)return status('The code request has expired on this browser. Send another code.','error');
+ const lock=attempts(pendingEmail);if(lock.lockedUntil>Date.now())return status(lockMessage(lock),'error');
+ try{setBusy(true);const api=await loadSDK();const response=await api.otps.authenticate(code,pendingMethodId,{session_duration_minutes:60});
+   if(!response?.session)throw Error('Stytch has not established a signed-in session.');
+   clearAttempts(pendingEmail);
+   const savedFirst=firstName,savedLast=lastName;
+   clearPending();
+   if(savedFirst&&savedLast&&typeof api.user.update==='function'){
+     try{await api.user.update({name:{first_name:savedFirst,last_name:savedLast}})}catch(error){console.warn('Name update unavailable; login is still successful.');}
+   }
+   currentUser=api.user.getSync()||response.user||null;
+   if(currentUser&&savedFirst&&savedLast){try{localStorage.setItem('sikau-stytch-name:'+currentUser.user_id,JSON.stringify({first_name:savedFirst,last_name:savedLast}))}catch(_){}}
+   if(!currentUser){try{const u=await api.user.get();currentUser=u?.user||u||null}catch(_){}}
+   if(!currentUser)throw Error('The session was created, but user details could not load. Refresh the page.');
+   if(savedFirst&&savedLast){try{localStorage.setItem('sikau-stytch-name:'+currentUser.user_id,JSON.stringify({first_name:savedFirst,last_name:savedLast}))}catch(_){}}
+   mode='profile';busy=false;updateHeader();grantAccess();
+ }catch(e){setBusy(false);const msg=friendlyError(e);if(/incorrect|expired|invalid|not found/i.test(msg))status(lockMessage(fail(pendingEmail))+' '+msg,'error');else status(msg,'error')}
+}
+async function signOut(){
+ if(guestSession&&!currentUser){guestSession=false;try{sessionStorage.removeItem(GUEST_KEY)}catch(_){}updateHeader();return requireAccess()}
+ try{setBusy(true);const api=await loadSDK();await api.session.revoke();currentUser=null;guestSession=false;try{sessionStorage.removeItem(GUEST_KEY)}catch(_){}clearPending();busy=false;updateHeader();requireAccess();}
+ catch(e){setBusy(false);status(friendlyError(e),'error')}
+}
+function updateHeader(){
+ const first=currentFirst();accountBtn.textContent=currentUser?'👤 '+(first||'My account'):guestSession?'🔑 Guest':'👤 Sign in';
+ accountBtn.setAttribute('aria-label',currentUser?'Open my account':guestSession?'Open guest account':'Sign in or create an account');
+ const greet=document.getElementById('greetSub');
+ if(greet){if((currentUser&&first)||guestSession){if(!greet.dataset.originalGreeting)greet.dataset.originalGreeting=greet.textContent||'आज पनि अंग्रेजी सिकौं';greet.textContent=guestSession&&!currentUser?'Welcome, Guest! · स्वागत छ!':'Welcome, '+first+'! · स्वागत छ!'}else if(greet.dataset.originalGreeting)greet.textContent=greet.dataset.originalGreeting;}
+}
+accountBtn.addEventListener('click',()=>open());
+closeBtn.addEventListener('click',close);
+modal.addEventListener('click',e=>{if(e.target===modal&&!busy)close()});
+document.addEventListener('keydown',e=>{if(modal.hidden)return;if(e.key==='Escape'&&!busy){e.preventDefault();close()}
+ if(e.key==='Tab'){const items=[...modal.querySelectorAll('button:not(:disabled),input:not(:disabled)')].filter(x=>x.getClientRects().length);if(!items.length)return;if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items[items.length-1].focus()}else if(!e.shiftKey&&document.activeElement===items[items.length-1]){e.preventDefault();items[0].focus()}}
+});
+updateHeader();
+if(guestSession){gate(false);modal.hidden=true;}else{requireAccess();if(pendingMethodId)mode='verify';render();}
+loadSDK().then(async api=>{
+ try{
+   const resultSession=await api.session.get();
+   const activeSession=resultSession?.session||resultSession;
+   if(!activeSession||!activeSession.session_id){if(!guestSession)requireAccess();return}
+   const result=await api.user.get();currentUser=result?.user||result||null;
+   if(currentUser){clearPending();updateHeader();grantAccess()}
+ }catch(error){console.warn('Stytch session check:',friendlyError(error));if(!guestSession)requireAccess()}
+}).catch(error=>{if(!guestSession){mode='welcome';status(friendlyError(error),'error')}});
 })();
 </script>
 
