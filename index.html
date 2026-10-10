@@ -29,7 +29,7 @@
   <header><small>🇳🇵 ENGLISH SIKAU · नेपाली</small><h1>Test your 6-digit email code</h1><p>इमेलमा आएको ६ अंकको कोड जाँच्नुहोस्।</p></header>
   <section>
     <div class="notice"><strong>Separate test page — your main English Sikau website is unchanged.</strong> Test on GitHub Pages only. The code will be sent by your Appwrite project, not Supabase or Stytch. No credit card or API secret is entered here.</div>
-    <div id="status" role="status" aria-live="polite">Ready. Enter an email address to request one code.</div>
+    <div id="status" role="status" aria-live="polite">Ready. Enter your email address to request a code. (Corrected SDK v17 integration.)</div>
     <form id="sendForm">
       <label for="email">Email address · इमेल</label>
       <input id="email" type="email" autocomplete="email" placeholder="you@gmail.com" required maxlength="254">
@@ -89,10 +89,10 @@
   checkCurrentSession();
   $('sendForm').addEventListener('submit',async event=>{
     event.preventDefault();if(sending)return;
-    const email=$('email').value.trim();if(!email)return;
+    const email=$('email').value.trim();if(!email || !$('email').checkValidity()){status('Please enter a valid email address.','bad');return;}
     sending=true;$('sendBtn').disabled=true;status('Requesting an email code from Appwrite…');
     try {
-      const token=await account.createEmailToken({userId:Appwrite.ID.unique(),email});
+      const token=await account.createEmailToken(Appwrite.ID.unique(), email);
       if(!token || !token.userId) throw new Error('Appwrite did not return a user ID for this request.');
       userId=token.userId;
       sessionStorage.setItem(pendingKey,JSON.stringify({email,userId}));
@@ -108,7 +108,7 @@
     if(!userId || !/^\d{6}$/.test(secret)){status('Enter the exact six-digit code from your email.','bad');return;}
     $('verifyBtn').disabled=true;status('Checking your code with Appwrite…');
     try {
-      await account.createSession({userId,secret});
+      await account.createSession(userId, secret);
       sessionStorage.removeItem(pendingKey);
       let email=$('email').value.trim();
       try {const u=await account.get();email=u.email||email;} catch (_) {}
@@ -124,7 +124,7 @@
   $('logoutBtn').addEventListener('click',async()=>{
     $('logoutBtn').disabled=true;
     try {
-      await account.deleteSession({sessionId:'current'});
+      await account.deleteSession('current');
       userId='';show('signedPanel',false);show('sendForm',true);show('verifyPanel',false);
       status('Signed out successfully. You can test another email.','good');
     } catch(e){status(errMessage(e),'bad');}
