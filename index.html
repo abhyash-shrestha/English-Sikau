@@ -771,6 +771,11 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:640px){.auth-modal{padding:0;align-items:end;place-items:end center}.auth-panel{width:100%;border-radius:24px 24px 0 0;max-height:96dvh}.auth-cover{padding:23px 20px 17px}.auth-inner{padding:20px 19px calc(22px + env(safe-area-inset-bottom,0px))}.auth-header-btn{max-width:155px}.auth-names{gap:9px}}
 @media(max-width:360px){.auth-names{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.auth-panel,.auth-modal{animation:none}}
+
+/* Email sign-in: compact, readable lockout guidance on all screen sizes. */
+.auth-lockout-help{margin:11px 2px 0;color:var(--mut);font-size:12px;line-height:1.55;text-align:center}
+.auth-actions .auth-link{min-height:40px;text-decoration:underline;text-underline-offset:3px}
+.auth-notice.error{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -991,7 +996,7 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 <section id="game" hidden>
   <div class="content">
     <h1 class="page-title">🎮 Game Mode</h1>
-    <div class="page-sub">English Quest · खेल्दै सिकौँ · No sign-in required</div>
+    <div class="page-sub">English Quest · खेल्दै सिकौँ · Login required</div>
     <div id="gameRoot"></div>
   </div>
 </section>
@@ -3244,31 +3249,21 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
 <script>
 /* ========= ENGLISH SIKAU · VERIFIED EMAIL ACCOUNT SYSTEM =========
    1. Create a free Supabase project: https://supabase.com/dashboard
-   2. Paste the Project URL and PUBLISHABLE/ANON key below (NEVER service_role).
-   3. Authentication > Providers > Email: enable email confirmations.
-   4. Authentication > Email Templates > Confirm sign up: include {{ .Token }}.
+   2. The public Project URL and publishable key are configured below (NEVER service_role).
+   3. Supabase admin: Authentication > Providers > Email: enable email confirmations.
+   4. Supabase admin: Confirm sign up template should include {{ .Token }}.
    5. Authentication > URL Configuration: enter your hosted website's URL.
    6. For public production signups, set up an SMTP service for reliable delivery.
    Login is required: email verified Supabase session OR guest ID and password.
 */
 (function(){
   'use strict';
-  // These two values may be embedded in the published HTML (public/anon ONLY).
-  // The owner can also add them in the Setup screen for a local preview.
+  // Supabase publishable credentials are designed to be public: HTML source is NOT secret.
+  // NEVER place a service_role key, secret API key, SMTP password, or user password here.
   const AUTH_CONFIG={
-    supabaseUrl:'',
-    publishableKey:''
+    supabaseUrl:'https://rlkctvtfmdzhcozcohua.supabase.co',
+    publishableKey:'sb_publishable_RTGfz6UFCaxViDLrTmB--g_QzdGU2nO'
   };
-  // Do not store user passwords, OTPs, or any secret/service_role key in HTML.
-  try{
-    if(!AUTH_CONFIG.supabaseUrl && !AUTH_CONFIG.publishableKey){
-      const saved=JSON.parse(localStorage.getItem('sikau_public_auth_setup_v1')||'null');
-      if(saved&&typeof saved.url==='string'&&typeof saved.key==='string'){
-        AUTH_CONFIG.supabaseUrl=saved.url;
-        AUTH_CONFIG.publishableKey=saved.key;
-      }
-    }
-  }catch(_){}
   const modal=document.getElementById('authModal');
   const content=document.getElementById('authContent');
   const closeBtn=document.getElementById('authClose');
@@ -3302,10 +3297,50 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
   function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" name="email" type="email" autocomplete="email" spellcheck="false" placeholder="you@gmail.com" required maxlength="254" value="'+clean(value||'')+'"><small class="auth-help">Gmail, Yahoo, Outlook, or any valid email · कुनै पनि इमेल</small></div>'}
   function passwordField(autocomplete){return '<div class="auth-field"><label for="authPassword">Password · पासवर्ड</label><div class="auth-pass-row"><input id="authPassword" name="password" type="password" autocomplete="'+autocomplete+'" required minlength="10" placeholder="Enter password"><button type="button" class="auth-toggle" data-auth-show="authPassword" aria-label="Show or hide password">Show</button></div></div>'}
   function ghostGuest(){return '<button type="button" class="auth-guest-btn" data-auth-mode="guest">🔑 Guest login · अतिथि लगइन (ID + password)</button>'}
+  // Client-side lock is per browser, not a server-side account lock.
+  // A real cross-device six-attempt lock requires a protected server endpoint.
+  const MAX_BAD_LOGINS=6, LOCKOUT_MS=30*60*1000;
+  const ATTEMPTS_KEY_PREFIX='english_sikau_failed_login_v2_';
+  function loginStorageKey(identifier){
+    // Short deterministic ID; do not store entered passwords or tokens here.
+    const normalized=String(identifier||'').trim().toLowerCase();
+    let h=2166136261;
+    for(let i=0;i<normalized.length;i++){h^=normalized.charCodeAt(i);h=Math.imul(h,16777619)}
+    return ATTEMPTS_KEY_PREFIX+(h>>>0).toString(16);
+  }
+  function getLoginAttempts(identifier){
+    const key=loginStorageKey(identifier);
+    try{
+      const r=JSON.parse(localStorage.getItem(key)||'null');
+      if(!r||!Number.isFinite(r.failures)||!Number.isFinite(r.updated))return {failures:0,lockedUntil:0};
+      if((r.lockedUntil||0)>0&&Date.now()>=r.lockedUntil){localStorage.removeItem(key);return {failures:0,lockedUntil:0}}
+      if(!r.lockedUntil&&Date.now()-r.updated>LOCKOUT_MS){localStorage.removeItem(key);return {failures:0,lockedUntil:0}}
+      return r;
+    }catch(_){return {failures:0,lockedUntil:0}}
+  }
+  function clearLoginAttempts(identifier){try{localStorage.removeItem(loginStorageKey(identifier))}catch(_){}}
+  function recordInvalidLogin(identifier){
+    const previous=getLoginAttempts(identifier), failures=Math.min(MAX_BAD_LOGINS,(previous.failures||0)+1);
+    const state={failures,updated:Date.now(),lockedUntil:failures>=MAX_BAD_LOGINS?Date.now()+LOCKOUT_MS:0};
+    try{localStorage.setItem(loginStorageKey(identifier),JSON.stringify(state))}catch(_){}
+    return state;
+  }
+  function lockoutMessage(state){
+    if(state.lockedUntil>Date.now()){
+      const mins=Math.ceil((state.lockedUntil-Date.now())/60000);
+      return 'Too many incorrect attempts. Sign-in on this device is locked for '+mins+' minute'+(mins===1?'':'s')+'. You can reset your password using Forgot password. · धेरै प्रयास भयो, केही समयपछि प्रयास गर्नुहोस्।';
+    }
+    const left=MAX_BAD_LOGINS-(state.failures||0);
+    return 'Incorrect email or password. '+left+' attempt'+(left===1?'':'s')+' remaining before a 30-minute lock. · इमेल वा पासवर्ड गलत छ।';
+  }
+  function isWrongPassword(err){
+    const code=String(err&&err.code||'').toLowerCase();
+    const message=String(err&&err.message||'').toLowerCase();
+    return code==='invalid_credentials'||/invalid login credentials|invalid email or password|invalid password|wrong password|incorrect password/.test(message);
+  }
   function render(){
     if(!modal||!content)return;
     let title='',subtitle='',body='';
-    const unconfigured=!configured();
     if(currentUser&&mode!=='reset')mode='profile';
     if(mode==='welcome'&&!hasAccess()){
       title='Welcome to English Sikau!';
@@ -3323,23 +3358,13 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
         '<div class="auth-field"><label for="guestUserId">Guest User ID · अतिथि प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Enter guest User ID" required></div>'+
         '<div class="auth-field"><label for="guestPassword">Guest password · अतिथि पासवर्ड</label><div class="auth-pass-row"><input id="guestPassword" type="password" autocomplete="current-password" placeholder="Enter guest password" required><button type="button" class="auth-toggle" data-auth-show="guestPassword">Show</button></div></div>'+
         '<button class="auth-submit" type="submit">🔓 Unlock learning · सिकाइ सुरु गर्नुहोस्</button></form>'+
-        '<p class="auth-gate-note">Ask the app owner for your guest login details.<br>अतिथि लगइन विवरणका लागि एप सञ्चालकलाई सोध्नुहोस्।</p>'+
+        '<p class="auth-gate-note">Ask the app owner for your guest login details. After six wrong tries, guest access is locked on this device for 30 minutes.<br>अतिथि लगइन विवरणका लागि एप सञ्चालकलाई सोध्नुहोस्।</p>'+
         '<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← Other login options · अन्य विकल्प</button></div>';
     }else if(mode==='guestprofile'&&guestSession){
       title='Guest account · अतिथि खाता';subtitle='You are learning in Guest Mode · अतिथि मोड';
       body='<div class="auth-profile"><strong>🔑 Guest · Nepal</strong><small>Shared guest access · स्थानीय उपकरणमा प्रगति सुरक्षित</small></div>'+ 
         '<p class="auth-help">Lessons work without a personal account. Learning progress stays on this device and is not synced between learners.</p>'+
         '<button type="button" class="auth-submit" data-auth-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button class="auth-link" type="button" data-auth-mode="signout">Sign out · लगआउट</button></div>';
-    }else if(mode==='setup'){
-      title='Activate email accounts · इमेल खाता सक्रिय गर्नुहोस्';
-      subtitle='One-time app-owner setup · एप सञ्चालकका लागि';
-      body=wrapNotice()+'<p class="auth-setup-heading">Connect a Supabase authentication project to send genuine verification emails.</p>'+
-       '<ol class="auth-setup-steps"><li>Visit <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase Dashboard ↗</a> and create a project.</li><li>From Project Settings → API Keys, copy the <b>Project URL</b> and <b>publishable / anon key</b> (never a secret or service_role key).</li><li>Turn on email confirmation, and put <code>{{ .Token }}</code> in the sign-up confirmation email template.</li><li>Configure an email provider (SMTP) so codes can reach Gmail, Yahoo and other inboxes.</li></ol>'+
-       '<form class="auth-form" id="authSetupForm"><div class="auth-field"><label for="authProjectUrl">Supabase Project URL</label><input id="authProjectUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://your-project.supabase.co" value="'+clean(AUTH_CONFIG.supabaseUrl)+'" required></div>'+
-       '<div class="auth-field"><label for="authPublicKey">Publishable / anon key (PUBLIC only)</label><input id="authPublicKey" type="text" autocomplete="off" spellcheck="false" placeholder="sb_publishable_..." value="'+clean(AUTH_CONFIG.publishableKey)+'" required><small class="auth-help">Never paste service_role, secret keys, SMTP credentials or passwords here.</small></div>'+
-       '<button type="submit" class="auth-submit">Save configuration on this device</button></form>'+
-       '<div class="auth-config-note"><strong>Important:</strong> Saving here activates only this browser. Before sharing your app, put these same two PUBLIC values into AUTH_CONFIG in the HTML file and host it on HTTPS. Supabase must also be configured to send email. Learners do not need Supabase accounts of their own.</div>'+
-       '<div class="auth-setup-footer"><button type="button" class="auth-link" data-auth-mode="signup">← Back to account</button><a href="https://supabase.com/docs/guides/auth/auth-email" target="_blank" rel="noopener noreferrer">Email setup help ↗</a></div>'+ghostGuest();
     }else if(mode==='profile'&&currentUser){
       const md=currentUser.user_metadata||{};
       const first=String(md.first_name||''),last=String(md.last_name||'');
@@ -3365,13 +3390,13 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       if(isSignup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" name="given-name" type="text" autocomplete="given-name" maxlength="60" placeholder="First name" required></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" name="family-name" type="text" autocomplete="family-name" maxlength="60" placeholder="Last name" required></div></div>';
       body+=emailField(emailToVerify)+passwordField(isSignup?'new-password':'current-password');
       if(isSignup)body+='<div class="auth-field"><label for="authConfirm">Confirm password · पुष्टि गर्नुहोस्</label><div class="auth-pass-row"><input id="authConfirm" type="password" autocomplete="new-password" required minlength="10" placeholder="Confirm your password"><button class="auth-toggle" type="button" data-auth-show="authConfirm">Show</button></div><small class="auth-help">At least 10 characters, including a letter and a number. Passwords are handled by the authentication service and are never stored in this HTML.</small></div>';
-      if(unconfigured){
-        body+='</form><div class="auth-config-note"><strong>Email accounts await activation.</strong> Guest login is available with a guest ID and password.</div><button type="button" class="auth-submit" data-auth-mode="setup">⚙️ App owner: activate email accounts</button>';
+      body+='<button type="submit" class="auth-submit">'+(isSignup?'Create account & email my code':'Sign in with email & password')+'</button></form>';
+      if(!isSignup){
+        body+='<div class="auth-actions"><button class="auth-link" data-auth-mode="forgot" type="button">Forgot password? · पासवर्ड बिर्सनुभयो?</button></div>';
+        body+='<p class="auth-lockout-help">🔒 Six unsuccessful password attempts will temporarily lock sign-in on this device for 30 minutes. · ६ पटक गलत पासवर्ड राखेपछि ३० मिनेट रोक लगाइन्छ।</p>';
       }else{
-        body+='<button type="submit" class="auth-submit">'+(isSignup?'Create account & email my code':'Sign in with email & password')+'</button></form>';
+        body+='<p class="auth-quiet">After signing up, enter the verification code sent to your email. Then sign in with your email and password.</p>';
       }
-      if(!isSignup)body+='<div class="auth-actions"><button class="auth-link" data-auth-mode="forgot" type="button">Forgot password? · पासवर्ड बिर्सनुभयो?</button></div>';
-      else if(!unconfigured)body+='<p class="auth-quiet">After signing up, verify the one-time code sent to your email. Next time, log in using your email and password.</p>';
       body+=ghostGuest()+'<div class="auth-back-row"><button type="button" class="auth-link" data-auth-mode="welcome">← All login options</button></div>';
     }
     document.getElementById('authTitle').textContent=title;
@@ -3385,7 +3410,6 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     const verify=document.getElementById('authVerifyForm');if(verify)verify.addEventListener('submit',confirmCode);
     const forgot=document.getElementById('authForgotForm');if(forgot)forgot.addEventListener('submit',sendReset);
     const reset=document.getElementById('authResetForm');if(reset)reset.addEventListener('submit',updatePassword);
-    const setup=document.getElementById('authSetupForm');if(setup)setup.addEventListener('submit',savePublicSetup);
     const guest=document.getElementById('authGuestForm');if(guest)guest.addEventListener('submit',loginGuest);
   }
   function open(target){
@@ -3399,6 +3423,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     if(next==='close'){close();return}
     if(next==='signout'){signout();return}
     if(next==='resend'){resend();return}
+    if(next==='setup')return;
     mode=next;notification=null;render();
   }
   function loginGuest(event){
@@ -3406,10 +3431,14 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     if(busy)return;
     const id=document.getElementById('guestUserId').value.trim();
     const pass=document.getElementById('guestPassword').value;
-    if(id!==GUEST_ID||pass!==GUEST_PASSWORD){
-      setStatus('Incorrect guest ID or password. · अतिथि ID वा पासवर्ड मिलेन।','error');
-      return;
+    const guestLock=getLoginAttempts('guest-access');
+    if(guestLock.lockedUntil>Date.now()){
+      setStatus(lockoutMessage(guestLock),'error');return;
     }
+    if(id!==GUEST_ID||pass!==GUEST_PASSWORD){
+      setStatus(lockoutMessage(recordInvalidLogin('guest-access')),'error');return;
+    }
+    clearLoginAttempts('guest-access');
     guestSession=true;
     try{sessionStorage.setItem(GUEST_SESSION_KEY,'active')}catch(_){}
     mode='guestprofile';updateHeader();grantAccess();
@@ -3420,31 +3449,9 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     if(/rate limit|too many/i.test(s))return 'Too many attempts. Please try again later. · केही समयपछि प्रयास गर्नुहोस्।';
     return s;
   }
-  async function savePublicSetup(ev){
-    ev.preventDefault();if(busy)return;
-    const url=document.getElementById('authProjectUrl').value.trim().replace(/\/$/,'');
-    const key=document.getElementById('authPublicKey').value.trim();
-    if(!/^https:\/\/[a-z0-9.-]+\/?.*$/i.test(url)||key.length<21){
-      setStatus('Enter a valid HTTPS project URL and public / anon key.','error');return;
-    }
-    if(/service_role|sb_secret_/i.test(key)){
-      setStatus('Stop: this is a secret key. Use only a publishable / anon key.','error');return;
-    }
-    try{
-      setBusy(true);
-      const res=await fetch(url+'/auth/v1/settings',{headers:{'apikey':key},mode:'cors'});
-      if(!res.ok)throw Error('Could not connect to this Supabase project ('+res.status+'). Check the project URL and publishable key.');
-      AUTH_CONFIG.supabaseUrl=url;
-      AUTH_CONFIG.publishableKey=key;
-      try{localStorage.setItem('sikau_public_auth_setup_v1',JSON.stringify({url,key}))}catch(_){}
-      client=null;clientPromise=null;
-      mode='signup';busy=false;
-      setStatus('Project connected on this browser. Email delivery needs Supabase confirmation settings and SMTP. To publish for everyone, add your public settings to the HTML file.','success');
-    }catch(err){setBusy(false);setStatus(errors(err),'error')}
-  }
   function setBusy(state){busy=state;content.querySelectorAll('button[type="submit"],button[data-auth-mode="resend"]').forEach(b=>b.disabled=state)}
   function loadClient(){
-    if(!configured())return Promise.reject(new Error('Email sign-up is not activated. Please use the activation setup first.'));
+    if(!configured())return Promise.reject(new Error('Email authentication is temporarily unavailable. Please try again later.'));
     if(client)return Promise.resolve(client);
     if(clientPromise)return clientPromise;
     clientPromise=new Promise((resolve,reject)=>{
@@ -3481,7 +3488,7 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
       const api=await loadClient();
       const {data,error}=await api.auth.signUp({email,password,options:{data:{first_name:first,last_name:last,full_name:first+' '+last}}});
       if(error)throw error;
-      if(data&&data.session){await api.auth.signOut();throw Error('Email confirmation is disabled in the Supabase project. The app owner must enable Confirm email before accepting new accounts.');}
+      if(data&&data.session){await api.auth.signOut();throw Error('Email confirmation must be enabled before new accounts can be verified. Please contact support.');}
       persistPending(email);mode='verify';busy=false;
       setStatus('Check your email for the verification code. It may take a moment; also check Spam/Junk. · आफ्नो इमेल जाँच्नुहोस्।','success');
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
@@ -3515,13 +3522,21 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     ev.preventDefault();if(busy)return;
     const email=document.getElementById('authEmail').value.trim().toLowerCase();
     const password=document.getElementById('authPassword').value;
+    emailToVerify=email;
+    const lock=getLoginAttempts(email);
+    if(lock.lockedUntil>Date.now()){setStatus(lockoutMessage(lock),'error');return;}
     try{
       setBusy(true);const api=await loadClient();
       const {data,error}=await api.auth.signInWithPassword({email,password});if(error)throw error;
       if(!data||!data.user)throw Error('Unable to sign in.');
+      clearLoginAttempts(email);
       currentUser=data.user;emailToVerify='';try{sessionStorage.removeItem('sikau_email_verification_pending')}catch(_){}updateHeader();mode='profile';busy=false;grantAccess();
       setStatus('Welcome back! · पुनः स्वागत छ।','success');
-    }catch(error){setBusy(false);setStatus(errors(error),'error')}
+    }catch(error){
+      setBusy(false);
+      if(isWrongPassword(error)){setStatus(lockoutMessage(recordInvalidLogin(email)),'error')}
+      else setStatus(errors(error),'error');
+    }
   }
   async function sendReset(ev){
     ev.preventDefault();if(busy)return;
@@ -3540,6 +3555,8 @@ try{touchDay();head();renderFestivals();refreshFestivalData();renderCultureLab()
     try{
       checkPassword(password,document.getElementById('authConfirm').value);setBusy(true);
       const api=await loadClient();const {error}=await api.auth.updateUser({password});if(error)throw error;
+      if(currentUser&&currentUser.email)clearLoginAttempts(currentUser.email);
+      if(emailToVerify)clearLoginAttempts(emailToVerify);
       mode='profile';busy=false;setStatus('Password updated successfully.','success');
     }catch(error){setBusy(false);setStatus(errors(error),'error')}
   }
