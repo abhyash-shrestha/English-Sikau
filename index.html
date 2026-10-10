@@ -746,9 +746,11 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 .auth-field input{width:100%;min-height:48px;background:var(--bg-2);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);font:inherit;font-size:16px;padding:10px 13px;min-width:0}
 .auth-field input:focus{outline:2px solid var(--deep-blue-light);outline-offset:1px;border-color:var(--deep-blue-light)}
 .auth-help{display:block;font-size:11.5px;line-height:1.5;color:var(--mut)}
-.auth-pass-row{position:relative}
-.auth-pass-row input{padding-right:66px}
-.auth-toggle{position:absolute;right:7px;top:6px;border-radius:9px;background:var(--card);padding:7px 10px;font-size:12px;color:var(--ink-2);font-weight:750}
+.auth-pass-row{position:relative;min-width:0}
+.auth-pass-row input{padding-right:94px}
+.auth-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);min-width:77px;min-height:36px;border:1px solid var(--line);border-radius:9px;background:var(--card);padding:6px 9px;font-size:12px;color:var(--ink-2);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;cursor:pointer}
+.auth-toggle:focus-visible{outline:2px solid var(--deep-blue-light);outline-offset:2px}
+.auth-toggle:active{transform:translateY(-50%) scale(.97)}
 .auth-submit{width:100%;padding:11px 14px;min-height:50px;margin-top:5px;border-radius:13px;background:linear-gradient(125deg,#C91140,#E84262);color:white;font-size:15px;font-weight:850;box-shadow:0 6px 16px rgba(220,20,60,.16)}
 .auth-submit:disabled{opacity:.6;cursor:wait}
 .auth-quiet{display:block;font-size:12px;color:var(--mut);line-height:1.5;text-align:center;margin:13px 0 0}
@@ -3333,7 +3335,14 @@ function afterSignIn(){updateHeader();if(hasAccess()){mode=guestSession&&!isPaid
 function status(message,type='info'){notice=message?{message,type}:null;render()}
 function noticeHTML(){return notice?'<div class="auth-notice '+escapeHTML(notice.type)+'" role="status">'+escapeHTML(notice.message)+'</div>':''}
 function emailField(value){return '<div class="auth-field"><label for="authEmail">Email address · इमेल</label><input id="authEmail" type="email" autocomplete="email" required maxlength="254" value="'+escapeHTML(value||'')+'" placeholder="you@gmail.com"><small class="auth-help">Gmail, Yahoo, Outlook, or any email provider · कुनै पनि इमेल</small></div>'}
-function passwordFields(confirm){return '<div class="auth-field"><label for="authPassword">'+(confirm?'Create password · पासवर्ड बनाउनुहोस्':'Password · पासवर्ड')+'</label><input id="authPassword" type="password" autocomplete="'+(confirm?'new-password':'current-password')+'" minlength="8" maxlength="256" required placeholder="At least 8 characters"><small class="auth-help">At least 8 characters. Avoid sharing your password. · कम्तीमा ८ अक्षर</small></div>'+(confirm?'<div class="auth-field"><label for="authPasswordConfirm">Confirm password · पासवर्ड फेरि राख्नुहोस्</label><input id="authPasswordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="256" required placeholder="Enter the same password again"></div>':'')}
+// Password visibility is local to each field; changing it never sends or saves a password.
+function passwordInput(id,autocomplete,placeholder,minimum){
+ return '<div class="auth-pass-row"><input id="'+id+'" type="password" autocomplete="'+autocomplete+'" '+(minimum?'minlength="8" maxlength="256" ':'')+'required placeholder="'+placeholder+'">'+
+  '<button class="auth-toggle" type="button" data-password-toggle="'+id+'" aria-controls="'+id+'" aria-pressed="false" aria-label="Show password"><span aria-hidden="true">👁</span><span class="auth-toggle-text">Show</span></button></div>';
+}
+function passwordFields(confirm){
+ return '<div class="auth-field"><label for="authPassword">'+(confirm?'Create password · पासवर्ड बनाउनुहोस्':'Password · पासवर्ड')+'</label>'+passwordInput('authPassword',confirm?'new-password':'current-password','At least 8 characters',true)+'<small class="auth-help">At least 8 characters. Avoid sharing your password. · कम्तीमा ८ अक्षर</small></div>'+ (confirm?'<div class="auth-field"><label for="authPasswordConfirm">Confirm password · पासवर्ड फेरि राख्नुहोस्</label>'+passwordInput('authPasswordConfirm','new-password','Enter the same password again',true)+'</div>':'');
+}
 function guestLink(){return '<button class="auth-guest-btn" type="button" data-mode="guest">🔑 Sign in with ID · ID बाट लगइन</button>'}
 function backLink(){return '<div class="auth-back-row"><button class="auth-link" type="button" data-mode="welcome">← Other login options · अन्य विकल्पहरू</button></div>'}
 function attemptsKey(identity){let hash=2166136261;for(const c of String(identity).trim().toLowerCase()){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619)}return 'sikau-appwrite-attempts-'+(hash>>>0).toString(16)}
@@ -3367,7 +3376,7 @@ function render(){
    '<p class="auth-gate-note">Create a password, verify your email, and pay रु. ९९९ once for lifetime student access. Bank verification is required before lessons unlock. · एकपटक शुल्क तिरेपछि आजीवन पहुँच।</p>';
  }else if(mode==='guest'&&!hasAccess()){
    title='Sign in with ID · ID बाट लगइन';sub='Enter your ID and password · ID र पासवर्ड राख्नुहोस्';
-   body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">User ID · प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Password · पासवर्ड</label><input id="guestPassword" type="password" autocomplete="current-password" required></div><button class="auth-submit" type="submit">Sign in · लगइन गर्नुहोस्</button></form><p class="auth-gate-note">Enter the ID and password supplied by the account administrator.</p>'+backLink();
+   body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">User ID · प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Password · पासवर्ड</label>'+passwordInput('guestPassword','current-password','Enter your password',false)+'</div><button class="auth-submit" type="submit">Sign in · लगइन गर्नुहोस्</button></form><p class="auth-gate-note">Enter the ID and password supplied by the account administrator.</p>'+backLink();
  }else if(mode==='guestprofile'&&guestSession){
    title='My learning session · मेरो सत्र';sub='Continue your English learning';body='<div class="auth-profile"><strong>🔑 Signed in</strong><small>Learning progress stays on this device.</small></div><button class="auth-submit" type="button" data-mode="close">Continue learning · सिकाइ जारी राख्नुहोस्</button><div class="auth-actions"><button type="button" class="auth-link" data-mode="signout">Sign out · लगआउट</button></div>';
  }else if(mode==='payment'&&currentUser&&!guestSession&&!isPaidUser()){
@@ -3423,6 +3432,16 @@ function render(){
  content.innerHTML=body;
  if(busy)content.querySelectorAll('button[type="submit"],button[data-mode="resend"]').forEach(b=>b.disabled=true);
  content.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.mode)));
+ // Show / Hide is available on signup, sign-in, confirm-password and password reset.
+ content.querySelectorAll('[data-password-toggle]').forEach(button=>button.addEventListener('click',()=>{
+   const input=content.querySelector('#'+button.dataset.passwordToggle);
+   if(!input)return;
+   const showing=input.type==='password';
+   input.type=showing?'text':'password';
+   button.setAttribute('aria-pressed',String(showing));
+   button.setAttribute('aria-label',showing?'Hide password':'Show password');
+   button.querySelector('.auth-toggle-text').textContent=showing?'Hide':'Show';
+ }));
  content.querySelector('#authEmailForm')?.addEventListener('submit',requestCode);
  content.querySelector('#authVerifyForm')?.addEventListener('submit',verifyCode);
  content.querySelector('#authGuestForm')?.addEventListener('submit',loginGuest);
