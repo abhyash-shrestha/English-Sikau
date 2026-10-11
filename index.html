@@ -831,6 +831,7 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 .auth-trial-offer .auth-trial-small{font-size:11px;color:var(--mut);margin:9px 0 0}
 
 </style>
+<!-- English Sikau translation fallback fix · 2026-10-11 -->
 </head>
 <body>
 
@@ -1415,10 +1416,137 @@ function fetchText(url,ms,opts){return new Promise(function(ok,fail){var c=hasAb
 function fetchJSON(url,ms){return fetchText(url,ms).then(JSON.parse)}
 function normForDict(t){var s=String(t||'').trim();try{s=s.normalize('NFC')}catch(e){}return s.replace(/[।?!,.]+$/g,'').replace(/\s+/g,' ').trim()}
 function dictLookup(t){if(!DICT_NORM){DICT_NORM={};Object.keys(MINI_NE_EN).forEach(function(k){DICT_NORM[normForDict(k)]=MINI_NE_EN[k]})}return DICT_NORM[normForDict(t)]||null}
-function srcLabel(s){return s==='dict'?'📖 Dictionary':s==='google'?'🌐 Google':s==='mymemory'?'🌐 Backup':s==='ai'?'✨ AI':'🌐 Online'}
+function srcLabel(s){return s==='offline'?'📖 Offline':s==='dict'?'📖 Dictionary':s==='google'?'🌐 Google':s==='mymemory'?'🌐 Backup':s==='ai'?'✨ AI':'🌐 Online'}
 function cacheKey(t,a,b){return a+'>'+b+'|'+String(t).trim().toLowerCase()}
 function cached(k,v){if(arguments.length>1){TR_CACHE.set(k,v);if(TR_CACHE.size>100)TR_CACHE.delete(TR_CACHE.keys().next().value)}return TR_CACHE.get(k)}
 function romanNormalize(t){return String(t||'').trim().replace(/\bxaina\b/gi,'chhaina').replace(/\bxa\b/gi,'chha').replace(/\bchaina\b/gi,'chhaina').replace(/\btapai\b/gi,'tapaaee').replace(/\bmalai\b/gi,'malaai').replace(/\bk\b/gi,'ke')}
+/*
+ * Reliable phrase fallback: both language directions now work without online providers.
+ * Matches ONLY known full phrases, never fabricates unknown sentence translations.
+ * Most English phrases were already present in the Nepali-first mini dictionary; previously
+ * this dictionary was consulted only for Nepali -> English, causing the reported bug.
+ */
+var EN_NE_OFFLINE=null;
+function normalizeEnglishPhrase(t){
+  return String(t||'').normalize('NFKC').replace(/[‘’]/g,"'")
+    .replace(/\bi['’]m\b/gi,'I am').replace(/\bdon['’]t\b/gi,'do not')
+    .replace(/\bcan['’]t\b/gi,'cannot').replace(/\bit['’]s\b/gi,'it is')
+    .replace(/[.!?।,;:\s]+$/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+}
+function englishPhraseLookup(text){
+  var key=normalizeEnglishPhrase(text);
+  if(!key||key.length>220)return null;
+  if(!EN_NE_OFFLINE){
+    EN_NE_OFFLINE=Object.create(null);
+    // Reverse all existing Nepali learning phrases. Prefer explicit natural Nepali below.
+    Object.keys(MINI_NE_EN).forEach(function(ne){
+      var en=MINI_NE_EN[ne];
+      // Entries with multiple slash-separated English alternatives are not exact translations.
+      if(!en||/\s\/\s/.test(en))return;
+      var k=normalizeEnglishPhrase(en);
+      if(k&&!EN_NE_OFFLINE[k])EN_NE_OFFLINE[k]=ne;
+    });
+    var natural={
+      'i am hungry':'मलाई भोक लागेको छ',
+      'i am thirsty':'मलाई तिर्खा लागेको छ',
+      'i am tired':'म थाकेको छु',
+      'i am sleepy':'मलाई निद्रा लागेको छ',
+      'i am happy':'म खुसी छु',
+      'i am sad':'म दुःखी छु',
+      'i am angry':'म रिसाएको छु',
+      'i am fine':'म ठीक छु',
+      'i am sick':'म बिरामी छु',
+      'i am busy':'म व्यस्त छु',
+      'i am ready':'म तयार छु',
+      'i am a student':'म विद्यार्थी हुँ',
+      'i am a teacher':'म शिक्षक हुँ',
+      'i am learning english':'म अंग्रेजी सिक्दै छु',
+      'i do not understand':'मैले बुझिनँ',
+      'i do not know':'मलाई थाहा छैन',
+      'i need help':'मलाई मद्दत चाहिन्छ',
+      'i need water':'मलाई पानी चाहिन्छ',
+      'i need food':'मलाई खाना चाहिन्छ',
+      'i want to go home':'म घर जान चाहन्छु',
+      'i am going home':'म घर जाँदै छु',
+      'i love you':'म तिमीलाई माया गर्छु',
+      'what is your name':'तपाईंको नाम के हो',
+      'what are you doing':'तपाईं के गर्दै हुनुहुन्छ',
+      'how are you':'तपाईंलाई कस्तो छ',
+      'where are you from':'तपाईं कहाँबाट हुनुहुन्छ',
+      'where do you live':'तपाईं कहाँ बस्नुहुन्छ',
+      'where are you going':'तपाईं कहाँ जाँदै हुनुहुन्छ',
+      'how much does it cost':'यो कति पर्छ',
+      'how much is this':'यो कति पर्छ',
+      'where is the toilet':'शौचालय कहाँ छ',
+      'where is the bathroom':'बाथरुम कहाँ छ',
+      'can you help me':'के तपाईं मलाई मद्दत गर्न सक्नुहुन्छ',
+      'could you help me':'के तपाईं मलाई मद्दत गर्न सक्नुहुन्छ',
+      'do you speak english':'के तपाईं अंग्रेजी बोल्नुहुन्छ',
+      'can you speak english':'के तपाईं अंग्रेजी बोल्न सक्नुहुन्छ',
+      'please speak slowly':'कृपया बिस्तारै बोल्नुहोस्',
+      'please say it again':'कृपया फेरि भन्नुहोस्',
+      'thank you':'धन्यवाद',
+      'thank you very much':'धेरै धन्यवाद',
+      'you are welcome':'स्वागत छ',
+      'good morning':'शुभ प्रभात',
+      'good afternoon':'शुभ दिउँसो',
+      'good evening':'शुभ साँझ',
+      'good night':'शुभ रात्रि',
+      'hello':'नमस्ते',
+      'hi':'नमस्ते',
+      'namaste':'नमस्ते',
+      'goodbye':'फेरि भेटौँला',
+      'see you tomorrow':'भोलि भेटौँला',
+      'see you later':'पछि भेटौँला',
+      'please':'कृपया',
+      'sorry':'माफ गर्नुहोस्',
+      'excuse me':'माफ गर्नुहोस्',
+      'yes':'हो',
+      'no':'होइन',
+      'okay':'ठीक छ',
+      'ok':'ठीक छ',
+      'what happened':'के भयो',
+      'what is this':'यो के हो',
+      'what time is it':'कति बज्यो',
+      'i like nepali food':'मलाई नेपाली खाना मन पर्छ',
+      'i like momo':'मलाई मःम मन पर्छ',
+      'i like dal bhat':'मलाई दाल भात मन पर्छ',
+      'my name is ram':'मेरो नाम राम हो',
+      'my name is sita':'मेरो नाम सीता हो',
+      'this is my house':'यो मेरो घर हो',
+      'i go to school':'म विद्यालय जान्छु',
+      'i drink water':'म पानी पिउँछु',
+      'i drink tea':'म चिया पिउँछु',
+      'i drink coffee':'म कफी पिउँछु',
+      'i am from nepal':'म नेपालबाट हुँ',
+      'i live in nepal':'म नेपालमा बस्छु',
+      'i work':'म काम गर्छु',
+      'i am working':'म काम गरिरहेको छु',
+      'i have a headache':'मेरो टाउको दुखेको छ',
+      'my stomach hurts':'मेरो पेट दुखेको छ',
+      'this is delicious':'यो मिठो छ',
+      'i am lost':'म बाटो बिराएको छु',
+      'call a doctor':'डाक्टर बोलाउनुहोस्',
+      'call the police':'प्रहरी बोलाउनुहोस्'
+    };
+    Object.keys(natural).forEach(function(k){EN_NE_OFFLINE[k]=natural[k]});
+  }
+  return EN_NE_OFFLINE[key]||null;
+}
+var ROMAN_NE_OFFLINE={
+  'namaste':'Hello / Namaste','namaskar':'Greetings',
+  'dhanyabad':'Thank you','dhanyavaad':'Thank you',
+  'malai bhok lagyo':'I am hungry','malai bhok lageko cha':'I am hungry',
+  'malai bhok lageko chha':'I am hungry','malai pani chahiyo':'I need water',
+  'malai tirkha lagyo':'I am thirsty','ma thakeko chu':'I am tired',
+  'ma thakeko chhu':'I am tired','mero naam ram ho':'My name is Ram',
+  'timro nam ke ho':'What is your name?','tapai ko nam ke ho':'What is your name?',
+  'tapai ko naam ke ho':'What is your name?','k gardai ho':'What are you doing?',
+  'ke gardai ho':'What are you doing?','sanchai hunuhuncha':'How are you?',
+  'ma sanchai chu':'I am fine','malai madat chahiyo':'I need help'
+};
+function romanOfflineLookup(text){return ROMAN_NE_OFFLINE[normalizeEnglishPhrase(text)]||null;}
+
 /* ============ LIVE VISITOR STATS ============ */
 /*
   Optional visitor statistics use Supabase REST only when separately configured (currently disabled).
@@ -1560,6 +1688,10 @@ async function aiTranslateSmart(text,sl,tl,draft,normalized){
 async function translateBest(text,sl,tl){
   text=String(text||'').trim();if(!text)throw new Error('Text खाली छ');var key=cacheKey(text,sl,tl),hit=cached(key);if(hit)return hit;
   if(sl==='ne'&&tl==='en'){var d=dictLookup(text);if(d){var exact={text:d,src:'dict'};cached(key,exact);return exact}}
+  if(sl==='en'&&tl==='ne'){
+    var known=englishPhraseLookup(text);
+    if(known&&validateResult(known,'ne',text).ok){var offline={text:known,src:'offline'};cached(key,offline);return offline}
+  }
   /* Google gives a stable draft; longer sentences get a context-aware AI review, then fall back safely. */
   var g=await googleTranslate(text,sl,tl),gOK=g&&validateResult(g,tl,text).ok,words=text.split(/\s+/).filter(Boolean).length;
   if(gOK&&words<=4){var quick={text:g,src:'google'};cached(key,quick);return quick}
@@ -1569,10 +1701,10 @@ async function translateBest(text,sl,tl){
   /* Google failed: try best-effort AI, then MyMemory. Every stage is isolated so one provider cannot crash Translate. */
   if(!AI_CFG.key){var rescue=await aiTranslateSmart(text,sl,tl,'','');if(rescue&&validateResult(rescue,tl,text).ok){var rescued={text:rescue,src:'ai'};cached(key,rescued);return rescued}}
   var mm=await myMemoryTranslate(text,sl,tl);if(mm&&validateResult(mm,tl,text).ok){var back={text:mm,src:'mymemory'};cached(key,back);return back}
-  throw new Error('Online translation अहिले उपलब्ध छैन। Internet जाँचेर फेरि प्रयास गर्नुहोस्।')
+  throw new Error('अनलाइन अनुवाद सेवाले जवाफ दिएन। इन्टरनेट ठीक भए पनि कहिलेकाहीँ प्रदायक उपलब्ध नहुन सक्छ। पछि फेरि प्रयास गर्नुहोस्। · Translation provider unavailable; try again later.')
 }
 async function translateNeToEn(text){
-  var original=String(text||'').trim();if(DEV.test(original))return translateBest(original,'ne','en');var key=cacheKey(original,'roman-ne','en'),hit=cached(key);if(hit)return hit;
+  var original=String(text||'').trim();if(DEV.test(original))return translateBest(original,'ne','en');var key=cacheKey(original,'roman-ne','en'),hit=cached(key);if(hit)return hit;var knownRoman=romanOfflineLookup(original);if(knownRoman){var offlineRoman={text:knownRoman,src:'offline'};cached(key,offlineRoman);return offlineRoman;}
   var dev='',draft=null,exact=null;try{dev=await translit(original);exact=dictLookup(dev);if(exact){var d={text:exact,src:'dict',normalized:dev};cached(key,d);return d}draft=await googleTranslate(dev||original,dev?'ne':'auto','en');if(draft&&!validateResult(draft,'en',original).ok)draft=null}catch(e){}
   if(AI_CFG.key){var ai=await aiTranslateSmart(original,'roman-ne','en',draft,dev);if(ai&&validateResult(ai,'en',original).ok){var a={text:ai,src:'ai',normalized:dev||''};cached(key,a);return a}}
   if(draft){var g={text:draft,src:'google',normalized:dev||''};cached(key,g);return g}
@@ -1771,7 +1903,7 @@ function wordsHTML(text,cls){return String(text).split(/(\s+)/).map(function(t){
 var btBtn=$('#bt');
 if(btBtn)btBtn.addEventListener('click',function(){var v=($('#inp')?$('#inp').value:'').trim();if(!v)return;translateAndShow(v);},false);
 
-function showLoading(){return '<div class="card rise"><div class="ai-loading"><div class="spinner"></div><div class="txt">🤖 Translating…<br><span style="font-size:11.5px;opacity:.75">✨ AI refinement · 🌐 Google · 📖 local phrases</span></div></div></div>';}
+function showLoading(){return '<div class="card rise"><div class="ai-loading"><div class="spinner"></div><div class="txt">🤖 Translating…<br><span style="font-size:11.5px;opacity:.75">🌐 Online translator · 📖 offline phrase backup</span></div></div></div>';}
 
 async function translateAndShow(text){
   var out=$('#out');
