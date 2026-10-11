@@ -810,7 +810,7 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 .auth-pay-stamp{font-size:12px;margin:9px 0;color:var(--ink-2);overflow-wrap:anywhere}
 .auth-pay-meta{font-size:11px;color:var(--mut);margin:10px 0;overflow-wrap:anywhere}
 @media(max-width:440px){.auth-pay-card{padding:12px}.auth-pay-qr{width:min(100%,275px)}}
-/* Five-minute account trial: floating clock stays visible on every lesson screen. */
+/* One-hour account trial: floating clock stays visible on every lesson screen. */
 .sikau-trial-clock{position:fixed;right:clamp(10px,2.4vw,28px);bottom:calc(91px + env(safe-area-inset-bottom,0px));z-index:190;max-width:min(260px,calc(100vw - 20px));min-height:54px;display:flex;gap:10px;align-items:center;justify-content:center;padding:10px 15px;border:1px solid rgba(255,255,255,.2);border-radius:17px;background:linear-gradient(120deg,#17316e,#294e9c);color:#fff;box-shadow:0 8px 30px rgba(7,26,74,.28);font-family:inherit;text-align:left;cursor:pointer}
 .sikau-trial-clock .trial-clock-icon{font-size:25px;line-height:1}
 .sikau-trial-clock .trial-clock-text{display:flex;flex-direction:column;gap:1px}
@@ -1125,9 +1125,9 @@ pre,code{white-space:pre-wrap;overflow-wrap:anywhere}
 
 
 <!-- Floating free-trial countdown is outside the content view, so it stays visible while navigating lessons. -->
-<button type="button" id="sikauTrialClock" class="sikau-trial-clock" aria-label="Five-minute free trial time remaining. Open account and payment options." hidden>
+<button type="button" id="sikauTrialClock" class="sikau-trial-clock" aria-label="One-hour free trial time remaining. Open account and payment options." hidden>
   <span class="trial-clock-icon" aria-hidden="true">⏳</span>
-  <span class="trial-clock-text"><span class="trial-clock-label">Free trial · निःशुल्क समय</span><span class="trial-clock-value" id="sikauTrialTime" role="timer" aria-live="off">05:00</span></span>
+  <span class="trial-clock-text"><span class="trial-clock-label">Free trial · निःशुल्क समय</span><span class="trial-clock-value" id="sikauTrialTime" role="timer" aria-live="off">60:00</span></span>
 </button>
 
 <!-- Appwrite email/password accounts with a six-digit email verification code; shared guest-demo passcode is not server-side authentication. -->
@@ -3324,12 +3324,14 @@ const PAYMENT_AMOUNT_NPR=999;
 const PAYMENT_BANK='Laxmi Sunrise Bank';
 const PAYMENT_APPROVAL_LABEL='sikaupaid';
 const PAYMENT_LEGACY_APPROVAL_LABEL='sikautestpaid';
+// Private unrestricted access is verified by the Appwrite Function using a server-only user ID.
+// Never put private credentials or the privileged account ID into public HTML/JavaScript.
 const PAYMENT_WHATSAPP='9779813419260';
 const PAYMENT_PREF_KEY='english_sikau_payment_claim_v1';
-// One five-minute free trial per VERIFIED EMAIL, even across devices and browser sessions.
+// One one-hour free trial per VERIFIED EMAIL, even across devices and browser sessions.
 // A server-side Appwrite Function keeps the authoritative record; no browser may create, update or delete it.
 // Deploy the included Appwrite Function and paste its Function ID below. Do not publish a server API key.
-const TRIAL_LENGTH_MS=5*60*1000;
+const TRIAL_LENGTH_MS=60*60*1000;
 const TRIAL_FUNCTION_ID='REPLACE_WITH_FUNCTION_ID';
 // Old local browser trials are intentionally NOT trusted as the source of authorization.
 const TRIAL_OLD_STORAGE_PREFIX='english-sikau-free-trial-v1:';
@@ -3346,6 +3348,7 @@ let sdk=null, sdkPromise=null, currentUser=null, mode='welcome', busy=false, las
 let pendingEmail='',pendingUserId='',pendingKind='signup',firstName='',lastName='',resendUntil=0,notice=null;
 let trialRecord=null, trialStatus='loading', trialError='', trialUserId=null, trialServerOffset=0;
 let trialRequest=null, trialWasActive=false, trialLastCheck=0, trialFetchSerial=0;
+let privateAccessUserId=null, privateAccessGranted=false;
 const GUEST_ID='Nepal',GUEST_PASSWORD='@HamroNepal';
 const GUEST_KEY='english-sikau-guest-session-v1';
 const OTP_KEY='english-sikau-appwrite-otp-pending-v1';
@@ -3356,8 +3359,10 @@ const escapeHTML=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<'
 function savePending(){try{sessionStorage.setItem(OTP_KEY,JSON.stringify({email:pendingEmail,userId:pendingUserId,kind:pendingKind,first:firstName,last:lastName,expires:Date.now()+15*60*1000}))}catch(_){}}
 function clearPending(){pendingEmail='';pendingUserId='';pendingKind='signup';firstName='';lastName='';try{sessionStorage.removeItem(OTP_KEY)}catch(_){}}
 try{const p=JSON.parse(sessionStorage.getItem(OTP_KEY)||'null');if(p&&p.expires>Date.now()&&p.userId&&p.email){pendingEmail=p.email;pendingUserId=p.userId;pendingKind=p.kind||'signin';firstName=p.first||'';lastName=p.last||'';}else sessionStorage.removeItem(OTP_KEY)}catch(_){}
-function isPaidUser(){return !!currentUser&&Array.isArray(currentUser.labels)&&
- (currentUser.labels.includes(PAYMENT_APPROVAL_LABEL)||currentUser.labels.includes(PAYMENT_LEGACY_APPROVAL_LABEL))}
+function hasPrivateAccess(){return !!currentUser&&privateAccessGranted&&privateAccessUserId===currentUser.$id}
+function isPaidUser(){return !!currentUser&&(
+  hasPrivateAccess()||(Array.isArray(currentUser.labels)&&
+  (currentUser.labels.includes(PAYMENT_APPROVAL_LABEL)||currentUser.labels.includes(PAYMENT_LEGACY_APPROVAL_LABEL))))}
 // The backend stores one immutable record per verified email.
 // Browser localStorage and editable account preferences never grant trial access.
 function trialConfigured(){return !!TRIAL_FUNCTION_ID&&!TRIAL_FUNCTION_ID.startsWith('REPLACE_')}
@@ -3382,12 +3387,13 @@ function applyTrialResult(data,expectedId){
  trialUserId=expectedId;trialStatus='ready';trialError='';trialLastCheck=Date.now();
 }
 function clearTrialState(){
+ privateAccessUserId=null;privateAccessGranted=false;
  trialFetchSerial++;trialRecord=null;trialStatus='loading';trialError='';trialUserId=null;trialRequest=null;trialLastCheck=0;trialWasActive=false;trialServerOffset=0;
  if(trialClock)trialClock.hidden=true;
 }
 async function callTrialFunction(action){
  const api=await loadSDK();
- // SDK sends the signed-in Appwrite session. The Function independently verifies the email.
+ // SDK sends the signed-in Appwrite session. The Function validates its identity server-side.
  const result=await api.functions.createExecution(TRIAL_FUNCTION_ID,JSON.stringify({action}),false);
  let parsed=null;
  try{parsed=JSON.parse(result?.responseBody||'null')}catch(_){throw Error('Trial service returned an unreadable response.')}
@@ -3395,6 +3401,24 @@ async function callTrialFunction(action){
   throw Error(String(parsed?.error||'Trial server request failed.').slice(0,250));
  }
  return parsed;
+}
+// The private account is recognized ONLY by the server-side Appwrite user ID.
+// The browser never contains or compares the private email/password or user ID.
+async function checkPrivateAccess(user){
+ const uid=user?.$id;
+ privateAccessUserId=null;privateAccessGranted=false;
+ if(!uid||!trialConfigured())return false;
+ try{
+  const result=await callTrialFunction('access');
+  // Never give a response from one login to a different currently signed-in account.
+  if(currentUser?.$id!==uid)return false;
+  privateAccessUserId=uid;
+  privateAccessGranted=result.fullAccess===true;
+  return privateAccessGranted;
+ }catch(err){
+  console.warn('Private account check unavailable:',err?.message||err);
+  return false; // Always fail closed; never grant privilege if the Function is offline.
+ }
 }
 async function fetchTrialRecord(force=false){
  if(!currentUser||guestSession||isPaidUser())return;
@@ -3428,19 +3452,19 @@ function trialOfferHTML(){
   action='<div class="auth-trial-status">⏳ Time left · बाँकी समय: <b id="authTrialRemaining">'+formatTrialTime(left)+'</b></div>'+
    '<button type="button" class="auth-submit" data-mode="continuetrial">▶ Continue learning · सिकाइ जारी राख्नुहोस्</button>';
  }else if(expired){
-  action='<p class="auth-trial-ended">⏰ Your one free 5-minute trial has ended. To continue learning, pay रु. '+PAYMENT_AMOUNT_NPR+' for lifetime access. · तपाईंको एकपटकको निःशुल्क ट्रायल सकियो। अब आजीवन पहुँचका लागि भुक्तानी गर्नुहोस्।</p>';
+  action='<p class="auth-trial-ended">⏰ Your one free 1-hour trial has ended. To continue learning, pay रु. '+PAYMENT_AMOUNT_NPR+' for lifetime access. · तपाईंको एकपटकको निःशुल्क ट्रायल सकियो। अब आजीवन पहुँचका लागि भुक्तानी गर्नुहोस्।</p>';
  }else if(trialStatus==='loading'||(trialUserId!==currentUser?.$id)){
   action='<div class="auth-trial-status">⏳ Checking your trial on all devices… · ट्रायल जाँच हुँदैछ…</div>';
  }else if(trialStatus==='unavailable'){
   action='<div class="auth-trial-ended" role="alert">⚠️ '+escapeHTML(trialError||'Trial service unavailable.')+'</div>'+
    '<button type="button" class="auth-submit" data-mode="checktrial">🔄 Try again · फेरि जाँच गर्नुहोस्</button>';
  }else{
-  action='<button type="button" class="auth-submit" data-mode="starttrial">🎁 Start my ONE free 5-minute trial · एकपटक ५ मिनेट निःशुल्क</button>';
+  action='<button type="button" class="auth-submit" data-mode="starttrial">🎁 Start my ONE free 1-hour trial · एकपटक १ घण्टा निःशुल्क</button>';
  }
- return '<section class="auth-trial-offer" aria-label="One-time five-minute free trial">'+
-  '<h3>🎁 Try English Sikau free for 5 minutes!</h3>'+
+ return '<section class="auth-trial-offer" aria-label="One-time one-hour free trial">'+
+  '<h3>🎁 Try English Sikau free for 1 hour!</h3>'+
   '<p>One trial per verified account. Your countdown is shared across phone and computer, and keeps running when you close the page. · एउटै खातामा एकपटक मात्र ट्रायल।</p>'+action+
-  '<p class="auth-trial-small">After your 5 minutes expire, payment is required for full access. Your first trial cannot be restarted. · ५ मिनेटपछि पूर्ण पहुँचका लागि भुक्तानी आवश्यक छ।</p></section>';
+  '<p class="auth-trial-small">After your 1 hour expires, payment is required for full access. Your one-time trial cannot be restarted. · १ घण्टापछि पूर्ण पहुँचका लागि भुक्तानी आवश्यक छ।</p></section>';
 }
 function refreshTrialClock(checkExpiry=true){
  const left=trialMillisecondsLeft(),active=left>0;
@@ -3468,7 +3492,7 @@ async function startFreeTrial(){
   applyTrialResult(data,userId);
   notice=null;mode='payment';updateHeader();
   if(isTrialActive())grantAccess();
-  else{requireAccess();status('⏰ Your one free five-minute trial has already ended. Pay to continue. · ट्रायल सकिएको छ।','info')}
+  else{requireAccess();status('⏰ Your one free one-hour trial has already ended. Pay to continue. · ट्रायल सकिएको छ।','info')}
  }catch(e){status('Could not start free trial: '+friendlyError(e),'error')}
  finally{setBusy(false);refreshTrialClock(false)}
 }
@@ -3542,7 +3566,7 @@ function friendlyError(e){const s=String(e?.message||e?.response?.message||e||'U
   if(/network|load failed|failed to fetch|sdk.*load/i.test(s))return 'Could not reach Appwrite. Check your internet connection and reload. · इन्टरनेट जाँच्नुहोस्।';
   return 'Appwrite: '+s+(code?' (HTTP '+code+')':'');
 }
-function currentEmail(){return String(currentUser?.email||'')}
+function currentEmail(){return hasPrivateAccess()?'Private access account':String(currentUser?.email||'')}
 function savedName(){try{return JSON.parse(localStorage.getItem('sikau-appwrite-name:'+currentUser?.$id)||'null')||{}}catch(_){return {}}}
 function nameParts(){const name=String(currentUser?.name||'').trim();return name?name.split(/\s+/):[]}
 function currentFirst(){return String(savedName().first_name||nameParts()[0]||'').trim()}
@@ -3552,11 +3576,11 @@ function render(){
  if(currentUser&&!guestSession&&mode!=='guest')mode=isPaidUser()?'profile':'payment';else if(guestSession)mode='guestprofile';
  if(mode==='welcome'&&!hasAccess()){
    title='Welcome to English Sikau!';sub='स्वागत छ! · Learn English at your own pace';
-   body=noticeHTML()+'<p class="auth-gate-brand">🇳🇵 Try 5 minutes free after email verification · रु. ९९९ once for lifetime access</p><div class="auth-entry-grid">'+
+   body=noticeHTML()+'<p class="auth-gate-brand">🇳🇵 Try 1 hour free after email verification · रु. ९९९ once for lifetime access</p><div class="auth-entry-grid">'+
    '<button class="auth-entry-choice" type="button" data-mode="signup"><span class="auth-entry-icon">✨</span><span><strong>Create account</strong><small>खाता बनाउनुहोस् · Receive a 6-digit email code</small></span><span class="auth-entry-arrow">→</span></button>'+
    '<button class="auth-entry-choice" type="button" data-mode="signin"><span class="auth-entry-icon">✉️</span><span><strong>Sign in</strong><small>इमेल र पासवर्डले लगइन गर्नुहोस्</small></span><span class="auth-entry-arrow">→</span></button>'+
    '</div>'+
-   '<p class="auth-gate-note">Create an account and verify your email to start a real 5-minute free trial. For lifetime access, pay रु. ९९९ once; bank verification is required. · इमेल प्रमाणित गरेपछि ५ मिनेट निःशुल्क, आजीवन पहुँचका लागि एकपटक भुक्तानी।</p>';
+   '<p class="auth-gate-note">Create an account and verify your email to start your one-time 1-hour free trial. For lifetime access, pay रु. ९९९ once; bank verification is required. · इमेल प्रमाणित गरेपछि १ घण्टा निःशुल्क, आजीवन पहुँचका लागि एकपटक भुक्तानी।</p>';
  }else if(mode==='guest'&&!hasAccess()){
    title='Sign in with ID · ID बाट लगइन';sub='Enter your ID and password · ID र पासवर्ड राख्नुहोस्';
    body=noticeHTML()+'<form id="authGuestForm" class="auth-form"><div class="auth-field"><label for="guestUserId">User ID · प्रयोगकर्ता ID</label><input id="guestUserId" type="text" autocomplete="username" required></div><div class="auth-field"><label for="guestPassword">Password · पासवर्ड</label>'+passwordInput('guestPassword','current-password','Enter your password',false)+'</div><button class="auth-submit" type="submit">Sign in · लगइन गर्नुहोस्</button></form><p class="auth-gate-note">Enter the ID and password supplied by the account administrator.</p>'+backLink();
@@ -3606,7 +3630,7 @@ function render(){
    if(signup)body+='<div class="auth-names"><div class="auth-field"><label for="authFirst">First name · पहिलो नाम</label><input id="authFirst" type="text" autocomplete="given-name" maxlength="60" required placeholder="First name"></div><div class="auth-field"><label for="authLast">Last name · थर</label><input id="authLast" type="text" autocomplete="family-name" maxlength="60" required placeholder="Last name"></div></div>';
    body+=emailField(pendingEmail);
    if(!codeSignIn)body+=passwordFields(signup);
-   body+=(signup?'<p class="auth-quiet">Verify your email with a 6-digit code, then try the website free for 5 minutes. Pay रु. ९९९ once by QR for lifetime access after bank approval. · पहिले ५ मिनेट ट्रायल, त्यसपछि आजीवन पहुँचका लागि एकपटक शुल्क।</p>':codeSignIn?'<p class="auth-quiet">For accounts created with email code before passwords were added. · पुरानो इमेल-कोड खाताका लागि।</p>':'<p class="auth-quiet">Use the password you created during signup. · खाता बनाउँदा राखेको पासवर्ड प्रयोग गर्नुहोस्।</p>')+
+   body+=(signup?'<p class="auth-quiet">Verify your email with a 6-digit code, then try the website free for 1 hour. Pay रु. ९९९ once by QR for lifetime access after bank approval. · पहिले १ घण्टा ट्रायल, त्यसपछि आजीवन पहुँचका लागि एकपटक शुल्क।</p>':codeSignIn?'<p class="auth-quiet">For accounts created with email code before passwords were added. · पुरानो इमेल-कोड खाताका लागि।</p>':'<p class="auth-quiet">Use the password you created during signup. · खाता बनाउँदा राखेको पासवर्ड प्रयोग गर्नुहोस्।</p>')+
    '<button class="auth-submit" type="submit">'+(signup?'Create account & send verification code · खाता र कोड':codeSignIn?'Send 6-digit sign-in code · इमेल कोड पठाउनुहोस्':'Sign in with password · पासवर्डले लगइन')+'</button></form>'+
    (signup?'':codeSignIn?'<div class="auth-actions"><button type="button" class="auth-link" data-mode="signin">← Sign in with password</button></div>':'<div class="auth-actions"><button type="button" class="auth-link" data-mode="recover">Forgot password? · पासवर्ड बिर्सनुभयो?</button><button type="button" class="auth-link" data-mode="emailcode">Sign in with email code · इमेल कोड</button></div>')+(mode==='signin'?guestLink():'')+backLink();
  }
@@ -3673,7 +3697,7 @@ async function submitPaymentClaim(ev){ev.preventDefault();if(busy||!currentUser|
  if(reference.length<4||reference.length>100)return status('Enter the bank transaction reference (4–100 characters). · कारोबार नम्बर राख्नुहोस्।','error');
  try{
   setBusy(true);const api=await loadSDK();const prefs=await api.account.getPrefs();
-  // This user-editable claim is NEVER used to grant access; only a Console-controlled Auth label grants access.
+  // This user-editable claim never grants access; paid labels and the private server-side check authorize access.
   const next={...prefs,[PAYMENT_PREF_KEY]:{reference,bank:PAYMENT_BANK,amountNpr:PAYMENT_AMOUNT_NPR,submittedAt:new Date().toISOString(),userId:currentUser.$id}};
   await api.account.updatePrefs(next);currentUser=await api.account.get();
   mode='payment';setBusy(false);
@@ -3700,14 +3724,17 @@ async function requestCode(ev){ev.preventDefault();if(busy)return;
  if(passwordSignIn){
   const lock=attempts(email);if(lock.lockedUntil>Date.now())return status(lockMessage(lock),'error');
   if(!pass)return status('Please enter your password. · पासवर्ड राख्नुहोस्।','error');
-  try{setBusy(true);const api=await loadSDK();await api.account.createEmailPasswordSession(email,pass);const user=await api.account.get();
-    // Appwrite may allow unverified email/password accounts to sign in. Do not open lessons yet.
-    if(user?.emailVerification===false){
+   try{setBusy(true);const api=await loadSDK();await api.account.createEmailPasswordSession(email,pass);const user=await api.account.get();
+    currentUser=user;
+    // Regular unverified accounts still need an email code. The designated private account does not.
+    const isPrivate=await checkPrivateAccess(user);
+    if(user?.emailVerification===false&&!isPrivate){
       await api.account.deleteSession('current');
+      clearTrialState();currentUser=null;
       const token=await sendEmailCode(email);firstName='';lastName='';stashCode(email,token,'signin');resendUntil=Date.now()+60000;
-      currentUser=null;mode='verify';setBusy(false);status('Please verify your email with the 6-digit code before learning. · इमेल प्रमाणित गर्नुहोस्।','info');return;
+      mode='verify';setBusy(false);status('Please verify your email with the 6-digit code before learning. · इमेल प्रमाणित गर्नुहोस्।','info');return;
     }
-    clearAttempts(email);currentUser=user;clearPending();setBusy(false);afterSignIn();
+    clearAttempts(email);clearPending();setBusy(false);afterSignIn();
   }catch(e){setBusy(false);if(Number(e?.code)===401)status(lockMessage(fail(email))+' '+friendlyError(e),'error');else status(friendlyError(e),'error')}
   return;
  }
@@ -3782,7 +3809,13 @@ document.addEventListener('keydown',e=>{if(modal.hidden)return;if(e.key==='Escap
 updateHeader();
 if(new URLSearchParams(location.search).get('reset')==='1'){gate(true);mode='reset';render()}else if(guestSession){gate(false);modal.hidden=true}else{requireAccess()}
 loadSDK().then(async api=>{
- try{const user=await api.account.get();if(user?.$id){if(user.emailVerification===false){await api.account.deleteSession('current');currentUser=null;requireAccess();status('Please verify your email with a 6-digit code before learning. Sign in with email code. · इमेल प्रमाणित गर्नुहोस्।','info')}else{currentUser=user;clearPending();afterSignIn()}}else if(!guestSession)requireAccess()}
+ try{const user=await api.account.get();if(user?.$id){
+   currentUser=user;const isPrivate=await checkPrivateAccess(user);
+   if(user.emailVerification===false&&!isPrivate){
+     await api.account.deleteSession('current');clearTrialState();currentUser=null;
+     requireAccess();status('Please verify your email with a 6-digit code before learning. Sign in with email code. · इमेल प्रमाणित गर्नुहोस्।','info');
+   }else{clearPending();afterSignIn()}
+  }else if(!guestSession)requireAccess()}
  catch(e){if(!guestSession){if(Number(e?.code)===401)return;console.warn('Appwrite session check:',e?.message||e);status(friendlyError(e),'error')}}
 }).catch(e=>{if(!guestSession)status(friendlyError(e),'error')});
 })();
