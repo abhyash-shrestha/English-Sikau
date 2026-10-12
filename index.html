@@ -753,6 +753,62 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* Launch candidate: private lessons stay hidden until authenticated Appwrite download succeeds. */
 #protected .cloud-story-info{min-width:0}
 @media(max-width:599px){#protected #bar button{min-height:44px}}
+
+/* Student dashboard: personalized welcome, compact premium header and cloud progress. */
+#protected #bar.student-topbar{
+  min-height:76px;padding:12px clamp(13px,2.4vw,34px);
+  display:flex;align-items:center;justify-content:space-between;gap:15px;
+  flex-wrap:nowrap;color:#fff;
+  background:linear-gradient(110deg,#25152f 0%,#51204e 48%,#182f65 100%);
+  border-bottom:1px solid #ffffff29;box-shadow:0 5px 18px #21103224;
+}
+#protected .student-topbar-brand{display:flex;align-items:center;gap:11px;min-width:0;flex:0 1 auto}
+#protected .student-brand-flag{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;
+  font-size:26px;background:#fff2;border:1px solid #fff3;flex-shrink:0}
+#protected .student-topbar-brand strong{display:block;white-space:nowrap;color:#fff;font-size:19px;font-weight:900;line-height:1.15;letter-spacing:-.04em}
+#protected .student-topbar-brand strong em{color:#ffd791;font-style:normal}
+#protected .student-topbar-brand small{display:block;font-size:11px;font-weight:650;opacity:.85;margin-top:4px}
+#protected .student-topbar-welcome{min-width:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:8px 13px;border:1px solid #ffffff36;border-radius:17px;background:#ffffff12;
+  box-shadow:inset 0 1px 0 #ffffff12}
+#protected .student-welcome-avatar{font-size:24px;line-height:1}
+#protected .student-welcome-copy{display:flex;min-width:0;flex-direction:column;gap:2px}
+#protected #studentTopGreeting{font-size:clamp(13px,1.3vw,17px);line-height:1.15;color:#fff7ec;font-weight:900;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#protected #studentTopNepali{font-size:12px;color:#f8d3e2;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+#protected .student-access-tag{font-weight:850;white-space:nowrap;border-radius:999px;padding:6px 11px;
+  border:1px solid #fff5;background:#ffe5ad22;color:#ffdfa6;font-size:11px}
+#protected #bar button#exit{background:#fff;border:1px solid #fff;color:#592043;font-size:12px;
+  min-height:44px;border-radius:13px;padding:10px 15px;font-weight:850;box-shadow:0 3px 13px #0c092924}
+#protected #bar button#exit:hover{background:#fff0f5;transform:translateY(-1px)}
+#protected #cloudStoryProgress{padding:11px clamp(13px,2.3vw,33px);border-bottom:1px solid #f2d6cf;
+  background:linear-gradient(110deg,#fff7f2,#f8f4ff 54%,#eff7ff);gap:13px}
+#protected .cloud-story-info strong{font-size:13px;color:#652448;font-weight:900;letter-spacing:-.01em}
+#protected #cloudStoryValues{display:block;color:#1e4772;font-size:12px;font-weight:800;line-height:1.5}
+#protected .cloud-story-info small{color:#785e71;font-size:11px}
+#protected #cloudStoryRefresh{border-color:#dfbad7;color:#7b2450;background:#fff;border-radius:13px;
+  font-weight:850;box-shadow:0 3px 12px #65355010}
+@media(max-width:900px){
+  #protected .student-topbar-brand small{display:none}
+  #protected .student-topbar-welcome{padding:7px 10px}
+  #protected .student-brand-flag{width:35px;height:35px;font-size:22px}
+  #protected .student-topbar-brand strong{font-size:16px}
+  #protected .student-access-tag{display:none}
+}
+@media(max-width:650px){
+  #protected #bar.student-topbar{flex-wrap:wrap;gap:9px;padding:10px 12px}
+  #protected .student-topbar-brand{order:1}
+  #protected #bar button#exit{order:2;margin-left:auto;min-height:40px;font-size:11px;padding:8px 11px}
+  #protected .student-topbar-welcome{order:3;flex:1 1 100%;justify-content:flex-start;border-radius:12px;padding:7px 11px;gap:9px}
+  #protected .student-welcome-avatar{font-size:19px}
+  #protected #studentTopGreeting{font-size:14px}
+  #protected #studentTopNepali{font-size:11px}
+  #protected #cloudStoryProgress{padding:9px 12px;gap:7px}
+  #protected .cloud-story-info strong{font-size:12px}
+  #protected #cloudStoryValues{font-size:11px}
+  #protected .cloud-story-info small{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){#protected #bar button#exit:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -782,8 +838,19 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 </header>
 <main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p><footer class="footer-credit" aria-label="English Sikau creator"><div class="nepal-landscape" aria-hidden="true"><span class="landscape-sun"></span><span class="landscape-ridge ridge-back"></span><span class="landscape-ridge ridge-front"></span><span class="landscape-temple left">🏯</span><span class="landscape-temple right">🏯</span><span class="landscape-birds">⌁　⌁</span></div><span class="credit-line">Made with ❤️ in Nepal by <strong>Abhyash.</strong></span><span class="credit-nepali">नेपालमा मायाले बनाइएको · अभ्यास</span></footer></main>
 </div></div>
-<section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar"><span>🔐 English Sikau · protected lessons <span id="sessionNote"></span></span><button type="button" id="exit">Sign out · लगआउट</button></div>
-<section id="cloudStoryProgress" class="cloud-story-bar" aria-label="Appwrite verified story progress"><div class="cloud-story-info"><strong>☁️ Verified story progress · सुरक्षित प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Separate from original app XP and mastery; totals are not added. · मूल प्रगतिसँग जोडिएको छैन।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
+<section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar" class="student-topbar">
+  <div class="student-topbar-brand" aria-label="English Sikau · अंग्रेजी सिकौं">
+    <span class="student-brand-flag" aria-hidden="true">🇳🇵</span>
+    <div><strong>English <em>Sikau</em></strong><small>अंग्रेजी सिकौं · Learn · Speak · Grow</small></div>
+  </div>
+  <div class="student-topbar-welcome" role="status" aria-live="polite">
+    <span class="student-welcome-avatar" aria-hidden="true">👋</span>
+    <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back!</strong><span id="studentTopNepali" lang="ne">नमस्ते! फेरि स्वागत छ।</span></div>
+    <span id="sessionNote" class="student-access-tag"></span>
+  </div>
+  <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
+</div>
+<section id="cloudStoryProgress" class="cloud-story-bar" aria-label="Appwrite verified story progress"><div class="cloud-story-info"><strong>☁️ Your verified learning progress · तपाईंको सुरक्षित प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Separate from original app XP and mastery; totals are not added. · मूल प्रगतिसँग जोडिएको छैन।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script>
 'use strict';
@@ -916,7 +983,83 @@ $('activeForm')?.addEventListener('submit',submit);$('paymentForm')?.addEventLis
 }
 function go(next){mode=next;showMsg('Choose an option to continue.');show()}
 async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Could not load the Appwrite SDK.');const client=new sdk.Client().setEndpoint(CFG.endpoint).setProject(CFG.project);account=new sdk.Account(client);functions=new sdk.Functions(client);ID=sdk.ID;}
+
+/* Personalized student dashboard. Names come ONLY from the signed-in Appwrite
+   account and are inserted as text, never as HTML or authorization data. */
+function studentFirstName(){
+  const raw=typeof user?.name==='string'&&user.name.trim()
+    ?user.name.trim():String(user?.email||'').split('@')[0].replace(/[._-]+/g,' ');
+  const first=String(raw).trim().split(/\s+/u)[0]||'Learner';
+  return first.replace(/[<>]/g,'').slice(0,32)||'Learner';
+}
+function updateStudentWelcome(){
+  if(!openedAccess||!user)return;
+  const first=studentFirstName();
+  const en=$('studentTopGreeting'),ne=$('studentTopNepali');
+  if(en)en.textContent='Welcome back, '+first+'! 👋';
+  if(ne)ne.textContent='नमस्ते, '+first+'! आज पनि अंग्रेजी सिकौं ✨';
+}
+let studentLessonObserver=null,studentLessonDocument=null,studentLessonFrameScheduled=false;
+function disconnectStudentLessonObserver(){
+  if(studentLessonObserver){studentLessonObserver.disconnect();studentLessonObserver=null;}
+  studentLessonDocument=null;studentLessonFrameScheduled=false;
+}
+function personalizeStudentLesson(){
+  if(!openedAccess||!user)return;
+  updateStudentWelcome();
+  let doc;
+  try{doc=$('lessonFrame').contentDocument;}catch{return;}
+  if(!doc?.body)return;
+  const first=studentFirstName();
+  // Target only short hero/greeting and badge text. Never touch exercises,
+  // storage, lesson state, XP, quiz scoring, or private source files.
+  let walk=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
+  let node,scanned=0,heroFound=false,subFound=false,badgeFound=false;
+  while((node=walk.nextNode())&&scanned++<3300){
+    const parent=node.parentElement;
+    if(!parent||/^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION)$/i.test(parent.tagName))continue;
+    const value=node.nodeValue||'',trim=value.trim();
+    if(!trim||trim.length>100)continue;
+    if(!badgeFound&&trim.length<60&&/^(?:🔐\s*|🔒\s*|🎁\s*|📚\s*)?Private lessons$/iu.test(trim)){
+      node.nodeValue=value.replace(/Private lessons/i,first+' · मेरो कक्षा');
+      parent.classList.add('sikau-personal-classroom');
+      badgeFound=true;continue;
+    }
+    if(!heroFound&&trim.length<60&&/नमस्ते\s*[!！।]/u.test(trim)&&!trim.includes('नमस्ते,')){
+      node.nodeValue=value.replace(/नमस्ते\s*[!！।]/u,'नमस्ते, '+first+'!');
+      parent.classList.add('sikau-personal-greeting');
+      heroFound=true;continue;
+    }
+    if(!subFound&&trim.length<90&&/शुभ\s*(?:प्रभात|बिहान|दिउँसो|साँझ|रात्री)/u.test(trim)&&!trim.includes(first)){
+      node.nodeValue=value.replace(/(शुभ\s*(?:प्रभात|बिहान|दिउँसो|साँझ|रात्री))\s*[!！।]?/u,'$1, '+first+'!');
+      subFound=true;
+    }
+    if(heroFound&&subFound&&badgeFound)break;
+  }
+  if(doc!==studentLessonDocument){
+    disconnectStudentLessonObserver();
+    studentLessonDocument=doc;
+    const style=doc.createElement('style');
+    style.id='sikau-student-personalization';
+    style.textContent='.sikau-personal-classroom{border-radius:999px!important;background:#fff2e8!important;color:#812747!important;border:1px solid #ffdbdc!important;padding:8px 14px!important;font-weight:850!important;box-shadow:0 5px 13px #40102516}.sikau-personal-greeting{letter-spacing:-.025em}';
+    if(doc.head)doc.head.appendChild(style);
+    // The private app redraws its hero on navigation. Reapply only when DOM
+    // children change; our text-node changes do not retrigger this observer.
+    studentLessonObserver=new MutationObserver(()=>{
+      if(!studentLessonFrameScheduled&&openedAccess){
+        studentLessonFrameScheduled=true;
+        requestAnimationFrame(()=>{
+          studentLessonFrameScheduled=false;
+          if(openedAccess&&user)personalizeStudentLesson();
+        });
+      }
+    });
+    studentLessonObserver.observe(doc.body,{subtree:true,childList:true});
+  }
+}
+$('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
 function killLessons(){
+  disconnectStudentLessonObserver();
   readNumber++;
   openedAccess=null;
   if($('cloudStoryValues'))$('cloudStoryValues').textContent='Sign in to view verified progress.';
@@ -1019,7 +1162,8 @@ async function openFile(token='',isTrial=false){
     frame.removeAttribute('src');
     frame.srcdoc=html;
     openedAccess=kind;
-    $('sessionNote').textContent='· '+kind;
+    $('sessionNote').textContent=kind==='lifetime'?'👑 Lifetime member':'⏰ Trial learner';
+    updateStudentWelcome();
     $('protected').classList.remove('hide');
     showMsg('✅ Private English Sikau lessons loaded securely.','ok');
     void refreshCloudStoryProgress();
@@ -1152,7 +1296,8 @@ async function revalidateOpenLessons(){
       if(paid(fresh)){
         // Paid approval takes priority when a student upgrades during a trial.
         openedAccess='lifetime';
-        $('sessionNote').textContent='· lifetime';
+        $('sessionNote').textContent='👑 Lifetime member';
+        updateStudentWelcome();
       }else{
         // Do not trust Date.now(), sessionStorage or a cached trial timestamp alone.
         const result=await fnCall(CFG.trial,'status');
