@@ -86,12 +86,118 @@ body{background:radial-gradient(circle at 5% 15%,#ffdad8 0%,transparent 31%),rad
  .auth-step{font-size:10px;text-align:right}
  .auth-step strong{font-size:11px}
 }
+
+/* English Sikau: playful, trustworthy trial + payment screen. */
+#panel[data-mode="payment"]{max-width:1110px;margin:auto}
+#panel[data-mode="payment"] .hero{padding:26px 40px;display:block}
+#panel[data-mode="payment"] .hero h1{font-size:clamp(27px,3.2vw,40px);margin:15px 0 8px}
+#panel[data-mode="payment"] .hero h1 span{display:inline;margin-left:.25em}
+#panel[data-mode="payment"] .hero-sub{font-size:14px;max-width:100%;margin:3px 0}
+#panel[data-mode="payment"] .hero-sub span{display:inline;margin-left:6px}
+#panel[data-mode="payment"] .hero-benefits,#panel[data-mode="payment"] .hero-footer{display:none}
+#panel[data-mode="payment"] .creator-spotlight{margin-top:13px;padding:9px 14px}
+#panel[data-mode="payment"] .creator-spotlight-mark{height:28px;width:28px;font-size:18px}
+#panel[data-mode="payment"] .creator-spotlight-copy strong{font-size:19px}
+#panel[data-mode="payment"] .content{padding:28px clamp(18px,4.5vw,56px) 25px}
+#panel[data-mode="payment"] .auth-eyebrow{margin-bottom:18px}
+.access-page{display:grid;gap:20px}
+.access-welcome{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.access-welcome h2{font-size:clamp(23px,3vw,30px);margin:10px 0 3px;color:#2c1a2b}
+.access-welcome p{font-size:13px;color:#827481;margin:0}
+.access-signout{font-size:13px;white-space:nowrap}
+.trial-card{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,#fff5f5,#fff0f4 62%,#ffe1e8);border:1px solid #ffd4de;border-radius:24px;display:grid;grid-template-columns:70px 1fr;gap:14px;align-items:center;padding:22px 28px;box-shadow:0 12px 30px #b83b6320}
+.trial-card:after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;border:1px solid #f2afc255;right:-40px;top:-65px;box-shadow:0 0 0 28px #ffe0e744;z-index:-1}
+.trial-icon{font-size:51px;align-self:start;filter:drop-shadow(0 5px 6px #d8677460)}
+.trial-kicker,.life-eyebrow{font-size:10px;letter-spacing:.13em;color:#ad2756;font-weight:850;margin:2px 0 5px}
+.trial-details h3{color:#851139;font-size:clamp(20px,2.5vw,29px);margin:0 0 7px;letter-spacing:-.035em}
+.trial-details p{color:#785864;font-size:14px;margin:5px 0 13px;max-width:620px;line-height:1.5}
+.trial-details #trialClock{color:#c11350;font-size:19px}
+.trial-button{font-size:15px;min-height:49px;max-width:590px;display:flex;justify-content:center;align-items:center;gap:12px;border-radius:999px}
+.trial-button span{font-size:20px}
+.trial-sparkle{position:absolute;right:25px;top:22px;font-size:30px;opacity:.92}
+.trial-active{border-color:#eabbea}
+.trial-ended{background:#f6f0f4}
+.lifetime-card{border:1px solid #ffdfad;border-radius:26px;background:radial-gradient(ellipse at 78% 8%,#ffedc47d,transparent 37%),linear-gradient(135deg,#fffaf3,#fff4e4);padding:clamp(20px,3vw,33px);box-shadow:0 14px 34px #94592216}
+.life-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.life-heading-main{display:flex;align-items:center;gap:14px}
+.crown-icon{display:grid;place-items:center;background:linear-gradient(135deg,#ffcf59,#fff0b0);border-radius:17px;width:64px;height:64px;flex:none;font-size:33px;box-shadow:0 7px 19px #fab93e2a}
+.life-heading h3{margin:0 0 5px;color:#291a2a;font-size:clamp(23px,3vw,34px);letter-spacing:-.045em;line-height:1.2}
+.life-heading h3 span{color:#782f66}
+.life-heading p{margin:0;color:#76616d;font-size:14px}
+.life-sticker{background:#ffe59c;border-radius:45% 55% 44% 56%/47% 42% 58% 53%;padding:15px 19px;max-width:190px;text-align:center;color:#6e351b;font-size:13px;font-weight:900;transform:rotate(-7deg);box-shadow:0 4px 0 #ffd37950}
+.life-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(255px,.85fr);gap:24px;align-items:stretch}
+.life-price-column{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.life-price-box{position:relative;background:radial-gradient(circle at 0 0,#ffe0ea,transparent 60%),linear-gradient(120deg,#ffedf0,#fff0e6);border-radius:21px;min-height:190px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:1px solid white;padding:18px;text-align:center;overflow:hidden}
+.life-price-box:before{content:"";position:absolute;inset:15px 20px;border:2px dashed #f4b9c9;border-radius:32px;pointer-events:none}
+.life-price-sparkle{position:absolute;top:15px;left:18px;font-size:22px}
+.life-price{font-weight:950;font-size:clamp(42px,6.3vw,75px);letter-spacing:-.05em;color:#df0b48;line-height:1.16}
+.life-price-label{font-size:14px;color:#8a2444;font-weight:800;margin-top:5px}
+.price-fun{margin-top:14px;border-radius:999px;background:#ffffffb3;padding:8px 12px;font-size:12px;color:#97405d}
+.life-explainer{color:#715761;font-size:14px;line-height:1.6;margin:0}
+.life-explainer strong{color:#4c2b3e}
+.approval-note{display:flex;gap:11px;align-items:center;background:#fffaf8;border:1px solid #f3dbc8;border-radius:14px;padding:11px 14px;color:#7e2d57;font-size:13px;font-weight:800}
+.approval-note small{color:#8d6e74;font-weight:500;font-size:11px}
+.life-qr-column{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}
+.qr-shell{background:white;border:1px solid #f0e6e3;border-radius:21px;padding:17px 17px 9px;width:100%;max-width:335px;text-align:center;box-shadow:0 8px 24px #41212b10}
+.qr-caption{display:block;color:#9d2256;font-weight:900;letter-spacing:.08em;font-size:11px;margin:0 auto 6px}
+#panel .life-qr-column .qr{width:min(100%,292px);border:0;border-radius:6px;margin:0 auto;padding:0;object-fit:contain;background:white}
+.qr-shell p{font-size:13px;font-weight:800;color:#a24e17;margin:6px 0 0}
+.qr-arrow{background:#fff0ed;color:#af285a;font-size:12px;border-radius:999px;padding:9px 17px;font-weight:850;transform:rotate(-3deg)}
+.payment-journey{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:27px 0 19px}
+.journey-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;border:1px solid #f6e3c9;border-radius:17px;background:#ffffffb8;padding:17px 8px 15px;min-height:144px}
+.step-number{position:absolute;left:9px;top:9px;background:#e71d5a;color:white;border-radius:50%;min-width:29px;height:29px;display:grid;place-items:center;font-size:14px;font-weight:900}
+.step-emoji{font-size:29px;margin-top:10px}
+.journey-step strong{font-size:13px;color:#3a2034}
+.journey-step small{font-size:11px;color:#806671;line-height:1.5}
+.payment-entry{border-top:1px solid #eacfb4;padding-top:16px}
+.payment-entry h4{font-size:20px;color:#381a30;margin:3px 0 4px}
+.payment-entry>p{font-size:13px;color:#785f67;margin:5px 0 13px}
+.payment-entry .field{margin:9px 0 14px}
+.payment-entry .field input{height:57px;border:1px solid #e3d3d2}
+.submit-payment{display:flex;justify-content:center;align-items:center;gap:10px;font-size:15px}
+.submit-payment>span:last-child{font-size:20px}
+.approval-button{margin-top:12px}
+.payment-help{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:25px;background:linear-gradient(110deg,#ffeded,#ffe2e6);border:1px solid #ffd3d8;padding:13px 16px;border-radius:18px;font-size:13px}
+.help-icon{font-size:25px}.payment-help>div{flex:1;min-width:180px}.payment-help a{font-weight:850;color:#ae1749}
+.help-flourish{font-weight:850;color:#a82a5a;font-size:12px}
+.footer-credit{padding:20px 12px 5px;text-align:center;color:#6b5365}
+.footer-credit .mountain{height:28px;background:linear-gradient(150deg,transparent 50%,#eecbd6 51%) 0 0/85px 28px repeat-x;opacity:.72;margin-bottom:10px;clip-path:polygon(0 100%,10% 33%,18% 75%,26% 10%,34% 78%,46% 25%,54% 83%,68% 4%,78% 76%,90% 25%,100% 100%)}
+.footer-credit .credit-line{display:block;font-size:14px;font-weight:800;color:#61344e}
+.footer-credit .credit-line strong{color:#b91549}
+.footer-credit .credit-nepali{font-size:11px;color:#977a8d;display:block;margin-top:3px}
+@media(max-width:780px){
+ #panel[data-mode="payment"] .hero{padding:16px 22px}
+ #panel[data-mode="payment"] .hero h1{font-size:26px}
+ #panel[data-mode="payment"] .hero-sub span{display:none}
+ #panel[data-mode="payment"] .content{padding:19px 17px}
+ .access-page{gap:13px}.trial-card{grid-template-columns:43px 1fr;padding:17px 14px;gap:9px}
+ .trial-icon{font-size:33px}.trial-sparkle{display:none}.trial-details h3{font-size:21px}
+ .trial-details p{font-size:12px}.trial-button{font-size:13px}
+ .lifetime-card{padding:17px}.life-heading{margin-bottom:16px}
+ .crown-icon{width:44px;height:44px;font-size:23px;border-radius:12px}
+ .life-heading-main{gap:10px}
+ .life-heading h3{font-size:22px}.life-sticker{font-size:11px;padding:10px}
+ .life-top{grid-template-columns:1fr;gap:14px}
+ .life-price-box{min-height:160px}.life-price{font-size:57px}
+ .payment-journey{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:20px}
+ .journey-step{min-height:125px}
+ .payment-help{gap:8px}.help-flourish{display:none}
+ .footer-credit{padding-top:10px}
+}
+@media(max-width:400px){
+ .life-heading h3{font-size:19px}.life-sticker{display:none}
+ .access-welcome{align-items:start}.access-signout{margin-left:auto}
+ .trial-details h3{font-size:19px}.life-price{font-size:48px}
+ .submit-payment{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.life-sticker,.qr-arrow{transform:none}}
+
 </style>
 </head>
 <body>
 <div id="shell"><div id="panel">
 <header class="hero"><div class="hero-kicker"><span class="hero-mark">🇳🇵</span><span>ENGLISH SIKAU <em>नेपाली</em></span></div><h1>Learn English.<span>Believe in yourself.</span></h1><p class="hero-sub">आफ्नो समयमा, आफ्नै गतिमा अंग्रेजी सिक्नुहोस्।<span>Learn anytime, anywhere — with a learning experience designed for Nepali speakers.</span></p><div class="creator-spotlight" aria-label="Created by Abhyash · अभ्यास"><span class="creator-spotlight-mark">✦</span><span class="creator-spotlight-copy"><small>CREATED BY · निर्माणकर्ता</small><strong>अभ्यास <span>· Abhyash</span></strong></span></div><div class="hero-benefits"><div><span>📖</span><strong>Simple lessons</strong><small>सजिलो पाठ</small></div><div><span>🎤</span><strong>Speak confidently</strong><small>आत्मविश्वासका साथ बोल्नुहोस्</small></div><div><span>📈</span><strong>Track your progress</strong><small>आफ्नो प्रगति हेर्नुहोस्</small></div></div><div class="hero-footer"><span>MADE FOR NEPALI LEARNERS</span><strong>English Sikau · अंग्रेजी सिकौं</strong></div></header>
-<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p></main>
+<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p><footer class="footer-credit" aria-label="English Sikau creator"><div class="mountain" aria-hidden="true"></div><span class="credit-line">Made with ❤️ in Nepal by <strong>Abhyash.</strong></span><span class="credit-nepali">नेपालमा मायाले बनाइएको · अभ्यास</span></footer></main>
 </div></div>
 <section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar"><span>🔐 English Sikau · protected lessons <span id="sessionNote"></span></span><button type="button" id="exit">Sign out · लगआउट</button></div>
 <div id="privateLocalPreviewBar" style="padding:10px 14px;background:#fff5df;border-bottom:1px solid #e8d6b5;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-family:system-ui;font-size:14px">
@@ -126,8 +232,59 @@ case 'forgot':out=form('Reset password · पासवर्ड परिवर�
 case 'reset':out=form('Choose a new password',pwd('password','New password','new-password')+pwd('confirm','Confirm new password','new-password'),'Reset password');break;
 case 'idlogin':out=form('Sign in with ID · ID बाट लगइन',makeInput('guestId','User ID · प्रयोगकर्ता ID')+pwd('guestPass','Password · पासवर्ड'),'Continue')+navButton('signin','← Sign in with email');break;
 case 'demo':out='<h2>English Sikau sample · नमुना सिकाइ</h2><p class="muted">Free practice examples · निःशुल्क अभ्यास</p><div class="demo"><strong>Today’s phrases</strong><p>How are you? — तपाईंलाई कस्तो छ?</p><p>I want to learn English. — म अंग्रेजी सिक्न चाहन्छु।</p><p>Please speak slowly. — कृपया बिस्तारै बोल्नुहोस्।</p></div><button type="button" class="secondary" data-mode="welcome">← Exit sample</button>';break;
-case 'payment':{let claim=user?.prefs?.[CFG.pref]||null;let paidContent=paid(user);const remaining=trial?.used?Math.max(0,new Date(trial.expiresAt).getTime()-Date.now()):0;const trialHtml=trial?.available&&remaining>0?`<div class="card"><h3>⏳ Your one-hour trial is active</h3><p>Time remaining: <b id="trialClock">${Math.floor(remaining/60000)}m ${Math.floor(remaining/1000)%60}s</b></p><button type="button" class="primary" data-mode="trialopen">Continue trial · सिकाइ जारी राख्नुहोस्</button></div>`:trial?.available&&!trial.used?`<div class="card"><h3>🎁 Your one free 1-hour trial</h3><p class="muted">One 60-minute trial per verified email. The timer keeps running if you close the page or switch devices.</p>${trialPassReady()?'<button type="button" class="primary" data-mode="trialstart">Start free trial · १ घण्टा निःशुल्क</button>':'<p class="msg">The one-hour trial is temporarily unavailable. Please try again later.</p>'}</div>`:trial?.used?`<p class="msg error">⏰ Your free one-hour trial has ended. · निःशुल्क समय सकियो।</p>`:`<div class="card"><h3>🎁 Free one-hour trial</h3><p class="muted">Checking your trial status securely. If the service is unavailable, lessons stay locked.</p><button type="button" class="secondary" data-mode="trialcheck">Check trial · ट्रायल जाँच</button></div>`;
- out=`<div class="row"><h2>Namaste, ${name}!</h2><button type="button" class="secondary" data-mode="signout">Sign out</button></div><span class="tag">EMAIL VERIFIED · इमेल प्रमाणित</span>${trialHtml}<div class="card"><h3>🔒 Lifetime access · आजीवन पहुँच</h3><div class="price">रु. ९९९ <small>one-time · lifetime</small></div><p class="right muted">About the price of chicken pizza and a can of Coke.</p><p class="muted">Pay using the ${CFG.bank} QR. Lessons unlock only after the owner verifies your bank transaction and assigns paid access.</p><img class="qr" src="${QR_SRC}" alt="Laxmi Sunrise Bank payment QR"><p class="muted">1. Scan QR in your banking app. 2. Pay NPR 999. 3. Enter the transaction reference below. 4. Wait for manual approval.</p>${claim?.reference?`<div class="msg ok">Reference submitted: ${escapeHTML(claim.reference)}. Pending verification; this is not proof of payment.</div>`:''}<form id="paymentForm">${makeInput('reference','Bank transaction reference · कारोबार नं.','text','off',claim?.reference||'')}<button type="submit" class="primary">Submit payment reference · भुक्तानी विवरण पठाउनुहोस्</button></form><button type="button" class="secondary" data-mode="checkapproval">🔄 Check approval · स्वीकृति जाँच</button><p class="muted">${paymentHelp()}</p></div>`;break}
+case 'payment':{
+  const claim=user?.prefs?.[CFG.pref]||null;
+  const remaining=trial?.used?Math.max(0,new Date(trial.expiresAt).getTime()-Date.now()):0;
+  const trialHtml=trial?.available&&remaining>0
+    ?`<section class="trial-card trial-active" aria-label="Active one-hour trial">
+      <div class="trial-icon">⏰</div><div class="trial-details"><div class="trial-kicker">YOUR LEARNING TIME IS HERE · सिक्ने समय</div>
+      <h3>Your trial is running!</h3>
+      <p>You have <b id="trialClock">${Math.floor(remaining/60000)}m ${Math.floor(remaining/1000)%60}s</b> remaining. Your timer continues across devices.</p>
+      <button type="button" class="primary trial-button" data-mode="trialopen">Continue learning · सिकाइ जारी राख्नुहोस् <span aria-hidden="true">→</span></button></div>
+      <span class="trial-sparkle" aria-hidden="true">✨</span></section>`
+    :trial?.available&&!trial.used
+    ?`<section class="trial-card" aria-label="One-hour trial">
+      <div class="trial-icon">🎁</div><div class="trial-details"><div class="trial-kicker">EXPLORE ENGLISH SIKAU · अंग्रेजी सिकौं</div>
+      <h3>Your one free 1-hour trial</h3>
+      <p>One 60-minute trial per verified email. Your timer keeps running even if you close the page or switch devices.</p>
+      ${trialPassReady()?'<button type="button" class="primary trial-button" data-mode="trialstart">Start free trial · १ घण्टा निःशुल्क <span aria-hidden="true">→</span></button>':'<p class="msg">The one-hour trial is temporarily unavailable. Please try again later.</p>'}
+      </div><span class="trial-sparkle" aria-hidden="true">⏱️</span></section>`
+    :trial?.used
+    ?`<section class="trial-card trial-ended"><div class="trial-icon">⏳</div><div class="trial-details"><h3>Trial completed · परीक्षण समय समाप्त</h3><p>Your one-hour trial has ended. Lifetime learning is available after payment approval.</p></div></section>`
+    :`<section class="trial-card"><div class="trial-icon">🎁</div><div class="trial-details"><h3>One-hour trial · १ घण्टा परीक्षण</h3><p>Trial status could not be confirmed yet. Lessons remain locked until the server approves access.</p><button type="button" class="secondary" data-mode="trialcheck">Check trial status · जाँच गर्नुहोस्</button></div></section>`;
+  out=`<div class="access-page">
+    <div class="access-welcome"><div><span class="tag">✅ EMAIL VERIFIED · इमेल प्रमाणित</span><h2>Namaste, ${name}! 👋</h2><p>Your English journey continues here. · तपाईंको अंग्रेजी सिक्ने यात्रा यहाँबाट अगाडि बढ्छ।</p></div><button type="button" class="secondary access-signout" data-mode="signout">Sign out · लगआउट</button></div>
+    ${trialHtml}
+    <section class="lifetime-card" aria-label="Lifetime access and payment">
+      <div class="life-heading"><div class="life-heading-main"><span class="crown-icon" aria-hidden="true">👑</span><div><div class="life-eyebrow">ONE PAYMENT · FOREVER LEARNING</div><h3>Lifetime access <span>· आजीवन पहुँच</span></h3><p>Learn today. Grow for a lifetime.</p></div></div><span class="life-sticker" aria-hidden="true">Learn at your own pace ✨</span></div>
+      <div class="life-top">
+        <div class="life-price-column">
+          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time payment · lifetime access</span><span class="price-fun">A small step toward a big future! 🚀</span></div>
+          <p class="life-explainer">Pay using your <strong>${CFG.bank}</strong> banking app. Lessons unlock <strong>only after the owner verifies payment and approves your account.</strong></p>
+          <div class="approval-note"><span>🔐</span><span>Secure approval · सुरक्षित स्वीकृति<br><small>Submitting a reference never unlocks lessons automatically.</small></span></div>
+        </div>
+        <div class="life-qr-column">
+          <div class="qr-shell"><span class="qr-caption">📲 SCAN & PAY · स्क्यान गरी तिर्नुहोस्</span><img class="qr" src="${QR_SRC}" alt="Original Laxmi Sunrise Bank payment QR for NPR 999" /><p>${CFG.bank}</p></div>
+          <div class="qr-arrow">↗ Scan with your banking app</div>
+        </div>
+      </div>
+      <div class="payment-journey" aria-label="Four payment steps">
+        <div class="journey-step"><span class="step-number">1</span><span class="step-emoji" aria-hidden="true">📱</span><strong>Scan QR</strong><small>Scan using your bank app · स्क्यान</small></div>
+        <div class="journey-step"><span class="step-number">2</span><span class="step-emoji" aria-hidden="true">💳</span><strong>Pay NPR 999</strong><small>Send the exact amount · भुक्तानी</small></div>
+        <div class="journey-step"><span class="step-number">3</span><span class="step-emoji" aria-hidden="true">🧾</span><strong>Enter reference</strong><small>Share your transaction ID · विवरण</small></div>
+        <div class="journey-step"><span class="step-number">4</span><span class="step-emoji" aria-hidden="true">✅</span><strong>Get approval</strong><small>Wait for manual confirmation · स्वीकृति</small></div>
+      </div>
+      <div class="payment-entry">
+        <h4>📝 Almost there! · अब अन्तिम चरण</h4>
+        <p>After paying, enter the bank transaction reference below. Do not enter a password, PIN, or banking OTP.</p>
+        ${claim?.reference?`<div class="msg ok">✅ Reference submitted: ${escapeHTML(claim.reference)}. Awaiting manual verification; this does not confirm payment.</div>`:''}
+        <form id="paymentForm">${makeInput('reference','Bank transaction reference · कारोबार नं.','text','off',claim?.reference||'')}<button type="submit" class="primary submit-payment"><span aria-hidden="true">✈️</span> Submit payment reference · भुक्तानी विवरण पठाउनुहोस् <span aria-hidden="true">→</span></button></form>
+        <button type="button" class="secondary approval-button" data-mode="checkapproval">🔄 Check approval · स्वीकृति जाँच</button>
+      </div>
+      <div class="payment-help"><span class="help-icon" aria-hidden="true">💬</span><div>${paymentHelp()}</div><span class="help-flourish" aria-hidden="true">We're here to help! ❤️</span></div>
+    </section>
+  </div>`;
+  break}
 case 'locked':out=`<h2>🔒 Access is not approved</h2><p class="muted">We could not verify access to your private lessons.</p><button type="button" class="primary" data-mode="checkapproval">Check account again</button>`;break;
 }
 $('screen').innerHTML=out;
