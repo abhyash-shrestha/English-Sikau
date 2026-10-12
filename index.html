@@ -1077,6 +1077,24 @@ function personalizeStudentLesson(){
   }
 }
 $('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
+
+/* Load optional game enhancements ONLY into the authenticated private lesson
+   iframe. The original lesson source stays in private Appwrite Storage. */
+$('lessonFrame').addEventListener('load',function(){
+  if(!openedAccess||!user||user.emailVerification!==true)return;
+  var doc;
+  try{doc=$('lessonFrame').contentDocument}catch(_){return}
+  if(!doc||!doc.head||doc.getElementById('sikau-game-studio-loader'))return;
+  var loader=doc.createElement('script');
+  loader.id='sikau-game-studio-loader';
+  loader.src=new URL('english-sikau-extra-game-topics.js',location.href).href;
+  loader.async=true;
+  loader.onerror=function(){
+    console.warn('English Sikau game enhancements did not load. Original private games remain available.');
+  };
+  doc.head.appendChild(loader);
+});
+
 function killLessons(){
   disconnectStudentLessonObserver();
   readNumber++;
