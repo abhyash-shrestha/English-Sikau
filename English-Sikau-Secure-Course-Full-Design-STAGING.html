@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ne">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#DC143C">
+<title>English Sikau · Secure Course STAGING · नेपाली</title>
+<style>
+:root{--crimson:#DC143C;--crimson-dark:#A50E2D;--crimson-light:#FF4D6D;--saffron:#FF9933;--deep-blue:#003893;--bg:#FFF8F0;--bg2:#FFF0E0;--card:#FFF;--ink:#1A0F0A;--mut:#846756;--line:#F0E0D0;--green:#10B981;--shadow:0 9px 27px rgba(140,20,50,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans Devanagari',system-ui,sans-serif;font-size:15px;line-height:1.5}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #3465C4;outline-offset:2px}button:disabled{opacity:.48;cursor:default}
+.app{min-height:100vh;max-width:1200px;margin:auto;display:grid;grid-template-columns:245px minmax(0,1fr);background:#fffdfa;box-shadow:var(--shadow)}
+aside{background:linear-gradient(170deg,#2b1234 0%,#25152a 70%,#151c3a);padding:26px 14px;color:#fff;position:sticky;top:0;align-self:start;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:9px;margin:0 0 27px 8px;font-weight:900;font-size:17px;line-height:1.2}.brand span{font-size:10px;opacity:.78;display:block;font-weight:600;margin-top:3px}
+.side-nav{display:grid;gap:6px}.side-nav .current{border-radius:12px;padding:13px;background:rgba(255,255,255,.15);font-weight:800;border:1px solid rgba(255,255,255,.12)}.side-nav .future{opacity:.6;padding:11px 13px;font-size:13px}.aside-note{margin-top:25px;padding:14px;border:1px solid rgba(255,255,255,.13);border-radius:13px;color:#f2dae4;font-size:12px;line-height:1.65}
+main{min-width:0;padding-bottom:80px}header{background:linear-gradient(135deg,var(--crimson) 0%,#b31c51 52%,var(--deep-blue) 100%);color:#fff;padding:25px 34px 31px;border-radius:0 0 26px 26px}.eyebrow{font-size:11px;font-weight:850;letter-spacing:.12em}header h1{font-size:clamp(27px,4vw,44px);letter-spacing:-1.4px;line-height:1.07;margin:16px 0 8px}header p{font-size:13px;margin:0;opacity:.9}.creator{margin-top:14px;display:inline-block;border:1px solid #ffffff7a;border-radius:12px;padding:6px 12px;font-size:12px;font-weight:750;background:#ffffff23}
+.content{max-width:940px;padding:22px 30px;margin:auto}.stage{display:inline-block;background:#FFE1AD;color:#65390b;font-weight:850;font-size:11px;letter-spacing:.04em;padding:8px 12px;border-radius:99px}.status{border:1px solid #eacc9e;border-radius:16px;background:#fff0d8;padding:14px 16px;margin:18px 0;line-height:1.6;white-space:pre-line}.status.good{background:#e9faef;border-color:#a8dcb9}.status.bad{background:#fff0ee;border-color:#f2b0ae;color:#89242e}
+h2{font-size:22px;letter-spacing:-.5px;margin:16px 0 5px}h3{font-size:17px;margin:0 0 8px}.sub{color:var(--mut);font-size:13px;margin:4px 0 18px}.card{border:1px solid var(--line);border-radius:19px;padding:18px;margin:15px 0;background:var(--card);box-shadow:var(--shadow)}.card.soft{background:#fff4e5}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.small{color:var(--mut);font-size:12px}.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.levels button{border:1px solid var(--line);background:#fff8f0;color:var(--ink);border-radius:13px;min-height:53px;font-weight:800;font-size:13px}.levels button.selected{background:linear-gradient(135deg,var(--crimson),var(--crimson-light));border-color:transparent;color:#fff}.chapters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.chapters button{text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;min-height:58px;font-weight:700;color:var(--ink)}.chapters button.selected{border:2px solid var(--crimson);padding:12px;background:#fff3f3}.chapters small{display:block;color:var(--mut);font-weight:500}
+.rule{padding:14px;border-left:4px solid var(--saffron);border-radius:12px;background:#fff3df;white-space:pre-wrap}.example{font-size:19px;color:#3465C4;font-weight:850}.question{font-size:22px;letter-spacing:-.4px;font-weight:850}.answer{width:100%;background:#fffdfb;border:1px solid #dccbbb;min-height:48px;padding:10px 12px;border-radius:12px;margin:7px 0}.btn{padding:13px 17px;border:0;border-radius:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--crimson),var(--crimson-light));min-height:47px}.btn.secondary{background:#f5e6d6;color:#542d20}.feedback{border-radius:12px;padding:12px 14px;margin-top:12px;background:#f0f6ff;white-space:pre-wrap}.feedback.ok{background:#e9faef}.feedback.err{background:#ffefed}.muted-feature{border:1px dashed #d2b9ae;background:#fffaf5;padding:15px;border-radius:15px;color:var(--mut);font-size:13px}.hidden{display:none!important}footer{font-size:12px;color:var(--mut);line-height:1.7;padding:14px 4px 18px}
+@media(max-width:760px){.app{display:block}aside{height:auto;position:static;padding:10px 18px;background:#25152a}.brand{margin:0;font-size:13px}.brand span{display:none}.side-nav,.aside-note{display:none}header{padding:24px 19px 28px}.content{padding:16px}.levels{grid-template-columns:repeat(5,1fr)}.chapters{grid-template-columns:1fr}}@media(max-width:400px){.levels{grid-template-columns:repeat(5,minmax(0,1fr))}.levels button{min-height:44px;font-size:12px}.content{padding:12px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside><div class="brand">🇳🇵 ENGLISH SIKAU<span>नेपाली • Learn • Speak • Grow</span></div><div class="side-nav"><div class="current">📚 Chapter Course · पाठ</div><div class="future">🔤 Words — migration later</div><div class="future">📖 Reader & Stories — migration later</div><div class="future">🕹️ Games & Practice — migration later</div><div class="future">🤖 AI Coach — migration later</div><div class="future">🇳🇵 Nepal Knowledge — migration later</div></div><div class="aside-note">SECURITY STAGING ONLY.<br>Never replace production index.html with this partial demo.<br><br>80 chapter records remain on Appwrite, not in this public HTML.</div></aside>
+<main><header><div class="eyebrow">🇳🇵 ENGLISH SIKAU · नेपाली</div><h1>Learn English. Grow with confidence.</h1><p>अंग्रेजी सिकौं · Learn · Speak · Grow</p><div class="creator">CREATED BY · अभ्यास • Abhyash</div></header>
+<div class="content"><span class="stage">PHASE 2 · ORIGINAL-STYLE SECURE COURSE PREVIEW</span><h2>Chapter by chapter · अध्यायअनुसार सिकौं</h2><p class="sub">10 levels · 80 chapters · Individual lessons loaded after Appwrite authorization</p>
+<div id="status" class="status" role="status" aria-live="polite">Checking your verified Appwrite account…</div>
+<section id="shell" class="hidden"><div class="card"><div class="row"><h3>📘 Select a level · स्तर छान्नुहोस्</h3><strong id="currentLevel">Level 1</strong></div><div id="levels" class="levels"></div></div>
+<div class="card"><div class="row"><h3>Chapters · अध्यायहरू</h3><small class="small" id="chapterCount"></small></div><div id="chapters" class="chapters"></div></div>
+<div id="lessonCard" class="card soft hidden"><div class="row"><span class="stage" id="lessonTag">LEVEL 1</span><span class="small">Server-authorized lesson</span></div><h2 id="lessonTitle"></h2><p class="rule" id="lessonRule"></p><div class="card"><strong>Example · उदाहरण</strong><p class="example" id="lessonExample"></p><div class="small" id="lessonTranslation"></div></div><div class="card"><strong>Complete the sentence · वाक्य पूरा गर्नुहोस्</strong><p class="question" id="lessonQuestion"></p><label for="answer">Your answer · तपाईंको उत्तर</label><input id="answer" class="answer" autocomplete="off" maxlength="150" placeholder="Type the missing word"/><button id="check" type="button" class="btn">Check answer · उत्तर जाँच गर्नुहोस्</button><div id="feedback" class="feedback hidden" role="status" aria-live="polite"></div></div><div class="muted-feature">This preview tests one fill-in-the-blank exercise per chapter. The full original chapter quiz, progress scoring, games, and other modes need separate server-side migration.</div></div></section>
+<footer>The UI source can be saved; lesson answers and the 80 chapter records are not embedded in this file. Authorized students may still copy lessons already delivered to them. This is a separate preview and does not replace the live English Sikau application.</footer></div></main></div>
+<script>
+'use strict';
+const ENDPOINT='https://fra.cloud.appwrite.io/v1';
+const PROJECT='6ac9b80d0009575e5d4d';
+const FUNCTION='6acc34ea0003a1c0c25a';
+const $=id=>document.getElementById(id);
+let account,functions,catalog=[],level=1,selected=null,current=null;
+function status(msg,kind){$('status').textContent=msg;$('status').className='status'+(kind?' '+kind:'')}
+function setText(id,val){$(id).textContent=String(val??'')}
+async function initSdk(){
+ let sdk=window.Appwrite;
+ if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){
+  try{await new Promise((resolve,reject)=>{const e=document.createElement('script');e.src=url;e.onload=resolve;e.onerror=reject;document.head.append(e)});sdk=window.Appwrite;if(sdk)break}catch(_){}
+ }}
+ if(!sdk)throw Error('Appwrite SDK could not load. Check internet access.');
+ const client=new sdk.Client().setEndpoint(ENDPOINT).setProject(PROJECT);
+ account=new sdk.Account(client);functions=new sdk.Functions(client);
+}
+async function api(action,fields={}){
+ const response=await functions.createExecution(FUNCTION,JSON.stringify({action,...fields}),false);
+ let result;try{result=JSON.parse(response.responseBody||'{}')}catch{throw Error('Invalid server response')}
+ if(response.status!=='completed'||+response.responseStatusCode!==200||result.ok!==true)
+  throw Error(result.error||`Access denied (${response.responseStatusCode})`);
+ return result;
+}
+function showLevels(){
+ $('levels').replaceChildren(...Array.from({length:10},(_,n)=>{const b=document.createElement('button');b.type='button';b.textContent='Level '+(n+1);b.className=n+1===level?'selected':'';b.onclick=()=>{level=n+1;selected=null;current=null;$('lessonCard').classList.add('hidden');showLevels();showChapters()};return b}));setText('currentLevel','Level '+level)
+}
+function showChapters(){
+ const units=catalog.filter(x=>x.level===level);setText('chapterCount',units.length+' chapters');
+ $('chapters').replaceChildren(...units.map((u,i)=>{const b=document.createElement('button');b.type='button';b.className=u.id===selected?'selected':'';
+  const t=document.createElement('strong');t.textContent=(i+1)+'. '+u.title;const sub=document.createElement('small');sub.textContent='Tap to request this chapter securely';b.append(t,sub);b.onclick=()=>load(u.id);return b;}));
+}
+async function load(id){
+ selected=id;current=null;$('lessonCard').classList.add('hidden');showChapters();status('Checking authorization for this chapter…');
+ try{const r=await api('lesson',{lessonId:id});if(selected!==id)return;current=r.lesson;setText('lessonTitle',current.title);setText('lessonRule',current.nep);
+  setText('lessonExample',current.example);setText('lessonTranslation',current.translation);setText('lessonQuestion',current.fill);
+  setText('lessonTag','LEVEL '+current.level);$('answer').value='';$('feedback').classList.add('hidden');$('lessonCard').classList.remove('hidden');status('Lesson received after Appwrite permission check. · पाठ अनुमति प्रमाणित भयो।','good');
+ }catch(e){selected=null;status('Locked: '+e.message,'bad');showChapters()}
+}
+async function check(){if(!current)return;const b=$('check');b.disabled=true;try{const r=await api('checkAnswer',{lessonId:current.id,answer:$('answer').value});const f=$('feedback');f.textContent=r.message+(r.hint?' '+r.hint:'');f.className='feedback '+(r.correct?'ok':'err');}catch(e){const f=$('feedback');f.textContent='Unable to check: '+e.message;f.className='feedback err';}finally{b.disabled=false}}
+$('check').onclick=check;$('answer').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check()}});
+(async()=>{try{await initSdk();const user=await account.get();if(!user?.$id||user.emailVerification!==true)throw Error('Sign in using a verified account on the official English Sikau website.');const x=await api('catalog');catalog=x.items;if(!Array.isArray(catalog)||catalog.length!==80)throw Error('Unexpected lesson catalog.');$('shell').classList.remove('hidden');showLevels();showChapters();status('Signed in: '+(user.name||'Verified student')+'. '+catalog.length+' protected chapter titles loaded.','good');}catch(e){status('Locked: '+e.message,'bad')}})();
+</script>
+</body></html>
