@@ -850,6 +850,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   </div>
   <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
 </div>
+<div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
 <section id="cloudStoryProgress" class="cloud-story-bar" aria-label="Appwrite verified story progress"><div class="cloud-story-info"><strong>☁️ Your verified learning progress · तपाईंको सुरक्षित प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Separate from original app XP and mastery; totals are not added. · मूल प्रगतिसँग जोडिएको छैन।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script>
@@ -1078,21 +1079,15 @@ function personalizeStudentLesson(){
 }
 $('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
 
-/* Load optional game enhancements ONLY into the authenticated private lesson
-   iframe. The original lesson source stays in private Appwrite Storage. */
+/* The extra game script loads inside srcdoc after the original course scripts.
+   Show an account-safe status without touching private lessons or student XP. */
 $('lessonFrame').addEventListener('load',function(){
-  if(!openedAccess||!user||user.emailVerification!==true)return;
-  var doc;
-  try{doc=$('lessonFrame').contentDocument}catch(_){return}
-  if(!doc||!doc.head||doc.getElementById('sikau-game-studio-loader'))return;
-  var loader=doc.createElement('script');
-  loader.id='sikau-game-studio-loader';
-  loader.src=new URL('english-sikau-extra-game-topics.js',location.href).href;
-  loader.async=true;
-  loader.onerror=function(){
-    console.warn('English Sikau game enhancements did not load. Original private games remain available.');
-  };
-  doc.head.appendChild(loader);
+  if(!openedAccess||!user)return;
+  var d;try{d=$('lessonFrame').contentDocument}catch(_){return}
+  if(!d)return;
+  const count=Array.isArray(d.defaultView?.GAME_STOPS)?d.defaultView.GAME_STOPS.length:0;
+  const note=$('gameStudioNote');
+  if(note)note.textContent=count>=26?'🎮 '+count+' game destinations ready · नयाँ खेलहरू तयार':'🎮 Classic games available';
 });
 
 function killLessons(){
@@ -1197,7 +1192,11 @@ async function openFile(token='',isTrial=false){
       throw Error('Your trial expired while opening lessons.');
     const frame=$('lessonFrame');
     frame.removeAttribute('src');
-    frame.srcdoc=html;
+    // Start the game studio inside authorized private lessons, after their own scripts.
+    const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=e99c9f8',location.href).href;
+    const gameScriptTag='<scr'+'ipt src="'+gameScriptUrl+'"></scr'+'ipt>';
+    const enhancedHtml=/<\/body\s*>/i.test(html)?html.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):html+gameScriptTag;
+    frame.srcdoc=enhancedHtml;
     openedAccess=kind;
     $('sessionNote').textContent=kind==='lifetime'?'👑 Lifetime member':'⏰ Trial learner';
     updateStudentWelcome();
