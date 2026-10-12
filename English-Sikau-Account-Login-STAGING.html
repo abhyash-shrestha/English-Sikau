@@ -476,6 +476,187 @@ body:has(#panel[data-mode="payment"]){background:#fffdf8}
  #panel[data-mode="signup"] .pair{grid-template-columns:1fr 1fr;gap:8px}
 }
 @media(max-width:400px){#panel[data-mode="signup"] .pair{grid-template-columns:1fr}#panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:18px 15px 28px}}
+
+/* English Sikau adaptive UI — phone (<600), tablet (600-1023),
+   laptop (1024-1439), desktop (1440+). Layout only; no backend edits. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+#shell,#panel,#protected,#panel .hero,#panel .content,.life-top,.access-page{min-width:0}
+#panel img,#panel svg{max-width:100%}
+#panel .hero-sub,#panel .life-explainer,#panel .payment-help,#panel .creator-spotlight{overflow-wrap:break-word}
+#panel .field input{min-width:0;max-width:100%}
+#panel :is(button,input,a):focus-visible,#protected :is(input,button,a,label):focus-visible{outline:3px solid #1668b5;outline-offset:3px}
+#protected{height:100vh;height:100dvh;max-height:100dvh;overflow:hidden}
+#protected #bar{flex:0 0 auto;min-width:0;min-height:53px;padding:9px max(13px,env(safe-area-inset-left))}
+#protected #bar>span{min-width:0;overflow-wrap:anywhere}
+#protected #bar button{flex:none;min-height:44px}
+#protected #privateLocalPreviewBar{min-width:0;flex:0 0 auto;max-height:32dvh;overflow-y:auto}
+#protected #privateLocalPreviewBar>span{min-width:0;overflow-wrap:anywhere}
+#protected #privateLocalPreviewBar label{display:inline-flex;align-items:center;min-height:44px}
+#protected iframe{display:block;min-width:0;min-height:0;width:100%;height:auto;flex:1 1 0}
+@media(max-width:599px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"],[data-mode="forgot"],[data-mode="emailcode"],[data-mode="verify"],[data-mode="reset"])){max-width:none;width:100%;margin:0;padding:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"],[data-mode="forgot"],[data-mode="emailcode"],[data-mode="verify"],[data-mode="reset"]){display:flex;flex-direction:column;min-height:100dvh;width:100%;border:0;border-radius:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{flex:none;min-height:0;padding:17px clamp(16px,5vw,25px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-headline{margin-top:14px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:clamp(26px,7.2vw,36px);line-height:1.13;margin:0 0 8px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-nepali{font-size:clamp(13px,3.8vw,16px);margin:4px 0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:12px;line-height:1.45}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight{margin:11px 0 0;padding:10px 12px;gap:9px;width:100%}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy strong{font-size:clamp(19px,5.6vw,26px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) :is(.hero-benefits,.hero-footer,.auth-landscape){display:none!important}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{flex:1 0 auto;width:100%;padding:18px clamp(15px,5vw,26px) max(28px,env(safe-area-inset-bottom))}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tabs{margin:16px 0 18px;padding:4px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tab{min-height:67px;font-size:clamp(12px,3.7vw,15px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .tab-icon{font-size:16px;margin-right:3px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:clamp(26px,7.1vw,33px);margin:3px 0 10px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title span{font-size:18px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-intro{padding-right:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-doodle{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-description{font-size:13px;line-height:1.5}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .field input{font-size:16px;height:52px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) :is(.primary,.auth-email-btn){width:100%;min-height:52px;font-size:clamp(13px,3.8vw,16px)}
+ #panel[data-mode="signup"] .pair{display:grid;grid-template-columns:1fr;gap:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-bottom{font-size:12px;justify-content:center}
+ #shell:has(#panel[data-mode="payment"]){width:100%;max-width:none;padding:0}
+ #panel[data-mode="payment"]{max-width:none;width:100%;margin:0}
+ #panel[data-mode="payment"] .content{padding:10px clamp(10px,3.5vw,18px) max(24px,env(safe-area-inset-bottom))}
+ .payment-creator-banner{padding:10px 10px 10px 76px;min-height:81px;border-radius:26px}
+ .creator-mascot{width:81px;height:80px;left:-3px}
+ .creator-heading{font-size:clamp(12px,3.7vw,15px)}
+ .creator-nepali,.creator-nepali-name{font-size:clamp(14px,4.1vw,18px)}
+ .creator-english{font-size:clamp(22px,6vw,29px)}
+ .payment-masthead{min-height:0;gap:6px;padding:9px 5px 12px}
+ .payment-logo strong{font-size:clamp(22px,6vw,27px)}
+ .payment-logo small{font-size:8px}
+ .payment-book{font-size:28px}
+ .masthead-quote{font-size:clamp(10px,2.7vw,13px)}
+ .access-welcome{padding:10px 11px}
+ .access-welcome h2{font-size:20px}
+ .trial-card{grid-template-columns:43px minmax(0,1fr);gap:8px;min-height:0;padding:15px 12px}
+ .trial-icon{font-size:36px}
+ .trial-right{display:none}
+ .trial-details h3{font-size:clamp(18px,5.1vw,23px)}
+ .trial-details p{font-size:12px}
+ .trial-button{width:100%;max-width:100%;min-height:49px;font-size:clamp(12px,3.45vw,15px);padding:9px}
+ .lifetime-card{padding:16px 11px}
+ .life-heading-main{min-width:0;gap:9px}
+ .life-heading h3{font-size:clamp(19px,5.6vw,26px)}
+ .life-heading p{font-size:13px}
+ .life-sticker{display:none}
+ .life-top{grid-template-columns:minmax(0,1fr);gap:14px}
+ .life-price-box{min-height:160px}
+ .life-price{font-size:clamp(48px,13vw,70px)}
+ .life-price-box:before{inset:16px 18px 44px}
+ .price-fun{max-width:100%;width:100%;font-size:clamp(11px,3.2vw,13px)}
+ .price-fun-nepali{font-size:clamp(11px,3.3vw,14px)}
+ .life-qr-column{width:100%}
+ .qr-shell{width:100%;max-width:340px}
+ #panel .life-qr-column .qr{max-width:min(100%,270px)}
+ .payment-journey{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .journey-step{min-height:122px;padding:13px 7px 9px}
+ .journey-step:after{display:none!important}
+ .step-emoji{font-size:25px}
+ .journey-step strong{font-size:12px}
+ .journey-step small{font-size:11px}
+ .payment-entry .field input{height:53px;font-size:16px}
+ .submit-payment{width:100%;min-height:57px;font-size:clamp(12px,3.3vw,15px);padding:11px}
+ .approval-button{width:100%;min-height:49px;font-size:14px}
+ .payment-help{padding:12px;gap:9px}
+ .payment-help>div{min-width:0;overflow-wrap:anywhere}
+ .help-flourish{display:none}
+ #protected #bar{flex-wrap:wrap;gap:7px;padding:8px 12px}
+ #protected #bar>span{font-size:12px}
+ #protected #privateLocalPreviewBar{max-height:35dvh;padding:9px 12px!important;font-size:12px!important;gap:7px!important}
+ #protected #privateLocalPreviewBar label{padding:9px 11px!important}
+}
+@media(min-width:600px) and (max-width:899px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"])){max-width:780px;margin:10px auto;padding:0 12px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]){display:flex;flex-direction:column;min-height:0;border-radius:24px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;padding:25px 34px 28px;min-height:0}
+ .hero-brand{grid-column:1/-1}
+ .hero-headline{grid-row:2;grid-column:1;margin-top:10px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:clamp(29px,5vw,40px);margin:0 0 9px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-nepali{font-size:15px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:12px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight{grid-row:2;grid-column:2;align-self:center;margin:0;width:100%;padding:14px 11px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy strong{font-size:clamp(21px,3.5vw,27px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:4px 0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits>div{min-height:83px;padding:8px;gap:7px;flex-wrap:wrap}
+ .hero-feature-icon{min-width:35px;height:38px;font-size:20px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits>div>strong{font-size:13px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits small{font-size:11px}
+ .hero-feature-chevron,#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-footer,.auth-landscape{display:none!important}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{width:100%;padding:28px clamp(36px,9vw,74px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tabs{margin:22px 0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:34px}
+ #panel[data-mode="signup"] .pair{grid-template-columns:1fr 1fr;gap:12px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .field input{font-size:16px}
+ #shell:has(#panel[data-mode="payment"]){width:100%;max-width:900px;padding:0 12px}
+ #panel[data-mode="payment"] .content{padding:14px 17px 25px}
+ .trial-card{grid-template-columns:69px minmax(0,1fr) 85px;gap:10px}
+ .trial-icon{font-size:58px}
+ .trial-big-clock{font-size:48px}
+ .trial-handnote{display:none}
+ .life-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+ .life-price{font-size:clamp(54px,7vw,72px)}
+ .life-price-box{min-height:190px}
+ .qr-shell{max-width:270px}
+ .payment-journey{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .journey-step:after{display:none!important}
+}
+@media(min-width:900px) and (max-width:1199px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"])){max-width:1170px;margin:16px auto;padding:0 16px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]){display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);min-height:830px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{min-height:830px;padding:30px 24px 195px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-headline{margin-top:34px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:clamp(34px,4.2vw,48px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-nepali{font-size:16px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:13px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight{padding:12px;margin:17px 0 14px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy strong{font-size:clamp(19px,2.8vw,27px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits>div{min-height:64px;padding:8px 11px}
+ .auth-landscape{height:205px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:27px clamp(23px,3vw,40px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tabs{margin:20px 0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:34px}
+ #panel[data-mode="signup"] .pair{grid-template-columns:1fr 1fr;gap:9px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .field input{font-size:16px}
+ #shell:has(#panel[data-mode="payment"]){max-width:1080px;padding:0 16px}
+ .life-top{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+ .payment-journey{gap:18px}
+ .journey-step:not(:last-child):after{right:-19px}
+}
+@media(min-width:1200px) and (max-width:1439px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"])){max-width:1300px;margin:20px auto}
+ #panel:is([data-mode="signin"],[data-mode="signup"]){grid-template-columns:minmax(0,.99fr) minmax(0,1.01fr)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:38px 45px 29px}
+ #shell:has(#panel[data-mode="payment"]){max-width:1160px}
+ #panel[data-mode="payment"]{max-width:1130px}
+}
+@media(min-width:1440px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"])){max-width:1540px;margin:clamp(18px,3vh,56px) auto;padding:0 28px 32px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]){grid-template-columns:minmax(0,.99fr) minmax(0,1.01fr);min-height:920px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{min-height:920px;padding:51px clamp(48px,5vw,80px) 245px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:clamp(52px,4.1vw,67px)}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:17px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:54px clamp(52px,5vw,80px) 35px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:44px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .field input{font-size:16px}
+ #shell:has(#panel[data-mode="payment"]){max-width:1280px}
+ #panel[data-mode="payment"]{max-width:1240px}
+ #panel[data-mode="payment"] .content{padding-left:26px;padding-right:26px}
+ .life-top{grid-template-columns:minmax(0,1.4fr) minmax(0,.85fr)}
+ .payment-journey{gap:30px}
+}
+@media(max-height:490px) and (max-width:899px) and (orientation:landscape){
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{padding-top:10px;padding-bottom:10px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-headline{margin-top:8px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:25px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits{display:none}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
