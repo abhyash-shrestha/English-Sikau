@@ -386,6 +386,96 @@ body:has(#panel[data-mode="payment"]){background:#fffdf8}
 .creator-nepali-name{color:#b51858;font-size:clamp(20px,2.85vw,32px)}
 @media(max-width:780px){.creator-nepali-name{font-size:clamp(15px,3.25vw,24px)}}
 @media(max-width:410px){.creator-nepali-name{font-size:18px}}
+
+/* Auth redesign based on approved mockups; scoped to login/signup, not payment. */
+#shell:has(#panel[data-mode="signin"]),#shell:has(#panel[data-mode="signup"]){max-width:1270px;margin:14px auto;padding:0 14px 24px}
+#panel:is([data-mode="signin"],[data-mode="signup"]){grid-template-columns:minmax(0,.98fr) minmax(0,1.08fr);min-height:930px;overflow:hidden;border-radius:27px;box-shadow:0 16px 55px #4b254326;background:#fffcf9}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero{min-height:930px;padding:40px clamp(26px,4vw,51px) 240px;justify-content:flex-start;background:radial-gradient(circle at 90% 6%,#f4498559,transparent 30%),linear-gradient(150deg,#b11450,#8f1b56 45%,#352151 100%)}
+.hero-brand{display:flex;align-items:center;gap:14px;z-index:2}
+.hero-brand-flag{font-size:39px}
+.hero-brand>div{display:flex;flex-direction:column;gap:4px}
+.hero-brand strong{font-size:clamp(23px,2.7vw,32px);letter-spacing:-.04em}
+.hero-brand>div>span{font-weight:700;color:#ffebee}
+.hero-headline{z-index:2;margin-top:43px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:clamp(37px,4vw,57px);margin:0 0 18px;line-height:1.08}
+.hero-nepali{font-size:19px;color:#fff6f3;margin:0 0 10px;font-weight:750}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:15px;line-height:1.6;color:#ffe9ef;max-width:420px;margin:0}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight{z-index:2;width:100%;margin:22px 0 16px;padding:14px 17px;background:#ffffff18;border:1px solid #ffffff50}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-mark{background:linear-gradient(130deg,#ef6c9f,#be2b79);width:51px;height:51px;font-size:26px;flex:none}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy small{font-size:11px;color:#ffe49c}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy strong{font-size:clamp(22px,2.6vw,31px)}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits{z-index:2;margin:0 0 23px;gap:12px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits>div{display:flex;align-items:center;gap:13px;min-height:77px;padding:10px 13px}
+.hero-feature-icon{display:grid;place-items:center;background:#fff4ff;border-radius:14px;min-width:51px;height:51px;font-size:26px;grid-row:auto!important}
+.hero-benefits>div>strong{font-size:16px;flex:1;color:white}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits small{display:block;margin-top:5px;color:#ffe0e7;font-size:12px;font-weight:500}
+.hero-feature-chevron{display:grid;place-items:center;width:29px;height:29px;flex:none;background:#ffffff26;color:white;border-radius:50%;font-size:22px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-footer{position:relative;z-index:2}
+.auth-landscape{position:absolute;bottom:0;left:0;width:100%;height:244px;pointer-events:none;z-index:1}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .content{background:#fffdfa;padding:38px clamp(26px,4.5vw,56px) 28px;align-self:stretch;position:relative}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-eyebrow{justify-content:center}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-eyebrow .tag{background:#e9f8ec;border:1px solid #bde2bb;color:#255541;padding:10px 17px;font-size:12px;box-shadow:0 4px 15px #3c75401c}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-eyebrow .auth-step{display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tabs{margin:30px 0 28px;background:#f7f3f6;border-radius:20px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tab{position:relative;min-height:79px;border-radius:15px;font-size:15px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tab.active{color:#d40f53}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-tab.active:after{content:"";position:absolute;height:3px;left:12%;right:12%;bottom:0;background:#ec185c;border-radius:8px}
+.tab-icon{display:inline-block;font-size:19px;margin-right:8px}
+.auth-intro{position:relative;padding-right:73px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:clamp(30px,3.4vw,42px);letter-spacing:-.055em;color:#1c2542;margin:6px 0 15px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title span{font-size:21px;color:#d32668;margin-top:8px;letter-spacing:0}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-description{font-size:14px;line-height:1.6;color:#605d70}
+.auth-doodle{position:absolute;top:0;right:0;color:#f4b966;font-size:41px;text-align:center;line-height:1}
+.auth-doodle small{display:block;color:#d45c72;font:italic 12px/1.15 cursive;transform:rotate(-8deg);margin-top:5px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field{position:relative;margin:13px 0}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field label{color:#202741;font-size:13px;font-weight:850}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field input{height:54px;border:1px solid #d9dce5;border-radius:12px;background:white;padding-left:40px;color:#1b2545}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field input::placeholder{color:#959aae}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#email):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#first):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#last):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#password):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#confirm):before{position:absolute;left:14px;bottom:16px;font-size:19px;color:#777b92;line-height:1;pointer-events:none}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#email):before{content:"✉"}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#first):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#last):before{content:"♙"}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#password):before,
+#panel:is([data-mode="signin"],[data-mode="signup"]) .field:has(#confirm):before{content:"⚿"}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .secret button{background:#f9edf3;border-color:#ecdbe6;color:#a61a57;border-radius:12px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) #activeForm .primary{min-height:61px;border-radius:14px;font-size:17px;position:relative}
+#panel:is([data-mode="signin"],[data-mode="signup"]) #activeForm .primary:after{content:"›";position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:27px;background:#ffffff24;border-radius:8px;padding:0px 11px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-linkrow{margin-top:12px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-email-btn{min-height:59px;border:1px solid #d9d8e3;border-radius:14px;font-size:15px;background:white}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-bottom{margin-top:17px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .auth-verification{background:#e9f7ff;color:#155287;border:1px solid #bce2fa;border-radius:13px;padding:14px 16px}
+#panel:is([data-mode="signin"],[data-mode="signup"]) #message{background:#e7f7ef;color:#226449;border:1px solid #d3ebdc}
+#panel:is([data-mode="signin"],[data-mode="signup"]) #message.error{background:#fff0f1;color:#a80e34;border-color:#f4c5cc}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .content>.notice{background:#edf8f1;border:1px solid #d7eadc;border-radius:12px;padding:13px;color:#3b6a58}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .content>hr{display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"]) .footer-credit{margin-top:16px;padding-top:12px}
+#panel[data-mode="signup"] .content{padding-top:25px}
+#panel[data-mode="signup"] .auth-tabs{margin:18px 0}
+#panel[data-mode="signup"] .field{margin:9px 0}
+#panel[data-mode="signup"] #activeForm .primary{min-height:56px}
+@media(max-width:780px){
+ #shell:has(#panel[data-mode="signin"]),#shell:has(#panel[data-mode="signup"]){padding:0;margin:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]){display:block;min-height:100dvh;border-radius:0}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero{padding:22px 23px;min-height:0}
+ .hero-brand-flag{font-size:28px}.hero-brand strong{font-size:24px}.hero-brand>div>span{font-size:12px}
+ .hero-headline{margin-top:17px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero h1{font-size:29px;margin:0 0 10px}
+ .hero-nepali{font-size:14px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-sub{font-size:12px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight{margin:14px 0 0;padding:10px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-mark{height:35px;width:35px;font-size:20px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .creator-spotlight-copy strong{font-size:21px}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .hero-benefits,#panel:is([data-mode="signin"],[data-mode="signup"]) .hero-footer,.auth-landscape{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:23px 20px 30px}
+ .auth-intro{padding-right:0}.auth-doodle{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"]) .auth-title{font-size:30px}
+ #panel[data-mode="signup"] .pair{grid-template-columns:1fr 1fr;gap:8px}
+}
+@media(max-width:400px){#panel[data-mode="signup"] .pair{grid-template-columns:1fr}#panel:is([data-mode="signin"],[data-mode="signup"]) .content{padding:18px 15px 28px}}
 </style>
 </head>
 <body>
