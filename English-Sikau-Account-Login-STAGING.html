@@ -657,6 +657,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
 
+
+/* Green phone emoji in WhatsApp help section */
+.payment-help .help-icon{display:inline-grid;place-items:center;flex:none;width:49px;height:49px;border-radius:50%;background:linear-gradient(135deg,#2ce57b,#09a94e);font-size:27px;line-height:1;box-shadow:0 4px 11px #10a84b30}
+@media(max-width:599px){.payment-help .help-icon{width:43px;height:43px;font-size:24px}}
 </style>
 </head>
 <body>
@@ -811,7 +815,7 @@ case 'payment':{
         <form id="paymentForm">${makeInput('reference','Bank transaction reference · कारोबार नं.','text','off',claim?.reference||'')}<button type="submit" class="primary submit-payment"><span aria-hidden="true">➤</span> Submit payment reference · भुक्तानी विवरण पठाउनुहोस् <span aria-hidden="true">→</span></button></form>
         <button type="button" class="secondary approval-button" data-mode="checkapproval">🔄 Check approval · स्वीकृति जाँच</button>
       </div>
-      <div class="payment-help"><span class="help-icon" aria-hidden="true">🟢</span><div>${paymentHelp()}</div><span class="help-flourish" aria-hidden="true">We're here to help! ❤️</span></div>
+      <div class="payment-help"><span class="help-icon" aria-hidden="true">📞</span><div>${paymentHelp()}</div><span class="help-flourish" aria-hidden="true">We're here to help! ❤️</span></div>
     </section>
   </div>`;
   break}
