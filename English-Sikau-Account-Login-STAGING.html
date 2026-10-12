@@ -381,6 +381,11 @@ body:has(#panel[data-mode="payment"]){background:#fffdf8}
  .creator-english{font-size:27px}
  .creator-dot{font-size:17px}
 }
+
+/* Correct creator display order: English first, and readable Nepali name */
+.creator-nepali-name{color:#b51858;font-size:clamp(20px,2.85vw,32px)}
+@media(max-width:780px){.creator-nepali-name{font-size:clamp(15px,3.25vw,24px)}}
+@media(max-width:410px){.creator-nepali-name{font-size:18px}}
 </style>
 </head>
 <body>
@@ -442,7 +447,7 @@ case 'payment':{
     ?`<section class="trial-card trial-ended"><div class="trial-icon">⏳</div><div class="trial-details"><h3>Trial completed · परीक्षण समय समाप्त</h3><p>Your one-hour trial has ended. Lifetime learning is available after payment approval.</p></div></section>`
     :`<section class="trial-card"><div class="trial-icon">🎁</div><div class="trial-details"><h3>One-hour trial · १ घण्टा परीक्षण</h3><p>Trial status could not be confirmed yet. Lessons remain locked until the server approves access.</p><button type="button" class="secondary" data-mode="trialcheck">Check trial status · जाँच गर्नुहोस्</button></div></section>`;
   out=`<div class="access-page">
-    <div class="payment-creator-banner" aria-label="Created by · निर्माणकर्ता अभ्यास · Abhyash">
+    <div class="payment-creator-banner" aria-label="CREATED BY · निर्माणकर्ता Abhyash · अभ्यास">
       <div class="creator-mascot" aria-hidden="true">
         <svg viewBox="0 0 175 135" xmlns="http://www.w3.org/2000/svg" role="presentation">
           <defs>
@@ -461,9 +466,14 @@ case 'payment':{
           <ellipse cx="84" cy="58" rx="38" ry="43" fill="url(#creatorFace)" stroke="#8d433b" stroke-width="2.4"/>
           <path d="M47 48Q42 9 74 12L83 2l4 10c19-18 35-8 41 10l-12-2c12 13 11 23 4 34-8-4-11-18-17-24-18 15-38 11-52 12z" fill="#351c32" stroke="#241427" stroke-width="3"/>
           <path d="M55 36Q65 17 85 24c-12 7-20 8-30 12zM86 23q19-17 29 0c-8-2-15 0-29 0z" fill="#59213a"/>
-          <path d="M59 58q9-5 17 0M92 58q10-5 17 0" stroke="#502434" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <ellipse cx="68" cy="64" rx="4.5" ry="6.5" fill="#211826"/><ellipse cx="101" cy="64" rx="4.5" ry="6.5" fill="#211826"/>
-          <circle cx="69" cy="62" r="1.7" fill="#fff"/><circle cx="102" cy="62" r="1.7" fill="#fff"/>
+          <g class="creator-sunglasses" aria-label="Cartoon guy wearing sunglasses">
+            <path d="M50 54 Q59 49 77 52 Q83 53 83 60 L82 63 Q80 72 70 73 Q58 73 54 64Z" fill="#21192f" stroke="#3a2344" stroke-width="3"/>
+            <path d="M88 60 Q89 53 96 52 Q109 49 119 54 L115 64 Q111 73 101 73 Q90 72 88 63Z" fill="#21192f" stroke="#3a2344" stroke-width="3"/>
+            <path d="M82 57 Q85 53 89 57" stroke="#302239" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M51 56 L45 55 M118 56 L124 54" stroke="#302239" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M57 55 Q62 53 69 54" stroke="#ffffff" stroke-width="2.8" fill="none" opacity=".7" stroke-linecap="round"/>
+            <path d="M95 55 Q102 52 109 54" stroke="#ffffff" stroke-width="2.8" fill="none" opacity=".7" stroke-linecap="round"/>
+          </g>
           <circle cx="60" cy="77" r="6" fill="#f26e7c" opacity=".46"/><circle cx="109" cy="77" r="6" fill="#f26e7c" opacity=".46"/>
           <path d="M72 79q12 17 24 0" stroke="#9a3854" stroke-width="3.5" fill="none" stroke-linecap="round"/>
           <path d="M118 126q22-7 27-27l-6-9q-7-6-8-1l-2 7-3-14q-1-7 4-9 5-1 7 4l4 13-1-25q0-7 6-7 5 0 5 7l1 25 8-11q4-5 9 0 3 3 0 8l-12 24q-8 14-29 22" fill="#ffd4b2" stroke="#9b4c48" stroke-width="3" stroke-linejoin="round"/>
@@ -473,9 +483,10 @@ case 'payment':{
       </div>
       <div class="payment-creator-wordmark">
         <span class="creator-heading">CREATED BY <span class="creator-dot">·</span></span>
-        <span class="creator-nepali" lang="ne">निर्माणकर्ता अभ्यास</span>
+        <span class="creator-nepali" lang="ne">निर्माणकर्ता</span>
+        <strong class="creator-english">Abhyash</strong>
         <span class="creator-dot">·</span>
-        <strong class="creator-english">Abhyash <span aria-hidden="true">♥</span></strong>
+        <span class="creator-nepali creator-nepali-name" lang="ne">अभ्यास</span>
       </div>
       <span class="creator-banner-sparkle creator-star-one" aria-hidden="true">✦</span>
       <span class="creator-banner-sparkle creator-star-two" aria-hidden="true">✧</span>
