@@ -331,6 +331,10 @@ body:has(#panel[data-mode="payment"]){background:#fffdf8}
  .trial-button{font-size:11px}
  .submit-payment{font-size:12px}
 }
+
+/* Bilingual lifetime-price comparison */
+.price-fun{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;line-height:1.45}
+.price-fun-nepali{font-weight:750;color:#9d3653;font-size:clamp(12px,1.3vw,14px)}
 </style>
 </head>
 <body>
@@ -398,7 +402,7 @@ case 'payment':{
       <div class="life-heading"><div class="life-heading-main"><span class="crown-icon" aria-hidden="true">👑</span><div><h3>Lifetime access <span>· आजीवन पहुँच</span></h3><p>One payment. Learn forever.</p><i class="life-underline" aria-hidden="true"></i></div></div><span class="life-sticker" aria-hidden="true">Learn today.<br>For a lifetime. ✨</span></div>
       <div class="life-top">
         <div class="life-price-column">
-          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun">About the price of chicken pizza and a can of Coke. 🍕🥤</span></div>
+          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun"><span>About the price of chicken pizza and a can of Coke. 🍕🥤</span><span lang="ne" class="price-fun-nepali">लगभग एउटा चिकेन पिज्जा र एक क्यान कोकको मूल्य बराबर। 🇳🇵</span></span></div>
           <p class="life-explainer">Pay using the <strong>${CFG.bank}</strong> QR. Lessons unlock only after the owner verifies your bank transaction and assigns paid access.</p>
         </div>
         <div class="life-qr-column">
