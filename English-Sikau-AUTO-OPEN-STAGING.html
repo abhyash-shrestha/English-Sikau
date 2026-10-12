@@ -739,6 +739,16 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #privateLocalPreviewBar{background:#f6f6fe!important;border-bottom:1px solid #dce0ef!important}
 #privateLocalPreviewBar label{background:#fff!important;border-color:#8898c0!important}
 @media(max-width:599px){#privateLocalPreviewBar{font-size:12px!important}}
+
+/* Read-only cloud progress, outside the original private learning app. */
+#protected #cloudStoryProgress{display:flex;flex:0 0 auto;gap:12px;justify-content:space-between;align-items:center;min-width:0;padding:9px 16px;border-bottom:1px solid #c9dbee;background:linear-gradient(110deg,#edf6ff,#fff9ec);font:13px/1.45 system-ui,sans-serif;color:#1a3149}
+#protected .cloud-story-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+#protected .cloud-story-info strong{font-size:13px;font-weight:800}
+#protected .cloud-story-info>span{font-weight:760;color:#18557d;font-variant-numeric:tabular-nums}
+#protected .cloud-story-info small{font-size:11px;color:#75606b}
+#protected #cloudStoryRefresh{flex:none;min-height:42px;padding:9px 12px;border:1px solid #8db7d8;border-radius:12px;background:#fff;color:#12507d;font:750 12px system-ui,sans-serif;cursor:pointer}
+#protected #cloudStoryRefresh:disabled{opacity:.6;cursor:wait}
+@media(max-width:599px){#protected #cloudStoryProgress{flex-wrap:wrap;gap:7px;padding:9px 11px}#protected .cloud-story-info{flex-basis:100%}#protected #cloudStoryRefresh{min-height:40px}}
 </style>
 </head>
 <body>
@@ -769,6 +779,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p><footer class="footer-credit" aria-label="English Sikau creator"><div class="nepal-landscape" aria-hidden="true"><span class="landscape-sun"></span><span class="landscape-ridge ridge-back"></span><span class="landscape-ridge ridge-front"></span><span class="landscape-temple left">🏯</span><span class="landscape-temple right">🏯</span><span class="landscape-birds">⌁　⌁</span></div><span class="credit-line">Made with ❤️ in Nepal by <strong>Abhyash.</strong></span><span class="credit-nepali">नेपालमा मायाले बनाइएको · अभ्यास</span></footer></main>
 </div></div>
 <section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar"><span>🔐 English Sikau · protected lessons <span id="sessionNote"></span></span><button type="button" id="exit">Sign out · लगआउट</button></div>
+<section id="cloudStoryProgress" class="cloud-story-bar" aria-label="Appwrite verified story progress"><div class="cloud-story-info"><strong>☁️ Verified story progress · सुरक्षित प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Separate from original app XP and mastery; totals are not added. · मूल प्रगतिसँग जोडिएको छैन।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <div id="privateLocalPreviewBar" style="padding:10px 14px;background:#fff5df;border-bottom:1px solid #e8d6b5;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-family:system-ui;font-size:14px">
 <strong>🧪 Automatic lesson loading test · निजी परीक्षण</strong>
 <label for="privateLocalPreviewInput" style="cursor:pointer;border:1px solid #98672a;background:white;border-radius:9px;padding:9px 12px;font-weight:750">📁 Optional local preview (test only)</label>
@@ -909,6 +920,8 @@ async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['htt
 function killLessons(){
   readNumber++;
   openedAccess=null;
+  if($('cloudStoryValues'))$('cloudStoryValues').textContent='Sign in to view verified progress.';
+  if($('cloudStoryRefresh'))$('cloudStoryRefresh').disabled=false;
   clearInterval(trialInterval);trialInterval=null;
   const frame=$('lessonFrame');
   frame.removeAttribute('srcdoc');
@@ -982,6 +995,7 @@ async function openFile(token='',isTrial=false){
         '. For this staging test only, you may choose the private preview HTML stored on your device.';
       showMsg('Automatic Appwrite download unavailable; private file selection remains available in this TEST page.','error');
     }
+    void refreshCloudStoryProgress();
     if(kind==='trial'){
       clearInterval(trialInterval);
       trialInterval=setInterval(()=>{
@@ -1024,6 +1038,28 @@ window.__englishSikauReadVerifiedProgress = async function () {
     chapters:p.completedChapters.filter(x=>typeof x==='string').length};
 };
 
+
+
+/* Separate Appwrite pilot story progress: read-only, no local XP merging. */
+let cloudLoading=false;
+async function refreshCloudStoryProgress(){
+  const target=$('cloudStoryValues'),button=$('cloudStoryRefresh');
+  if(!target||!button||cloudLoading)return;
+  if(!user||!openedAccess||user.emailVerification!==true){
+    target.textContent='Available after authorized login.';return;
+  }
+  const id=user.$id,version=readNumber;
+  cloudLoading=true;button.disabled=true;target.textContent='Checking Appwrite… · जाँच्दैछ…';
+  try{
+    const p=await window.__englishSikauReadVerifiedProgress();
+    if(!user||user.$id!==id||readNumber!==version||!openedAccess)return;
+    target.textContent='⭐ '+p.xp+' verified pilot XP  ·  🔥 '+p.streak+' UTC-day streak  ·  📚 '+p.chapters+' verified chapters  ·  🏆 '+p.mastery+' pilot mastery';
+  }catch(err){
+    if(user&&user.$id===id&&readNumber===version&&openedAccess)
+      target.textContent='Cloud progress temporarily unavailable. Original app progress is unchanged.';
+  }finally{cloudLoading=false;button.disabled=false}
+}
+$('cloudStoryRefresh').addEventListener('click',()=>{void refreshCloudStoryProgress()});
 
 $('privateLocalPreviewInput').addEventListener('change', async function () {
   const chosen = this.files && this.files[0];
