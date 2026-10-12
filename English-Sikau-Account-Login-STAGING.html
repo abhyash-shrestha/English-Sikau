@@ -671,6 +671,69 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #panel[data-mode="payment"] .qr-shell{padding-bottom:12px}
 @media(min-width:900px){.price-fun-english{white-space:nowrap;font-size:clamp(10px,1.05vw,14px)}}
 @media(max-width:899px){.price-fun-english{white-space:normal;text-wrap:pretty}}
+
+/* Price + bank QR polish: roomy bilingual white pill; clean top of original QR screenshot. */
+#panel[data-mode="payment"] .life-price-box{padding-inline:10px}
+#panel[data-mode="payment"] .price-fun{
+  box-sizing:border-box;width:100%;max-width:100%;
+  align-self:stretch;margin:16px 0 0;padding:13px 14px 14px;
+  border:1px solid #fff;border-radius:26px;
+  background:#fffafcf2;box-shadow:0 3px 10px #b35d6b0d;
+  text-align:center;gap:5px;overflow:visible
+}
+#panel[data-mode="payment"] .price-fun-english{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:3px 7px;min-width:0;width:100%;max-width:100%;
+  font-size:clamp(12px,1.06vw,15px);white-space:normal!important;
+  line-height:1.42;letter-spacing:-.015em
+}
+#panel[data-mode="payment"] .price-fun-english-copy{min-width:0;overflow-wrap:normal}
+#panel[data-mode="payment"] .price-fun-emojis{
+  display:inline-block;flex:none;white-space:nowrap;letter-spacing:1px;line-height:1;
+  font-size:1.2em;vertical-align:middle
+}
+#panel[data-mode="payment"] .price-fun-nepali{
+  max-width:100%;line-height:1.35;overflow-wrap:break-word;
+  font-size:clamp(12px,1.18vw,15px)
+}
+#panel[data-mode="payment"] .qr-shell{
+  box-sizing:border-box;max-width:340px;width:100%;
+  padding:12px 13px 13px!important;overflow:hidden;
+  background:#fff;border:1px solid #eae7e5;border-radius:19px;
+  box-shadow:0 7px 25px #42222b12
+}
+#panel[data-mode="payment"] .qr-image-viewport{
+  position:relative;box-sizing:border-box;display:block;
+  width:100%;max-width:300px;margin:0 auto;
+  border:1px solid #f0ece9;border-radius:10px;
+  overflow:hidden;background:#fff
+}
+#panel[data-mode="payment"] .qr-image-viewport .qr{
+  display:block;width:100%!important;max-width:100%!important;
+  height:auto!important;object-fit:contain;
+  padding:0!important;margin:-15px 0 -13px!important;
+  border:0!important;border-radius:0!important;
+  background:white
+}
+/* Hide only the narrow gray banner embedded at the top of the QR image;
+   QR modules and the printed Laxmi Sunrise name remain untouched. */
+#panel[data-mode="payment"] .qr-image-viewport::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:white;z-index:1;pointer-events:none
+}
+@media(max-width:599px){
+ #panel[data-mode="payment"] .life-price-box{padding-inline:8px}
+ #panel[data-mode="payment"] .price-fun{padding:12px 10px;border-radius:19px}
+ #panel[data-mode="payment"] .price-fun-english{font-size:clamp(11px,3.15vw,13px)}
+ #panel[data-mode="payment"] .price-fun-nepali{font-size:clamp(11px,3.3vw,13px)}
+ #panel[data-mode="payment"] .qr-shell{max-width:340px}
+ #panel[data-mode="payment"] .qr-image-viewport .qr{margin:-10px 0 -9px!important}
+}
+@media(min-width:600px) and (max-width:899px){
+ #panel[data-mode="payment"] .price-fun-english{font-size:clamp(11px,1.6vw,14px)}
+ #panel[data-mode="payment"] .qr-image-viewport .qr{margin:-12px 0 -10px!important}
+}
+
 </style>
 </head>
 <body>
@@ -805,11 +868,11 @@ case 'payment':{
       <div class="life-heading"><div class="life-heading-main"><span class="crown-icon" aria-hidden="true">👑</span><div><h3>Lifetime access <span>· आजीवन पहुँच</span></h3><p>One payment. Learn forever.</p><i class="life-underline" aria-hidden="true"></i></div></div><span class="life-sticker" aria-hidden="true">Learn today.<br>For a lifetime. ✨</span></div>
       <div class="life-top">
         <div class="life-price-column">
-          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun"><span class="price-fun-english">About the price of chicken pizza and a can of Coke. <span class="price-fun-emojis" aria-label="pizza and soda">🍕🥤</span></span><span lang="ne" class="price-fun-nepali">लगभग एउटा चिकेन पिज्जा र एक क्यान कोकको मूल्य बराबर। 🇳🇵</span></span></div>
+          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun"><span class="price-fun-english"><span class="price-fun-english-copy">About the price of chicken pizza and a can of Coke.</span> <span class="price-fun-emojis" aria-label="pizza and soda">🍕🥤</span></span><span lang="ne" class="price-fun-nepali">लगभग एउटा चिकेन पिज्जा र एक क्यान कोकको मूल्य बराबर। 🇳🇵</span></span></div>
           <p class="life-explainer">Pay using the <strong>${CFG.bank}</strong> QR. Lessons unlock only after the owner verifies your bank transaction and assigns paid access.</p>
         </div>
         <div class="life-qr-column">
-          <div class="qr-shell"><img class="qr" src="${QR_SRC}" alt="Laxmi Sunrise Bank payment QR for NPR 999, including the bank name in the image" /></div>
+          <div class="qr-shell"><div class="qr-image-viewport"><img class="qr" src="${QR_SRC}" alt="Laxmi Sunrise Bank payment QR for NPR 999, including the bank name in the image" /></div></div>
           <div class="qr-arrow"><span aria-hidden="true">↗</span> Scan this QR in your banking app</div>
         </div>
       </div>
