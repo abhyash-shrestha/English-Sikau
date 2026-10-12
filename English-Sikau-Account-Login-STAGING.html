@@ -664,6 +664,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* Price card readability: remove dashed oval that overlaps bilingual caption. */
 #panel[data-mode="payment"] .life-price-box::before{content:none!important;display:none!important;border:0!important}
+
+/* Keep pizza + drink together and let bilingual pricing breathe. */
+.price-fun-english{max-width:100%;font-size:clamp(11px,1.14vw,14px);line-height:1.45;letter-spacing:-.01em}
+.price-fun-emojis{display:inline-block;white-space:nowrap;vertical-align:baseline}
+#panel[data-mode="payment"] .qr-shell{padding-bottom:12px}
+@media(min-width:900px){.price-fun-english{white-space:nowrap;font-size:clamp(10px,1.05vw,14px)}}
+@media(max-width:899px){.price-fun-english{white-space:normal;text-wrap:pretty}}
 </style>
 </head>
 <body>
@@ -798,11 +805,11 @@ case 'payment':{
       <div class="life-heading"><div class="life-heading-main"><span class="crown-icon" aria-hidden="true">👑</span><div><h3>Lifetime access <span>· आजीवन पहुँच</span></h3><p>One payment. Learn forever.</p><i class="life-underline" aria-hidden="true"></i></div></div><span class="life-sticker" aria-hidden="true">Learn today.<br>For a lifetime. ✨</span></div>
       <div class="life-top">
         <div class="life-price-column">
-          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun"><span>About the price of chicken pizza and a can of Coke. 🍕🥤</span><span lang="ne" class="price-fun-nepali">लगभग एउटा चिकेन पिज्जा र एक क्यान कोकको मूल्य बराबर। 🇳🇵</span></span></div>
+          <div class="life-price-box"><span class="life-price-sparkle" aria-hidden="true">✨</span><span class="price-confetti price-confetti-a" aria-hidden="true">◢</span><span class="price-confetti price-confetti-b" aria-hidden="true">◆</span><span class="price-confetti price-confetti-c" aria-hidden="true">✦</span><span class="life-price">रु. ९९९</span><span class="life-price-label">one-time · lifetime</span><span class="price-fun"><span class="price-fun-english">About the price of chicken pizza and a can of Coke. <span class="price-fun-emojis" aria-label="pizza and soda">🍕🥤</span></span><span lang="ne" class="price-fun-nepali">लगभग एउटा चिकेन पिज्जा र एक क्यान कोकको मूल्य बराबर। 🇳🇵</span></span></div>
           <p class="life-explainer">Pay using the <strong>${CFG.bank}</strong> QR. Lessons unlock only after the owner verifies your bank transaction and assigns paid access.</p>
         </div>
         <div class="life-qr-column">
-          <div class="qr-shell"><img class="qr" src="${QR_SRC}" alt="Original Laxmi Sunrise Bank payment QR for NPR 999" /><p><span aria-hidden="true">🏵️</span> Laxmi Sunrise</p></div>
+          <div class="qr-shell"><img class="qr" src="${QR_SRC}" alt="Laxmi Sunrise Bank payment QR for NPR 999, including the bank name in the image" /></div>
           <div class="qr-arrow"><span aria-hidden="true">↗</span> Scan this QR in your banking app</div>
         </div>
       </div>
