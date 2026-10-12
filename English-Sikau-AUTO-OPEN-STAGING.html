@@ -928,7 +928,49 @@ function killLessons(){
   frame.setAttribute('src','about:blank');
   $('protected').classList.add('hide');
 }
-async function session(){killLessons();try{const a=await account.get();if(!a?.$id)throw Error('No session');if(a.emailVerification!==true){user=null;mode='signin';showMsg('Please verify your email before continuing. · इमेल प्रमाणित गर्नुहोस्।','error');show();return}user=a;mode='payment';showMsg('Signed in. Checking your access…');show();if(paid(a))await loadPaid();else{await trialCheck();show();if(trial?.available)showMsg('Your email is verified. Select a free trial or payment option.');else showMsg('Your email is verified, but the trial status could not be confirmed. Leave the trial locked until the server responds.','error')}}catch(e){user=null;mode='signin';showMsg('Sign in or create an account to begin.');show()}}
+async function session(){
+  killLessons();
+  try{
+    const a=await account.get();
+    if(!a?.$id)throw Error('No session');
+    if(a.emailVerification!==true){
+      user=null;mode='signin';
+      showMsg('Please verify your email before continuing. · इमेल प्रमाणित गर्नुहोस्।','error');
+      show();return;
+    }
+    user=a;mode='payment';
+    showMsg('Signed in. Checking your access…');
+    show();
+    if(paid(a)){await loadPaid();return;}
+    await trialCheck();
+    // Resume only a previously started trial that the Appwrite server says is
+    // still active. This does NOT call the one-time 'start' endpoint again.
+    // A used / expired trial stays locked with no new trial awarded.
+    const now=Date.parse(trial?.serverNow||'');
+    const expiry=Date.parse(trial?.expiresAt||'');
+    const canResume=trial?.available===true&&trial.used===true&&trial.active===true&&
+      Number.isFinite(now)&&Number.isFinite(expiry)&&now<expiry;
+    if(canResume){
+      show();showMsg('Resuming your existing active trial… · चलिरहेको परीक्षण फेरि खोल्दैछौं।');
+      await trialOpen();
+      return;
+    }
+    show();
+    if(trial?.available===true){
+      if(trial.used===true){
+        showMsg('Your 60-minute trial has ended. Lessons stay locked until paid access is approved. · परीक्षण समय समाप्त भयो।');
+      }else{
+        showMsg('Your email is verified. Select your available trial or payment option.');
+      }
+    }else{
+      showMsg('Unable to confirm trial status. Private lessons remain locked until the server responds.','error');
+    }
+  }catch(e){
+    user=null;mode='signin';
+    showMsg('Sign in or create an account to begin.');
+    show();
+  }
+}
 const getFileUrl=(token='')=>`${CFG.endpoint}/storage/buckets/${CFG.bucket}/files/${CFG.file}/download?project=${CFG.project}&audit=${Date.now()}-${Math.random().toString(36).slice(2)}`+(token?'&token='+encodeURIComponent(token):'');
 function activeTrialExpiry(){const expiry=Date.parse(trial?.expiresAt||'');return Number.isFinite(expiry)&&expiry>Date.now()?expiry:0}
 // STAGING TEST ONLY: use the existing authenticated Appwrite backend for
