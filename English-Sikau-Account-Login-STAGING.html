@@ -63,12 +63,35 @@ body{background:radial-gradient(circle at 5% 15%,#ffdad8 0%,transparent 31%),rad
 @media(max-width:780px){#shell{max-width:650px;margin:0 auto;padding:0}#panel{border-radius:0;min-height:100dvh;border:0}#panel[data-mode="signin"],#panel[data-mode="signup"],#panel[data-mode="welcome"],#panel[data-mode="emailcode"],#panel[data-mode="forgot"],#panel[data-mode="verify"],#panel[data-mode="reset"]{display:block;min-height:100dvh}.hero{padding:22px 25px 19px}.hero h1{font-size:28px;margin:15px 0 9px}.hero-sub{font-size:13px;line-height:1.5}.hero-sub span{font-size:12px;margin-top:3px}.hero-benefits{display:none}.hero-footer{display:none}.hero-mark{font-size:27px}.content{padding:22px 22px 30px;align-self:auto}.auth-tabs{margin:20px 0}.auth-title{font-size:27px;margin-top:9px}.auth-eyebrow{gap:3px}.content hr{margin-top:16px}}
 @media(prefers-reduced-motion:reduce){.auth-tab{transition:none}}
 
+
+/* Visible founder credit: accessible on login, registration, and account pages. */
+.creator-spotlight{
+ display:flex;align-items:center;gap:13px;width:max-content;max-width:100%;
+ background:linear-gradient(110deg,#fff3de20,#ffffff12);border:1px solid #ffdfb380;
+ border-radius:17px;padding:14px 18px;margin-top:20px;box-shadow:0 10px 22px #37062725
+}
+.creator-spotlight-mark{display:grid;place-items:center;flex:none;width:35px;height:35px;
+ color:#fff7d9;background:#ffffff29;border-radius:11px;font-size:23px}
+.creator-spotlight-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.creator-spotlight-copy small{color:#ffe6b8;letter-spacing:.15em;font-weight:850;font-size:10px}
+.creator-spotlight-copy strong{color:white;font-weight:900;font-size:clamp(20px,2.3vw,27px);letter-spacing:-.02em}
+.creator-spotlight-copy strong span{color:#ffe6bf}
+.auth-step{font-size:12px;color:#837381}
+.auth-step strong{display:block;color:#ad164a;font-size:13px;margin-top:3px;white-space:nowrap}
+@media(max-width:780px){
+ .creator-spotlight{margin:14px 0 0;padding:9px 12px;gap:9px;border-radius:12px}
+ .creator-spotlight-mark{width:28px;height:28px;font-size:17px}
+ .creator-spotlight-copy strong{font-size:20px}
+ .creator-spotlight-copy small{font-size:9px}
+ .auth-step{font-size:10px;text-align:right}
+ .auth-step strong{font-size:11px}
+}
 </style>
 </head>
 <body>
 <div id="shell"><div id="panel">
-<header class="hero"><div class="hero-kicker"><span class="hero-mark">🇳🇵</span><span>ENGLISH SIKAU <em>नेपाली</em></span></div><h1>Learn English.<span>Believe in yourself.</span></h1><p class="hero-sub">आफ्नो समयमा, आफ्नै गतिमा अंग्रेजी सिक्नुहोस्।<span>Learn anytime, anywhere — with a learning experience designed for Nepali speakers.</span></p><div class="hero-benefits"><div><span>📖</span><strong>Simple lessons</strong><small>सजिलो पाठ</small></div><div><span>🎤</span><strong>Speak confidently</strong><small>आत्मविश्वासका साथ बोल्नुहोस्</small></div><div><span>📈</span><strong>Track your progress</strong><small>आफ्नो प्रगति हेर्नुहोस्</small></div></div><div class="hero-footer"><span>MADE FOR NEPALI LEARNERS</span><strong>English Sikau · अंग्रेजी सिकौं</strong></div></header>
-<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">English Sikau</span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p></main>
+<header class="hero"><div class="hero-kicker"><span class="hero-mark">🇳🇵</span><span>ENGLISH SIKAU <em>नेपाली</em></span></div><h1>Learn English.<span>Believe in yourself.</span></h1><p class="hero-sub">आफ्नो समयमा, आफ्नै गतिमा अंग्रेजी सिक्नुहोस्।<span>Learn anytime, anywhere — with a learning experience designed for Nepali speakers.</span></p><div class="creator-spotlight" aria-label="Created by Abhyash · अभ्यास"><span class="creator-spotlight-mark">✦</span><span class="creator-spotlight-copy"><small>CREATED BY · निर्माणकर्ता</small><strong>अभ्यास <span>· Abhyash</span></strong></span></div><div class="hero-benefits"><div><span>📖</span><strong>Simple lessons</strong><small>सजिलो पाठ</small></div><div><span>🎤</span><strong>Speak confidently</strong><small>आत्मविश्वासका साथ बोल्नुहोस्</small></div><div><span>📈</span><strong>Track your progress</strong><small>आफ्नो प्रगति हेर्नुहोस्</small></div></div><div class="hero-footer"><span>MADE FOR NEPALI LEARNERS</span><strong>English Sikau · अंग्रेजी सिकौं</strong></div></header>
+<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p></main>
 </div></div>
 <section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar"><span>🔐 English Sikau · protected lessons <span id="sessionNote"></span></span><button type="button" id="exit">Sign out · लगआउट</button></div>
 <div id="privateLocalPreviewBar" style="padding:10px 14px;background:#fff5df;border-bottom:1px solid #e8d6b5;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-family:system-ui;font-size:14px">
