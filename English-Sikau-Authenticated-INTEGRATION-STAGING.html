@@ -71,7 +71,50 @@ function killLessons(){
 async function session(){killLessons();try{const a=await account.get();if(!a?.$id)throw Error('No session');if(a.emailVerification!==true){user=null;mode='signin';showMsg('Please verify your email before continuing. · इमेल प्रमाणित गर्नुहोस्।','error');show();return}user=a;mode='payment';showMsg('Signed in. Checking your access…');show();if(paid(a))await loadPaid();else{await trialCheck();show();if(trial?.available)showMsg('Your email is verified. Select a free trial or payment option.');else showMsg('Your email is verified, but the trial status could not be confirmed. Leave the trial locked until the server responds.','error')}}catch(e){user=null;mode='welcome';showMsg('Sign in or create an account to begin.');show()}}
 const getFileUrl=(token='')=>`${CFG.endpoint}/storage/buckets/${CFG.bucket}/files/${CFG.file}/download?project=${CFG.project}&audit=${Date.now()}-${Math.random().toString(36).slice(2)}`+(token?'&token='+encodeURIComponent(token):'');
 function activeTrialExpiry(){const expiry=Date.parse(trial?.expiresAt||'');return Number.isFinite(expiry)&&expiry>Date.now()?expiry:0}
-async function openFile(token='',isTrial=false){const seq=++readNumber;showMsg('Checking Appwrite permission and loading private lessons…');try{if(isTrial&&(!token||!activeTrialExpiry()))throw Error('Trial has expired or the server did not confirm an expiry.');const response=await fetch(getFileUrl(token),{credentials:'include',cache:'no-store',headers:{'X-Appwrite-Project':CFG.project}});if(!response.ok){showMsg('Protected download denied (HTTP '+response.status+'). Your lessons remain locked.','error');return}const html=await response.text();if(seq!==readNumber||!user)return;if(isTrial&&!activeTrialExpiry())throw Error('Trial expired during download.');if(!/<!doctype html/i.test(html.slice(0,200))&&!/<html[\s>]/i.test(html.slice(0,300)))throw Error('Unexpected protected file response');$('lessonFrame').srcdoc=html;openedAccess=isTrial?'trial':'lifetime';$('sessionNote').textContent='· '+(isTrial?'trial':'lifetime');$('protected').classList.remove('hide');showMsg('Private lesson download approved by Appwrite.','ok');if(isTrial){clearInterval(trialInterval);trialInterval=setInterval(()=>{if(!activeTrialExpiry()){clearInterval(trialInterval);killLessons();mode='payment';show();showMsg('Trial time has ended. Payment is required for future access.','error')}},1000)}}catch(e){killLessons();showMsg('Could not open lessons: '+shortError(e),'error')}}
+// STAGING TEST ONLY: use the existing authenticated Appwrite backend for
+// entitlement verification, then load a private preview from the student's
+// own Mac. The original production site still uses protected Storage.
+async function openFile(_unusedToken='',isTrial=false){
+  const seq=++readNumber,accountId=user?.$id;
+  showMsg('Verifying access with Appwrite before opening the local preview…');
+  try{
+    if(!accountId||user.emailVerification!==true)throw Error('Please sign in with a verified account.');
+    const fresh=await account.get();
+    if(seq!==readNumber||!user||user.$id!==accountId)return;
+    if(fresh?.$id!==accountId||fresh.emailVerification!==true)throw Error('Student account verification failed.');
+    user=fresh;
+    let kind='lifetime';
+    if(!paid(fresh)){
+      if(!isTrial)throw Error('Payment approval or an active trial is required.');
+      const current=await fnCall(CFG.trial,'status');
+      const serverNow=Date.parse(current.serverNow||''),expiry=Date.parse(current.expiresAt||'');
+      if(current.used!==true||current.active!==true||
+         !Number.isFinite(serverNow)||!Number.isFinite(expiry)||serverNow>=expiry)
+        throw Error('Your trial is not active. Please check its status.');
+      trial={...current,available:true};
+      kind='trial';
+    }
+    // This endpoint verifies the SAME logged-in student and paid/trial
+    // entitlement on the server, not a browser flag or a file token.
+    await fnCall(CFG.trialPass,'progressGet');
+    if(seq!==readNumber||!user||user.$id!==accountId)return;
+    $('lessonFrame').removeAttribute('srcdoc');
+    $('lessonFrame').setAttribute('src','about:blank');
+    openedAccess=kind;
+    $('sessionNote').textContent='· '+kind+' · integration test';
+    $('protected').classList.remove('hide');
+    showMsg('✅ Appwrite approved this test session. Choose your private preview HTML below.','ok');
+    if(kind==='trial'){
+      clearInterval(trialInterval);
+      trialInterval=setInterval(()=>{
+        if(!activeTrialExpiry()){
+          clearInterval(trialInterval);killLessons();mode='payment';show();
+          showMsg('Trial time has ended. Lessons are locked.','error');
+        }
+      },1000);
+    }
+  }catch(e){killLessons();showMsg('Preview authorization denied: '+shortError(e),'error')}
+}
 async function loadPaid(){if(!user||!paid(user))return;await openFile('');}
 function trialFunctionReady(){return CFG.trial&&!CFG.trial.startsWith('REPLACE_')}
 function trialPassReady(){return CFG.trialPass&&!CFG.trialPass.startsWith('REPLACE_')}
@@ -133,7 +176,15 @@ $('privateLocalPreviewInput').addEventListener('change', async function () {
 });
 
 async function trialCheck(){if(!user||paid(user)||!trialFunctionReady())return;try{const result=await fnCall(CFG.trial,'status');trial={...result,available:true};}catch(e){trial={available:false};showMsg('Trial check unavailable: '+shortError(e),'error')}}
-async function trialOpen(){if(!user||paid(user))return;if(!trialPassReady()){showMsg('Secure trial-pass service has not been configured.','error');return}try{const result=await fnCall(CFG.trialPass,'issue');if(typeof result.token!=='string'||!result.token)throw Error('Server did not issue a file token');const expiry=result.trialExpiresAt||trial?.expiresAt;if(!Number.isFinite(Date.parse(expiry))||Date.parse(expiry)<=Date.now())throw Error('Server did not confirm an active trial expiry');trial={...trial,available:true,used:true,expiresAt:expiry};await openFile(result.token,true)}catch(e){killLessons();showMsg('Trial access denied: '+shortError(e),'error')}}
+async function trialOpen(){
+  if(!user||paid(user))return;
+  if(!trialFunctionReady()||!trialPassReady()){
+    showMsg('Secure Appwrite trial services are unavailable.','error');return;
+  }
+  // Do not request a private Storage file token for this local-only test.
+  // openFile independently checks fresh server trial status and progress access.
+  await openFile('',true);
+}
 async function action(which){if(busy)return;if(['welcome','signin','signup','emailcode','forgot','idlogin'].includes(which))return go(which);if(which==='signout')return signOut();if(which==='checkapproval'){await session();return}if(which==='trialcheck'){await trialCheck();show();return}if(which==='trialstart'){if(!user)return;if(!trialPassReady()){showMsg('Secure trial-pass service has not been configured. Trial not started.','error');return}try{busy=true;showMsg('Recording your first and only trial on the server…');const result=await fnCall(CFG.trial,'start');trial={...result,available:true};show();if(trial?.expiresAt&&Date.now()<Date.parse(trial.expiresAt))await trialOpen()}catch(e){showMsg('Trial could not start: '+shortError(e),'error')}finally{busy=false}return}if(which==='trialopen')return trialOpen()}
 function savePending(next){pending={...next,until:Date.now()+15*60*1000};sessionStorage.setItem('sikau-v2-pending-otp',JSON.stringify(pending))}
 async function submit(e){e.preventDefault();if(busy)return;busy=true;try{const val=id=>($(id)?.value||'').trim();if(mode==='signin'){await account.createEmailPasswordSession(val('email'),$('password').value);await session()}
