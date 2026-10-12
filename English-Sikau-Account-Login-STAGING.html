@@ -661,6 +661,9 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* Green phone emoji in WhatsApp help section */
 .payment-help .help-icon{display:inline-grid;place-items:center;flex:none;width:49px;height:49px;border-radius:50%;background:linear-gradient(135deg,#2ce57b,#09a94e);font-size:27px;line-height:1;box-shadow:0 4px 11px #10a84b30}
 @media(max-width:599px){.payment-help .help-icon{width:43px;height:43px;font-size:24px}}
+
+/* Price card readability: remove dashed oval that overlaps bilingual caption. */
+#panel[data-mode="payment"] .life-price-box::before{content:none!important;display:none!important;border:0!important}
 </style>
 </head>
 <body>
