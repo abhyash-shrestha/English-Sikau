@@ -900,6 +900,30 @@ case 'reset':out=form('Choose a new password',pwd('password','New password','new
 case 'idlogin':out=form('Sign in with ID · ID बाट लगइन',makeInput('guestId','User ID · प्रयोगकर्ता ID')+pwd('guestPass','Password · पासवर्ड'),'Continue')+navButton('signin','← Sign in with email');break;
 case 'demo':out='<h2>English Sikau sample · नमुना सिकाइ</h2><p class="muted">Free practice examples · निःशुल्क अभ्यास</p><div class="demo"><strong>Today’s phrases</strong><p>How are you? — तपाईंलाई कस्तो छ?</p><p>I want to learn English. — म अंग्रेजी सिक्न चाहन्छु।</p><p>Please speak slowly. — कृपया बिस्तारै बोल्नुहोस्।</p></div><button type="button" class="secondary" data-mode="welcome">← Exit sample</button>';break;
 case 'payment':{
+  // The account is verified, but access has not been resolved. This is not
+  // evidence that a student needs to pay, particularly when the trial service
+  // is unavailable. Never show another payment request during an outage.
+  if(!trial || trial.available===false){
+    const waiting=trial===null;
+    const email=escapeHTML(user?.email||'');
+    out=`<div class="access-page"><div class="access-welcome">
+      <div><span class="tag">✅ EMAIL VERIFIED · इमेल प्रमाणित</span>
+      <h2>Membership verification · सदस्यता जाँच</h2>
+      <p>Signed in as · लगइन इमेल: <strong>${email}</strong></p></div>
+      <button type="button" class="secondary access-signout" data-mode="signout">Sign out · लगआउट</button>
+    </div>
+    <section class="trial-card" role="status" aria-live="polite">
+      <div class="trial-icon">🔐</div><div class="trial-details">
+        <h3>${waiting?'Checking your access… · पहुँच जाँच्दैछौं…':'We cannot confirm access yet · पहुँच पुष्टि भएको छैन'}</h3>
+        <p>${waiting?'Please wait while the account and trial servers respond.':'Your email is verified, but lifetime membership is not currently recognized and the trial-status server could not be reached. This does not mean you need to pay again.'}</p>
+        <p lang="ne">${waiting?'कृपया जाँच पूरा हुन दिनुहोस्।':'पुनः पैसा नतिर्नुहोस्। आफ्नो पुरानो सदस्यता जाँच गर्नुहोस्।'}</p>
+        <p>${waiting?'':'If you already have lifetime access on another device, compare the signed-in email address on both devices and select Check membership again.'}</p>
+        <button type="button" class="primary trial-button" data-mode="checkapproval">↻ Check membership again · सदस्यता फेरि जाँच्नुहोस्</button>
+        <p class="muted">Already paid? · पहिले भुक्तानी गर्नुभएको छ? ${paymentHelp()}</p>
+      </div>
+    </section></div>`;
+    break;
+  }
   const claim=user?.prefs?.[CFG.pref]||null;
   const remaining=trial?.used?Math.max(0,new Date(trial.expiresAt).getTime()-Date.now()):0;
   const trialHtml=trial?.available&&remaining>0
