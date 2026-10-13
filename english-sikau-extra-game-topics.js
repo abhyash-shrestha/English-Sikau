@@ -6,7 +6,15 @@ window.EnglishSikauSupplementalTopicsV1.push(...[{"id":"kfood","name":"Kathmandu
 /* Game Studio: add diverse themes and prevent immediate repeats.
    Runs inside the verified student's protected iframe after login. */
 (function(){
- if(!Array.isArray(GAME_STOPS)||typeof gameHub!=='function'||typeof gameStore!=='function')return;
+ // The protected lesson app is versioned separately. Never reference a
+ // possibly-undeclared game global while checking for the optional game hub.
+ // If this student lesson version does not include Game Studio, keep the
+ // existing lessons available and do not show an uncaught JS error.
+ if(typeof GAME_STOPS==='undefined'||!Array.isArray(GAME_STOPS)||
+    typeof gameHub!=='function'||typeof gameStore!=='function'){
+   window.__sikauGameStudioStatus={ready:false,reason:'Game Studio is not available in this lesson version.'};
+   return;
+ }
  if(window.__sikauGameStudioInstalled)return;
  window.__sikauGameStudioInstalled=true;
  var topics=window.EnglishSikauSupplementalTopicsV1||[];
@@ -111,5 +119,5 @@ window.EnglishSikauSupplementalTopicsV1.push(...[{"id":"kfood","name":"Kathmandu
  var style=document.createElement('style');style.id='sikau-game-studio-style';style.textContent=css;document.head.appendChild(style);
  window.__sikauGameStudioStatus={ready:true,topics:GAME_STOPS.length,addonVersion:'game-studio-v3'};
  // Redraw the current game hub once to expose new selectable modes and places.
- if(typeof window.GAME_RUNNING==='undefined'||!GAME_RUNNING)gameHub();
+ if(typeof window.GAME_RUNNING==='undefined'||!window.GAME_RUNNING)gameHub();
 })();
