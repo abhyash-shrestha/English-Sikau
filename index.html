@@ -1188,6 +1188,191 @@ function enhanceFestivalCalendar(doc){
   }
 }
 
+
+/* The first screen after an authorized sign-in. This presentation-only tab
+   reuses the live festival card and its original click handlers, without
+   changing the protected app's router, XP, lessons or membership checks. */
+function enhanceLearningHome(doc,firstName){
+  if(!doc?.body||!doc.head)return;
+  const nav=doc.querySelector('.nav')||
+    doc.querySelector('button[data-t]')?.closest('nav');
+  const content=doc.querySelector('main .content')||doc.querySelector('.content');
+  if(!nav||!content)return;
+  const parent=content.parentElement;
+  if(!parent)return;
+  if(!doc.getElementById('sikauHomeStyle')){
+    const css=doc.createElement('style');
+    css.id='sikauHomeStyle';
+    css.textContent=[
+      '.nav button.sikau-home-nav{display:flex!important;align-items:center!important;gap:10px!important;min-height:54px!important;width:100%!important;text-align:left!important;cursor:pointer!important;border-radius:14px!important}',
+      '.sikau-home-nav .sikau-home-emoji{font-size:21px;display:inline-grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:12px;background:#fff3e9}',
+      '.sikau-home-nav .sikau-home-nav-label{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:14px;font-weight:850}',
+      '.sikau-home-nav .sikau-home-nav-label small{font-size:11px;font-weight:650;opacity:.8}',
+      '.nav button.sikau-home-nav.on{background:#fff0f5!important;color:#be164c!important;outline:2px solid #c44070;outline-offset:-2px}',
+      'html.sikau-home-active .nav button[data-t]:not(.sikau-home-nav).on{background:transparent!important;color:inherit!important;outline:0!important;box-shadow:none!important}',
+      'html.sikau-home-active .content{display:none!important}',
+      '#sikauHomeScreen{max-width:1250px;width:100%;margin:0 auto;padding:clamp(16px,2.5vw,32px) clamp(14px,2.5vw,34px) 42px;color:#30253a}',
+      '#sikauHomeScreen[hidden]{display:none!important}',
+      '#sikauHomeScreen .sikau-home-intro{padding:clamp(19px,3vw,30px);border:1px solid #eedfe5;border-radius:22px;background:linear-gradient(110deg,#fff9f5,#f8f5ff);box-shadow:0 7px 22px #512d3c0a}',
+      '#sikauHomeScreen .sikau-home-eyebrow{display:block;color:#b21651;letter-spacing:.07em;text-transform:uppercase;font-size:11px;font-weight:900;margin-bottom:8px}',
+      '#sikauHomeScreen h2{font-size:clamp(23px,3.1vw,33px);letter-spacing:-.035em;margin:0 0 7px;line-height:1.2;color:#281b36}',
+      '#sikauHomeScreen .sikau-home-subtitle{font-size:14px;line-height:1.65;color:#766678;margin:0}',
+      '#sikauHomeScreen .sikau-home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}',
+      '#sikauHomeScreen .sikau-home-actions button{border-radius:12px;min-height:44px;padding:9px 15px;font-weight:850;cursor:pointer;font-size:13px}',
+      '#sikauHomeScreen .sikau-home-coach{background:linear-gradient(110deg,#bd154c,#e83d70);color:white;border:1px solid #b5164b}',
+      '#sikauHomeScreen .sikau-home-read{background:white;color:#92365b;border:1px solid #e6ced8}',
+      '#sikauHomeScreen .sikau-home-actions button:focus-visible,.nav button.sikau-home-nav:focus-visible{outline:3px solid #2359bc!important;outline-offset:3px}',
+      '#sikauHomeScreen .sikau-home-festival-heading{font-size:19px;font-weight:900;color:#33233f;margin:26px 0 12px}',
+      '#sikauHomeScreen .sikau-home-festival-hint{font-size:13px;color:#756775;margin:-6px 0 13px}',
+      '#sikauHomeFestivalMount>section,#sikauHomeFestivalMount>.sikau-home-native-festival{display:block;width:100%;max-width:100%;margin:0!important}',
+      '#sikauHomeFestivalMount .sikau-home-native-festival{border-radius:23px!important}',
+      '#sikauHomeFestivalMount .sikau-home-native-festival button{max-width:100%}',
+      '#sikauHomeFestivalMount .sikau-home-native-festival [class*="festival"]{max-width:100%}',
+      '#sikauHomeFestivalMount .sikau-home-loading{background:#fff8eb;border:1px dashed #dfa660;border-radius:16px;padding:20px;color:#806244;font-size:14px}',
+      '@media(max-width:680px){#sikauHomeScreen{padding:12px 13px 28px}#sikauHomeScreen .sikau-home-intro{padding:17px 15px}#sikauHomeScreen .sikau-home-actions button{flex:1 1 160px}#sikauHomeScreen .sikau-home-festival-heading{font-size:17px;margin-top:17px}}',
+      '@media(prefers-reduced-motion:reduce){#sikauHomeScreen *{scroll-behavior:auto!important}}'
+    ].join('\n');
+    doc.head.append(css);
+  }
+  let home=doc.getElementById('sikauHomeScreen');
+  if(!home){
+    home=doc.createElement('section');
+    home.id='sikauHomeScreen';
+    home.hidden=true;
+    home.setAttribute('aria-label','Learning home · सिकाइ गृहपृष्ठ');
+    const intro=doc.createElement('div');
+    intro.className='sikau-home-intro';
+    const eyebrow=doc.createElement('span');
+    eyebrow.className='sikau-home-eyebrow';eyebrow.textContent='🏠 Your learning home · तपाईंको सिकाइ गृहपृष्ठ';
+    const title=doc.createElement('h2');title.textContent='Namaste! Welcome to English Sikau 👋';
+    const sub=doc.createElement('p');sub.className='sikau-home-subtitle';
+    sub.textContent='Discover upcoming Nepali festivals, learn useful English, and start when you are ready. · नेपाली चाडपर्वबाट रमाइलोसँग अंग्रेजी सिक्नुहोस्।';
+    const actions=doc.createElement('div');actions.className='sikau-home-actions';
+    const coach=doc.createElement('button');coach.type='button';coach.className='sikau-home-coach';
+    coach.textContent='✨ Start Coach · अभ्यास सुरु गर्नुहोस्';
+    const read=doc.createElement('button');read.type='button';read.className='sikau-home-read';
+    read.textContent='📖 Practice reading · पढ्ने अभ्यास';
+    const openTab=function(target){
+      const buttons=Array.from(nav.querySelectorAll('button[data-t]')).filter(b=>!b.classList.contains('sikau-home-nav'));
+      const button=buttons.find(b=>String(b.dataset.t||'').toLowerCase()===target)||
+        buttons.find(b=>new RegExp(target,'i').test(b.textContent||''));
+      if(button)button.click();
+    };
+    coach.addEventListener('click',()=>openTab('coach'));
+    read.addEventListener('click',()=>openTab('read'));
+    actions.append(coach,read);intro.append(eyebrow,title,sub,actions);
+    const heading=doc.createElement('h3');
+    heading.className='sikau-home-festival-heading';
+    heading.textContent='🎉 Nepal Festivals · नेपालका चाडपर्व';
+    const hint=doc.createElement('p');hint.className='sikau-home-festival-hint';
+    hint.textContent='What is coming up in Nepal? · नेपालमा अब कुन चाड आउँदैछ?';
+    const mount=doc.createElement('div');mount.id='sikauHomeFestivalMount';
+    const loading=doc.createElement('div');loading.className='sikau-home-loading';
+    loading.textContent='📅 Loading the published festival calendar… · चाडपर्वको पात्रो खुल्दैछ…';
+    mount.append(loading);
+    home.append(intro,heading,hint,mount);
+    parent.insertBefore(home,content.nextSibling);
+  }else if(home.parentElement!==parent){
+    parent.insertBefore(home,content.nextSibling);
+  }
+  const title=home.querySelector('h2');
+  if(title){
+    const name=String(firstName||'').trim().slice(0,32);
+    const text=name?'Namaste, '+name+'! 👋':'Namaste! 👋';
+    if(title.textContent!==text)title.textContent=text;
+  }
+  let homeTab=nav.querySelector('.sikau-home-nav');
+  if(!homeTab){
+    homeTab=doc.createElement('button');
+    homeTab.type='button';
+    homeTab.className='sikau-home-nav';
+    homeTab.dataset.t='home';homeTab.dataset.sikauHome='true';
+    homeTab.setAttribute('aria-label','Home · गृहपृष्ठ — Nepal Festivals');
+    const emoji=doc.createElement('span');emoji.className='sikau-home-emoji';
+    emoji.textContent='🏠';emoji.setAttribute('aria-hidden','true');
+    const words=doc.createElement('span');words.className='sikau-home-nav-label';
+    const word=doc.createElement('strong');word.textContent='Home';
+    const ne=doc.createElement('small');ne.lang='ne';ne.textContent='गृहपृष्ठ · चाडपर्व';
+    words.append(word,ne);homeTab.append(emoji,words);
+    const first=nav.querySelector('button[data-t]');
+    if(first)nav.insertBefore(homeTab,first);else nav.prepend(homeTab);
+    homeTab.addEventListener('click',function(event){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+      doc.documentElement.classList.add('sikau-home-active');
+      home.hidden=false;
+      homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
+      // Keep the normal tab state intact; only hide its content visually.
+      home.scrollIntoView({block:'start',behavior:'auto'});
+    });
+  }
+  // Exit Home whenever an existing private-app tab is chosen.
+  if(!nav.dataset.sikauHomeListening){
+    nav.dataset.sikauHomeListening='true';
+    nav.addEventListener('click',function(event){
+      const b=event.target.closest('button[data-t]');
+      if(!b||b.classList.contains('sikau-home-nav'))return;
+      doc.documentElement.classList.remove('sikau-home-active');
+      const panel=doc.getElementById('sikauHomeScreen');
+      if(panel)panel.hidden=true;
+      const homeButton=nav.querySelector('.sikau-home-nav');
+      if(homeButton){homeButton.classList.remove('on');homeButton.removeAttribute('aria-current');}
+    },true);
+  }
+  // Find the smallest published-festival panel which contains the header and
+  // at least two festival-learning actions. Do not move the whole lesson page.
+  const titles=Array.from(doc.querySelectorAll('h1,h2,h3,h4,h5,strong,b,header,p,span'))
+    .filter(el=>!el.closest('#sikauHomeScreen') &&
+      /NEPAL FESTIVALS/i.test((el.textContent||'').trim()) &&
+      (el.textContent||'').trim().length<130);
+  let card=null;
+  for(const heading of titles){
+    let node=heading.parentElement;
+    for(let depth=0;node&&depth<9;depth++,node=node.parentElement){
+      if(node===content||node===doc.body||node.matches('.app,main'))break;
+      const buttons=Array.from(node.querySelectorAll('button,a'))
+        .filter(b=>/Learn festival English/i.test(b.textContent||''));
+      if(buttons.length>=2 && (node.textContent||'').length<13000){
+        card=node;break;
+      }
+    }
+    if(card)break;
+  }
+  const mount=home.querySelector('#sikauHomeFestivalMount');
+  if(card&&mount&&!card.closest('#sikauHomeScreen')){
+    const original=mount.querySelector('.sikau-home-native-festival');
+    if(original&&original!==card)original.remove();
+    card.classList.add('sikau-home-native-festival');
+    mount.replaceChildren(card);
+  }
+  // Default to Home only once per authenticated iframe load, never override
+  // the student's subsequent clicks on Coach, Read or other existing tabs.
+  if(!doc.documentElement.dataset.sikauHomeInitialized){
+    doc.documentElement.dataset.sikauHomeInitialized='true';
+    doc.documentElement.classList.add('sikau-home-active');
+    home.hidden=false;
+    homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
+    // Some private lesson versions start on another tab. Request the normal
+    // Translate tab once to populate the festival source before moving it.
+    if(!mount.querySelector('.sikau-home-native-festival')){
+      const translate=Array.from(nav.querySelectorAll('button[data-t]'))
+        .find(b=>!b.classList.contains('sikau-home-nav') &&
+          (/translate/i.test(String(b.dataset.t))||/translate/i.test(b.textContent||'')));
+      if(translate){
+        translate.click();
+        doc.documentElement.classList.add('sikau-home-active');
+        home.hidden=false;
+        homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
+      }
+    }
+  }else{
+    const active=doc.documentElement.classList.contains('sikau-home-active');
+    home.hidden=!active;
+    homeTab.classList.toggle('on',active);
+    if(active)homeTab.setAttribute('aria-current','page');
+    else homeTab.removeAttribute('aria-current');
+  }
+}
+
 /* Clear, bilingual controls and a calm first step for the protected AI Coach.
    Only presentation/accessible labels are changed; no scoring or lesson logic. */
 function enhanceBeginnerClarity(doc){
@@ -1338,6 +1523,7 @@ function personalizeStudentLesson(){
   const first=studentFirstName();
   enhanceBeginnerClarity(doc);
   enhanceFestivalCalendar(doc);
+  enhanceLearningHome(doc,first);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
   let walk=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
