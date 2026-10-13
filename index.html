@@ -1021,6 +1021,175 @@ function updateStudentWelcome(){
   if(ne)ne.textContent='नमस्ते, '+first+'! आज पनि अंग्रेजी सिकौं ✨';
 }
 
+
+/* Upcoming Nepal festivals (2083 BS): show only current/upcoming celebrations
+   in Kathmandu local time. Calendar items beyond the source's native five
+   are curated from the published 2083 BS government holiday schedule.
+   This is display-only: original course, festival learning logic and scores
+   remain untouched. Do not invent later-year festival dates. */
+const SIKAU_FESTIVAL_TARGET_COUNT=5;
+const SIKAU_FESTIVAL_SOURCE='https://moha.gov.np/en/page/government-and-public-holidays-in-2083';
+const SIKAU_NEXT_FESTIVALS=[
+  {name:'Maghe Sankranti / Maghi',ne:'माघे सङ्क्रान्ति / माघी',date:'2027-01-15',bs:'२०८३ माघ १',icon:'🌾',
+   words:[['Harvest','बाली भित्र्याउने समय'],['Celebration','उत्सव'],['Family','परिवार']]},
+  {name:'Sonam Lhosar',ne:'सोनाम ल्होछार · तामाङ समुदाय',date:'2027-02-07',bs:'२०८३ माघ २४',icon:'🎊',
+   words:[['New Year','नयाँ वर्ष'],['Tradition','परम्परा'],['Community','समुदाय']]},
+  {name:'Basanta Panchami / Saraswati Puja',ne:'वसन्त पञ्चमी / सरस्वती पूजा',date:'2027-02-11',bs:'२०८३ माघ २८',icon:'📖',
+   words:[['Knowledge','ज्ञान'],['Books','पुस्तकहरू'],['Learning','सिकाइ']]},
+  {name:'Maha Shivaratri',ne:'महाशिवरात्रि',date:'2027-03-06',bs:'२०८३ फागुन २२',icon:'🕉️',
+   words:[['Prayer','प्रार्थना'],['Temple','मन्दिर'],['Devotion','भक्ति']]},
+  {name:'Gyalpo Lhosar',ne:'ग्याल्पो ल्होछार',date:'2027-03-09',bs:'२०८३ फागुन २५',icon:'🏔️',
+   words:[['New Year','नयाँ वर्ष'],['Greetings','शुभकामना'],['Culture','संस्कृति']]},
+  {name:'Fagu Purnima / Holi',ne:'फागु पूर्णिमा / होली · पहाड २१, तराई २२ मार्च',date:'2027-03-22',bs:'२०८३ चैत ७–८',icon:'🎨',
+   words:[['Colours','रङहरू'],['Friendship','मित्रता'],['Festival','चाडपर्व']]},
+  {name:'Ghode Jatra',ne:'घोडेजात्रा · काठमाडौँ उपत्यका',date:'2027-04-06',bs:'२०८३ चैत २३',icon:'🐎',
+   words:[['Horse','घोडा'],['Parade','परेड'],['Valley','उपत्यका']]}
+];
+const SIKAU_FESTIVAL_MONTHS={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function sikauNepalDate(){
+  const parts=new Intl.DateTimeFormat('en-US',{
+    timeZone:'Asia/Kathmandu',year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(new Date());
+  const value=key=>parts.find(x=>x.type===key)?.value||'';
+  return value('year')+'-'+value('month')+'-'+value('day');
+}
+function sikauPublishedEnd(text){
+  // Use the final Gregorian date on a native festival row so multi-day
+  // Dashain and Tihar stay visible until their LAST day has passed.
+  const matches=Array.from(String(text).matchAll(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(20\d{2})\b/gi));
+  const dates=matches.map(match=>{
+    const month=SIKAU_FESTIVAL_MONTHS[match[2].slice(0,3).toLowerCase()];
+    const day=Number(match[1]),year=Number(match[3]);
+    return month&&day>=1&&day<=31?String(year)+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0'):null;
+  }).filter(Boolean);
+  return dates.length?dates[dates.length-1]:null;
+}
+function sikauFindFestivalRow(button){
+  if(button.closest('.sikau-future-festival'))return null;
+  let node=button.parentElement;
+  for(let depth=0;node&&depth<9;depth++,node=node.parentElement){
+    const content=(node.textContent||'').trim();
+    if(content.length>1300)break;
+    const actions=Array.from(node.querySelectorAll('button,a,[role="button"]'))
+      .filter(item=>/Learn festival English/i.test(item.textContent||''));
+    if(actions.length!==1 || !sikauPublishedEnd(content))continue;
+    return node;
+  }
+  return null;
+}
+function sikauNewFestivalRow(doc,festival){
+  const row=doc.createElement('div');
+  row.className='sikau-future-festival';
+  row.dataset.sikauFestivalDate=festival.date;
+  const icon=doc.createElement('span');
+  icon.className='sikau-festival-icon';icon.textContent=festival.icon;
+  icon.setAttribute('aria-hidden','true');
+  const body=doc.createElement('div');body.className='sikau-festival-copy';
+  const title=doc.createElement('strong');title.textContent=festival.name;
+  const nepali=doc.createElement('span');nepali.lang='ne';nepali.textContent=festival.ne;
+  const status=doc.createElement('small');status.textContent='Coming up · आउँदैछ · 📅 Published 2083 BS';
+  const learn=doc.createElement('button');learn.type='button';learn.className='sikau-festival-learn';
+  learn.textContent='📚 Learn festival English · चाडपर्वको अंग्रेजी सिकौं';
+  learn.setAttribute('aria-expanded','false');
+  const words=doc.createElement('div');
+  words.className='sikau-festival-words';words.hidden=true;
+  const label=doc.createElement('b');label.textContent='3 festival words · चाडपर्वका ३ शब्द';
+  const list=doc.createElement('ul');
+  festival.words.forEach(pair=>{
+    const item=doc.createElement('li');
+    const en=doc.createElement('strong');en.textContent=pair[0]+' — ';
+    const ne=doc.createElement('span');ne.lang='ne';ne.textContent=pair[1];
+    item.append(en,ne);list.append(item);
+  });
+  words.append(label,list);
+  learn.addEventListener('click',()=>{
+    words.hidden=!words.hidden;
+    learn.setAttribute('aria-expanded',String(!words.hidden));
+  });
+  body.append(title,nepali,status,learn,words);
+  const time=doc.createElement('time');time.dateTime=festival.date;
+  const parts=festival.date.split('-').map(Number);
+  time.textContent=parts[2]+' '+Object.keys(SIKAU_FESTIVAL_MONTHS)
+    .find(month=>SIKAU_FESTIVAL_MONTHS[month]===parts[1])
+    .replace(/^./,x=>x.toUpperCase())+' '+parts[0];
+  const bs=doc.createElement('small');bs.textContent=festival.bs;
+  const datebox=doc.createElement('div');datebox.className='sikau-festival-date';
+  datebox.append(time,bs);
+  row.append(icon,body,datebox);
+  return row;
+}
+function enhanceFestivalCalendar(doc){
+  if(!doc?.body)return;
+  let today;
+  try{today=sikauNepalDate();}catch{return;}
+  // Only touch the published festival list, not dates elsewhere in lessons.
+  const actions=Array.from(doc.querySelectorAll('button,a,[role="button"]'))
+    .filter(x=>/Learn festival English/i.test(x.textContent||'')&&!x.closest('.sikau-future-festival'));
+  const found=[];
+  for(const button of actions){
+    const row=sikauFindFestivalRow(button);
+    if(!row||found.some(x=>x.row===row))continue;
+    const end=sikauPublishedEnd(row.textContent||'');
+    if(end)found.push({row,end});
+  }
+  let slot=doc.getElementById('sikauFestivalRolloverSlot');
+  if(!found.length&&!slot)return;
+  if(found.length&&!slot){
+    const last=found[found.length-1].row;
+    if(!last.parentElement)return;
+    slot=doc.createElement('div');
+    slot.id='sikauFestivalRolloverSlot';
+    last.insertAdjacentElement('afterend',slot);
+  }
+  if(!slot)return;
+  if(!doc.getElementById('sikauFestivalRolloverStyle')&&doc.head){
+    const style=doc.createElement('style');style.id='sikauFestivalRolloverStyle';
+    style.textContent=[
+      '#sikauFestivalRolloverSlot{display:contents}',
+      '.sikau-future-festival{display:grid;grid-template-columns:60px minmax(0,1fr) auto;align-items:center;gap:16px;padding:17px 1px;border-bottom:1px dashed #eadbcb;font:15px/1.4 system-ui,sans-serif;color:#31283d}',
+      '.sikau-festival-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:16px;background:#ffcb73;font-size:26px}',
+      '.sikau-festival-copy{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px}',
+      '.sikau-festival-copy>strong{font-size:18px;font-weight:900}',
+      '.sikau-festival-copy>span,.sikau-festival-copy>small{color:#826b7d;font-size:13px}',
+      '.sikau-festival-learn{margin-top:7px;max-width:100%;padding:9px 12px;border:1px solid #f2d9d2;border-radius:12px;background:#fff7f0;color:#b52154;font-weight:800;cursor:pointer;white-space:normal;text-align:left}',
+      '.sikau-festival-learn:focus-visible{outline:3px solid #265bcc;outline-offset:3px}',
+      '.sikau-festival-date{justify-self:end;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:9px 12px;border-radius:999px;background:#ffe0d2;color:#cf1850;font-size:13px;font-weight:900}',
+      '.sikau-festival-date small{font-size:11px;color:#8b6470}',
+      '.sikau-festival-words{padding:11px 13px;margin-top:5px;border-radius:12px;border:1px solid #e8d2e2;background:#fff;max-width:100%}',
+      '.sikau-festival-words[hidden]{display:none!important}',
+      '.sikau-festival-words ul{padding-left:19px;margin:7px 0 0}',
+      '.sikau-festival-source{display:block;font-size:11px;color:#776e7c;margin:10px 0 0}',
+      '@media(max-width:600px){.sikau-future-festival{grid-template-columns:46px minmax(0,1fr);gap:10px}.sikau-festival-icon{width:43px;height:43px;font-size:21px}.sikau-festival-copy>strong{font-size:16px}.sikau-festival-date{grid-column:2;justify-self:start;font-size:12px;padding:6px 10px}}'
+    ].join('\n');
+    doc.head.appendChild(style);
+  }
+  if(found.length){
+    const sourceEnd=found.map(x=>x.end).sort().at(-1);
+    if(!slot.dataset.sikauNativeEnd || sourceEnd>slot.dataset.sikauNativeEnd)
+      slot.dataset.sikauNativeEnd=sourceEnd;
+  }
+  // Remove a celebration ONLY after its final Nepal-local date has elapsed.
+  const live=found.filter(x=>x.end>=today);
+  found.filter(x=>x.end<today).forEach(x=>x.row.remove());
+  const latestNative=slot.dataset.sikauNativeEnd||'';
+  // The source's existing published entries retain their own interactive buttons.
+  // Supplement with the NEXT published festivals after the native source horizon.
+  const newEntries=SIKAU_NEXT_FESTIVALS
+    .filter(x=>x.date>=today&&x.date>latestNative)
+    .slice(0,Math.max(0,SIKAU_FESTIVAL_TARGET_COUNT-live.length));
+  const signature=today+'|'+latestNative+'|'+live.length+'|'+newEntries.map(x=>x.date).join(',');
+  if(slot.dataset.sikauSignature===signature)return;
+  slot.dataset.sikauSignature=signature;
+  slot.replaceChildren(...newEntries.map(event=>sikauNewFestivalRow(doc,event)));
+  if(newEntries.length){
+    const link=doc.createElement('a');
+    link.className='sikau-festival-source';
+    link.textContent='📅 Additional published 2083 BS dates · आधिकारिक बिदा सूची';
+    link.href=SIKAU_FESTIVAL_SOURCE;link.target='_blank';link.rel='noopener noreferrer';
+    slot.appendChild(link);
+  }
+}
+
 /* Clear, bilingual controls and a calm first step for the protected AI Coach.
    Only presentation/accessible labels are changed; no scoring or lesson logic. */
 function enhanceBeginnerClarity(doc){
@@ -1170,6 +1339,7 @@ function personalizeStudentLesson(){
   if(!doc?.body)return;
   const first=studentFirstName();
   enhanceBeginnerClarity(doc);
+  enhanceFestivalCalendar(doc);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
   let walk=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
@@ -1236,6 +1406,8 @@ function personalizeStudentLesson(){
   }
 }
 $('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
+// Keep the visible festival schedule current across Nepal midnight, even without navigation.
+setInterval(()=>{if(openedAccess&&user)personalizeStudentLesson();},15*60*1000);
 
 /* The extra game script loads inside srcdoc after the original course scripts.
    Show an account-safe status without touching private lessons or student XP. */
