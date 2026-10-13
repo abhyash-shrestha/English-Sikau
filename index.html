@@ -1683,6 +1683,28 @@ function disconnectStudentLessonObserver(){
   if(studentLessonObserver){studentLessonObserver.disconnect();studentLessonObserver=null;}
   studentLessonDocument=null;studentLessonFrameScheduled=false;
 }
+/* Simple, consistent hero greeting for every authenticated learner.
+   Keep only the personalized Namaste heading; no time-of-day subtitle. */
+function simplifyStudentHeroGreeting(doc,first){
+  if(!doc?.body)return;
+  const header=doc.querySelector('.app-header');
+  if(!header)return;
+  const heading=header.querySelector('.greeting .namaste');
+  const subtitle=header.querySelector('.greeting .sub');
+  if(heading){
+    const message='🇳🇵 नमस्ते, '+first+' 🙏';
+    if(heading.textContent!==message)heading.textContent=message;
+    heading.lang='ne';
+  }
+  if(subtitle && !subtitle.hidden)subtitle.hidden=true;
+  if(doc.head&&!doc.getElementById('sikauSimpleHeroGreeting')){
+    const style=doc.createElement('style');
+    style.id='sikauSimpleHeroGreeting';
+    style.textContent='.app-header .greeting .sub{display:none!important}.app-header .greeting .namaste{margin-bottom:0!important;overflow-wrap:break-word}';
+    doc.head.appendChild(style);
+  }
+}
+
 function personalizeStudentLesson(){
   if(!openedAccess||!user)return;
   updateStudentWelcome();
@@ -1693,10 +1715,11 @@ function personalizeStudentLesson(){
   enhanceBeginnerClarity(doc);
   enhanceFestivalCalendar(doc);
   enhanceLearningHome(doc,first);
+  simplifyStudentHeroGreeting(doc,first);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
   let walk=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
-  let node,scanned=0,heroFound=false,subFound=false,badgeFound=false;
+  let node,scanned=0,badgeFound=false;
   while((node=walk.nextNode())&&scanned++<3300){
     const parent=node.parentElement;
     if(!parent||/^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION)$/i.test(parent.tagName))continue;
@@ -1707,16 +1730,7 @@ function personalizeStudentLesson(){
       parent.classList.add('sikau-personal-classroom');
       badgeFound=true;continue;
     }
-    if(!heroFound&&trim.length<60&&/नमस्ते\s*[!！।]/u.test(trim)&&!trim.includes('नमस्ते,')){
-      node.nodeValue=value.replace(/नमस्ते\s*[!！।]/u,'नमस्ते, '+first+'!');
-      parent.classList.add('sikau-personal-greeting');
-      heroFound=true;continue;
-    }
-    if(!subFound&&trim.length<90&&/शुभ\s*(?:प्रभात|बिहान|दिउँसो|साँझ|रात्री)/u.test(trim)&&!trim.includes(first)){
-      node.nodeValue=value.replace(/(शुभ\s*(?:प्रभात|बिहान|दिउँसो|साँझ|रात्री))\s*[!！।]?/u,'$1, '+first+'!');
-      subFound=true;
-    }
-    if(heroFound&&subFound&&badgeFound)break;
+    if(badgeFound)break;
   }
 
   // Remove outdated sign-in and free-access wording only in UI copy.
