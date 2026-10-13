@@ -1790,13 +1790,35 @@ async function openFile(token='',isTrial=false){
     // Only the backend decides whether this verified account may view lessons.
     await fnCall(CFG.trialPass,'progressGet');
     if(seq!==readNumber||!user||user.$id!==accountId)return;
-    // Fail closed: do not reveal an empty lesson window when the download fails.
-    const response=await fetch(getFileUrl(token),{
+    // Appwrite's Web SDK authenticates account.get() using either normal
+    // cookies or its X-Fallback-Cookies session header. Safari/iOS may block
+    // third-party cookies, so a raw fetch lacking that SDK fallback falsely
+    // looks unauthenticated (sometimes an HTTP 404 for private Storage files).
+    // Mirror ONLY the Appwrite SDK's existing fallback session to our fixed,
+    // first-party-configured Appwrite endpoint. Never log or expose its value.
+    const fileUrl=getFileUrl(token);
+    if(new URL(fileUrl).origin!==new URL(CFG.endpoint).origin)
+      throw Error('Unexpected lesson server origin. Access remains locked.');
+    const downloadHeaders={'X-Appwrite-Project':CFG.project};
+    try{
+      const fallback=window.localStorage.getItem('cookieFallback');
+      if(typeof fallback==='string'&&fallback.length>0&&fallback.length<=8192)
+        downloadHeaders['X-Fallback-Cookies']=fallback;
+    }catch(_){/* Browser storage may be restricted; normal cookies still work. */}
+    const response=await fetch(fileUrl,{
       method:'GET',credentials:'include',cache:'no-store',
-      headers:{'X-Appwrite-Project':CFG.project}
+      headers:downloadHeaders
     });
-    if(!response.ok)
-      throw Error('Private lesson download failed (HTTP '+response.status+'). Access remains locked.');
+    if(!response.ok){
+      let errorType='';
+      try{
+        const details=await response.clone().json();
+        if(typeof details?.type==='string'&&/^[a-z0-9_]{1,80}$/i.test(details.type))
+          errorType=' · '+details.type;
+      }catch(_){}
+      throw Error('Private lesson download failed (HTTP '+response.status+errorType+
+        '). Access remains locked. · सुरक्षित पाठ डाउनलोड भएन।');
+    }
     const html=await response.text();
     if(html.length>4000000)throw Error('Private lesson file is too large.');
     if(!/^\s*<!doctype html/i.test(html.slice(0,200))&&
