@@ -1015,7 +1015,7 @@ html[data-sikau-theme="dark"] #protected #cloudStoryRefresh{color:#ebddf6!import
    This is presentation only and never affects session or payment validation. */
 const SIKAU_THEME_STORAGE='english-sikau-theme-v1';
 let sikauTheme=document.documentElement.getAttribute('data-sikau-theme')==='dark'?'dark':'light';
-const sikauLessonDarkCSS=String.raw\`
+const sikauLessonDarkCSS=String.raw`
 /* Dark palette for protected English Sikau lesson HTML (srcdoc iframe). */
 html[data-sikau-theme="dark"]{
  color-scheme:dark;
@@ -1090,7 +1090,7 @@ html[data-sikau-theme="dark"] :is(.tag,.pill,.level-tag){color:#fff1b8!important
 @media(max-width:767px){
  html[data-sikau-theme="dark"] .nav{background:#161c2c!important;box-shadow:0 -4px 18px #0508137a!important}
 }
-\`;
+`;
 function sikauThemeButtons(){
  const dark=sikauTheme==='dark';
  for(const id of ['sikauThemeAuth','sikauThemeProtected']){
