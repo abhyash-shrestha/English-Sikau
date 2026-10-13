@@ -936,6 +936,7 @@ html[data-sikau-theme="dark"] .tag{background:#443b2b!important;color:#ffe5a4!im
 html[data-sikau-theme="dark"] :is(.footer-credit,.credit-line,.credit-nepali){color:#dbd0df!important}
 html[data-sikau-theme="dark"] #protected{background:#101522}
 html[data-sikau-theme="dark"] #protected #bar.student-topbar{background:linear-gradient(110deg,#101323,#292044,#121e3c)!important}
+html[data-sikau-theme="dark"] #sikauThemeProtected{background:#2b304a!important;color:#f9f0fc!important;border-color:#616b88!important}
 html[data-sikau-theme="dark"] #protected #cloudStoryProgress{background:#1c263b!important;border-color:#424d6c!important}
 html[data-sikau-theme="dark"] #protected .cloud-story-info :is(strong,small),
 html[data-sikau-theme="dark"] #protected #cloudStoryValues{color:#f0e9fa!important}
@@ -1090,6 +1091,91 @@ html[data-sikau-theme="dark"] :is(.tag,.pill,.level-tag){color:#fff1b8!important
 @media(max-width:767px){
  html[data-sikau-theme="dark"] .nav{background:#161c2c!important;box-shadow:0 -4px 18px #0508137a!important}
 }
+
+/* Consistent dark-surface overrides, verified against the protected app's
+   actual sidebar (#mobileModes) and Writing Coach (#hw) markup. */
+html[data-sikau-theme="dark"]{
+  --bg:#111827;--bg-2:#1b2536;--card:#222c40;--card-2:#293348;
+  --ink:#f7f4fc;--ink-2:#e8e0f2;--mut:#cbd0df;--mut-2:#b4bdd1;
+  --line:#4b5671;--crimson:#ff6297;--crimson-dark:#ae2862;
+  --crimson-light:#fa85ad;--deep-blue-light:#89b5ff
+}
+html[data-sikau-theme="dark"] body{background:#111827!important;color:#f7f4fc!important}
+html[data-sikau-theme="dark"] #mobileModes.nav{
+  background:#171e30!important;border-color:#39465e!important;
+  color:#f3ecf8!important;box-shadow:5px 0 25px #02040c60!important
+}
+html[data-sikau-theme="dark"] #mobileModes :is(.nav-brand,.nav-note){
+  background:transparent!important;color:#c9cfe0!important;border-color:#36435d!important
+}
+html[data-sikau-theme="dark"] #mobileModes .nav-brand :is(b,small){color:#f3edf8!important}
+html[data-sikau-theme="dark"] #mobileModes button[data-t],
+html[data-sikau-theme="dark"] #mobileModes button.nav-more{
+  color:#e1deeb!important;opacity:1!important;text-shadow:none!important
+}
+html[data-sikau-theme="dark"] #mobileModes button[data-t].on,
+html[data-sikau-theme="dark"] #mobileModes button.sikau-home-nav.on{
+  background:#392d50!important;color:#ffd2e4!important;border-color:#ee649b!important;
+  box-shadow:inset 3px 0 #ff77a9!important
+}
+html[data-sikau-theme="dark"] #mobileModes button i,
+html[data-sikau-theme="dark"] #mobileModes button .sikau-home-nav-label strong{
+  opacity:1!important;color:inherit!important
+}
+html[data-sikau-theme="dark"] #mobileModes button .sikau-home-nav-label small{color:#d3c8e0!important}
+html[data-sikau-theme="dark"] #hw .topic-dice,
+html[data-sikau-theme="dark"] #hw #topicCard{
+  background:linear-gradient(135deg,#30243b,#3c2945)!important;
+  border:1.5px solid #976087!important;color:#f8f2fd!important;
+  box-shadow:0 8px 24px #03071335!important
+}
+html[data-sikau-theme="dark"] #hw #topicCard .topic-ne{
+  color:#fff6fc!important;opacity:1!important;text-shadow:none!important
+}
+html[data-sikau-theme="dark"] #hw #topicCard .topic-en{
+  color:#e9dce9!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] #hw #topicCard .topic-hint{
+  background:#56304a!important;color:#ffd3e4!important
+}
+html[data-sikau-theme="dark"] #hw #topicCard .dice-btn{
+  background:#433253!important;color:#f9e7f3!important;border:1px solid #95729c!important
+}
+html[data-sikau-theme="dark"] #hw #writeResult :is(.topic-dice,.card),
+html[data-sikau-theme="dark"] :is(.card,.coach-ask,.culture-lab,.course-hero,.game-shell,.reader-card,.reading-card){
+  background:#222b3e!important;border-color:#495670!important;color:#f4edfa!important
+}
+html[data-sikau-theme="dark"] #hw .card.color-purple{
+  background:#222b3e!important;border-color:#55517e!important
+}
+html[data-sikau-theme="dark"] #hw :is(.write-mode-switch,.seg){background:#30394f!important}
+html[data-sikau-theme="dark"] #hw .write-mode-switch button:not(.on){color:#c9c8d9!important}
+html[data-sikau-theme="dark"] #hw .write-mode-switch button.on{
+  background:#453048!important;color:#ffd6e6!important;border-color:#dd639a!important
+}
+html[data-sikau-theme="dark"] :is(input,textarea,select,.writeArea){
+  background:#202a3c!important;color:#f9f4fc!important;border-color:#68718e!important
+}
+html[data-sikau-theme="dark"] :is(input,textarea)::placeholder{
+  color:#c8c2d5!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] :is(.page-title,.content h1,.content h2,.content h3,.content h4){
+  color:#f8f1fc!important
+}
+html[data-sikau-theme="dark"] :is(.page-sub,.char-count,.muted){
+  color:#cbd0df!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sikau-home-intro,
+html[data-sikau-theme="dark"] #sikauHomeFestivalMount .sikau-festival-preview,
+html[data-sikau-theme="dark"] #sikauCoachQuickStart,
+html[data-sikau-theme="dark"] .sikau-translation-hint{
+  background:#252d41!important;border-color:#535b72!important;color:#f2edf9!important
+}
+@media(max-width:767px){
+  html[data-sikau-theme="dark"] #mobileModes.nav{
+    box-shadow:0 -5px 18px #02040c80!important
+  }
+}
 `;
 function sikauThemeButtons(){
  const dark=sikauTheme==='dark';
@@ -1107,6 +1193,9 @@ function sikauApplyLessonTheme(doc){
  if(!doc?.head||!doc.documentElement)return;
  const html=doc.documentElement;
  html.setAttribute('data-sikau-theme',sikauTheme);
+ // The original private lesson app uses [data-theme], whereas the secure
+ // wrapper uses [data-sikau-theme]. Keep both in sync in this document.
+ html.setAttribute('data-theme',sikauTheme);
  html.style.colorScheme=sikauTheme;
  let style=doc.getElementById('sikauUnifiedDarkStyles');
  if(!style){
@@ -1149,10 +1238,15 @@ function sikauApplyLessonTheme(doc){
 function sikauSetTheme(theme){
  sikauTheme=theme==='dark'?'dark':'light';
  document.documentElement.setAttribute('data-sikau-theme',sikauTheme);
+ document.documentElement.setAttribute('data-theme',sikauTheme);
  document.documentElement.style.colorScheme=sikauTheme;
  const meta=document.querySelector('meta[name="theme-color"]');
  if(meta)meta.content=sikauTheme==='dark'?'#111626':'#b50c34';
- try{localStorage.setItem(SIKAU_THEME_STORAGE,sikauTheme)}catch(_){}
+ try{
+   localStorage.setItem(SIKAU_THEME_STORAGE,sikauTheme);
+   // Private App's own theme loader reads this legacy preference on start.
+   localStorage.setItem('sikau_theme',sikauTheme);
+ }catch(_){}
  sikauThemeButtons();
  try{sikauApplyLessonTheme(document.getElementById('lessonFrame')?.contentDocument)}catch(_){}
 }
