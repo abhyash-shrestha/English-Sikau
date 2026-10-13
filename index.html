@@ -1094,6 +1094,18 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script>
 'use strict';
 
+// Keep recovery credentials only in memory, before loading any external script.
+let recoveryLink=null;
+{
+ const recoveryURL=new URL(location.href);
+ if(recoveryURL.searchParams.has('reset')){
+  recoveryLink={userId:recoveryURL.searchParams.get('userId'),secret:recoveryURL.searchParams.get('secret')};
+  recoveryURL.searchParams.delete('userId');
+  recoveryURL.searchParams.delete('secret');
+  history.replaceState(history.state,'',recoveryURL.pathname+recoveryURL.search+recoveryURL.hash);
+ }
+}
+
 /* One accessible light/dark preference across account and protected lessons.
    This is presentation only and never affects session or payment validation. */
 const SIKAU_THEME_STORAGE='english-sikau-theme-v1';
@@ -1369,7 +1381,7 @@ case 'emailcode':out=form('Sign in with email code',makeInput('email','Email · 
 case 'verify':out=form('Verify your email · इमेल प्रमाणित गर्नुहोस्',`<p class="muted">Enter the six-digit code sent to ${escapeHTML(pending?.email||'your email')}.</p>`+makeInput('otp','6-digit code · ६-अङ्कको कोड','text','one-time-code'),'Verify and continue')+navButton('emailcode','Request another code');break;
 case 'forgot':out=form('Reset password · पासवर्ड परिवर्तन',makeInput('email','Account email · इमेल','email','email'),'Send recovery link')+navButton('signin','← Sign in');break;
 case 'reset':out=form('Choose a new password',pwd('password','New password','new-password')+pwd('confirm','Confirm new password','new-password'),'Reset password');break;
-case 'idlogin':out=form('Sign in with ID · ID बाट लगइन',makeInput('guestId','User ID · प्रयोगकर्ता ID')+pwd('guestPass','Password · पासवर्ड'),'Continue')+navButton('signin','← Sign in with email');break;
+case 'idlogin':mode='signin';show();showMsg('Sign in with your own verified Appwrite account.');return;
 case 'demo':out='<h2>English Sikau sample · नमुना सिकाइ</h2><p class="muted">Free practice examples · निःशुल्क अभ्यास</p><div class="demo"><strong>Today’s phrases</strong><p>How are you? — तपाईंलाई कस्तो छ?</p><p>I want to learn English. — म अंग्रेजी सिक्न चाहन्छु।</p><p>Please speak slowly. — कृपया बिस्तारै बोल्नुहोस्।</p></div><button type="button" class="secondary" data-mode="welcome">← Exit sample</button>';break;
 case 'payment':{
   // A confirmed paid account must never see the payment sales page, even
@@ -1521,7 +1533,7 @@ $('screen').querySelectorAll('[data-show]').forEach(x=>x.addEventListener('click
 $('activeForm')?.addEventListener('submit',submit);$('paymentForm')?.addEventListener('submit',sendClaim);
 }
 function go(next){mode=next;showMsg('Choose an option to continue.');show()}
-async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Could not load the Appwrite SDK.');const client=new sdk.Client().setEndpoint(CFG.endpoint).setProject(CFG.project);account=new sdk.Account(client);functions=new sdk.Functions(client);ID=sdk.ID;}
+async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0/dist/iife/sdk.js','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.integrity='sha384-phNZum4lHcy1EBX3U1LcBErZWMZklS/yJ2NzJIk5VOJWDDYwavQurpyRdrH2uHZj';s.crossOrigin='anonymous';s.referrerPolicy='no-referrer';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Could not load the Appwrite SDK.');const client=new sdk.Client().setEndpoint(CFG.endpoint).setProject(CFG.project);account=new sdk.Account(client);functions=new sdk.Functions(client);ID=sdk.ID;}
 
 /* Personalized student dashboard. Names come ONLY from the signed-in Appwrite
    account and are inserted as text, never as HTML or authorization data. */
@@ -2715,9 +2727,8 @@ else if(mode==='signup'){if($('password').value!==$('confirm').value)throw Error
 else if(mode==='emailcode'){const email=val('email').toLowerCase();const token=await account.createEmailToken(ID.unique(),email);savePending({email,userId:token.userId});mode='verify';show();showMsg('Enter the six-digit code from your email.','ok')}
 else if(mode==='verify'){if(!pending)throw Error('Request a new email code.');const otp=val('otp');if(!/^\d{6}$/.test(otp))throw Error('Enter all six digits');await account.createSession(pending.userId,otp);pending=null;sessionStorage.removeItem('sikau-v2-pending-otp');await session()}
 else if(mode==='forgot'){await account.createRecovery(val('email'),location.origin+location.pathname+'?reset=1');showMsg('If eligible, your email will receive a password-reset link.','ok')}
-else if(mode==='reset'){const args=new URLSearchParams(location.search);if($('password').value!==$('confirm').value)throw Error('Passwords do not match');await account.updateRecovery(args.get('userId'),args.get('secret'),$('password').value);history.replaceState(null,'',location.pathname);mode='signin';show();showMsg('Password reset. Sign in with your new password.','ok')}
-else if(mode==='idlogin'){// A shared ID is NEVER proof of paid access. This login only displays public sample material.
- if(val('guestId')!=='Nepal'||$('guestPass').value!=='@HamroNepal')throw Error('Incorrect ID or password');mode='demo';show();showMsg('Free English sample opened.','ok')}
+else if(mode==='reset'){if(!recoveryLink?.userId||!recoveryLink?.secret)throw Error('Open the password-reset link from your email again.');if($('password').value!==$('confirm').value)throw Error('Passwords do not match');await account.updateRecovery(recoveryLink.userId,recoveryLink.secret,$('password').value);recoveryLink=null;history.replaceState(null,'',location.pathname);mode='signin';show();showMsg('Password reset. Sign in with your new password.','ok')}
+else if(mode==='idlogin'){mode='signin';show();showMsg('Sign in with your own verified Appwrite account.')}
 }catch(err){showMsg('Unable to continue: '+shortError(err),'error')}finally{busy=false}}
 async function sendClaim(e){e.preventDefault();if(!user||paid(user))return;const ref=$('reference')?.value.trim()||'';if(!/^[\p{L}\p{N}\-_\/ ]{5,80}$/u.test(ref)){showMsg('Enter a valid bank transaction reference (5–80 characters).','error');return}try{busy=true;const next={...(user.prefs||{})};next[CFG.pref]={reference:ref,bank:CFG.bank,amountNpr:CFG.amount,submittedAt:new Date().toISOString(),userId:user.$id};await account.updatePrefs(next);user=await account.get();mode='payment';show();showMsg('Your reference was submitted. The lessons are STILL locked until the owner checks the bank and approves this account.','ok')}catch(err){showMsg('Reference submission failed: '+shortError(err),'error')}finally{busy=false}}
 async function signOut(){killLessons();clearInterval(trialInterval);user=null;pending=null;trial=null;try{await account?.deleteSession('current')}catch(err){console.warn('Unable to delete the Appwrite session:',err);showMsg('Unable to confirm sign-out. Clear the session or retry before sharing this device.','error');return}mode='signin';show();showMsg('Signed out. Private content closed.','ok')}
