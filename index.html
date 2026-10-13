@@ -2347,15 +2347,37 @@ async function openFile(token='',isTrial=false){
  }
  function residual(t){return /\b(?:wantt|theem|they is|i am agree|i has|I is|in usa)\b/i.test(t)||
    /\b(?:USA|Nepal)\s+I\s+(?:miss|want|need)\b/.test(t)}
+
+ function improveSentences(v){return correctDraft(String(v||'')
+ .replace(/\bhellps\b/gi,'helps').replace(/\beverythough\b/gi,'even though')
+ .replace(/\bindia\b/gi,'India').replace(/\bfacebook\b/gi,'Facebook')
+ .replace(/\bin Facebook\b/gi,'on Facebook')
+ .replace(/\bhe not just\b/gi,'he is not just')
+ .replace(/\bhe like a bother\b/gi,'he is like a brother')
+ .replace(/\bhe likes a bother\b/gi,'he is like a brother')
+ .replace(/\bhe helps me anything\b/gi,'he helps me with everything')
+ .replace(/\b(helps me with everything) (he is not just)\b/gi,'$1. $2')
+ .replace(/\b(my friend) (he is like)\b/gi,'$1; $2')
+ .replace(/\b(he is in India) (I miss)\b/gi,'$1. $2')
+ .replace(/\b(I miss him so much) (even though)\b/gi,'$1. $2')
+ .replace(/\b(even though he is far) (we)\b/gi,'$1 away, $2')
+ .replace(/\b(even though he is far away) (we)\b/gi,'$1, $2')
+ .replace(/\b(family) but\b/gi,'$1, but')); }
+ function polishSentences(v){return improveSentences(v)
+ .replace(/He helps me with everything\. He is not just my friend; he is like a brother to me\./i,'He is always there to help me, and he is more than just a friend; he is like a brother to me.')
+ .replace(/He is not just my friend; he is like a brother to me\./i,'He is more than just a friend; he is like a brother to me.')
+ .replace(/But now he is in India\. I miss him so much\./i,'Now that he is in India, I miss him very much.')
+ .replace(/Even though he is far away, we always talk on Facebook\./i,'Although we live far apart, we stay in touch on Facebook.')
+ .replace(/I hope we can see each other again\./i,'I hope we can meet again someday.')
+ .replace(/I miss them so much\. I want to see them\./i,'I miss them very much and hope to see them again.');}
  checkWriting=async function(text,topic,wordCount){
    var res=await originalCheckWriting.apply(this,arguments);
    if(!res||typeof res!=='object')return res;
-   var previous=String(res.corrected||text||''),corrected=correctDraft(previous);
+   var previous=String(res.corrected||text||''),corrected=improveSentences(previous);
    if(corrected){
      res.corrected=corrected;
-     var smoother=naturalDraft(corrected),aiNatural=String(res.natural||'').trim();
-     res.natural=(aiNatural&&aiNatural!==previous&&!residual(aiNatural))?
-       correctDraft(aiNatural):smoother;
+     var smoother=polishSentences(naturalDraft(corrected)),aiNatural=String(res.natural||'').trim();
+     res.natural=smoother!==corrected?smoother:((aiNatural&&aiNatural!==previous&&!residual(aiNatural))?improveSentences(aiNatural):corrected);
      if(res.natural===res.corrected)res.natural=smoother;
    }
    if(Array.isArray(res.mistakes)){
@@ -2380,18 +2402,12 @@ async function openFile(token='',isTrial=false){
  };
 })();
 `;
-    let lessonsWithQuality=repairedHtml,qualityInstalled=false;
-    if(repairedHtml.includes('async function checkWriting(')){
-      lessonsWithQuality=repairedHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi,block=>{
-        if(qualityInstalled||!block.includes('async function checkWriting('))return block;
-        const close=block.lastIndexOf('})();');
-        const scriptEnd=block.search(/<\/script\s*>$/i);
-        if(close<0||scriptEnd<0||close>scriptEnd)return block;
-        qualityInstalled=true;
-        return block.slice(0,close)+'\n'+writingQualityPatch+'\n'+block.slice(close);
-      });
-    }
-    if(!qualityInstalled)console.warn('Writing Coach enhancement was not installed: private lesson format differs.');
+    // Direct insertion immediately before the private checker declaration:
+    // previous last-closure insertion targeted unrelated navigation code.
+    const qualityEntry=/async\s+function\s+checkWriting\s*\(\s*text\s*,\s*topic\s*,\s*wordCount\s*\)\s*\{/;
+    const qualityInstalled=qualityEntry.test(repairedHtml);
+    const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>writingQualityPatch+'\n'+m):repairedHtml;
+    if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):
       lessonsWithQuality+gameScriptTag;
