@@ -809,6 +809,25 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   #protected .cloud-story-info small{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){#protected #bar button#exit:hover{transform:none}}
+
+/* Beginner-friendly navigation: progress remains available, never a persistent banner. */
+#protected #cloudStoryProgress[hidden]{display:none!important}
+#protected #bar button#cloudStoryToggle{
+  min-height:44px;border:1px solid #ffffff70;background:#ffffff18;color:#fff;
+  padding:9px 13px;border-radius:13px;box-shadow:inset 0 1px #ffffff12;
+  font:850 12px/1.35 system-ui,sans-serif;cursor:pointer;white-space:nowrap
+}
+#protected #bar button#cloudStoryToggle:hover,
+#protected #bar button#cloudStoryToggle[aria-expanded="true"]{background:#fff;color:#60224e}
+#protected #bar button#cloudStoryToggle:focus-visible{outline:3px solid #ffdc8e;outline-offset:3px}
+@media(max-width:990px){
+  #protected #bar.student-topbar{flex-wrap:wrap}
+  #protected .student-topbar-welcome{flex:1 1 270px}
+}
+@media(max-width:650px){
+  #protected #bar button#cloudStoryToggle{order:3;min-height:40px;flex:1 1 auto}
+  #protected .student-topbar-welcome{order:4;flex:1 1 100%}
+}
 </style>
 </head>
 <body>
@@ -848,10 +867,11 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back!</strong><span id="studentTopNepali" lang="ne">नमस्ते! फेरि स्वागत छ।</span></div>
     <span id="sessionNote" class="student-access-tag"></span>
   </div>
+  <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
   <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
 </div>
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
-<section id="cloudStoryProgress" class="cloud-story-bar" aria-label="Appwrite verified story progress"><div class="cloud-story-info"><strong>☁️ Your verified learning progress · तपाईंको सुरक्षित प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Separate from original app XP and mastery; totals are not added. · मूल प्रगतिसँग जोडिएको छैन।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
+<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script>
 'use strict';
@@ -1000,6 +1020,114 @@ function updateStudentWelcome(){
   if(en)en.textContent='Welcome back, '+first+'! 👋';
   if(ne)ne.textContent='नमस्ते, '+first+'! आज पनि अंग्रेजी सिकौं ✨';
 }
+
+/* Clear, bilingual controls and a calm first step for the protected AI Coach.
+   Only presentation/accessible labels are changed; no scoring or lesson logic. */
+function enhanceBeginnerClarity(doc){
+  if(!doc || !doc.body)return;
+  if(doc.head && !doc.getElementById('sikauBeginnerClarityStyle')){
+    const style=doc.createElement('style');
+    style.id='sikauBeginnerClarityStyle';
+    style.textContent=[
+      'button.sikau-beginner-action,[role="button"].sikau-beginner-action{display:inline-flex!important;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 7px;min-height:46px!important;min-width:48px;padding:9px 11px!important;border:1.5px solid #d5a4b9!important;border-radius:13px!important;background:#fff6f3!important;color:#8e2350!important;font-weight:850!important;line-height:1.2!important;box-shadow:0 3px 10px #75304b12;cursor:pointer}',
+      '.sikau-beginner-action::after{content:attr(data-sikau-cue);display:inline-block;font-size:11px;font-weight:850;max-width:135px;white-space:normal;line-height:1.25;text-align:center}',
+      '.sikau-beginner-action:hover:not(:disabled){background:#ffe9ed!important;border-color:#c13c74!important}',
+      '.sikau-beginner-action:focus-visible,#sikauCoachQuickStart button:focus-visible{outline:3px solid #2863c3!important;outline-offset:3px}',
+      '#sikauCoachQuickStart{background:linear-gradient(120deg,#fff9f0,#fff2f8);border:1.5px solid #ebcbd9;border-radius:18px;margin:14px 0 18px;padding:16px 18px;box-shadow:0 5px 18px #4b2d4a0b}',
+      '#sikauCoachQuickStart strong{display:block;color:#673153;font-size:clamp(17px,2vw,20px);line-height:1.35}',
+      '#sikauCoachQuickStart p{color:#624f60;font-size:13px;line-height:1.55;margin:7px 0 12px}',
+      '#sikauCoachQuickStart .sikau-coach-actions{display:flex;flex-wrap:wrap;gap:9px}',
+      '#sikauCoachQuickStart button{border-radius:12px;padding:11px 14px;min-height:45px;font-size:13px;font-weight:850;cursor:pointer}',
+      '#sikauCoachQuickStart .sikau-coach-start{border:0;color:white;background:#c41852}',
+      '#sikauCoachQuickStart .sikau-coach-more-btn{border:1px solid #dcb5c8;color:#823458;background:#fff}',
+      'body:not(.sikau-coach-show-more) [data-sikau-coach-extra="true"]{display:none!important}',
+      '.coach-top{padding:clamp(18px,2.3vw,27px)!important}',
+      '.coach-top h2{font-size:clamp(24px,2.9vw,33px)!important}',
+      '@media(max-width:599px){.sikau-beginner-action::after{max-width:112px;font-size:10px}#sikauCoachQuickStart{padding:14px}#sikauCoachQuickStart button{flex:1 1 160px}}',
+      '@media(prefers-reduced-motion:reduce){#sikauCoachQuickStart *{transition:none!important}}'
+    ].join('\n');
+    doc.head.appendChild(style);
+  }
+  const buttons=doc.querySelectorAll('button,[role="button"]');
+  for(const button of buttons){
+    if(button.closest('#sikauCoachQuickStart')||button.hasAttribute('data-sikau-cue'))continue;
+    const visibleText=(button.textContent||'').trim();
+    const meta=((button.getAttribute('aria-label')||'')+' '+(button.getAttribute('title')||'')).toLowerCase();
+    const plain=visibleText.replace(/[\s\p{P}\p{S}\p{N}]/gu,'').trim();
+    const alreadyExplained=plain.length>=7;
+    let label='';
+    if(visibleText.includes('🎲') && !alreadyExplained)label='Change topic · विषय बदल्नुहोस्';
+    else if(visibleText.includes('🇳🇵') && !alreadyExplained)label='See Nepali · नेपाली अर्थ';
+    else if(/[⬆⬇↑↓]/u.test(visibleText) && !alreadyExplained){
+      const up=/[⬆↑]/u.test(visibleText),down=/[⬇↓]/u.test(visibleText);
+      label=up&&down?'Change level · स्तर बदल्नुहोस्':
+        up?'Level up · स्तर बढाउनुहोस्':'Level down · स्तर घटाउनुहोस्';
+    }
+    else if(!alreadyExplained && /(?:shuffle|random|next topic)/i.test(meta))label='Change topic · विषय बदल्नुहोस्';
+    else if(!alreadyExplained && /(?:nepali translation|show nepali|nepali meaning)/i.test(meta))label='See Nepali · नेपाली अर्थ';
+    if(!label)continue;
+    button.classList.add('sikau-beginner-action');
+    button.setAttribute('data-sikau-cue',label);
+    if(!button.getAttribute('title'))button.setAttribute('title',label);
+    if(!button.getAttribute('aria-label') || !alreadyExplained)button.setAttribute('aria-label',label);
+  }
+  const hero=doc.querySelector('.coach-top');
+  if(!hero || !hero.parentElement)return;
+  let hiddenCount=0;
+  const markExtra=function(el){
+    if(el && !el.hasAttribute('data-sikau-coach-extra')){
+      el.setAttribute('data-sikau-coach-extra','true');
+    }
+    if(el)hiddenCount++;
+  };
+  doc.querySelectorAll('.coach-top .coach-metrics').forEach(markExtra);
+  doc.querySelectorAll('.coach-plan').forEach(function(plan){
+    if(!plan.querySelector('.coach-ask,textarea,input'))markExtra(plan);
+  });
+  for(const selector of ['.coach-mode-card','.coach-scene']){
+    const list=Array.from(doc.querySelectorAll(selector));
+    if(list.length>3)list.slice(2).forEach(markExtra);
+  }
+  if(hero.parentElement.querySelector('#sikauCoachQuickStart'))return;
+  const guide=doc.createElement('div');
+  guide.id='sikauCoachQuickStart';
+  guide.setAttribute('role','region');
+  guide.setAttribute('aria-label','Start using the English Coach');
+  const heading=doc.createElement('strong');
+  heading.textContent='👋 Start with one sentence · एउटा वाक्यबाट सुरु गर्नुहोस्';
+  const note=doc.createElement('p');
+  note.textContent='Write or say a simple English sentence below. Coach will guide you step by step. · तल अंग्रेजीमा एउटा सानो वाक्य लेख्नुहोस् वा बोल्नुहोस्।';
+  const actions=doc.createElement('div');
+  actions.className='sikau-coach-actions';
+  const start=doc.createElement('button');
+  start.type='button';start.className='sikau-coach-start';
+  start.textContent='✍️ Start practicing · अभ्यास सुरु';
+  start.addEventListener('click',function(){
+    const target=doc.querySelector('.coach-ask')||doc.querySelector('.coach-mode-card,.coach-scene');
+    if(!target)return;
+    target.scrollIntoView({behavior:'smooth',block:'center'});
+    const input=target.querySelector('textarea,input,[contenteditable="true"],button');
+    if(input)input.focus({preventScroll:true});
+  });
+  if(doc.querySelector('.coach-ask,.coach-mode-card,.coach-scene'))actions.appendChild(start);
+  if(hiddenCount){
+    const more=doc.createElement('button');
+    more.type='button';more.className='sikau-coach-more-btn';
+    const update=function(){
+      const open=doc.body.classList.contains('sikau-coach-show-more');
+      more.setAttribute('aria-expanded',String(open));
+      more.textContent=open?'− Fewer tools · सजिलो दृश्य':'＋ More coach tools · थप अभ्यास';
+    };
+    more.addEventListener('click',function(){
+      doc.body.classList.toggle('sikau-coach-show-more');
+      update();
+    });
+    update();actions.appendChild(more);
+  }
+  guide.appendChild(heading);guide.appendChild(note);guide.appendChild(actions);
+  hero.insertAdjacentElement('afterend',guide);
+}
+
 let studentLessonObserver=null,studentLessonDocument=null,studentLessonFrameScheduled=false;
 function disconnectStudentLessonObserver(){
   if(studentLessonObserver){studentLessonObserver.disconnect();studentLessonObserver=null;}
@@ -1012,6 +1140,7 @@ function personalizeStudentLesson(){
   try{doc=$('lessonFrame').contentDocument;}catch{return;}
   if(!doc?.body)return;
   const first=studentFirstName();
+  enhanceBeginnerClarity(doc);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
   let walk=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
@@ -1094,6 +1223,11 @@ function killLessons(){
   disconnectStudentLessonObserver();
   readNumber++;
   openedAccess=null;
+  if($('cloudStoryProgress'))$('cloudStoryProgress').hidden=true;
+  if($('cloudStoryToggle')){
+    $('cloudStoryToggle').setAttribute('aria-expanded','false');
+    $('cloudStoryToggle').textContent='⭐ My progress · मेरो प्रगति';
+  }
   if($('cloudStoryValues'))$('cloudStoryValues').textContent='Sign in to view verified progress.';
   if($('cloudStoryRefresh'))$('cloudStoryRefresh').disabled=false;
   clearInterval(trialInterval);trialInterval=null;
@@ -1269,6 +1403,14 @@ async function refreshCloudStoryProgress(){
   }finally{cloudLoading=false;button.disabled=false}
 }
 $('cloudStoryRefresh').addEventListener('click',()=>{void refreshCloudStoryProgress()});
+$('cloudStoryToggle').addEventListener('click',()=>{
+  const panel=$('cloudStoryProgress'),toggle=$('cloudStoryToggle');
+  const open=panel.hidden;
+  panel.hidden=!open;
+  toggle.setAttribute('aria-expanded',String(open));
+  toggle.textContent=open?'✕ Hide progress · प्रगति बन्द':'⭐ My progress · मेरो प्रगति';
+  if(open)void refreshCloudStoryProgress();
+});
 
 async function trialCheck(){if(!user||paid(user)||!trialFunctionReady())return;try{const result=await fnCall(CFG.trial,'status');trial={...result,available:true};}catch(e){trial={available:false};showMsg('Trial check unavailable: '+shortError(e),'error')}}
 async function trialOpen(){
