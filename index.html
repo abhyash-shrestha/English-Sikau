@@ -1964,165 +1964,90 @@ function simplifyStudentHeroGreeting(doc,first){
 
 /* Four small, guarded usability repairs for the separately versioned
    protected lesson DOM. Never alter answers, quiz/XP, permissions or routes. */
+
+/* Verified against the PRIVATE learning-app integration preview (not a
+   generic .content selector). Sections are #sp, #tr, #learn and #rd.
+   No exercise scores, XP, quiz answers or authentication are changed. */
 function sikauImproveLessonControls(doc){
   if(!doc?.body||!doc.head)return;
-  if(!doc.getElementById('sikauLessonUxFixes')){
-    const st=doc.createElement('style');st.id='sikauLessonUxFixes';
-    st.textContent=[
-      // Equal-size English and Nepali choices in Speak.
-      '.sikau-speak-language-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;gap:7px!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}',
-      '.sikau-speak-language-tabs>button,.sikau-speak-language-tabs>[role="button"]{display:flex!important;justify-content:center!important;align-items:center!important;flex:1 1 0!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:46px!important;margin:0!important;padding:10px 8px!important;border-radius:13px!important;text-align:center!important;font-weight:850!important;white-space:normal!important;box-sizing:border-box!important}',
-      // A friendly lesson pathway instead of a blank book-icon card.
-      '.sikau-practice-intro{position:relative;display:grid!important;grid-template-columns:minmax(0,1fr);gap:13px!important;min-height:0!important;padding:clamp(17px,2.4vw,28px)!important;border:1px solid #edd8dd!important;border-radius:23px!important;background:linear-gradient(120deg,#fff4e5,#fff4f9 55%,#eef4ff)!important;overflow:hidden!important}',
-      '.sikau-practice-intro .sikau-practice-path{display:grid;gap:11px;position:relative;z-index:1}',
-      '.sikau-practice-intro .sikau-practice-head{display:flex;gap:12px;align-items:center}',
-      '.sikau-practice-intro .sikau-practice-head .sikau-practice-emoji{display:grid;place-items:center;font-size:28px;width:55px;height:55px;flex:none;background:#ffe6b1;border-radius:16px}',
-      '.sikau-practice-intro .sikau-practice-head strong{display:block;color:#39233f;font-size:clamp(19px,2vw,25px);font-weight:900}',
-      '.sikau-practice-intro .sikau-practice-head small{display:block;color:#765c6a;line-height:1.5;font-size:12px;margin-top:2px}',
-      '.sikau-practice-intro .sikau-practice-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}',
-      '.sikau-practice-intro .sikau-practice-step{border:1px solid #ebd7dc;border-radius:14px;background:#ffffffda;min-width:0;padding:12px 11px;display:flex;flex-direction:column;gap:4px}',
-      '.sikau-practice-intro .sikau-practice-step b{font-size:13px;color:#8e2253}',
-      '.sikau-practice-intro .sikau-practice-step small{font-size:11px;color:#67586a;line-height:1.4}',
-      // Chapter-cover titles remain legible at large landscape breakpoints.
-      '.sikau-reading-art-fix{position:relative!important;isolation:isolate!important;min-height:245px;max-height:clamp(270px,33vw,410px);overflow:hidden!important}',
-      '.sikau-reading-caption{pointer-events:none;position:absolute;z-index:30;bottom:0;left:0;right:0;display:none;padding:45px clamp(18px,3vw,37px) 22px;background:linear-gradient(0deg,#250e31bd,transparent);color:#fff!important;font-family:system-ui,sans-serif}',
-      '.sikau-reading-caption small{display:block;color:#ffe2bc!important;font-size:12px;font-weight:850;letter-spacing:.04em}',
-      '.sikau-reading-caption strong{display:block;color:white!important;font-size:clamp(19px,2.2vw,30px);font-weight:900;margin-top:6px;line-height:1.2}',
-      '@media(min-width:1150px){.sikau-reading-caption{display:block!important}}',
-      '@media(max-width:650px){.sikau-practice-intro{padding:14px!important}.sikau-practice-intro .sikau-practice-steps{grid-template-columns:1fr!important}.sikau-practice-intro .sikau-practice-step{padding:9px 12px!important}}',
-      'html[data-sikau-theme="dark"] .sikau-practice-intro{background:linear-gradient(125deg,#302638,#242b43)!important;border-color:#55516b!important}',
-      'html[data-sikau-theme="dark"] .sikau-practice-head :is(strong,small){color:#f4eefa!important}',
-      'html[data-sikau-theme="dark"] .sikau-practice-step{background:#2f3047!important;border-color:#57516f!important}',
-      'html[data-sikau-theme="dark"] .sikau-practice-step :is(b,small){color:#f2dfec!important}'
+  if(!doc.getElementById('sikauExactLessonFixes')){
+    const style=doc.createElement('style');style.id='sikauExactLessonFixes';
+    style.textContent=[
+      /* Speak: two equal-size choices at desktop, tablet and mobile widths. */
+      '#sp #speakDirSeg{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:6px!important;align-items:stretch!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}',
+      '#sp #speakDirSeg button{box-sizing:border-box!important;display:flex!important;justify-content:center!important;align-items:center!important;flex:none!important;float:none!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:46px!important;height:auto!important;margin:0!important;padding:10px 6px!important;font-weight:850!important;text-align:center!important;white-space:normal!important;line-height:1.3!important}',
+      /* Course overview: restore the original legible gradient erased by a
+         generic .course-hero {background:white} personalization rule. */
+      '#learn #courseRoot .course-hero{background:linear-gradient(120deg,#244b91,#6c3b9d 65%,#943263)!important;color:#fff!important;border:1px solid #b0a2e2!important;min-height:0!important;height:auto!important;box-shadow:0 12px 25px #273d7130!important;padding:clamp(18px,2.5vw,28px)!important}',
+      '#learn #courseRoot .course-hero :is(h2,p,div,strong,span,small){color:#fff!important}',
+      '#learn #courseRoot .course-hero .course-progress{background:#ffffff45!important;border-radius:30px!important}',
+      '#learn #courseRoot .course-hero .course-progress>div{background:linear-gradient(90deg,#71ebbe,#ffdf81)!important}',
+      '#learn #courseRoot .sikau-course-steps{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:17px 0 0;padding:0}',
+      '#learn #courseRoot .sikau-course-step{background:#ffffff20!important;border:1px solid #ffffff6b;border-radius:13px;padding:11px 9px;display:flex;gap:4px;flex-direction:column;color:#fff!important}',
+      '#learn #courseRoot .sikau-course-step strong{font-size:13px!important;color:#fff!important}',
+      '#learn #courseRoot .sikau-course-step small{font-size:11px!important;color:#f7eafe!important;line-height:1.4}',
+      /* SVG story cover is 1000x540; never crop its bottom chapter/title text. */
+      '#rd #rbox img.story-hero{display:block!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1000/540!important;object-fit:contain!important;object-position:center center!important;overflow:visible!important;background:transparent!important}',
+      '#rd #storyReader{overflow:visible!important}',
+      '@media(max-width:580px){#learn #courseRoot .sikau-course-steps{grid-template-columns:1fr!important}#learn #courseRoot .sikau-course-step{padding:8px 11px!important}}',
+      'html[data-sikau-theme="dark"] #learn #courseRoot .course-hero{background:linear-gradient(120deg,#213b76,#503382 60%,#652948)!important;color:white!important}',
+      'html[data-sikau-theme="dark"] #learn #courseRoot .sikau-course-step{background:#ffffff1c!important;border-color:#ffffff4a!important}'
     ].join('\n');
-    doc.head.appendChild(st);
+    doc.head.appendChild(style);
   }
-  // Only the currently rendered private-app panel is inspected.
-  const content=doc.querySelector('main .content')||doc.querySelector('.content');
-  if(!content)return;
-  const headings=Array.from(content.querySelectorAll('h1,h2,h3,.page-title'));
-  const heading=headings.find(el=>(el.textContent||'').trim().length<85);
-  const title=(heading?.textContent||'').trim();
-  const screenText=(content.textContent||'').slice(0,450);
-
-  // Speak language toggle: pair the two real controls, not nav tabs.
-  if(/\bSpeak\b/i.test(title) || /\bSpeak\b/i.test(screenText.slice(0,100))){
-    const choices=Array.from(content.querySelectorAll('button,[role="button"]'))
-      .filter(el=>!el.closest('.nav')&&(el.textContent||'').trim().length<=35);
-    const english=choices.find(el=>/🇬🇧/.test(el.textContent||''));
-    const nepali=choices.find(el=>/🇳🇵/.test(el.textContent||'')&&
-      /नेपाली/.test(el.textContent||''));
-    if(english&&nepali){
-      let container=english.parentElement;
-      for(let depth=0;container&&depth<4&&!container.contains(nepali);depth++)
-        container=container.parentElement;
-      if(container && container!==content &&
-        container.querySelectorAll('button,[role="button"]').length<=3){
-        container.classList.add('sikau-speak-language-tabs');
-      }
-    }
+  // Practice intro is a dynamically re-rendered course library.
+  // Add noninteractive guidance AFTER the existing course content.
+  const courseHero=doc.querySelector('#learn #courseRoot .course-hero');
+  if(courseHero&&!courseHero.querySelector('.sikau-course-steps')){
+    const steps=doc.createElement('div');steps.className='sikau-course-steps';
+    [
+      ['📖 1. Learn','पाठ र उदाहरण पढ्नुहोस्'],
+      ['✍️ 2. Practice','आफ्नै जवाफ दिनुहोस्'],
+      ['🌟 3. Improve','गल्ती बुझेर सुधार्नुहोस्']
+    ].forEach(([en,ne])=>{
+      const tile=doc.createElement('div');tile.className='sikau-course-step';
+      const strong=doc.createElement('strong');strong.textContent=en;
+      const small=doc.createElement('small');small.lang='ne';small.textContent=ne;
+      tile.append(strong,small);steps.append(tile);
+    });
+    courseHero.append(steps);
   }
-
-  // Translate change-topic dice: when random chooses the same prompt, reroll
-  // a bounded number of times until it genuinely changes. Keep the original
-  // button's click handler, generated data and translation services intact.
-  if(/\bTranslat/i.test(title) || /\bTranslat/i.test(screenText.slice(0,90))){
-    const fields=()=>Array.from(content.querySelectorAll('textarea,input:not([type="hidden"]),[contenteditable="true"]'))
-      .filter(el=>!el.disabled&&el.getClientRects().length)
-      .slice(0,6);
-    const topicButtons=Array.from(content.querySelectorAll('button,[role="button"]'))
-      .filter(el=>/🎲|Change topic/i.test((el.textContent||'')+' '+(el.getAttribute('aria-label')||'')) &&
-        !el.closest('#sikauHomeScreen'));
-    for(const btn of topicButtons){
-      if(btn.dataset.sikauDistinctTopic==='1')continue;
-      btn.dataset.sikauDistinctTopic='1';
-      btn.addEventListener('click',function(){
-        if(btn.dataset.sikauRerolling==='1')return;
-        const originalFields=fields();
-        if(!originalFields.length)return;
-        const original=originalFields.map(el=>('value' in el?el.value:el.textContent)||'').join('\u241f');
-        let attempts=0;
-        const retry=()=>{
-          if(!btn.isConnected||!content.contains(btn))return;
-          const now=fields().map(el=>('value' in el?el.value:el.textContent)||'').join('\u241f');
-          if(now!==original || attempts>=7)return;
-          attempts++;
-          btn.dataset.sikauRerolling='1';
-          try{btn.click()}finally{btn.dataset.sikauRerolling='0'}
-          doc.defaultView?.setTimeout(retry,85);
-        };
-        // Let the source button's own click handler finish before checking.
-        doc.defaultView?.setTimeout(retry,85);
-      },true);
-    }
-  }
-
-  // Replace *only* the noninteractive, virtually empty Practice illustration.
-  // A loaded exercise, chapter card, level picker or quiz is never touched.
-  if(/\bPractice English\b/i.test(title) || /\bPractice English\b/i.test(screenText.slice(0,120))){
-    const empty=Array.from(content.querySelectorAll('.card,section,article,div'))
-      .filter(el=>{
-        if(el.dataset.sikauPracticeIntro==='1'||el.querySelector('button,input,textarea,select,[role="button"]'))return false;
-        const text=(el.textContent||'').trim();
-        if(!/^[📗📚📖\s]{1,18}$/u.test(text))return false;
-        return el.getBoundingClientRect().height>=110&&el.getBoundingClientRect().width>=180;
-      }).sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length)[0];
-    if(empty){
-      empty.dataset.sikauPracticeIntro='1';
-      empty.classList.add('sikau-practice-intro');
-      const wrap=doc.createElement('div');wrap.className='sikau-practice-path';
-      const top=doc.createElement('div');top.className='sikau-practice-head';
-      const emoji=doc.createElement('span');emoji.className='sikau-practice-emoji';emoji.textContent='📚';
-      const copy=doc.createElement('div');
-      const header=doc.createElement('strong');header.textContent='Your English learning journey';
-      const ne=doc.createElement('small');ne.lang='ne';ne.textContent='सानो अभ्यासबाट सुरु गर्नुहोस् · हरेक दिन सुधार गर्नुहोस्';
-      copy.append(header,ne);top.append(emoji,copy);
-      const path=doc.createElement('div');path.className='sikau-practice-steps';
-      for(const step of [
-        ['① 📖 Learn','Read a short lesson · पाठ पढ्नुहोस्'],
-        ['② ✍️ Practice','Try your answer · अभ्यास गर्नुहोस्'],
-        ['③ 🌟 Improve','See feedback · सुझाव हेर्नुहोस्']
-      ]){
-        const tile=doc.createElement('div');tile.className='sikau-practice-step';
-        const h=doc.createElement('b');h.textContent=step[0];
-        const sub=doc.createElement('small');sub.textContent=step[1];
-        tile.append(h,sub);path.appendChild(tile);
-      }
-      wrap.append(top,path);
-      empty.replaceChildren(wrap);
-    }
-  }
-
-  // Reading cover fallback: wide monitors sometimes clip the native cover
-  // caption while rendering the red illustration. Add an accessible, scoped
-  // title overlay only at that large breakpoint; retain the native artwork.
-  const markers=Array.from(content.querySelectorAll('div,span,strong,p,h2,h3'))
-    .filter(el=>{
-      const text=(el.textContent||'').trim();
-      return text.length<90&&/\bCHAPTER\s*\d+\s*[·:]\s*LEVEL STORY\b/i.test(text) &&
-        !Array.from(el.children).some(child=>/CHAPTER\s*\d+/i.test(child.textContent||''));
-    }).slice(0,6);
-  for(const marker of markers){
-    let cover=marker.parentElement;
-    for(let d=0;cover&&d<8;d++,cover=cover.parentElement){
-      const box=cover.getBoundingClientRect();
-      if(box.height<150||box.height>780||box.width<250||box.width<box.height*1.05)continue;
-      const bg=doc.defaultView?.getComputedStyle(cover).backgroundImage||'';
-      if(bg==='none'&& !/(cover|story|slide|art|chapter)/i.test(String(cover.className||'')))continue;
-      break;
-    }
-    if(!cover||cover===content||cover.querySelector('.sikau-reading-caption'))continue;
-    cover.classList.add('sikau-reading-art-fix');
-    const label=(marker.textContent||'').trim().replace(/\s+/g,' ');
-    const nearby=cover.parentElement;
-    const headings=Array.from(nearby?.querySelectorAll('h2,h3,h4')||[])
-      .filter(el=>!cover.contains(el)&&(el.textContent||'').length<100);
-    const name=headings.find(el=>!/CHAPTER|Reading/i.test(el.textContent||''))?.textContent?.trim()
-      ||'Read the story · कथा पढ्नुहोस्';
-    const caption=doc.createElement('div');caption.className='sikau-reading-caption';
-    const sm=doc.createElement('small');sm.textContent=label;
-    const h=doc.createElement('strong');h.textContent=name;
-    caption.append(sm,h);cover.appendChild(caption);
+  // The original private Translate dice generates an input sentence, but
+  // does NOT translate it or clear the previous result. Keep its native
+  // generator, clear stale translations, and provide a fallback if any old
+  // private build fails to advance the sentence.
+  const dice=doc.querySelector('#tr #ex'),input=doc.querySelector('#tr #inp');
+  if(dice&&input&&dice.dataset.sikauExactTopic!=='1'){
+    dice.dataset.sikauExactTopic='1';
+    dice.title='🎲 Change sentence · नयाँ वाक्य';
+    dice.setAttribute('aria-label','Change sentence · नयाँ वाक्य');
+    dice.addEventListener('click',function(){
+      const previous=input.value;
+      doc.defaultView?.setTimeout(()=>{
+        if(!dice.isConnected||!input.isConnected)return;
+        if(input.value===previous){
+          const lang=doc.querySelector('#tr #dirSel button.on')?.dataset.d||'ne';
+          const counter=Number(dice.dataset.sikauFallbackCount||'0')+1;
+          dice.dataset.sikauFallbackCount=String(counter);
+          const locations=lang==='ne'?['पोखरा','काठमाडौँ','धरान','जनकपुर','चितवन','बुटवल','भक्तपुर','ललितपुर']:
+            ['Pokhara','Kathmandu','Dharan','Janakpur','Chitwan','Butwal','Bhaktapur','Lalitpur'];
+          const place=locations[(counter-1)%locations.length];
+          input.value=lang==='ne'?
+            'भोलि म '+place+' मा '+String(counter)+' नयाँ अंग्रेजी शब्द सिक्न चाहन्छु।':
+            'Tomorrow I want to learn '+String(counter)+' new English words in '+place+'.';
+          input.dispatchEvent(new doc.defaultView.Event('input',{bubbles:true}));
+        }
+        const out=doc.querySelector('#tr #out');
+        // Do not automatically call Translate: the source awards XP for each
+        // translation, so automatic calls would incorrectly inflate scores.
+        if(out && out.textContent.trim()){
+          const notice=doc.createElement('p');
+          notice.className='sikau-next-translate-hint';
+          notice.textContent='✅ New sentence ready. Tap Translate to see its meaning. · नयाँ वाक्य तयार छ। अनुवाद थिच्नुहोस्।';
+          out.replaceChildren(notice);
+        }
+      },0);
+    },true);
   }
 }
 
@@ -2346,7 +2271,15 @@ async function openFile(token='',isTrial=false){
     // Start the game studio inside authorized private lessons, after their own scripts.
     const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=f88e40bc',location.href).href;
     const gameScriptTag='<scr'+'ipt src="'+gameScriptUrl+'"></scr'+'ipt>';
-    const enhancedHtml=/<\/body\s*>/i.test(html)?html.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):html+gameScriptTag;
+
+    // The currently deployed private lesson dice occasionally throws inside
+    // makeNepaliDice/makeEnglishDice when an optional phrase list is missing.
+    // Guard each attempt and use its existing serial unique-sentence fallback.
+    // The patch runs in memory only, AFTER authorized Appwrite download.
+    const oldDice='for(var i=0;i<12;i++){s=maker();if(!set.has(s)){diceRemember(lang,s);return s}}';
+    const safeDice='for(var i=0;i<12;i++){try{s=maker()}catch(_){continue}if(typeof s==="string"&&s&&!set.has(s)){diceRemember(lang,s);return s}}';
+    const repairedHtml=html.includes(oldDice)?html.replace(oldDice,safeDice):html;
+    const enhancedHtml=/<\/body\s*>/i.test(repairedHtml)?repairedHtml.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):repairedHtml+gameScriptTag;
     frame.srcdoc=enhancedHtml;
     openedAccess=kind;
     $('sessionNote').textContent=kind==='lifetime'?'👑 Lifetime member':'⏰ Trial learner';
