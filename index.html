@@ -1029,8 +1029,15 @@ function enhanceBeginnerClarity(doc){
     const style=doc.createElement('style');
     style.id='sikauBeginnerClarityStyle';
     style.textContent=[
-      'button.sikau-beginner-action,[role="button"].sikau-beginner-action{display:inline-flex!important;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 7px;min-height:46px!important;min-width:48px;padding:9px 11px!important;border:1.5px solid #d5a4b9!important;border-radius:13px!important;background:#fff6f3!important;color:#8e2350!important;font-weight:850!important;line-height:1.2!important;box-shadow:0 3px 10px #75304b12;cursor:pointer}',
-      '.sikau-beginner-action::after{content:attr(data-sikau-cue);display:inline-block;font-size:11px;font-weight:850;max-width:135px;white-space:normal;line-height:1.25;text-align:center}',
+      /* Never add multiline pseudo-text to tiny inline icons or absolutely positioned prompt buttons. */
+      'button.sikau-beginner-action,[role="button"].sikau-beginner-action{box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;gap:6px;min-height:43px!important;min-width:43px;padding:7px 10px!important;border:1.5px solid #dab5c5!important;border-radius:12px!important;background:#fff8f6!important;color:#873052!important;font:850 12px/1.2 system-ui,sans-serif!important;box-shadow:0 2px 7px #75304b0d;cursor:pointer;vertical-align:middle}',
+      'button.sikau-beginner-action::after{content:none!important;display:none!important}',
+      'button.sikau-topic-action::after,button.sikau-level-action::after{content:attr(data-sikau-short)!important;display:inline-block!important;position:static!important;max-width:none!important;white-space:nowrap!important;font:850 11px/1.2 system-ui,sans-serif!important;color:inherit!important}',
+      'button.sikau-topic-action,button.sikau-level-action{width:auto!important;max-width:100%!important;min-width:unset!important;min-height:44px!important;white-space:nowrap!important;flex:0 0 auto!important}',
+      'button.sikau-translate-action{display:inline-flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;white-space:nowrap!important;line-height:1!important;vertical-align:middle!important}',
+      'button.sikau-translate-action::after{content:none!important;display:none!important}',
+      '.sikau-translation-hint{clear:both;display:block;width:fit-content;max-width:100%;margin:10px 0 14px;padding:8px 12px;border-radius:11px;border:1px solid #e3dfed;background:#f7f5ff;color:#4f3d6d;font:700 12px/1.5 system-ui,sans-serif;overflow-wrap:break-word}',
+      '@media(max-width:720px){button.sikau-topic-action::after,button.sikau-level-action::after{font-size:10px!important}button.sikau-topic-action,button.sikau-level-action{padding:8px 9px!important}}',
       '.sikau-beginner-action:hover:not(:disabled){background:#ffe9ed!important;border-color:#c13c74!important}',
       '.sikau-beginner-action:focus-visible,#sikauCoachQuickStart button:focus-visible{outline:3px solid #2863c3!important;outline-offset:3px}',
       '#sikauCoachQuickStart{background:linear-gradient(120deg,#fff9f0,#fff2f8);border:1.5px solid #ebcbd9;border-radius:18px;margin:14px 0 18px;padding:16px 18px;box-shadow:0 5px 18px #4b2d4a0b}',
@@ -1043,7 +1050,7 @@ function enhanceBeginnerClarity(doc){
       'body:not(.sikau-coach-show-more) [data-sikau-coach-extra="true"]{display:none!important}',
       '.coach-top{padding:clamp(18px,2.3vw,27px)!important}',
       '.coach-top h2{font-size:clamp(24px,2.9vw,33px)!important}',
-      '@media(max-width:599px){.sikau-beginner-action::after{max-width:112px;font-size:10px}#sikauCoachQuickStart{padding:14px}#sikauCoachQuickStart button{flex:1 1 160px}}',
+      '@media(max-width:599px){#sikauCoachQuickStart{padding:14px}#sikauCoachQuickStart button{flex:1 1 160px}button.sikau-translate-action{width:44px!important;max-width:44px!important}}',
       '@media(prefers-reduced-motion:reduce){#sikauCoachQuickStart *{transition:none!important}}'
     ].join('\n');
     doc.head.appendChild(style);
@@ -1066,10 +1073,32 @@ function enhanceBeginnerClarity(doc){
     else if(!alreadyExplained && /(?:shuffle|random|next topic)/i.test(meta))label='Change topic · विषय बदल्नुहोस्';
     else if(!alreadyExplained && /(?:nepali translation|show nepali|nepali meaning)/i.test(meta))label='See Nepali · नेपाली अर्थ';
     if(!label)continue;
-    button.classList.add('sikau-beginner-action');
+    const kind=label.startsWith('Change topic')?'topic':
+      label.startsWith('See Nepali')?'translate':'level';
+    button.classList.add('sikau-beginner-action','sikau-'+kind+'-action');
     button.setAttribute('data-sikau-cue',label);
-    if(!button.getAttribute('title'))button.setAttribute('title',label);
-    if(!button.getAttribute('aria-label') || !alreadyExplained)button.setAttribute('aria-label',label);
+    // The displayed caption is deliberately short. Full English + Nepali instructions
+    // remain available to screen readers and in the separate translation hint.
+    if(kind==='topic')button.setAttribute('data-sikau-short','Change topic');
+    else if(kind==='level')button.setAttribute('data-sikau-short',
+      label.startsWith('Level up')?'Level up':label.startsWith('Level down')?'Level down':'Change level');
+    button.setAttribute('title',label);
+    button.setAttribute('aria-label',label);
+  }
+  // One readable instruction above the reading passages, not under every flag.
+  const flags=Array.from(doc.querySelectorAll('button.sikau-translate-action'));
+  if(flags.length){
+    const first=flags[0];
+    const card=first.closest('.card,.reader-card,.reading-card,[class*="lesson-card"],article');
+    const guideHost=card||first.closest('.reader-line')?.parentElement||null;
+    if(guideHost && !guideHost.querySelector('.sikau-translation-hint')){
+      const hint=doc.createElement('p');
+      hint.className='sikau-translation-hint';
+      hint.textContent='🇳🇵 Tap the flag next to a sentence to see Nepali. · नेपाली अर्थ हेर्न झण्डा थिच्नुहोस्।';
+      const heading=guideHost.querySelector('h2,h3,h4');
+      if(heading && heading.parentElement===guideHost)heading.insertAdjacentElement('afterend',hint);
+      else guideHost.insertBefore(hint,guideHost.firstChild);
+    }
   }
   const hero=doc.querySelector('.coach-top');
   if(!hero || !hero.parentElement)return;
