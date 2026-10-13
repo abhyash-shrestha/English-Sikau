@@ -941,6 +941,88 @@ html[data-sikau-theme="dark"] #protected #cloudStoryProgress{background:#1c263b!
 html[data-sikau-theme="dark"] #protected .cloud-story-info :is(strong,small),
 html[data-sikau-theme="dark"] #protected #cloudStoryValues{color:#f0e9fa!important}
 html[data-sikau-theme="dark"] #protected #cloudStoryRefresh{color:#ebddf6!important;background:#30334d!important}
+
+/* Authentication theme: the signin/signup design has its own white .content
+   surface (#panel:is([data-mode="signin"],[data-mode="signup"]) .content).
+   Keep the form background and the form text IN THE SAME theme, with specific
+   selectors that outrank the original styled authentication page. */
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) > .content{
+  background:#1b2234!important;
+  color:#f5f2fc!important;
+  border-color:#414c67!important;
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]){
+  background:#1b2234!important;border-color:#3c4965!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-title{
+  color:#f9f4ff!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-title span{
+  color:#ff9fcb!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(
+ .auth-description,.auth-bottom,.auth-step,.password-help,.auth-alt,.auth-linkrow,
+ .content>.notice,.content p,.footer-credit,.footer-credit small
+){color:#cdd3e4!important;opacity:1!important}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .field label{
+  color:#f1eafa!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .field input,
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .secret input{
+  background:#252e45!important;color:#f8f3ff!important;
+  border:1.5px solid #69758e!important;box-shadow:none!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .field input::placeholder{
+  color:#c4c9d9!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .field:before{
+  color:#aeb9d1!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(.auth-tabs,.seg){
+  background:#252d43!important;border:1px solid #404a63!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-tab{
+  color:#d2d4e5!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-tab.active{
+  background:#40324e!important;color:#fff1fa!important;
+  box-shadow:0 4px 14px #05081466!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-tab.active:after{
+  background:#ff74a8!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(
+ .auth-email-btn,.secret button,.secondary,.auth-verification
+){background:#303951!important;color:#f2edfc!important;border-color:#626a83!important}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .tertiary{
+  color:#ffa3c7!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) #message{
+  background:#293449!important;color:#e6e9f6!important;border:1px solid #4f637b!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) #message.error{
+  background:#4a2537!important;color:#ffd1df!important;border:1px solid #a96580!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) #message.ok{
+  background:#20423a!important;color:#d7ffeb!important;border:1px solid #489a79!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .content>.notice{
+  background:#223c3c!important;color:#d4f7ec!important;
+  border:1px solid #426761!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-eyebrow .tag{
+  background:#423a2b!important;color:#ffe5a5!important;border:1px solid #756241!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .auth-doodle small{
+  color:#ffaaca!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) .footer-credit strong{
+  color:#ff9fcb!important
+}
+html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(button,input):focus-visible{
+  outline:3px solid #a5c3ff!important;outline-offset:3px
+}
+
 #sikauThemeAuth,#sikauThemeProtected{
  display:inline-flex;align-items:center;justify-content:center;gap:6px;
  min-height:40px;padding:8px 11px;border-radius:12px;
@@ -2248,7 +2330,7 @@ function killLessons(){
   frame.setAttribute('src','about:blank');
   $('protected').classList.add('hide');
 }
-async function session(){
+async function session({silentGuest=false}={}){
   killLessons();
   trial=null;
   lastTrialCheckError='';
@@ -2289,7 +2371,16 @@ async function session(){
     }
   }catch(e){
     user=null;mode='signin';
-    showMsg('Session check failed: '+shortError(e)+' · सत्र जाँच असफल भयो।','error');
+    // An anonymous first visit is expected. Account.get() can respond with
+    // 401 "User (role: guests) missing scopes". Show a normal login invitation,
+    // but keep real errors visible and do not weaken authentication checks.
+    const noSession=Number(e?.code||0)===401 ||
+      /(?:role:\s*guests|user_unauthorized|missing scopes.*account)/i.test(String(e?.message||''));
+    if(silentGuest && noSession){
+      showMsg('Welcome! Sign in to continue learning. · सिक्नका लागि लगइन गर्नुहोस्।');
+    }else{
+      showMsg('Session check failed: '+shortError(e)+' · सत्र जाँच असफल भयो।','error');
+    }
     show();
   }
 }
@@ -2690,5 +2781,5 @@ window.addEventListener('offline',()=>{if(openedAccess)lockProtected('Internet c
 // The interval intentionally runs only an account lookup and, for trial users, one
 // server trial-status request while protected lessons are open.
 setInterval(()=>{if(openedAccess)void revalidateOpenLessons()},60000);
-(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())pending=p}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session()}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}})();
+(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())pending=p}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session({silentGuest:true})}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}})();
 </script></body></html>
