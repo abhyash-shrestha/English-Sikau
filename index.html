@@ -1637,7 +1637,7 @@ $('lessonFrame').addEventListener('load',function(){
   if(!d)return;
   const count=Array.isArray(d.defaultView?.GAME_STOPS)?d.defaultView.GAME_STOPS.length:0;
   const note=$('gameStudioNote');
-  if(note)note.textContent=count>=26?'🎮 '+count+' game destinations ready · नयाँ खेलहरू तयार':'🎮 Classic games available';
+  if(note)note.textContent=count>=26?'🎮 '+count+' game destinations ready · नयाँ खेलहरू तयार':(d.defaultView?.__sikauGameStudioStatus?.reason?'🎮 Classic games available · क्लासिक खेलहरू तयार':'🎮 Classic games available');
 });
 
 function killLessons(){
@@ -1748,7 +1748,7 @@ async function openFile(token='',isTrial=false){
     const frame=$('lessonFrame');
     frame.removeAttribute('src');
     // Start the game studio inside authorized private lessons, after their own scripts.
-    const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=e99c9f8',location.href).href;
+    const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=f88e40bc',location.href).href;
     const gameScriptTag='<scr'+'ipt src="'+gameScriptUrl+'"></scr'+'ipt>';
     const enhancedHtml=/<\/body\s*>/i.test(html)?html.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):html+gameScriptTag;
     frame.srcdoc=enhancedHtml;
