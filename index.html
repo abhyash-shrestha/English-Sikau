@@ -1192,6 +1192,35 @@ function enhanceFestivalCalendar(doc){
 /* The first screen after an authorized sign-in. This presentation-only tab
    reuses the live festival card and its original click handlers, without
    changing the protected app's router, XP, lessons or membership checks. */
+
+const SIKAU_FESTIVAL_PREVIEW=[
+  {name:'Dashain',ne:'दशैं',date:'2026-10-17',end:'2026-10-23',
+   bs:'२०८३ असोज ३१ – कार्तिक ६',icon:'🌾',words:[['Family','परिवार'],['Blessings','आशीर्वाद'],['Celebration','उत्सव']]},
+  {name:'Tihar',ne:'तिहार / यमपञ्चक',date:'2026-11-08',end:'2026-11-12',
+   bs:'२०८३ कार्तिक २२–२६',icon:'🪔',words:[['Lights','बत्तीहरू'],['Flowers','फूलहरू'],['Family','परिवार']]},
+  {name:'Chhath',ne:'छठ',date:'2026-11-15',
+   bs:'२०८३ कार्तिक २९',icon:'🌅',words:[['Sun','सूर्य'],['Prayer','प्रार्थना'],['River','नदी']]},
+  {name:'Tamu Lhosar',ne:'तमु ल्होसार',date:'2026-12-30',
+   bs:'२०८३ पुस १५',icon:'🏔️',words:[['New Year','नयाँ वर्ष'],['Tradition','परम्परा'],['Community','समुदाय']]}
+];
+function sikauFestivalPreview(doc,mount){
+  let today;try{today=sikauNepalDate();}catch{return;}
+  if(mount.dataset.sikauPreview===today)return;
+  const dates=[...SIKAU_FESTIVAL_PREVIEW,...SIKAU_NEXT_FESTIVALS]
+    .filter(f=>(f.end||f.date)>=today).sort((x,y)=>x.date.localeCompare(y.date))
+    .slice(0,SIKAU_FESTIVAL_TARGET_COUNT);
+  const panel=doc.createElement('section');panel.className='sikau-festival-preview';
+  const head=doc.createElement('strong');
+  head.textContent='🎉 Upcoming Festivals · आउँदै गरेका चाडपर्व';panel.append(head);
+  if(dates.length)dates.forEach(f=>panel.append(sikauNewFestivalRow(doc,f)));
+  else {
+    const note=doc.createElement('p');
+    note.textContent='The next official festival dates will be added after publication. · नयाँ आधिकारिक पात्रो आएपछि मिति थपिनेछ।';
+    panel.append(note);
+  }
+  mount.replaceChildren(panel);mount.dataset.sikauPreview=today;
+}
+
 function enhanceLearningHome(doc,firstName){
   if(!doc?.body||!doc.head)return;
   const nav=doc.querySelector('.nav')||
@@ -1200,6 +1229,7 @@ function enhanceLearningHome(doc,firstName){
   if(!nav||!content)return;
   const parent=content.parentElement;
   if(!parent)return;
+  content.classList.add('sikau-original-lesson-content');
   if(!doc.getElementById('sikauHomeStyle')){
     const css=doc.createElement('style');
     css.id='sikauHomeStyle';
@@ -1210,7 +1240,7 @@ function enhanceLearningHome(doc,firstName){
       '.sikau-home-nav .sikau-home-nav-label small{font-size:11px;font-weight:650;opacity:.8}',
       '.nav button.sikau-home-nav.on{background:#fff0f5!important;color:#be164c!important;outline:2px solid #c44070;outline-offset:-2px}',
       'html.sikau-home-active .nav button[data-t]:not(.sikau-home-nav).on{background:transparent!important;color:inherit!important;outline:0!important;box-shadow:none!important}',
-      'html.sikau-home-active .content{display:none!important}',
+      'html.sikau-home-active .sikau-original-lesson-content{display:none!important}',
       '#sikauHomeScreen{max-width:1250px;width:100%;margin:0 auto;padding:clamp(16px,2.5vw,32px) clamp(14px,2.5vw,34px) 42px;color:#30253a}',
       '#sikauHomeScreen[hidden]{display:none!important}',
       '#sikauHomeScreen .sikau-home-intro{padding:clamp(19px,3vw,30px);border:1px solid #eedfe5;border-radius:22px;background:linear-gradient(110deg,#fff9f5,#f8f5ff);box-shadow:0 7px 22px #512d3c0a}',
@@ -1222,13 +1252,16 @@ function enhanceLearningHome(doc,firstName){
       '#sikauHomeScreen .sikau-home-coach{background:linear-gradient(110deg,#bd154c,#e83d70);color:white;border:1px solid #b5164b}',
       '#sikauHomeScreen .sikau-home-read{background:white;color:#92365b;border:1px solid #e6ced8}',
       '#sikauHomeScreen .sikau-home-actions button:focus-visible,.nav button.sikau-home-nav:focus-visible{outline:3px solid #2359bc!important;outline-offset:3px}',
-      '#sikauHomeScreen .sikau-home-festival-heading{font-size:19px;font-weight:900;color:#33233f;margin:26px 0 12px}',
+      '#sikauHomeScreen .sikau-home-festival-heading{display:none!important}',
       '#sikauHomeScreen .sikau-home-festival-hint{font-size:13px;color:#756775;margin:-6px 0 13px}',
       '#sikauHomeFestivalMount>section,#sikauHomeFestivalMount>.sikau-home-native-festival{display:block;width:100%;max-width:100%;margin:0!important}',
       '#sikauHomeFestivalMount .sikau-home-native-festival{border-radius:23px!important}',
       '#sikauHomeFestivalMount .sikau-home-native-festival button{max-width:100%}',
       '#sikauHomeFestivalMount .sikau-home-native-festival [class*="festival"]{max-width:100%}',
       '#sikauHomeFestivalMount .sikau-home-loading{background:#fff8eb;border:1px dashed #dfa660;border-radius:16px;padding:20px;color:#806244;font-size:14px}',
+      '#sikauHomeFestivalMount .sikau-festival-preview{margin-top:15px;padding:12px 18px;background:#fff8e8;border:1.5px solid #ffa850;border-radius:22px}',
+      '#sikauHomeFestivalMount .sikau-festival-preview>strong{display:block;color:#be1750;padding:6px;font-size:15px;font-weight:900}',
+      '#sikauHomeFestivalMount .sikau-festival-preview .sikau-future-festival{padding:14px 2px}',
       '@media(max-width:680px){#sikauHomeScreen{padding:12px 13px 28px}#sikauHomeScreen .sikau-home-intro{padding:17px 15px}#sikauHomeScreen .sikau-home-actions button{flex:1 1 160px}#sikauHomeScreen .sikau-home-festival-heading{font-size:17px;margin-top:17px}}',
       '@media(prefers-reduced-motion:reduce){#sikauHomeScreen *{scroll-behavior:auto!important}}'
     ].join('\n');
@@ -1239,14 +1272,14 @@ function enhanceLearningHome(doc,firstName){
     home=doc.createElement('section');
     home.id='sikauHomeScreen';
     home.hidden=true;
-    home.setAttribute('aria-label','Learning home · सिकाइ गृहपृष्ठ');
+    home.setAttribute('aria-label','Nepali Festivals · नेपाली चाडपर्व');
     const intro=doc.createElement('div');
     intro.className='sikau-home-intro';
     const eyebrow=doc.createElement('span');
-    eyebrow.className='sikau-home-eyebrow';eyebrow.textContent='🏠 Your learning home · तपाईंको सिकाइ गृहपृष्ठ';
-    const title=doc.createElement('h2');title.textContent='Namaste! Welcome to English Sikau 👋';
+    eyebrow.className='sikau-home-eyebrow';eyebrow.textContent='🇳🇵 OUR FESTIVALS · हाम्रा चाडपर्व';
+    const title=doc.createElement('h2');title.textContent='🎉 Nepali Festivals · नेपाली चाडपर्व';
     const sub=doc.createElement('p');sub.className='sikau-home-subtitle';
-    sub.textContent='Discover upcoming Nepali festivals, learn useful English, and start when you are ready. · नेपाली चाडपर्वबाट रमाइलोसँग अंग्रेजी सिक्नुहोस्।';
+    sub.textContent='Explore upcoming Nepali festivals while learning English. · नेपाली चाडपर्वबाट रमाइलोसँग अंग्रेजी सिक्नुहोस्।';
     const actions=doc.createElement('div');actions.className='sikau-home-actions';
     const coach=doc.createElement('button');coach.type='button';coach.className='sikau-home-coach';
     coach.textContent='✨ Start Coach · अभ्यास सुरु गर्नुहोस्';
@@ -1276,23 +1309,20 @@ function enhanceLearningHome(doc,firstName){
     parent.insertBefore(home,content.nextSibling);
   }
   const title=home.querySelector('h2');
-  if(title){
-    const name=String(firstName||'').trim().slice(0,32);
-    const text=name?'Namaste, '+name+'! 👋':'Namaste! 👋';
-    if(title.textContent!==text)title.textContent=text;
-  }
+  if(title && title.textContent!=='🎉 Nepali Festivals · नेपाली चाडपर्व')
+    title.textContent='🎉 Nepali Festivals · नेपाली चाडपर्व';
   let homeTab=nav.querySelector('.sikau-home-nav');
   if(!homeTab){
     homeTab=doc.createElement('button');
     homeTab.type='button';
     homeTab.className='sikau-home-nav';
-    homeTab.dataset.t='home';homeTab.dataset.sikauHome='true';
-    homeTab.setAttribute('aria-label','Home · गृहपृष्ठ — Nepal Festivals');
+    homeTab.dataset.t='nepali-festivals';homeTab.dataset.sikauHome='true';
+    homeTab.setAttribute('aria-label','Nepali Festivals · नेपाली चाडपर्व');
     const emoji=doc.createElement('span');emoji.className='sikau-home-emoji';
-    emoji.textContent='🏠';emoji.setAttribute('aria-hidden','true');
+    emoji.textContent='🎉';emoji.setAttribute('aria-hidden','true');
     const words=doc.createElement('span');words.className='sikau-home-nav-label';
-    const word=doc.createElement('strong');word.textContent='Home';
-    const ne=doc.createElement('small');ne.lang='ne';ne.textContent='गृहपृष्ठ · चाडपर्व';
+    const word=doc.createElement('strong');word.textContent='Nepali Festivals';
+    const ne=doc.createElement('small');ne.lang='ne';ne.textContent='नेपाली चाडपर्व';
     words.append(word,ne);homeTab.append(emoji,words);
     const first=nav.querySelector('button[data-t]');
     if(first)nav.insertBefore(homeTab,first);else nav.prepend(homeTab);
@@ -1318,32 +1348,38 @@ function enhanceLearningHome(doc,firstName){
       if(homeButton){homeButton.classList.remove('on');homeButton.removeAttribute('aria-current');}
     },true);
   }
-  // Find the smallest published-festival panel which contains the header and
-  // at least two festival-learning actions. Do not move the whole lesson page.
-  const titles=Array.from(doc.querySelectorAll('h1,h2,h3,h4,h5,strong,b,header,p,span'))
-    .filter(el=>!el.closest('#sikauHomeScreen') &&
-      /NEPAL FESTIVALS/i.test((el.textContent||'').trim()) &&
-      (el.textContent||'').trim().length<130);
-  let card=null;
-  for(const heading of titles){
-    let node=heading.parentElement;
-    for(let depth=0;node&&depth<9;depth++,node=node.parentElement){
-      if(node===content||node===doc.body||node.matches('.app,main'))break;
-      const buttons=Array.from(node.querySelectorAll('button,a'))
-        .filter(b=>/Learn festival English/i.test(b.textContent||''));
-      if(buttons.length>=2 && (node.textContent||'').length<13000){
-        card=node;break;
-      }
-    }
-    if(card)break;
-  }
+
+  // Find the calendar by its original "Learn festival English" controls;
+  // the heading is not always an h2/strong in the private lesson HTML.
   const mount=home.querySelector('#sikauHomeFestivalMount');
-  if(card&&mount&&!card.closest('#sikauHomeScreen')){
-    const original=mount.querySelector('.sikau-home-native-festival');
-    if(original&&original!==card)original.remove();
-    card.classList.add('sikau-home-native-festival');
-    mount.replaceChildren(card);
+  const nativeButtons=Array.from(doc.querySelectorAll('button,a,[role="button"]'))
+    .filter(button=>!button.closest('#sikauHomeScreen') &&
+      /Learn festival English/i.test(button.textContent||''));
+  let festivalCard=null;
+  if(nativeButtons.length>=2){
+    const matches=[];
+    for(let node=nativeButtons[0].parentElement,depth=0;
+      node&&depth<16&&node!==content&&node!==doc.body;node=node.parentElement,depth++){
+      const controls=Array.from(node.querySelectorAll('button,a,[role="button"]'))
+        .filter(b=>/Learn festival English/i.test(b.textContent||'')).length;
+      if(controls<2||node.matches('.app,main')||
+         node.querySelector('textarea,input:not([type="hidden"]),[contenteditable="true"]')||
+         (node.textContent||'').length>26000)continue;
+      matches.push({node,header:/NEPAL\s+FESTIVALS|नेपालका\s+चाडपर्व/i.test(node.textContent||''),
+        named:/(festival|calendar|holiday)/i.test(String(node.className||'')+' '+String(node.id||''))});
+    }
+    festivalCard=matches.find(x=>x.header&&x.named)?.node||
+      matches.find(x=>x.header)?.node||
+      matches.find(x=>x.named)?.node||
+      matches[matches.length-1]?.node||null;
   }
+  if(festivalCard&&mount&&!festivalCard.closest('#sikauHomeScreen')){
+    festivalCard.classList.add('sikau-home-native-festival');
+    mount.replaceChildren(festivalCard);
+    mount.removeAttribute('data-sikau-preview');
+  }
+  if(mount&&!mount.querySelector('.sikau-home-native-festival'))
+    sikauFestivalPreview(doc,mount);
   // Default to Home only once per authenticated iframe load, never override
   // the student's subsequent clicks on Coach, Read or other existing tabs.
   if(!doc.documentElement.dataset.sikauHomeInitialized){
