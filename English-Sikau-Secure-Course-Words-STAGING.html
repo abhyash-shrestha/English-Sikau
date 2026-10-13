@@ -56,8 +56,8 @@ function status(msg,kind){$('status').textContent=msg;$('status').className='sta
 function setText(id,val){$(id).textContent=String(val??'')}
 async function initSdk(){
  let sdk=window.Appwrite;
- if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){
-  try{await new Promise((resolve,reject)=>{const e=document.createElement('script');e.src=url;e.onload=resolve;e.onerror=reject;document.head.append(e)});sdk=window.Appwrite;if(sdk)break}catch(_){}
+ if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0/dist/iife/sdk.js','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){
+  try{await new Promise((resolve,reject)=>{const e=document.createElement('script');e.src=url;e.integrity='sha384-phNZum4lHcy1EBX3U1LcBErZWMZklS/yJ2NzJIk5VOJWDDYwavQurpyRdrH2uHZj';e.crossOrigin='anonymous';e.referrerPolicy='no-referrer';e.onload=resolve;e.onerror=reject;document.head.append(e)});sdk=window.Appwrite;if(sdk)break}catch(_){}
  }}
  if(!sdk)throw Error('Appwrite SDK could not load. Check internet access.');
  const client=new sdk.Client().setEndpoint(ENDPOINT).setProject(PROJECT);

@@ -43,7 +43,7 @@ const el=id=>document.getElementById(id);
 let account,functions,selected=null;
 function info(s){el('status').textContent=s}
 function putText(id,s){el(id).textContent=String(s??'')}
-async function loadSdk(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src=url;s.onload=ok;s.onerror=no;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Appwrite SDK unavailable');const client=new sdk.Client().setEndpoint(ENDPOINT).setProject(PROJECT);account=new sdk.Account(client);functions=new sdk.Functions(client)}
+async function loadSdk(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0/dist/iife/sdk.js','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src=url;s.integrity='sha384-phNZum4lHcy1EBX3U1LcBErZWMZklS/yJ2NzJIk5VOJWDDYwavQurpyRdrH2uHZj';s.crossOrigin='anonymous';s.referrerPolicy='no-referrer';s.onload=ok;s.onerror=no;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Appwrite SDK unavailable');const client=new sdk.Client().setEndpoint(ENDPOINT).setProject(PROJECT);account=new sdk.Account(client);functions=new sdk.Functions(client)}
 async function api(action,extras={}){
  
  const call=await functions.createExecution(LESSON_API_FUNCTION_ID,JSON.stringify({action,...extras}),false);
