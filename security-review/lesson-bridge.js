@@ -16,15 +16,19 @@ export const allowedStoreKey=key=>typeof key==='string'&&(STORES.includes(key)||
 export function accountStorage(storage,userId){
  if(!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,35}$/.test(userId))throw Error('Invalid verified account');
  const scope='english-sikau-v3:'+userId+':',snapshot={};
+ const legacyAvailable=storage.getItem('sikau')!==null;
+ const legacyPending=legacyAvailable&&storage.getItem(scope+'sikau')===null;let restoredThisSession=false;
  for(const k of [...STORES,'sikau_dice_en','sikau_dice_ne']){const value=storage.getItem(scope+k);if(value!==null)snapshot[k]=value}
- return {snapshot,legacyAvailable:storage.getItem('sikau')!==null,
-  put(key,value){if(!allowedStoreKey(key)||typeof value!=='string'||value.length>524288)throw Error('Invalid device progress');storage.setItem(scope+key,value)},
+ if(legacyPending&&storage.getItem(scope+'sikau-draft')!==null)snapshot.sikau=storage.getItem(scope+'sikau-draft');
+ return {snapshot,legacyAvailable,legacyPending,
+  put(key,value){if(!allowedStoreKey(key)||typeof value!=='string'||value.length>524288)throw Error('Invalid device progress');
+   const target=key==='sikau'&&(legacyPending||restoredThisSession)?'sikau-draft':key;storage.setItem(scope+target,value)},
   // Requires an explicit learner choice. Original device records remain unchanged.
   importLegacy(confirmed){if(confirmed!==true)throw Error('Confirm that this device history belongs to you');
    if(storage.getItem(scope+'sikau')!==null)throw Error('This account already has device progress; no replacement was performed');
    const raw=storage.getItem('sikau');if(!raw||raw.length>524288)throw Error('Previous device history is unavailable');
    const value=JSON.parse(raw);if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Previous device history needs review');
-   storage.setItem(scope+'sikau',raw);return raw;
+   storage.setItem(scope+'sikau',raw);restoredThisSession=true;return raw;
   }};
 }
 export function createLessonBridge({frame,execute,isCurrent,storage,userId,onFault,hostWindow=window}){
@@ -64,7 +68,7 @@ export function createLessonBridge({frame,execute,isCurrent,storage,userId,onFau
   const channel=new hostWindow.MessageChannel();port=channel.port1;port.onmessage=handle;port.start();
   // '*' is necessary for an opaque origin. Only this exact WindowProxy receives
   // the port, and all subsequent traffic uses that port and this frame nonce.
-  frame.contentWindow.postMessage({type:'sikau-connect',nonce,storage:device.snapshot,legacyAvailable:device.legacyAvailable,supportsSpeech:!!(hostWindow.SpeechRecognition||hostWindow.webkitSpeechRecognition)},'*',[channel.port2]);
+  frame.contentWindow.postMessage({type:'sikau-connect',nonce,storage:device.snapshot,legacyAvailable:device.legacyAvailable,legacyPending:device.legacyPending,supportsSpeech:!!(hostWindow.SpeechRecognition||hostWindow.webkitSpeechRecognition)},'*',[channel.port2]);
  }
  hostWindow.addEventListener('message',connect);
  return {nonce,close};
