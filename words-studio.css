@@ -1,0 +1,96 @@
+/* Words Studio — scoped, responsive, bilingual vocabulary dashboard */
+#words.sikau-words-v1>.content{display:block!important;width:100%!important;max-width:1750px!important;min-width:0!important;background:#f8faff!important;padding:clamp(12px,1.6vw,25px)!important}
+#words.sikau-words-v1>.content>.page-title,#words.sikau-words-v1>.content>.page-sub,#words.sikau-words-v1>.content>.sikau-ui-intro{display:none!important}
+#words.sikau-words-v1 .wv-root{min-width:0;max-width:100%;font-family:Inter,system-ui,"Noto Sans Devanagari",sans-serif;color:#1c294a}
+#words.sikau-words-v1 .wv-root *{box-sizing:border-box}
+#words.sikau-words-v1 .wv-root button{cursor:pointer}
+#words.sikau-words-v1 .wv-hero{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;min-height:183px;gap:18px;background:linear-gradient(105deg,#163c88,#5e52a0 55%,#efb4aa);border-radius:18px;overflow:hidden;padding:24px 27px;margin-bottom:13px;color:white}
+#words.sikau-words-v1 .wv-hero-art{position:absolute;inset:0;background:linear-gradient(90deg,#182f7cb5,#233b8370),url("./assets/translate-nepal-scene.svg") center/cover no-repeat;z-index:-1}
+#words.sikau-words-v1 .wv-hero-message{min-width:0;max-width:65%}
+#words.sikau-words-v1 .wv-small-banner{display:inline-block;background:#ffffff25;border:1px solid #ffffff4f;border-radius:18px;padding:5px 9px;font-size:10px;font-weight:850;letter-spacing:.12em}
+#words.sikau-words-v1 .wv-hero h1{color:#fff!important;font-size:clamp(31px,3.5vw,51px)!important;line-height:1.1!important;letter-spacing:-.04em;margin:7px 0 10px!important}
+#words.sikau-words-v1 .wv-hero h1 span{color:#ffe780!important;font-size:.61em;letter-spacing:0}
+#words.sikau-words-v1 .wv-hero p{color:#fff!important;font-size:14px;line-height:1.45;margin:0 0 4px}
+#words.sikau-words-v1 .wv-today{flex:0 0 235px;max-width:35%;padding:17px;background:#fffffff0;color:#182852;border-radius:14px;box-shadow:0 8px 20px #1423542b}
+#words.sikau-words-v1 .wv-today-head{font-size:12px;font-weight:850;margin-bottom:9px}
+#words.sikau-words-v1 .wv-today strong{display:block;font-size:21px;color:#182246}
+#words.sikau-words-v1 .wv-today span{display:block;color:#9c285b;font-size:12px;margin:2px 0}
+#words.sikau-words-v1 .wv-today p{font-size:11px;color:#4d5772!important}
+#words.sikau-words-v1 .wv-small-button{padding:7px 10px;border:1px solid #efbdd4;border-radius:9px;background:#fff4f9;color:#b31655;font-size:11px;font-weight:850;margin-top:7px}
+#words.sikau-words-v1 .wv-categories{display:flex;gap:7px;overflow-x:auto;scrollbar-width:thin;padding:5px 3px 10px;margin-bottom:10px}
+#words.sikau-words-v1 .wv-category{display:flex;align-items:center;gap:7px;white-space:nowrap;flex:0 0 auto;min-height:53px;padding:9px 12px;border:1px solid #e8e8f1;border-radius:12px;background:#fff6fb;color:#233153;text-align:left}
+#words.sikau-words-v1 .wv-category:nth-child(3n){background:#eff7ff}#words.sikau-words-v1 .wv-category:nth-child(3n+1){background:#f0fff6}
+#words.sikau-words-v1 .wv-category.active{background:#ed1463!important;color:white!important;border-color:#ed1463!important}
+#words.sikau-words-v1 .wv-cat-icon{font-size:22px}
+#words.sikau-words-v1 .wv-cat-text strong{display:block;font-size:12px}
+#words.sikau-words-v1 .wv-cat-text small{display:block;font-size:10px;margin-top:2px}
+#words.sikau-words-v1 .wv-filterrow{display:grid;grid-template-columns:minmax(240px,1fr) repeat(3,minmax(125px,185px));gap:9px;margin-bottom:14px}
+#words.sikau-words-v1 .wv-search{display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #dfe5f1;border-radius:13px;background:#fff;min-width:0}
+#words.sikau-words-v1 .wv-search span{font-size:26px;color:#7785ac}
+#words.sikau-words-v1 .wv-search input{display:block;width:100%!important;min-width:0;min-height:46px;border:0!important;box-shadow:none!important;background:transparent!important;font-size:13px;color:#213051}
+#words.sikau-words-v1 .wv-select{border:1px solid #dfe5f1!important;border-radius:13px!important;background:#fff!important;color:#273252!important;padding:10px!important;min-height:47px!important;font-size:12px}
+#words.sikau-words-v1 .wv-board{display:grid;grid-template-columns:minmax(245px,.78fr) minmax(0,1.65fr);gap:14px;align-items:start;min-width:0}
+#words.sikau-words-v1 .wv-list-pane,#words.sikau-words-v1 .wv-detail-pane{background:#fff!important;border:1px solid #e6ebf4!important;border-radius:17px!important;box-shadow:0 5px 20px #2235530d!important;min-width:0;padding:14px}
+#words.sikau-words-v1 .wv-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 9px}
+#words.sikau-words-v1 .wv-list-head h2{font-size:17px!important;margin:0!important;color:#1e2c50!important}
+#words.sikau-words-v1 .wv-list-head small{font-size:11px;color:#71809b}
+#words.sikau-words-v1 .wv-list{display:grid;gap:3px;max-height:520px;overflow:auto;scrollbar-width:thin}
+#words.sikau-words-v1 .wv-word-row{display:flex;align-items:center;gap:9px;text-align:left;width:100%;min-width:0;min-height:63px;border:1px solid transparent;border-bottom-color:#eef1f6;background:white;color:#243153;padding:9px;border-radius:11px}
+#words.sikau-words-v1 .wv-word-row.selected{background:#fff0f6!important;border-color:#f4cada!important;box-shadow:inset 3px 0 #e9206c}
+#words.sikau-words-v1 .wv-sound-icon{font-size:20px;background:#ecf3ff;border-radius:50%;height:35px;width:35px;flex:0 0 35px;display:grid;place-items:center}
+#words.sikau-words-v1 .wv-row-words{min-width:0;flex:1}
+#words.sikau-words-v1 .wv-row-words strong{display:block;font-size:13px;color:#203050;overflow-wrap:break-word}
+#words.sikau-words-v1 .wv-row-words small{display:block;font-size:11px;color:#536487;margin-top:3px}
+#words.sikau-words-v1 .wv-row-extra{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+#words.sikau-words-v1 .wv-level{padding:5px 7px;border-radius:999px;background:#eaf8eb;color:#277446;font-size:10px;font-weight:850}
+#words.sikau-words-v1 .wv-row-star{font-size:23px;color:#eeb029}
+#words.sikau-words-v1 .wv-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;margin-bottom:10px}
+#words.sikau-words-v1 .wv-selected-word{min-width:0}
+#words.sikau-words-v1 .wv-selected-word h2{font-size:clamp(21px,2.3vw,32px)!important;color:#17264a!important;margin:0 0 3px!important;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#words.sikau-words-v1 .wv-speak,#words.sikau-words-v1 .wv-save{border:0;background:#eef4ff;border-radius:50%;height:36px;width:36px;font-size:18px}
+#words.sikau-words-v1 .wv-save{background:#fff7e7;color:#e9a600}
+#words.sikau-words-v1 .wv-translation{font-weight:850;margin:0 0 9px;font-size:16px;color:#414264}
+#words.sikau-words-v1 .wv-tags{display:flex;gap:7px}
+#words.sikau-words-v1 .wv-tag{border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;background:#fce6ef;color:#ab2054}
+#words.sikau-words-v1 .wv-tag-level{background:#eee8ff;color:#533b92}
+#words.sikau-words-v1 .wv-picture{height:106px;width:34%;max-width:240px;flex:0 0 34%;border-radius:12px;background:linear-gradient(160deg,#c3dcff44,#eeceef55),url("./assets/translate-nepal-scene.svg") center/cover no-repeat;display:grid;place-items:center;overflow:hidden}
+#words.sikau-words-v1 .wv-picture-emoji{font-size:43px;filter:drop-shadow(0 3px 4px #26385c50)}
+#words.sikau-words-v1 .wv-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:9px 0}
+#words.sikau-words-v1 .wv-tab{display:flex;align-items:center;justify-content:center;gap:5px;min-height:47px;padding:6px 4px;border:1px solid #e8edf6;border-radius:10px;background:#f7f9fd;color:#38466d;font-size:11px;font-weight:850}
+#words.sikau-words-v1 .wv-tab.active{background:#e91461;border-color:#e91461;color:#fff}
+#words.sikau-words-v1 .wv-tab small{display:block;font-size:9px;font-weight:600;margin-top:2px}
+#words.sikau-words-v1 .wv-detail-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(165px,.85fr);gap:10px}
+#words.sikau-words-v1 .wv-detail-main,#words.sikau-words-v1 .wv-detail-side{display:grid;gap:9px;align-content:start;min-width:0}
+#words.sikau-words-v1 .wv-content-card,#words.sikau-words-v1 .wv-example-card,#words.sikau-words-v1 .wv-related-card,#words.sikau-words-v1 .wv-practice-card{border:1px solid #ede7f2;border-radius:12px;padding:13px;min-width:0}
+#words.sikau-words-v1 .wv-content-card{background:#fff2f7}
+#words.sikau-words-v1 .wv-example-card{background:#f2f7ff}
+#words.sikau-words-v1 .wv-related-card{background:#fff8e8}
+#words.sikau-words-v1 .wv-practice-card{background:#eaffef}
+#words.sikau-words-v1 .wv-root h3{font-size:12px!important;font-weight:900!important;color:#253254!important;margin:0 0 8px!important}
+#words.sikau-words-v1 .wv-root :is(.wv-content-card,.wv-example-card,.wv-related-card,.wv-practice-card) p{font-size:12px;line-height:1.55;color:#33415f;margin:5px 0;overflow-wrap:break-word}
+#words.sikau-words-v1 .wv-root .wv-subtext{color:#566688!important}
+#words.sikau-words-v1 .wv-related-mini,#words.sikau-words-v1 .wv-related-word{display:block;text-align:left;border:0;background:#ffffffa7;color:#314366;border-radius:8px;padding:7px;width:100%;font-size:11px;margin:3px 0}
+#words.sikau-words-v1 .wv-practice-button,#words.sikau-words-v1 .wv-check,#words.sikau-words-v1 .wv-inline{min-height:36px;border:1px solid #d8cbe9;border-radius:10px;padding:8px 10px;background:#fff;color:#ac1758;font-size:11px;font-weight:850}
+#words.sikau-words-v1 .wv-quiz-input{display:block;width:100%;min-height:42px;border:1px solid #d8ddea;border-radius:9px;padding:9px;font-size:14px;margin:8px 0}
+#words.sikau-words-v1 .wv-feedback{font-size:12px;color:#985073;margin:10px 0 0}
+#words.sikau-words-v1 .wv-empty{font-size:13px;padding:20px;color:#667595}
+#words.sikau-words-v1 .wv-original{margin:17px 0 0;border:1px solid #e7e4f1;background:white;border-radius:14px;padding:11px 15px}
+#words.sikau-words-v1 .wv-original>summary{cursor:pointer;font-size:13px;font-weight:850;color:#ad1a5f}
+#words.sikau-words-v1 .wv-original-content{margin:12px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+#words.sikau-words-v1 .wv-original-content>.card{min-width:0;margin:0!important}
+#words.sikau-words-v1 .wv-root button:focus-visible,#words.sikau-words-v1 .wv-root select:focus-visible,#words.sikau-words-v1 .wv-root input:focus-visible{outline:3px solid #3468cb!important;outline-offset:2px}
+@media(max-width:1200px){#words.sikau-words-v1 .wv-filterrow{grid-template-columns:minmax(180px,1fr) repeat(3,minmax(95px,125px))}#words.sikau-words-v1 .wv-board{grid-template-columns:minmax(210px,.83fr) minmax(0,1.4fr)}#words.sikau-words-v1 .wv-detail-grid{grid-template-columns:1fr}#words.sikau-words-v1 .wv-detail-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){#words.sikau-words-v1 .wv-filterrow{grid-template-columns:repeat(3,minmax(0,1fr))}#words.sikau-words-v1 .wv-search{grid-column:1/-1}#words.sikau-words-v1 .wv-board{grid-template-columns:1fr}#words.sikau-words-v1 .wv-list{max-height:290px}#words.sikau-words-v1 .wv-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#words.sikau-words-v1 .wv-detail-side{grid-template-columns:1fr}#words.sikau-words-v1 .wv-hero-message{max-width:63%}}
+@media(max-width:580px){#words.sikau-words-v1>.content{padding:11px!important}#words.sikau-words-v1 .wv-hero{min-height:190px;padding:17px;gap:8px}#words.sikau-words-v1 .wv-hero-message{max-width:100%}#words.sikau-words-v1 .wv-hero h1{font-size:30px!important}#words.sikau-words-v1 .wv-hero p{font-size:12px}#words.sikau-words-v1 .wv-today{flex:0 0 112px;max-width:43%;padding:10px}#words.sikau-words-v1 .wv-today-head{font-size:10px}#words.sikau-words-v1 .wv-today strong{font-size:15px}#words.sikau-words-v1 .wv-today p{font-size:10px}#words.sikau-words-v1 .wv-category{padding:7px 9px;min-height:46px}#words.sikau-words-v1 .wv-filterrow{gap:6px}#words.sikau-words-v1 .wv-select{padding:7px 4px!important;font-size:10px}#words.sikau-words-v1 .wv-list-pane,#words.sikau-words-v1 .wv-detail-pane{padding:11px}#words.sikau-words-v1 .wv-detail-grid{grid-template-columns:1fr}#words.sikau-words-v1 .wv-detail-side{grid-template-columns:repeat(2,minmax(0,1fr))}#words.sikau-words-v1 .wv-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}#words.sikau-words-v1 .wv-original-content{grid-template-columns:1fr}#words.sikau-words-v1 .wv-picture{height:90px}}
+@media(max-width:360px){#words.sikau-words-v1 .wv-hero{flex-direction:column;align-items:stretch}#words.sikau-words-v1 .wv-today{max-width:100%;flex:auto}#words.sikau-words-v1 .wv-detail-side{grid-template-columns:1fr}}
+html[data-sikau-theme="dark"] #words.sikau-words-v1>.content{background:#131b2b!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-root{color:#f5edf9}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 :is(.wv-list-pane,.wv-detail-pane,.wv-original,.wv-category,.wv-word-row,.wv-select){background:#253147!important;color:#f5edf9!important;border-color:#4d5a75!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 :is(.wv-row-words strong,.wv-selected-word h2,.wv-translation,.wv-list-head h2,.wv-root h3,.wv-tab){color:#f4eefb!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 :is(.wv-content-card,.wv-example-card,.wv-related-card,.wv-practice-card){background:#2b3850!important;border-color:#536078!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 :is(.wv-content-card,.wv-example-card,.wv-related-card,.wv-practice-card) p{color:#e4dfed!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-search{background:#253147!important;border-color:#526078!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-search input{color:#f5edf9!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-tab{background:#333e56!important;border-color:#56617b!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-tab.active{background:#c91b64!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-word-row.selected{background:#49314d!important}
