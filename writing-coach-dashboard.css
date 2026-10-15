@@ -1,0 +1,98 @@
+/* English Sikau Writing Coach – screenshot-inspired, original UI preserved */
+#hw.sikau-writing-v1>.content{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;grid-template-columns:none!important;width:100%!important;min-width:0!important;max-width:1750px!important;margin:0 auto!important;padding:clamp(12px,1.5vw,24px)!important;background:#fbf9ff!important}
+#hw.sikau-writing-v1>.content>.page-title,#hw.sikau-writing-v1>.content>.page-sub,#hw.sikau-writing-v1>.content>.sikau-ui-intro{display:none!important}
+#hw.sikau-writing-v1 .wc-dashboard{font-family:Inter,system-ui,"Noto Sans Devanagari",sans-serif;color:#1c274e;min-width:0;width:100%;max-width:100%}
+#hw.sikau-writing-v1 .wc-dashboard *{box-sizing:border-box}
+#hw.sikau-writing-v1 .wc-dashboard button{cursor:pointer}
+#hw.sikau-writing-v1 .wc-banner{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:208px;margin:0 0 17px;border-radius:20px;background:linear-gradient(116deg,#a90053 0%,#c3246d 48%,#de7396 78%,#ffa79a 100%);box-shadow:0 8px 22px #44254819}
+#hw.sikau-writing-v1 .wc-mountains{position:absolute;inset:0;background:linear-gradient(90deg,#ac035aba 4%,#a6045390 36%,#782f7390 66%,#3b417759 100%),url("./assets/translate-nepal-scene.svg") center/cover no-repeat;z-index:-1}
+#hw.sikau-writing-v1 .wc-banner-intro{padding:clamp(18px,2.5vw,35px);min-width:0;max-width:70%;color:#fff}
+#hw.sikau-writing-v1 .wc-banner-badge{display:inline-flex;border:1px solid #ffd8e1a1;background:#ffffff25;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:900;margin-bottom:12px;color:white}
+#hw.sikau-writing-v1 .wc-banner h1{font-weight:900!important;font-size:clamp(31px,3.7vw,53px)!important;letter-spacing:-.048em!important;line-height:1.03!important;color:#fff!important;margin:0!important}
+#hw.sikau-writing-v1 .wc-banner h2{font-weight:900!important;font-size:clamp(19px,2vw,28px)!important;line-height:1.15!important;color:#fff!important;margin:4px 0 11px!important;padding:0!important;border:0!important}
+#hw.sikau-writing-v1 .wc-banner p{font-size:clamp(11px,1.12vw,14px);line-height:1.55;color:#fff!important;margin:0 0 4px;max-width:650px}
+#hw.sikau-writing-v1 .wc-banner-slogan{min-width:155px;margin-right:clamp(16px,3vw,48px);padding:18px 21px;background:#ffe0e8dc;border:1px solid #fff4;border-radius:16px;transform:rotate(-5deg);box-shadow:0 6px 15px #6b295729}
+#hw.sikau-writing-v1 .wc-banner-slogan strong{display:block;font-size:clamp(13px,1.35vw,18px);line-height:1.4;color:#4a1743;font-weight:850;font-style:italic;text-align:center}
+#hw.sikau-writing-v1 .wc-banner-slogan small{display:block;text-align:center;font-size:12px;color:#74325b;font-weight:800;margin-top:8px}
+#hw.sikau-writing-v1 .wc-primary-grid{display:grid!important;grid-template-columns:minmax(0,1.17fr) minmax(0,1.13fr) minmax(205px,.56fr)!important;gap:13px!important;width:100%!important;align-items:stretch;margin-bottom:14px}
+#hw.sikau-writing-v1 .wc-topic-panel,#hw.sikau-writing-v1 .wc-editor-panel,#hw.sikau-writing-v1 .wc-checklist{background:white!important;min-width:0!important;max-width:100%!important;padding:14px!important;border:1px solid #ebdfeb!important;border-radius:17px!important;box-shadow:0 6px 20px #2827460e!important}
+#hw.sikau-writing-v1 .wc-topic-panel{background:linear-gradient(152deg,#ffeff7,#fff8fb)!important}
+#hw.sikau-writing-v1 .wc-topic-heading{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:2px 1px 13px}
+#hw.sikau-writing-v1 .wc-topic-heading-ico{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;font-size:25px;border-radius:12px;background:#ffdee9}
+#hw.sikau-writing-v1 .wc-topic-heading>div{min-width:0;flex:1}
+#hw.sikau-writing-v1 .wc-topic-heading strong{display:block;font-size:15px;color:#b51b5d;font-weight:900}
+#hw.sikau-writing-v1 .wc-topic-heading small{display:block;font-size:11px;color:#a56080;margin-top:2px}
+#hw.sikau-writing-v1 .wc-change{min-height:36px;padding:8px 10px;border:1px solid #ffbdd2;border-radius:11px;background:#fff!important;color:#d01961;font-size:11px;font-weight:850;white-space:normal}
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:230px!important;padding:18px 16px!important;margin:0!important;border:1px solid #f1d8e8!important;border-radius:15px!important;background:linear-gradient(140deg,#fff8fc,#f8effa)!important;box-shadow:none!important;color:#1c254b!important;text-align:left!important}
+#hw.sikau-writing-v1 .wc-topic-panel #topicDice{position:absolute!important;right:11px!important;top:10px!important;width:35px!important;height:35px!important;min-height:35px!important;line-height:1!important;border-radius:50%!important;font-size:17px!important;padding:5px!important;background:#fff4fb!important;color:#ba1b65!important;box-shadow:none!important;border:1px solid #f8c9dc!important}
+#hw.sikau-writing-v1 .wc-topic-panel #topicEmoji{font-size:25px!important;line-height:1.2!important;width:auto!important;max-width:calc(100% - 50px)!important;margin:0 0 7px!important;text-align:left!important}
+#hw.sikau-writing-v1 .wc-topic-panel #topicHint{display:inline-flex!important;align-items:center!important;background:#f7d5fa!important;color:#6e2c82!important;border-radius:999px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;margin:0 0 11px!important;max-width:100%!important;white-space:normal!important}
+#hw.sikau-writing-v1 .wc-topic-panel #topicNe{font-size:clamp(17px,1.55vw,24px)!important;font-weight:900!important;line-height:1.4!important;color:#181c49!important;max-width:100%!important;word-break:normal!important;overflow-wrap:break-word!important;text-align:left!important;margin:0 0 10px!important}
+#hw.sikau-writing-v1 .wc-topic-panel #topicEn{font-size:clamp(12px,1.1vw,15px)!important;line-height:1.52!important;color:#51537d!important;text-align:left!important;margin:0!important}
+#hw.sikau-writing-v1 .wc-topic-prompts{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 1px}
+#hw.sikau-writing-v1 .wc-topic-prompts span{display:inline-block;border-radius:9px;background:#f9ebff;color:#775285;font-size:10px;font-weight:800;padding:7px 9px}
+#hw.sikau-writing-v1 .wc-editor-panel{display:flex;flex-direction:column}
+#hw.sikau-writing-v1 .wc-editor-heading{font-size:14px;font-weight:900;color:#292449;margin:3px 0 12px}
+#hw.sikau-writing-v1 .wc-editor-panel>.card{display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;flex:1!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeModeSw{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;width:100%!important;padding:4px!important;margin:0 0 12px!important;border:0!important;border-radius:12px!important;background:#f5f3f7!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeModeSw button{width:100%!important;min-width:0!important;min-height:44px!important;border:1px solid transparent!important;border-radius:10px!important;padding:9px!important;color:#6d6285!important;background:#fff4!important;font-size:12px!important;font-weight:850!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeModeSw button.on{background:#fff!important;border-color:#e91765!important;color:#d2105b!important;box-shadow:0 2px 9px #4b285516!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeTypeMode{display:flex!important;flex-direction:column!important;flex:1 0 auto!important;min-width:0!important;width:100%!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeTypeMode[hidden],#hw.sikau-writing-v1 .wc-editor-panel #writePhotoMode[hidden]{display:none!important}
+#hw.sikau-writing-v1 .wc-editor-panel .writeArea{display:block!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:190px!important;flex:1 0 auto!important;resize:vertical!important;border:1.5px solid #ebdfe9!important;border-radius:12px!important;background:#fffdfa!important;color:#23304b!important;font-size:14px!important;line-height:1.65!important;padding:15px!important;box-shadow:none!important}
+#hw.sikau-writing-v1 .wc-editor-panel .writeArea:focus{border-color:#ef3e80!important;outline:3px solid #fcd4e6!important;outline-offset:1px}
+#hw.sikau-writing-v1 .wc-editor-panel .char-count{display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:5px!important;padding:10px 1px!important;color:#687690!important;font-weight:750!important;font-size:11px!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeCheck{min-height:49px!important;width:100%!important;border:0!important;border-radius:12px!important;background:linear-gradient(110deg,#e60960,#f51d70)!important;color:white!important;box-shadow:0 6px 16px #db11533d!important;font-weight:900!important;font-size:16px!important;line-height:1.4!important;padding:12px!important}
+#hw.sikau-writing-v1 .wc-editor-panel #writeAiStatus{font-size:11px!important;line-height:1.5!important;color:#64718a!important}
+#hw.sikau-writing-v1 .wc-checklist{background:linear-gradient(150deg,#f1f4ff,#fafbff)!important}
+#hw.sikau-writing-v1 .wc-checklist h3{font-size:15px!important;color:#293b68!important;font-weight:900!important;margin:4px 0!important}
+#hw.sikau-writing-v1 .wc-checklist-ne{color:#6c76a1;font-size:11px;margin:0 0 11px}
+#hw.sikau-writing-v1 .wc-check-item{display:flex;align-items:center;gap:8px;margin:5px 0;padding:9px;border:1px solid #e3eafc;background:#ffffffb5;border-radius:12px}
+#hw.sikau-writing-v1 .wc-check-icon{display:grid;place-items:center;font-size:16px;font-weight:900;width:32px;height:32px;flex:0 0 32px;border-radius:9px;color:#179769;background:#e2fbf0}
+#hw.sikau-writing-v1 .wc-check-item:nth-of-type(3n) .wc-check-icon{background:#fff0e4;color:#ec6c21}
+#hw.sikau-writing-v1 .wc-check-item strong{display:block;font-size:11px;font-weight:850;color:#293757}
+#hw.sikau-writing-v1 .wc-check-item small{display:block;font-size:10px;color:#697799;margin-top:3px}
+#hw.sikau-writing-v1 .wc-real-feedback{margin:4px 0 12px;width:100%;min-width:0}
+#hw.sikau-writing-v1 .wc-real-feedback[hidden]{display:none!important}
+#hw.sikau-writing-v1 .wc-feedback-heading{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+#hw.sikau-writing-v1 .wc-feedback-heading h2{font-size:19px!important;color:#1d284b!important;letter-spacing:-.02em;margin:0!important}
+#hw.sikau-writing-v1 .wc-feedback-heading p{font-size:11px;color:#69718b;margin:0}
+#hw.sikau-writing-v1 .wc-feedback-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+#hw.sikau-writing-v1 .wc-feedback-card{display:flex;flex-direction:column;gap:9px;min-height:200px;border:1px solid #e8e7f0;border-radius:15px;padding:13px;box-shadow:0 5px 17px #3f345411;background:white;min-width:0;overflow:hidden}
+#hw.sikau-writing-v1 .wc-feedback-blue{background:linear-gradient(150deg,#f0f7ff,#e9f6ff)}
+#hw.sikau-writing-v1 .wc-feedback-amber{background:linear-gradient(145deg,#fff9ec,#fff2df)}
+#hw.sikau-writing-v1 .wc-feedback-rose{background:linear-gradient(145deg,#fff4f7,#fff9fb)}
+#hw.sikau-writing-v1 .wc-feedback-purple{background:linear-gradient(145deg,#f2f2ff,#f7f5ff)}
+#hw.sikau-writing-v1 .wc-feedback-green{background:linear-gradient(145deg,#effff2,#e7f9ec)}
+#hw.sikau-writing-v1 .wc-feedback-title{display:flex;gap:8px;align-items:center;min-width:0}
+#hw.sikau-writing-v1 .wc-feedback-title strong{display:block;color:#29314e;font-size:12px;font-weight:900}
+#hw.sikau-writing-v1 .wc-feedback-title small{display:block;color:#657089;margin-top:3px;font-size:10px}
+#hw.sikau-writing-v1 .wc-feedback-icon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:10px;background:#fff;font-size:18px}
+#hw.sikau-writing-v1 .wc-feedback-text{font-size:11px;line-height:1.6;color:#3a4966;overflow-wrap:break-word;margin:0;white-space:pre-line}
+#hw.sikau-writing-v1 .wc-feedback-button{border:1px solid #d9dff0!important;border-radius:9px!important;color:#344e91!important;font-weight:850!important;font-size:11px!important;margin-top:auto!important;padding:9px!important;background:#fff!important;min-height:36px!important}
+#hw.sikau-writing-v1 .wc-feedback-count{font-size:12px;color:#7f4b66;font-weight:750;margin:0}
+#hw.sikau-writing-v1 .wc-feedback-error{font-size:11px;line-height:1.5;color:#aa315c;border-radius:8px;border:1px solid #f4d6e2;background:#fff;padding:6px 7px;overflow-wrap:break-word}
+#hw.sikau-writing-v1 .wc-feedback-error strong{color:#277747;font-size:11px}
+#hw.sikau-writing-v1 .wc-feedback-score{font-weight:900;color:#1d427e;font-size:28px;line-height:1.1;margin:8px 0!important}
+#hw.sikau-writing-v1 .wc-feedback-alert{color:#a9294b!important;font-size:12px;line-height:1.5}
+#hw.sikau-writing-v1 .wc-native-feedback{border:1px solid #e4d9e8;border-radius:13px;background:#fff;min-width:0;padding:12px;margin:0 0 28px}
+#hw.sikau-writing-v1 .wc-native-feedback>summary{font-size:13px;font-weight:850;color:#b0185b;cursor:pointer}
+#hw.sikau-writing-v1 .wc-native-feedback #writeResult{width:100%;min-width:0;max-width:100%;padding-top:12px;overflow-wrap:break-word}
+#hw.sikau-writing-v1 .wc-dashboard :is(button,textarea,summary):focus-visible{outline:3px solid #346acf!important;outline-offset:3px}
+@media(max-width:1280px){#hw.sikau-writing-v1 .wc-primary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#hw.sikau-writing-v1 .wc-checklist{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#hw.sikau-writing-v1 .wc-checklist h3,#hw.sikau-writing-v1 .wc-checklist-ne{grid-column:1/-1}#hw.sikau-writing-v1 .wc-feedback-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:850px){#hw.sikau-writing-v1 .wc-primary-grid{grid-template-columns:minmax(0,1fr)!important}#hw.sikau-writing-v1 .wc-checklist{grid-column:auto;grid-template-columns:repeat(2,minmax(0,1fr))}#hw.sikau-writing-v1 .wc-feedback-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#hw.sikau-writing-v1 .wc-banner-intro{max-width:75%}#hw.sikau-writing-v1 .wc-banner-slogan{min-width:110px;margin-right:15px;padding:12px}}
+@media(max-width:580px){#hw.sikau-writing-v1>.content{padding:11px!important}#hw.sikau-writing-v1 .wc-banner{min-height:190px;border-radius:16px}#hw.sikau-writing-v1 .wc-banner-intro{max-width:100%;padding:17px}#hw.sikau-writing-v1 .wc-banner h1{font-size:32px!important}#hw.sikau-writing-v1 .wc-banner h2{font-size:21px!important}#hw.sikau-writing-v1 .wc-banner p{font-size:11px}#hw.sikau-writing-v1 .wc-banner-slogan{display:none}#hw.sikau-writing-v1 .wc-primary-grid{gap:10px!important}#hw.sikau-writing-v1 .wc-topic-panel,#hw.sikau-writing-v1 .wc-editor-panel,#hw.sikau-writing-v1 .wc-checklist{padding:12px!important}#hw.sikau-writing-v1 .wc-topic-heading{gap:5px}#hw.sikau-writing-v1 .wc-topic-heading strong{font-size:13px}#hw.sikau-writing-v1 .wc-change{font-size:10px;padding:8px}#hw.sikau-writing-v1 .wc-topic-panel #topicCard{min-height:180px!important;padding:13px!important}#hw.sikau-writing-v1 .wc-editor-panel .writeArea{min-height:180px!important;font-size:16px!important}#hw.sikau-writing-v1 .wc-feedback-grid{grid-template-columns:1fr}#hw.sikau-writing-v1 .wc-feedback-card{min-height:125px}#hw.sikau-writing-v1 .wc-checklist{grid-template-columns:1fr 1fr;gap:5px}#hw.sikau-writing-v1 .wc-check-item{margin:0;padding:7px}#hw.sikau-writing-v1 .wc-check-item strong{font-size:10px}}
+@media(max-width:350px){#hw.sikau-writing-v1 .wc-checklist{grid-template-columns:1fr}#hw.sikau-writing-v1 .wc-topic-heading-ico{display:none}}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1>.content{background:#131b2a!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-dashboard{color:#f5eff9}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-topic-panel,.wc-editor-panel,.wc-checklist,.wc-native-feedback,.wc-feedback-card){background:#253148!important;border-color:#4e5c75!important;color:#f8effb!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-topic-panel #topicCard,.wc-check-item,.wc-editor-panel .writeArea){background:#1f2b40!important;border-color:#526079!important;color:#f4ecf9!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-topic-panel #topicNe,.wc-topic-panel #topicEn,.wc-editor-heading,.wc-check-item strong,.wc-checklist h3,.wc-feedback-heading h2,.wc-feedback-title strong,.wc-feedback-text){color:#f5edf9!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-topic-panel #topicHint{background:#583457!important;color:#fbe1fa!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-topic-prompts span{background:#383250!important;color:#efdafa!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-check-item small{color:#bdc6d8!important}
+@media(prefers-reduced-motion:reduce){#hw.sikau-writing-v1 *{scroll-behavior:auto!important;transition:none!important}}
+
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard{position:relative!important}
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>section,#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>aside{grid-row:auto!important;grid-column:auto!important}
+#hw.sikau-writing-v1 .wc-native-feedback #writeResult .detail-sec{max-width:100%;min-width:0}
