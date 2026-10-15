@@ -1091,6 +1091,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
+<script src="./festival-dashboard-preview.js"></script>
 <script>
 'use strict';
 
@@ -2249,6 +2250,8 @@ function personalizeStudentLesson(){
   enhanceBeginnerClarity(doc);
   enhanceFestivalCalendar(doc);
   enhanceLearningHome(doc,first);
+  // Visual-only test dashboard; preserves original festival handlers and security.
+  window.enhanceFestivalDashboardPreview?.(doc,first,[...SIKAU_FESTIVAL_PREVIEW,...SIKAU_NEXT_FESTIVALS],sikauNepalDate());
   simplifyStudentHeroGreeting(doc,first);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
