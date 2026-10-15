@@ -59,14 +59,21 @@ function renderRealFeedback(doc,result,summary,original){
  // rich paragraph is in a .ds-body inside its own detail section.
  let modelText=previewFrom(modelSection,410);
  if(!modelText&&teaching){
-   const bodies=[...teaching.querySelectorAll('.ds-body')];
-   modelText=(bodies.find(n=>n.textContent.trim().length>90)?.textContent||'').trim().slice(0,410);
+   // The native teaching section has a "Model answer" label followed by
+   // an explanatory note and then the model's .ds-body; don't display lesson
+   // instructions as if they were the model answer.
+   const marker=[...teaching.querySelectorAll('div')].find(n=>
+     n.children.length===0 && /राम्रो नमुना उत्तर|^Model answer/i.test(n.textContent.trim())
+   );
+   let cursor=marker?.nextElementSibling;
+   while(cursor&&!cursor.classList.contains('ds-body'))cursor=cursor.nextElementSibling;
+   modelText=(cursor?.textContent||'').trim().slice(0,410);
  }
  add(doc,model,'p','wc-feedback-text',modelText||'A model answer may appear in the complete feedback below.');
  const details=add(doc,model,'button','wc-feedback-button','Read full model answer · नमुना पढ्नुहोस्');
  details.type='button';details.addEventListener('click',()=>{original.open=true;teaching?.scrollIntoView({block:'nearest',behavior:'smooth'});});
  const mistakes=card('rose','⚠️','Mistakes to Fix','सुधार गर्नुपर्ने गल्ती');
- const mistakesFound=[...result.querySelectorAll('.mistake')];
+ const mistakesFound=[...result.querySelectorAll('.mistake')].filter(n=>n.querySelector('.wrong,.right'));
  const label=add(doc,mistakes,'p','wc-feedback-count',mistakesFound.length?mistakesFound.length+' feedback item(s)':'See the detailed error analysis');
  for(const n of mistakesFound.slice(0,3)){
    const w=(n.querySelector('.wrong')?.textContent||'').trim();
@@ -86,9 +93,8 @@ function renderRealFeedback(doc,result,summary,original){
  if(/Off-topic answer/i.test(allText))add(doc,scores,'p','wc-feedback-alert','⚠️ Off-topic: answer the assigned question first.');
  if(/Partly on-topic/i.test(allText))add(doc,scores,'p','wc-feedback-alert','⚠️ Answer all parts of the assigned topic.');
  const explanation=card('green','📖','Nepali Explanation','नेपालीमा व्याख्या');
- const gap=teaching?.querySelector('.detail-sec')||teaching;
  const tips=nativeSection(result,/Study tips|Next steps/i);
- const explanationText=(gap?.querySelector('.ds-body')?.textContent||tips?.textContent||'').trim();
+ const explanationText=(tips?.textContent||teaching?.textContent||'').trim();
  add(doc,explanation,'p','wc-feedback-text',explanationText?explanationText.slice(0,410):'नेपाली व्याख्या हेर्न तलको पूरा प्रतिक्रिया खोल्नुहोस्।');
  const explainButton=add(doc,explanation,'button','wc-feedback-button','Read full explanation · सबै पढ्नुहोस्');
  explainButton.type='button';explainButton.addEventListener('click',()=>{original.open=true;(teaching||result).scrollIntoView({behavior:'smooth',block:'nearest'});});
