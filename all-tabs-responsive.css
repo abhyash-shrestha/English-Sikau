@@ -1,0 +1,213 @@
+/* English Sikau 2026 – unified responsive learner workspace.
+   Visual-only. Scoped to the protected lesson frame and never changes authorization,
+   progress, quizzes, microphone, camera, translation, or lesson event handlers. */
+html.sikau-refresh {
+  --ui-bg:#f7f9fd;--ui-surface:#fff;--ui-ink:#182448;--ui-muted:#66718c;
+  --ui-line:#e5eaf3;--ui-pink:#e91663;--ui-shadow:0 8px 24px #2638540d;
+  --ui-radius:17px;
+  color-scheme:light;
+}
+html.sikau-refresh,
+html.sikau-refresh body{background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html.sikau-refresh body{min-width:0!important;overflow-x:clip!important}
+html.sikau-refresh *{box-sizing:border-box}
+html.sikau-refresh :is(.content,.card,#coachRoot,#courseRoot,#gameRoot,.reading-card,.reader-card,#pgo,#wordBox,#pbList,#hw,#sp){min-width:0;max-width:100%}
+html.sikau-refresh img{max-width:100%;height:auto}
+html.sikau-refresh :is(input,textarea,select){max-width:100%;min-width:0;box-sizing:border-box;font:inherit}
+html.sikau-refresh :is(input,textarea,select,button):focus-visible{outline:3px solid #346cdb!important;outline-offset:2px}
+html.sikau-refresh button{touch-action:manipulation}
+html.sikau-refresh :is(.card,.coach-ask,.coach-plan,.coach-mode-card,.coach-scene,.course-chapter,.game-shell,.game-map-stop,.reading-card,.reader-card,.culture-lab){
+  border-radius:var(--ui-radius)!important;
+  border:1px solid var(--ui-line)!important;
+  box-shadow:var(--ui-shadow)!important;
+  background:var(--ui-surface)!important;
+  color:var(--ui-ink)!important;
+}
+html.sikau-refresh :is(.card,.coach-ask,.coach-plan,.coach-mode-card,.coach-scene,.course-chapter,.game-shell,.game-map-stop,.reading-card,.reader-card) p{overflow-wrap:break-word}
+html.sikau-refresh :is(.page-title,.content h1){color:#15254e;letter-spacing:-.035em;line-height:1.19}
+html.sikau-refresh :is(.page-sub,.muted){color:var(--ui-muted);line-height:1.5}
+html.sikau-refresh section[id]>.content{width:100%;max-width:1540px;margin:0 auto!important;padding:clamp(13px,2.1vw,32px)!important}
+html.sikau-refresh :is(#coach,#tr,#words,#hw,#rd,#learn,#game,#sp,#pg) .content>.card{margin:12px 0!important}
+html.sikau-refresh :is(#coach,#tr,#words,#hw,#rd,#learn,#game,#sp,#pg) .card h2{font-weight:850;line-height:1.35}
+html.sikau-refresh :is(.btn.primary,button.primary){background:linear-gradient(110deg,#e70f5c,#f22c74)!important;color:white!important;border:1px solid #df1a67!important;border-radius:12px!important;min-height:44px;font-weight:850;box-shadow:0 5px 15px #e91d6329}
+html.sikau-refresh .btn.ghost{border-radius:12px!important;min-height:43px!important;background:#fff!important;color:#ad1957!important;border:1px solid #e6dbe7!important}
+html.sikau-refresh :is(.seg,.write-mode-switch){background:#f5f5fb!important;border:1px solid #eceaf3!important;padding:5px;border-radius:13px!important;gap:5px}
+html.sikau-refresh :is(.seg,.write-mode-switch) button{border-radius:10px!important;min-height:42px!important;font-weight:760}
+html.sikau-refresh :is(.seg,.write-mode-switch) button.on{background:#ee226d!important;color:#fff!important;box-shadow:none!important}
+html.sikau-refresh :is(.chips,.course-levels,.game-modes){gap:8px!important}
+html.sikau-refresh .chips :is(button,.pill){border-radius:12px!important;min-height:34px}
+/* Keep private lesson language/translation preferences accessible;
+   the outer auth bar already shows brand, greeting, subscription, and theme. */
+html.sikau-refresh .app-header,
+html.sikau-refresh:has(#tr.sikau-translated:not([hidden])) .app-header{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;
+ min-height:49px!important;height:auto!important;padding:5px clamp(12px,2vw,25px)!important;
+ margin:0!important;border:0!important;border-radius:0!important;
+ background:#f7f9fd!important;box-shadow:none!important;color:#263454!important;
+}
+html.sikau-refresh .app-header::before,html.sikau-refresh .app-header::after{display:none!important}
+html.sikau-refresh .app-header :is(.app-brand,.greeting,.hero-stats){display:none!important}
+html.sikau-refresh .app-header .app-header-top{width:100%!important;display:flex!important;justify-content:flex-end!important;gap:6px!important}
+html.sikau-refresh .app-header .header-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px!important;align-items:center}
+html.sikau-refresh .app-header .header-btns :is(button,select){min-height:34px!important;padding:5px 9px!important;font-size:11px!important;line-height:1.2!important;border-radius:9px!important}
+
+html.sikau-refresh #gameStudioNote{display:none!important}
+html.sikau-refresh .nav-brand{background:transparent!important}
+html.sikau-refresh #mobileModes.nav{background:#fff!important;border-color:var(--ui-line)!important;color:var(--ui-ink)!important}
+html.sikau-refresh #mobileModes.nav button[data-t]{color:#34436d!important;transition:background .16s ease}
+html.sikau-refresh #mobileModes.nav button[data-t].on{background:#ffeaf2!important;color:#d10b55!important;box-shadow:inset 3px 0 #ea1260!important;font-weight:900}
+html.sikau-refresh #mobileModes.nav button i{font-style:normal!important}
+html.sikau-refresh #mobileModes.nav .sikau-home-nav-label small{font-size:10px}
+html.sikau-refresh .sikau-ui-intro{
+ display:flex;align-items:center;justify-content:space-between;gap:18px;
+ min-height:145px;padding:clamp(17px,2.5vw,30px)!important;margin:0 0 16px!important;
+ border:1px solid #e9e7f3;border-radius:19px;
+ background:linear-gradient(115deg,#fff0f6,#f2f5ff);
+ box-shadow:0 7px 19px #1d234b0b;overflow:hidden;position:relative;
+}
+html.sikau-refresh .sikau-ui-intro::after{
+ content:attr(data-icon);font-size:clamp(55px,8vw,110px);line-height:1;
+ display:block;opacity:.88;flex:none;filter:drop-shadow(0 5px 12px #ac72ac24)
+}
+html.sikau-refresh .sikau-ui-intro-copy{min-width:0;position:relative;z-index:1}
+html.sikau-refresh .sikau-ui-intro .ui-eyebrow{display:block;color:#aa2058;letter-spacing:.14em;font-weight:900;font-size:10px;margin:0 0 7px;text-transform:uppercase}
+html.sikau-refresh .sikau-ui-intro h2{font-size:clamp(24px,2.7vw,35px)!important;line-height:1.12;margin:0 0 6px!important;letter-spacing:-.045em;color:#1a254c!important;font-weight:900}
+html.sikau-refresh .sikau-ui-intro .ui-ne{font-size:clamp(12px,1.2vw,15px);color:#5e5980;margin:0 0 6px;line-height:1.5;font-weight:720}
+html.sikau-refresh .sikau-ui-intro .ui-detail{font-size:clamp(11px,1.15vw,13px);color:#5f6a86;line-height:1.5;margin:0}
+html.sikau-refresh :is(#words,#hw,#rd,#learn,#game,#sp,#pg)>.content:has(.sikau-ui-intro)>.page-title,
+html.sikau-refresh :is(#words,#hw,#rd,#learn,#game,#sp,#pg)>.content:has(.sikau-ui-intro)>.page-sub{display:none!important}
+html.sikau-refresh #words .sikau-ui-intro{background:linear-gradient(113deg,#e9fff2,#eefafb,#faf8ff)}
+html.sikau-refresh #hw .sikau-ui-intro{background:linear-gradient(113deg,#fff0dd,#ffeef1,#fff7f3)}
+html.sikau-refresh #rd .sikau-ui-intro{background:linear-gradient(113deg,#e6f3ff,#e6fcff,#f4f0ff)}
+html.sikau-refresh #learn .sikau-ui-intro{background:linear-gradient(113deg,#fff7db,#ecfff2,#f2f7ff)}
+html.sikau-refresh #game .sikau-ui-intro{background:linear-gradient(113deg,#f2e5ff,#f7efff,#f5f9ff)}
+html.sikau-refresh #sp .sikau-ui-intro{background:linear-gradient(113deg,#dff3ff,#f1edff,#fff2f8)}
+html.sikau-refresh #pg .sikau-ui-intro{background:linear-gradient(113deg,#e4fff2,#eff9ff,#e9f2ff)}
+/* Dashboard already has a dedicated hero and keyboard-native controls. */
+html.sikau-refresh #sikauHomeScreen{max-width:1550px!important;width:100%!important;padding:clamp(14px,2vw,30px)!important}
+html.sikau-refresh #sikauHomeScreen .sfd-hero{min-height:200px!important}
+html.sikau-refresh #sikauHomeScreen .sfd-card{box-shadow:var(--ui-shadow)!important}
+html.sikau-refresh #sikauHomeScreen .sfd-main-grid{min-width:0}
+/* Coach: prioritize one question, secondary activities visible but not overwhelming. */
+html.sikau-refresh #coachRoot{min-width:0;max-width:100%;gap:15px!important}
+html.sikau-refresh #coach .sikau-coach-banner{margin-bottom:16px!important;min-height:215px!important}
+html.sikau-refresh #coach .coach-ask.sikau-coach-restyled{margin:0!important}
+html.sikau-refresh #coach .sikau-coach-extras{margin-top:12px}
+html.sikau-refresh #coach .sikau-coach-cards button{border-radius:15px;min-height:120px}
+html.sikau-refresh #coach .sikau-coach-topics button{min-height:68px}
+/* Translation: retain its own corrected two-panel desktop layout; no narrowing. */
+html.sikau-refresh #tr.sikau-translated>.content{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;grid-template-columns:none!important}
+html.sikau-refresh #tr.sikau-translated .tt-work{min-width:0!important;width:100%!important;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)!important}
+html.sikau-refresh #tr.sikau-translated .tt-hero{width:100%!important;max-width:100%;min-width:0}
+html.sikau-refresh #tr.sikau-translated .tt-panel{width:100%!important;max-width:100%;min-width:0}
+html.sikau-refresh #tr.sikau-translated .tt-output #out{min-width:0!important;width:100%!important;overflow-wrap:break-word!important}
+html.sikau-refresh #tr.sikau-translated .tt-output #out:empty::before{white-space:normal!important;overflow-wrap:break-word!important;display:block!important;min-height:0!important;padding:0!important}
+/* Words: concise dictionary, tidy phrasebook without massive whitespace. */
+html.sikau-refresh #words .content{align-items:start}
+html.sikau-refresh #words .content>.card{height:auto;min-width:0}
+html.sikau-refresh #words #wordBox{min-width:0;max-height:none}
+html.sikau-refresh #words #pbList{min-width:0}
+html.sikau-refresh #words input{background:#fbfcff;color:#1d2b4d;border:1px solid #dfe4f0;border-radius:12px;min-height:43px}
+/* Write: topic selector readable; checker buttons stay attached to native form. */
+html.sikau-refresh #hw .topic-dice{background:linear-gradient(112deg,#fff6fa,#fff9eb)!important;border:1px solid #f1dbea!important;border-radius:18px!important;padding:clamp(14px,2vw,24px)!important;box-shadow:var(--ui-shadow)!important;max-width:100%!important}
+html.sikau-refresh #hw #topicCard .topic-ne{color:#4d2a58!important;font-size:clamp(15px,1.5vw,19px)!important;overflow-wrap:break-word}
+html.sikau-refresh #hw #topicCard .topic-en{color:#63556e!important;overflow-wrap:break-word}
+html.sikau-refresh #hw .writeArea{border:1px solid #dfe3f0!important;border-radius:13px!important;min-height:130px;line-height:1.6}
+html.sikau-refresh #hw .card.color-purple{border-color:#ece5f0!important}
+html.sikau-refresh #hw #writeResult{width:100%;min-width:0;overflow-wrap:break-word}
+/* Reading: full artwork visible, story/quiz beneath it. */
+html.sikau-refresh #rd #rbox img.story-hero{display:block!important;height:auto!important;max-height:none!important;object-fit:contain!important}
+html.sikau-refresh #rd .reading-card,html.sikau-refresh #rd .reader-card{padding:clamp(14px,2vw,22px)}
+html.sikau-refresh #rd #storyReader{overflow:visible!important;min-width:0}
+html.sikau-refresh #rd #storyReader img{height:auto!important;max-width:100%!important;object-fit:contain!important}
+/* Practice: level progression retains the original chapter lock logic. */
+html.sikau-refresh #learn #courseRoot{width:100%;min-width:0}
+html.sikau-refresh #learn .course-chapters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px!important}
+html.sikau-refresh #learn .course-chapter{min-width:0!important;padding:15px!important}
+html.sikau-refresh #learn #courseRoot .course-hero{border-radius:17px!important;background:linear-gradient(125deg,#28469a,#713bb1)!important;color:white!important}
+html.sikau-refresh #learn #courseRoot .course-hero :is(h2,strong,p,small){color:white!important}
+/* Games: colorful focused playable tiles, original handlers intact. */
+html.sikau-refresh #game .game-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));gap:11px!important}
+html.sikau-refresh #game .game-map-stop{display:flex!important;min-height:78px;border-radius:16px!important;overflow-wrap:break-word}
+html.sikau-refresh #game .game-map-stop:nth-child(4n+1){background:#eaf9f1!important}
+html.sikau-refresh #game .game-map-stop:nth-child(4n+2){background:#e9f5ff!important}
+html.sikau-refresh #game .game-map-stop:nth-child(4n+3){background:#fff6e5!important}
+html.sikau-refresh #game .game-map-stop:nth-child(4n){background:#f7eeff!important}
+html.sikau-refresh #game .game-map-stop.selected{border-color:#e2286e!important}
+html.sikau-refresh #game .game-shell{padding:clamp(14px,2vw,25px)!important}
+/* Speak: equal language sizes, microphone and feedback easy to find. */
+html.sikau-refresh #sp #speakDirSeg{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;gap:8px}
+html.sikau-refresh #sp #speakDirSeg button{min-height:47px!important;min-width:0!important;width:100%!important;text-align:center;white-space:normal!important;line-height:1.25}
+html.sikau-refresh #sp #micBig{display:grid;place-items:center;margin:20px auto!important;min-height:130px;min-width:130px}
+html.sikau-refresh #sp .micBig{border-radius:100px!important}
+html.sikau-refresh #sp #spOut{width:100%;overflow-wrap:anywhere}
+/* Progress: readable genuine metrics from signed-in user's native data. */
+html.sikau-refresh #pg #pgo{width:100%;min-width:0}
+html.sikau-refresh #pg #pgo .card{padding:clamp(14px,2vw,23px);min-width:0}
+html.sikau-refresh #pg #pgo :is(.progress-ring,.streak-card,.achievement-card){max-width:100%}
+/* Tablet: right-size text and grids without reflowing lessons into a phone. */
+@media(min-width:700px) and (max-width:1023px){
+ html.sikau-refresh section[id]>.content{padding:19px 21px!important}
+ html.sikau-refresh #mobileModes.nav{box-shadow:0 -5px 18px #25295115!important}
+ html.sikau-refresh #coach .sikau-coach-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html.sikau-refresh #tr.sikau-translated .tt-work{grid-template-columns:minmax(0,1fr) 43px minmax(0,1fr)!important}
+ html.sikau-refresh #learn .course-chapters{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Phone: no squashed sidebars or overflow, one task at a time. */
+@media(max-width:699px){
+ html.sikau-refresh body{width:100%!important;margin:0!important;padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}
+ html.sikau-refresh section[id]>.content{padding:12px 12px 25px!important;max-width:100%!important}
+ html.sikau-refresh #mobileModes.nav{overflow-x:auto!important;overscroll-behavior-x:contain;scrollbar-width:none}
+ html.sikau-refresh #mobileModes.nav::-webkit-scrollbar{display:none}
+ html.sikau-refresh #mobileModes.nav button[data-t]{flex:0 0 60px!important;min-width:60px!important;font-size:10px!important;padding:6px 2px!important;min-height:60px!important;white-space:normal!important}
+ html.sikau-refresh #mobileModes.nav .sikau-home-nav{flex:0 0 65px!important}
+ html.sikau-refresh .sikau-ui-intro{min-height:110px!important;padding:16px!important;border-radius:15px;gap:10px}
+ html.sikau-refresh .sikau-ui-intro::after{font-size:52px}
+ html.sikau-refresh .sikau-ui-intro h2{font-size:23px!important}
+ html.sikau-refresh .sikau-ui-intro .ui-detail{font-size:11px}
+ html.sikau-refresh :is(.card,.coach-ask,.coach-plan,.game-shell){padding:13px!important}
+ html.sikau-refresh #tr.sikau-translated .tt-work{grid-template-columns:minmax(0,1fr)!important}
+ html.sikau-refresh #tr.sikau-translated .tt-hero{min-height:195px!important}
+ html.sikau-refresh #tr.sikau-translated .tt-source,html.sikau-refresh #tr.sikau-translated .tt-output{min-height:120px!important}
+ html.sikau-refresh #words .content{display:block!important}
+ html.sikau-refresh #rd :is(.reader-card,.reading-card){width:100%}
+ html.sikau-refresh #learn .course-chapters{grid-template-columns:1fr!important}
+ html.sikau-refresh #game .game-map{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.sikau-refresh #coach .sikau-coach-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html.sikau-refresh #coach .sikau-coach-grid{grid-template-columns:minmax(0,1fr)!important}
+ html.sikau-refresh #coach .sikau-coach-side{grid-column:1!important}
+ html.sikau-refresh #hw .writeArea{font-size:16px!important}
+}
+@media(max-width:359px){
+ html.sikau-refresh #game .game-map{grid-template-columns:1fr!important}
+ html.sikau-refresh #coach .sikau-coach-cards{grid-template-columns:1fr!important}
+}
+/* Dark mode must remain readable when switching inside and outside login. */
+html.sikau-refresh[data-sikau-theme="dark"],html.sikau-refresh[data-theme="dark"]{
+ --ui-bg:#12182a;--ui-surface:#232b3e;--ui-ink:#f4f0fb;--ui-muted:#c3c4d7;
+ --ui-line:#424c65;--ui-shadow:0 7px 23px #070b1738;color-scheme:dark;
+}
+html.sikau-refresh[data-sikau-theme="dark"],
+html.sikau-refresh[data-sikau-theme="dark"] body{background:var(--ui-bg)!important;color:var(--ui-ink)!important}
+html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav{background:#1c2536!important;border-color:#3d4964!important}
+html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav button[data-t]{color:#e0dcea!important}
+html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav button.on{background:#433048!important;color:#ffd9ec!important}
+html.sikau-refresh[data-sikau-theme="dark"] :is(.card,.coach-ask,.coach-plan,.coach-mode-card,.coach-scene,.course-chapter,.game-shell,.game-map-stop,.reading-card,.reader-card){background:var(--ui-surface)!important;border-color:var(--ui-line)!important;color:var(--ui-ink)!important}
+html.sikau-refresh[data-sikau-theme="dark"] :is(.page-title,.content h1,.content h2,.content h3){color:#f5eff9!important}
+html.sikau-refresh[data-sikau-theme="dark"] .sikau-ui-intro{background:linear-gradient(116deg,#302b46,#253348)!important;border-color:#49506b!important}
+html.sikau-refresh[data-sikau-theme="dark"] .sikau-ui-intro :is(h2,.ui-ne,.ui-detail,.ui-eyebrow){color:#f8f1fd!important}
+html.sikau-refresh[data-sikau-theme="dark"] #hw .topic-dice{background:#2c2d43!important;border-color:#5b526c!important}
+html.sikau-refresh[data-sikau-theme="dark"] #hw #topicCard :is(.topic-en,.topic-ne){color:#f5ecff!important}
+html.sikau-refresh[data-sikau-theme="dark"] #game .game-map-stop:nth-child(n){background:#292f49!important;color:#f5edfa!important}
+html.sikau-refresh[data-sikau-theme="dark"] #sp #micBig{color:#fff!important}
+@media(prefers-reduced-motion:reduce){html.sikau-refresh *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+html.sikau-refresh #mobileModes.nav .sikau-nav-word{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:2px;line-height:1.18}
+html.sikau-refresh #mobileModes.nav .sikau-nav-word strong{font-size:13px;line-height:1.2;color:inherit;font-weight:850}
+html.sikau-refresh #mobileModes.nav .sikau-nav-word small{font-size:10px;line-height:1.2;color:#7e839b;font-weight:600}
+@media(max-width:1023px){
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word{align-items:center;text-align:center;max-width:100%}
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word strong{font-size:10px}
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word small{display:none}
+}
+html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav .sikau-nav-word small{color:#bcb8cd}

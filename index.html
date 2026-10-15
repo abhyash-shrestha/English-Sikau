@@ -1094,6 +1094,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./festival-dashboard-preview.js"></script>
 <script src="./coach-dashboard.js"></script>
 <script src="./translate-dashboard.js"></script>
+<script src="./all-tabs-responsive.js"></script>
 <script>
 'use strict';
 
@@ -2252,6 +2253,7 @@ function personalizeStudentLesson(){
   enhanceBeginnerClarity(doc);
   window.enhanceCoachDashboard?.(doc,first);
   window.enhanceTranslationDashboard?.(doc);
+  window.enhanceUnifiedStudentUI?.(doc);
   enhanceFestivalCalendar(doc);
   enhanceLearningHome(doc,first);
   // Visual-only test dashboard; preserves original festival handlers and security.
