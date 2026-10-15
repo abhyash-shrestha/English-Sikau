@@ -92,3 +92,7 @@ html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-topic-panel #topicHint{ba
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-topic-prompts span{background:#383250!important;color:#efdafa!important}
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-check-item small{color:#bdc6d8!important}
 @media(prefers-reduced-motion:reduce){#hw.sikau-writing-v1 *{scroll-behavior:auto!important;transition:none!important}}
+
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard{position:relative!important}
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>section,#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>aside{grid-row:auto!important;grid-column:auto!important}
+#hw.sikau-writing-v1 .wc-native-feedback #writeResult .detail-sec{max-width:100%;min-width:0}
