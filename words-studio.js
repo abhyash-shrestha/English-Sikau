@@ -148,7 +148,7 @@ window.enhanceWordsDashboard=function(doc){
  add(doc,message,'span','wv-small-banner','WORDS · शब्दहरू');
  const h=add(doc,message,'h1','','Words ');add(doc,h,'span','','शब्दहरू');
  add(doc,message,'p','','Build your vocabulary step by step.');
- add(doc,message,'p','wv-ne','','नयाँ शब्द सिकौं, सम्झौं र दैनिक प्रयोग गरौं।');
+ add(doc,message,'p','wv-ne','नयाँ शब्द सिकौं, सम्झौं र दैनिक प्रयोग गरौं।');
  const todayPanel=add(doc,hero,'div','wv-today');
  add(doc,todayPanel,'div','wv-today-head','💡 Today’s Word · आजको शब्द');
  const todayTerm=add(doc,todayPanel,'strong','');
