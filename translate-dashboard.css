@@ -75,3 +75,7 @@ html[data-sikau-theme="dark"] #tr.sikau-translated :is(.tt-example,.tt-topic,.tt
 html[data-sikau-theme="dark"] #tr.sikau-translated :is(.tt-example small,.tt-topic small,.tt-hero p,.tt-section h3 small){color:#d4d1e2!important}
 html[data-sikau-theme="dark"] #tr.sikau-translated .tt-modes button.on{background:#c41a61!important}
 #tr .tt-panel :is(button,textarea):focus-visible,#tr .tt-section button:focus-visible{outline:3px solid #2766d2!important;outline-offset:3px}
+
+#tr.sikau-translated .tt-source[hidden],#tr.sikau-translated .tt-tools[hidden],#tr.sikau-translated .tt-camera[hidden]{display:none!important}
+#tr.sikau-translated .tt-native-translator #trTypeMode[hidden]{display:none!important}
+#tr.sikau-translated .tt-example:focus-visible,#tr.sikau-translated .tt-topic:focus-visible{outline:3px solid #2369cf!important;outline-offset:3px}
