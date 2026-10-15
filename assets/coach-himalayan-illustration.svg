@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 335" role="img" aria-label="Friendly Nepali English coach with Himalayan mountains and a temple">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffcedb"/><stop offset=".5" stop-color="#f2bcdf"/><stop offset="1" stop-color="#a9a2e5"/></linearGradient><linearGradient id="snow" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#fffefb"/><stop offset="1" stop-color="#aaaddc"/></linearGradient><linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#25172b"/><stop offset=".54" stop-color="#4e2735"/><stop offset="1" stop-color="#1d172c"/></linearGradient><linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff567d"/><stop offset="1" stop-color="#b51954"/></linearGradient><filter id="shadow"><feGaussianBlur stdDeviation="6"/></filter></defs>
+<rect width="900" height="335" fill="url(#sky)"/>
+<circle cx="672" cy="76" r="43" fill="#ffe9d2" opacity=".7"/><g fill="#fff0ed" opacity=".37"><ellipse cx="184" cy="168" rx="95" ry="29"/><ellipse cx="136" cy="148" rx="59" ry="34"/><ellipse cx="285" cy="204" rx="129" ry="31"/><ellipse cx="766" cy="165" rx="100" ry="29"/></g>
+<path d="M0 250 105 162l41 41 106-124 89 111 97-135 125 130 93-75 76 75 90-94 124 153v91H0Z" fill="#b8a8de"/>
+<path d="M120 253 257 87l88 112 91-132 122 131 83-84 99 139Z" fill="url(#snow)"/>
+<path d="m258 88 28 45-31-12-18 24-20-4Zm179-21 41 47-44-11-33 35-16-14Zm206 48 34 49-37-18-19 19-19-9Z" fill="#fff"/>
+<path d="M0 278q145-79 307-26t342-18q160-45 251 14v87H0Z" fill="#8889b9" opacity=".8"/>
+<path d="M0 302q151-59 320-12t305-13q174-57 275 11v47H0Z" fill="#6e809b"/>
+<g transform="translate(758 125)"><path d="M17 191V92h118v99Z" fill="#c35b57"/><path d="M8 98 76 47l66 51-9 12H19Z" fill="#382444"/><path d="M22 91h105" stroke="#ffc089" stroke-width="7"/><path d="M30 148h92" stroke="#f9bd83" stroke-width="7"/><path d="m1 148 73-42 77 42-14 12H16Z" fill="#4f294e"/><path d="M65 5h17v48H65Z" fill="#60364a"/><path d="M28 191v-32h32v32m20 0v-32h33v32" fill="#4d3552"/></g>
+<g stroke="#775479" stroke-width="2"><path d="M729 196 Q807 161 896 170" fill="none"/></g><g><path d="m744 189 13-3-5 17Z" fill="#e94a76"/><path d="m773 180 14-4-5 17Z" fill="#f8c85d"/><path d="m807 173 14-2-6 18Z" fill="#6398d8"/><path d="m845 168 12 2-9 15Z" fill="#51a793"/><path d="m878 169 12 5-11 14Z" fill="#e46b74"/></g>
+<!-- Coach silhouette and hair -->
+<g transform="translate(388 8)">
+<ellipse cx="159" cy="319" rx="167" ry="18" fill="#462352" opacity=".15" filter="url(#shadow)"/>
+<path d="M80 136Q44 55 127 25q50-25 106 6t48 102q21 53-1 96-5 29 7 87H65q8-47-7-87-22-70 22-93Z" fill="url(#hair)"/>
+<path d="M86 204Q52 235 30 334h255q-7-75-57-128l-51-25-91 23Z" fill="url(#dress)"/>
+<path d="M119 190v37q30 33 66 0v-43Z" fill="#f7ab8e"/>
+<path d="M122 217 94 240l43 94h94l-44-102-20-6-18 41Z" fill="#ffeced"/>
+<path d="m125 220 29 43-21 71H91l-17-69Z" fill="#d92c6a"/><path d="m190 228-35 36 28 70h63l-24-80Z" fill="#fff7f1"/>
+<path d="M100 85q-18 46-9 89 13 56 62 61 55-3 74-63l4-64q-39-40-82-48-13 25-49 25Z" fill="#ffbd9c"/>
+<path d="M92 137q-20-2-18 20 2 19 22 19M227 140q21-2 20 18-1 17-24 17" fill="#ffb794" stroke="#d58a78" stroke-width="2"/>
+<path d="M85 130q15-23 21-57 37-43 106-20 27 7 31 61-36-3-55-31-39 27-103 47Z" fill="url(#hair)"/>
+<ellipse cx="124" cy="143" rx="8" ry="12" fill="#2c1828"/><ellipse cx="194" cy="143" rx="8" ry="12" fill="#2c1828"/>
+<circle cx="127" cy="139" r="3" fill="#fff"/><circle cx="197" cy="139" r="3" fill="#fff"/><path d="M111 122q16-10 28 0m40-1q16-10 30 1" fill="none" stroke="#432332" stroke-width="5" stroke-linecap="round"/>
+<path d="M154 153q-6 12 5 12" fill="none" stroke="#df8d77" stroke-width="3" stroke-linecap="round"/>
+<path d="M134 187q24 25 48-1-22-4-48 1Z" fill="#9f3a59"/><path d="M141 189q16 9 34 0" fill="none" stroke="#fff0e8" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="98" cy="180" rx="7" ry="10" fill="#f7c941"/><ellipse cx="224" cy="180" rx="7" ry="10" fill="#f7c941"/>
+<path d="M72 245q-30 10-46 42l32 30 36-14-15-20Z" fill="#f5a58d"/>
+<path d="M236 235q32 4 52 22l41-24q14-5 18 4-1 6-10 10l-14 11q22-7 24 2-1 7-16 9l-45 26q-29 9-54-19Z" fill="#f7b08f"/>
+<!-- Book and stationery -->
+<g transform="translate(51 255) rotate(-8)"><path d="M0 0 87 11l-5 92-89-10Z" fill="#123a63"/><path d="m0 0 81 12 1 82-81-12Z" fill="#214d7b"/><path d="M14 24 65 30M12 35l51 7" stroke="#f5ca75" stroke-width="3"/><path d="M3 2v82" stroke="#b3c9ce" stroke-width="4"/></g>
+</g>
+<g transform="translate(258 41)"><ellipse cx="0" cy="58" rx="110" ry="62" fill="#fff9fb" opacity=".94"/><path d="m70 105 33 26-13-40" fill="#fff9fb"/><text x="0" y="42" text-anchor="middle" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#352446">Hello!</text><text x="0" y="65" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#352446">I'm your English Coach</text><text x="0" y="85" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#352446">Let's learn together!</text></g>
+</svg>
