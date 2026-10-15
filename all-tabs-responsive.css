@@ -36,7 +36,21 @@ html.sikau-refresh :is(.seg,.write-mode-switch) button{border-radius:10px!import
 html.sikau-refresh :is(.seg,.write-mode-switch) button.on{background:#ee226d!important;color:#fff!important;box-shadow:none!important}
 html.sikau-refresh :is(.chips,.course-levels,.game-modes){gap:8px!important}
 html.sikau-refresh .chips :is(button,.pill){border-radius:12px!important;min-height:34px}
-html.sikau-refresh .app-header{display:none!important} /* outer secure bar already carries branding */
+/* Keep private lesson language/translation preferences accessible;
+   the outer auth bar already shows brand, greeting, subscription, and theme. */
+html.sikau-refresh .app-header,
+html.sikau-refresh:has(#tr.sikau-translated:not([hidden])) .app-header{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;
+ min-height:49px!important;height:auto!important;padding:5px clamp(12px,2vw,25px)!important;
+ margin:0!important;border:0!important;border-radius:0!important;
+ background:#f7f9fd!important;box-shadow:none!important;color:#263454!important;
+}
+html.sikau-refresh .app-header::before,html.sikau-refresh .app-header::after{display:none!important}
+html.sikau-refresh .app-header :is(.app-brand,.greeting,.hero-stats){display:none!important}
+html.sikau-refresh .app-header .app-header-top{width:100%!important;display:flex!important;justify-content:flex-end!important;gap:6px!important}
+html.sikau-refresh .app-header .header-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px!important;align-items:center}
+html.sikau-refresh .app-header .header-btns :is(button,select){min-height:34px!important;padding:5px 9px!important;font-size:11px!important;line-height:1.2!important;border-radius:9px!important}
+
 html.sikau-refresh #gameStudioNote{display:none!important}
 html.sikau-refresh .nav-brand{background:transparent!important}
 html.sikau-refresh #mobileModes.nav{background:#fff!important;border-color:var(--ui-line)!important;color:var(--ui-ink)!important}
