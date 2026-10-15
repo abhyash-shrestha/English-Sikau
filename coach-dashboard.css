@@ -1,0 +1,77 @@
+/* Coach home refresh — only enhances the signed-in private course DOM. */
+.sikau-coach-banner,.sikau-coach-extras,.sikau-coach-side{font-family:Inter,system-ui,"Noto Sans Devanagari",sans-serif;box-sizing:border-box;color:#1b2147}
+.sikau-coach-banner *,.sikau-coach-extras *,.sikau-coach-side *{box-sizing:border-box}
+.sikau-coach-banner{position:relative;isolation:isolate;min-height:258px;display:flex;align-items:center;overflow:hidden;margin:0 0 19px;border:1px solid #f2dbe7;border-radius:20px;background:linear-gradient(112deg,#ffecf0,#f7c8dc 55%,#d9c7ff);box-shadow:0 8px 27px #3e244313}
+.sikau-coach-banner .sikau-coach-hero-content{position:relative;z-index:1;width:56%;min-width:0;padding:clamp(20px,3vw,38px);background:linear-gradient(90deg,#fff1f5f9 0%,#ffe9f0d3 73%,transparent)}
+.sikau-coach-banner .sikau-coach-eyebrow{font-size:11px;letter-spacing:.22em;font-weight:900;color:#4b305e;margin:0 0 9px}
+.sikau-coach-banner h2{font-size:clamp(31px,3.5vw,49px)!important;line-height:1.12!important;letter-spacing:-.045em!important;margin:0 0 7px!important;color:#25174d!important;font-weight:900!important}
+.sikau-coach-banner .sikau-coach-en{font-size:clamp(20px,2.3vw,28px);font-weight:820;line-height:1.15;letter-spacing:-.025em;color:#242144;margin:0 0 5px}
+.sikau-coach-banner .sikau-coach-ne{font-size:clamp(17px,2vw,24px);font-weight:820;color:#3c2851;margin:0 0 15px}
+.sikau-coach-banner .sikau-coach-tagline{font-size:13px;line-height:1.55;color:#51516d;margin:0;max-width:520px}
+.sikau-coach-banner .sikau-coach-hero-image{position:absolute;inset:0 0 0 38%;background-image:url("./assets/coach-himalayan-illustration.svg");background-position:center right;background-repeat:no-repeat;background-size:cover}
+.sikau-coach-native-hero{display:none!important}
+#sikauCoachQuickStart{display:none!important}
+.sikau-coach-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(220px,285px)!important;gap:18px!important;align-items:start!important;margin:0!important}
+.sikau-coach-grid>.coach-ask{grid-column:1!important;grid-row:1!important;margin:0!important;min-width:0!important;width:100%!important;max-width:none!important;padding:clamp(17px,2vw,25px)!important;background:#fff!important;border:1px solid #ece6ee!important;border-radius:17px!important;box-shadow:0 7px 28px #3826480a!important;color:#242247!important}
+.sikau-coach-grid>.coach-plan{display:none!important}
+.sikau-coach-grid.sikau-coach-more-on>.coach-plan{display:block!important;grid-column:1/-1!important}
+.sikau-coach-grid>.sikau-coach-side{grid-column:2!important;grid-row:1!important;min-width:0}
+.coach-ask.sikau-coach-restyled{border:1px solid #eee0e9!important;border-radius:17px!important;padding:clamp(16px,2vw,25px)!important;background:#fff!important;box-shadow:0 7px 28px #3826480a!important}
+.coach-ask.sikau-coach-restyled>.sikau-coach-input-intro{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:0 0 13px}
+.sikau-coach-input-intro .sikau-coach-input-heading{display:flex;gap:11px;align-items:center;min-width:0}
+.sikau-coach-input-heading .sikau-coach-input-icon{height:40px;width:40px;flex:0 0 40px;display:grid;place-items:center;background:#fff1f6;border-radius:13px;font-size:23px}
+.sikau-coach-input-heading strong{font-size:clamp(15px,1.45vw,19px);font-weight:900;color:#1a1f42;line-height:1.2;display:block}
+.sikau-coach-input-heading small{font-size:12px;color:#77718f;display:block;margin-top:3px}
+.sikau-coach-input-intro .sikau-coach-example{background:#fff;border:1px solid #ebe3f3;border-radius:11px;padding:10px 13px;min-height:39px;color:#42365d;font-weight:750;font-size:12px;white-space:normal}
+.coach-ask.sikau-coach-restyled>h2,.coach-ask.sikau-coach-restyled>h3{display:none!important}
+.coach-ask.sikau-coach-restyled textarea{box-sizing:border-box!important;width:100%!important;min-height:115px!important;max-width:100%!important;resize:vertical!important;border:1.5px solid #dbd3e9!important;border-radius:13px!important;background:#fff!important;padding:14px 15px!important;color:#20253d!important;line-height:1.55!important;box-shadow:none!important}
+.coach-ask.sikau-coach-restyled :is(input[type="text"],[contenteditable="true"]){border:1.5px solid #dbd3e9!important;border-radius:12px!important;background:#fff!important;color:#25233c!important}
+.coach-ask.sikau-coach-restyled textarea::placeholder{color:#9192a8!important}
+.coach-ask.sikau-coach-restyled textarea:focus{border-color:#d32a70!important;outline:3px solid #f0c6dd77!important}
+.coach-ask.sikau-coach-restyled button:not(.sikau-coach-example){border-radius:12px}
+.coach-ask.sikau-coach-restyled button.btn.primary,.coach-ask.sikau-coach-restyled button.primary{background:linear-gradient(125deg,#da1665,#ee2675)!important;color:#fff!important;border:0!important;font-weight:850!important;padding:12px 18px!important;min-height:43px}
+.sikau-coach-side{display:grid;gap:15px}
+.sikau-coach-side-panel{background:#fff;border:1px solid #ebe8ef;border-radius:17px;padding:17px;box-shadow:0 7px 24px #36345a0b}
+.sikau-coach-side-panel h3{font-size:15px!important;font-weight:900!important;color:#252144!important;margin:0 0 11px!important;display:flex;align-items:center;gap:8px}
+.sikau-coach-side-panel p{font-size:12px;color:#626680;line-height:1.65;margin:7px 0!important}
+.sikau-coach-side-panel button{cursor:pointer;display:block;width:100%;text-align:left;min-height:38px;border:1px solid #e9e2ef;background:#fff;border-radius:10px;margin-top:7px;padding:9px 11px;font-size:12px;font-weight:700;color:#473663}
+.sikau-coach-side-panel button:hover{border-color:#d94681;background:#fff7fa}
+.sikau-coach-side-panel .sikau-coach-progress-link{color:#b0195b;font-weight:900;text-align:center}
+.sikau-coach-side-panel .sikau-coach-note{background:#f8f5ff;border-radius:10px;padding:12px;margin-top:11px;color:#616184}
+.sikau-coach-extras{margin:17px 0 33px}
+.sikau-coach-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 0 22px}
+.sikau-coach-cards button{cursor:pointer;display:flex;gap:8px;flex-direction:column;align-items:flex-start;min-width:0;min-height:146px;width:100%;padding:15px 13px;border-radius:16px;border:1px solid #f1e9f1;box-shadow:0 6px 22px #33304f0a;text-align:left;transition:transform .15s ease,box-shadow .15s ease}
+.sikau-coach-cards button:hover,.sikau-coach-topics button:hover{transform:translateY(-2px);box-shadow:0 11px 24px #5834531e}
+.sikau-coach-cards .sikau-card-icon{display:grid;place-items:center;width:41px;height:41px;border-radius:12px;background:#ffffffa4;font-size:24px}
+.sikau-coach-cards strong{font-size:14px;font-weight:900;line-height:1.24;color:#282346}
+.sikau-coach-cards small{display:block;font-size:11px;line-height:1.3;color:#666385}
+.sikau-coach-cards .sikau-card-caption{font-size:12px;line-height:1.5;color:#62657e;margin-top:auto}
+.sikau-coach-cards .sikau-pink{background:linear-gradient(135deg,#fff0f6,#fff9fb)}
+.sikau-coach-cards .sikau-blue{background:linear-gradient(135deg,#edf3ff,#f9fbff)}
+.sikau-coach-cards .sikau-yellow{background:linear-gradient(135deg,#fff6e5,#fffdf8)}
+.sikau-coach-cards .sikau-green{background:linear-gradient(135deg,#eafaee,#f8fff9)}
+.sikau-coach-topic-heading{display:flex;align-items:center;gap:10px;font-size:18px!important;line-height:1.3!important;color:#242146!important;font-weight:900;margin:0 0 13px!important}
+.sikau-coach-topic-heading small{font-size:14px;font-weight:700;color:#706482}
+.sikau-coach-topics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.sikau-coach-topics button{cursor:pointer;min-width:0;display:flex;align-items:center;gap:10px;min-height:73px;padding:12px 11px;border-radius:14px;text-align:left;border:1px solid #eee8f0;transition:transform .15s ease,box-shadow .15s ease}
+.sikau-coach-topics .sikau-topic-icon{font-size:25px;line-height:1}
+.sikau-coach-topics .sikau-topic-label{font-size:12px;font-weight:900;line-height:1.2;color:#1f2242}
+.sikau-coach-topics .sikau-topic-label small{font-size:11px;font-weight:500;display:block;margin-top:4px;color:#706b84}
+.sikau-coach-topics .sikau-pink{background:#fff0f8}.sikau-coach-topics .sikau-blue{background:#edf5ff}.sikau-coach-topics .sikau-yellow{background:#fff7e8}.sikau-coach-topics .sikau-purple{background:#f5f0ff}.sikau-coach-topics .sikau-green{background:#eefaef}
+.sikau-coach-extras .sikau-coach-more-button{display:block;margin:20px 0 0;width:100%;text-align:center;cursor:pointer;background:#fff;border:1px solid #e9d3de;border-radius:12px;min-height:43px;padding:10px;color:#a91851;font-weight:820;font-size:13px}
+.sikau-coach-notice{display:block;color:#866079;font-size:12px;margin-top:9px;min-height:1.2em}
+.sikau-coach-banner button:focus-visible,.sikau-coach-extras button:focus-visible,.sikau-coach-side button:focus-visible,.sikau-coach-input-intro button:focus-visible{outline:3px solid #2863c3!important;outline-offset:3px}
+@media(max-width:1040px){.sikau-coach-grid{grid-template-columns:minmax(0,1fr) 230px!important}.sikau-coach-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.sikau-coach-topics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.sikau-coach-grid{grid-template-columns:1fr!important}.sikau-coach-grid>.sikau-coach-side{grid-column:1!important;grid-row:auto!important;grid-template-columns:repeat(2,minmax(0,1fr))}.sikau-coach-grid>.coach-ask{grid-column:1!important;grid-row:1!important}.sikau-coach-banner .sikau-coach-hero-content{width:68%}.sikau-coach-banner .sikau-coach-hero-image{inset:0 0 0 33%}}
+@media(max-width:580px){.sikau-coach-banner{min-height:260px;border-radius:17px}.sikau-coach-banner .sikau-coach-hero-content{width:100%;padding:18px 16px;background:linear-gradient(90deg,#fff1f5fa,#fff0f5e8 65%,#ffeff5a6)}.sikau-coach-banner .sikau-coach-hero-image{inset:0 0 0 20%;opacity:.38}.sikau-coach-banner h2{font-size:clamp(29px,8vw,38px)!important}.sikau-coach-banner .sikau-coach-en{font-size:20px}.sikau-coach-banner .sikau-coach-ne{font-size:17px}.sikau-coach-banner .sikau-coach-tagline{font-size:12px}.sikau-coach-grid>.sikau-coach-side{grid-template-columns:1fr}.sikau-coach-cards{gap:9px}.sikau-coach-cards button{min-height:142px;padding:12px}.sikau-coach-cards strong{font-size:12px}.sikau-coach-cards small{font-size:10px}.sikau-coach-topics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sikau-coach-topic-heading{font-size:16px!important;flex-wrap:wrap}.sikau-coach-input-intro{gap:9px!important}.sikau-coach-input-intro .sikau-coach-example{width:100%}}
+@media(max-width:345px){.sikau-coach-cards,.sikau-coach-topics{grid-template-columns:1fr}}
+html[data-sikau-theme="dark"] .sikau-coach-banner{background:linear-gradient(125deg,#302442,#3c2d5b)!important;border-color:#665377!important}
+html[data-sikau-theme="dark"] .sikau-coach-banner .sikau-coach-hero-content{background:linear-gradient(90deg,#30243eee,#34264aba,transparent)!important}
+html[data-sikau-theme="dark"] .sikau-coach-banner :is(h2,.sikau-coach-en,.sikau-coach-ne,.sikau-coach-eyebrow){color:#fff1f9!important}
+html[data-sikau-theme="dark"] .sikau-coach-banner .sikau-coach-tagline{color:#ead9ee!important}
+html[data-sikau-theme="dark"] :is(.sikau-coach-cards button,.sikau-coach-topics button,.sikau-coach-side-panel,.coach-ask.sikau-coach-restyled){background:#222b40!important;border-color:#4b536b!important;color:#f5f0f9!important}
+html[data-sikau-theme="dark"] :is(.sikau-coach-cards strong,.sikau-coach-cards small,.sikau-coach-cards .sikau-card-caption,.sikau-coach-topics .sikau-topic-label,.sikau-coach-topics .sikau-topic-label small,.sikau-coach-topic-heading,.sikau-coach-topic-heading small,.sikau-coach-input-heading strong,.sikau-coach-input-heading small,.sikau-coach-side-panel h3,.sikau-coach-side-panel p){color:#f2eafa!important}
+html[data-sikau-theme="dark"] :is(.sikau-coach-more-button,.sikau-coach-example,.sikau-coach-side-panel button){background:#34314a!important;color:#ffcee1!important;border-color:#676080!important}
+html[data-sikau-theme="dark"] .sikau-coach-side-panel .sikau-coach-note{background:#30364b!important;color:#d8d3e8!important}
+html[data-sikau-theme="dark"] .coach-ask.sikau-coach-restyled textarea{background:#1c2435!important;color:#fff!important;border-color:#5c6278!important}
+@media(prefers-reduced-motion:reduce){.sikau-coach-cards button,.sikau-coach-topics button{transition:none!important;transform:none!important}}
