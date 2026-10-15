@@ -1084,7 +1084,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
   </div>
   <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
   <div class="student-top-actions">
-    <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v3 · checking</span>
+    <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v4 · checking</span>
     <button id="sikauThemeProtected" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
     <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
   </div>
@@ -1094,7 +1094,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
 <script src="./coach-dashboard.js"></script>
-<script src="./translate-dashboard.js"></script>
+<script src="./translate-studio-v4.js?v=20261015-r1"></script>
 <script src="./all-tabs-responsive.js"></script>
 <script>
 'use strict';
@@ -2265,13 +2265,13 @@ function personalizeStudentLesson(){
   const buildLabel=$('sikauUiBuild');
   if(buildLabel){
     const active=doc.documentElement.classList.contains('sikau-refresh');
-    buildLabel.textContent=active?'UI v3 · active':'UI v3 · not loaded';
+    buildLabel.textContent=active?'UI v4 · active':'UI v4 · not loaded';
     buildLabel.title=active?'The updated interface script ran.':'The updated interface script did not apply. Please report this status.';
     const stylesheet=doc.getElementById('sikauUnifiedAllTabsStyle');
     if(stylesheet&&!stylesheet.dataset.sikauBuildWatch){
       stylesheet.dataset.sikauBuildWatch='1';
-      stylesheet.addEventListener('load',()=>{buildLabel.textContent='UI v3 · ready';});
-      stylesheet.addEventListener('error',()=>{buildLabel.textContent='UI v3 · CSS error';});
+      stylesheet.addEventListener('load',()=>{buildLabel.textContent='UI v4 · ready';});
+      stylesheet.addEventListener('error',()=>{buildLabel.textContent='UI v4 · CSS error';});
     }
   }
   // Visual-only test dashboard; preserves original festival handlers and security.
