@@ -1084,6 +1084,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
   </div>
   <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
   <div class="student-top-actions">
+    <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v3 · checking</span>
     <button id="sikauThemeProtected" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
     <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
   </div>
@@ -2250,12 +2251,29 @@ function personalizeStudentLesson(){
   try{doc=$('lessonFrame').contentDocument;}catch{return;}
   if(!doc?.body)return;
   const first=studentFirstName();
-  enhanceBeginnerClarity(doc);
-  window.enhanceCoachDashboard?.(doc,first);
-  window.enhanceTranslationDashboard?.(doc);
-  window.enhanceUnifiedStudentUI?.(doc);
-  enhanceFestivalCalendar(doc);
-  enhanceLearningHome(doc,first);
+  // Apply the common UI first; one optional enhancement must never prevent
+  // the others from running. These callbacks do not change authorization.
+  const uiStep=(name,fn)=>{
+    try{fn();}catch(error){console.warn('English Sikau UI enhancement:',name,error);}
+  };
+  uiStep('responsive all tabs',()=>window.enhanceUnifiedStudentUI?.(doc));
+  uiStep('beginner clarity',()=>enhanceBeginnerClarity(doc));
+  uiStep('coach',()=>window.enhanceCoachDashboard?.(doc,first));
+  uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
+  uiStep('festival calendar',()=>enhanceFestivalCalendar(doc));
+  uiStep('festival home',()=>enhanceLearningHome(doc,first));
+  const buildLabel=$('sikauUiBuild');
+  if(buildLabel){
+    const active=doc.documentElement.classList.contains('sikau-refresh');
+    buildLabel.textContent=active?'UI v3 · active':'UI v3 · not loaded';
+    buildLabel.title=active?'The updated interface script ran.':'The updated interface script did not apply. Please report this status.';
+    const stylesheet=doc.getElementById('sikauUnifiedAllTabsStyle');
+    if(stylesheet&&!stylesheet.dataset.sikauBuildWatch){
+      stylesheet.dataset.sikauBuildWatch='1';
+      stylesheet.addEventListener('load',()=>{buildLabel.textContent='UI v3 · ready';});
+      stylesheet.addEventListener('error',()=>{buildLabel.textContent='UI v3 · CSS error';});
+    }
+  }
   // Visual-only test dashboard; preserves original festival handlers and security.
   window.enhanceFestivalDashboardPreview?.(doc,first,[...SIKAU_FESTIVAL_PREVIEW,...SIKAU_NEXT_FESTIVALS],sikauNepalDate());
   simplifyStudentHeroGreeting(doc,first);
