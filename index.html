@@ -1093,6 +1093,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
 <script src="./coach-dashboard.js"></script>
+<script src="./translate-dashboard.js"></script>
 <script>
 'use strict';
 
@@ -2250,6 +2251,7 @@ function personalizeStudentLesson(){
   const first=studentFirstName();
   enhanceBeginnerClarity(doc);
   window.enhanceCoachDashboard?.(doc,first);
+  window.enhanceTranslationDashboard?.(doc);
   enhanceFestivalCalendar(doc);
   enhanceLearningHome(doc,first);
   // Visual-only test dashboard; preserves original festival handlers and security.
