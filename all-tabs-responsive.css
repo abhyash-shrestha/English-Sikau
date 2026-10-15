@@ -201,3 +201,13 @@ html.sikau-refresh[data-sikau-theme="dark"] #hw #topicCard :is(.topic-en,.topic-
 html.sikau-refresh[data-sikau-theme="dark"] #game .game-map-stop:nth-child(n){background:#292f49!important;color:#f5edfa!important}
 html.sikau-refresh[data-sikau-theme="dark"] #sp #micBig{color:#fff!important}
 @media(prefers-reduced-motion:reduce){html.sikau-refresh *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+html.sikau-refresh #mobileModes.nav .sikau-nav-word{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:2px;line-height:1.18}
+html.sikau-refresh #mobileModes.nav .sikau-nav-word strong{font-size:13px;line-height:1.2;color:inherit;font-weight:850}
+html.sikau-refresh #mobileModes.nav .sikau-nav-word small{font-size:10px;line-height:1.2;color:#7e839b;font-weight:600}
+@media(max-width:1023px){
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word{align-items:center;text-align:center;max-width:100%}
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word strong{font-size:10px}
+ html.sikau-refresh #mobileModes.nav .sikau-nav-word small{display:none}
+}
+html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav .sikau-nav-word small{color:#bcb8cd}
