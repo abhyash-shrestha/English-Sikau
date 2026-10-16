@@ -1,0 +1,55 @@
+
+#rd.sikau-read-v2>.content{display:flex!important;flex-direction:column!important;max-width:1600px!important;min-width:0!important;width:100%!important;gap:12px!important;padding:clamp(12px,2vw,25px)!important;background:#f8faff!important}
+#rd.sikau-read-v2>.content>.page-title,#rd.sikau-read-v2>.content>.page-sub,#rd.sikau-read-v2>.content>.sikau-ui-intro{display:none!important}
+#rd.sikau-read-v2 .read-v2-hero{position:relative;min-height:158px;display:flex;align-items:center;border-radius:18px;background:linear-gradient(90deg,#fff0f3,#fbe5f4 57%,#e9d7f1);overflow:hidden;padding:24px 28px;border:1px solid #f2dfe9;isolation:isolate}
+#rd.sikau-read-v2 .read-v2-hero:after{content:"";position:absolute;inset:0 0 0 37%;background:url("./assets/reading-nepal-book.svg") center right/cover no-repeat;z-index:-1}
+#rd.sikau-read-v2 .read-v2-copy{width:60%;max-width:700px}
+#rd.sikau-read-v2 .read-v2-hero h1{color:#223056!important;font-size:clamp(29px,3vw,43px)!important;line-height:1.12!important;margin:0 0 2px!important;font-weight:900!important;letter-spacing:-.04em}
+#rd.sikau-read-v2 .read-v2-hero h2{color:#32335d!important;margin:0 0 8px!important;font-size:clamp(18px,1.9vw,25px)!important}
+#rd.sikau-read-v2 .read-v2-hero p{color:#616987!important;font-size:13px;margin:3px 0;line-height:1.4}
+#rd.sikau-read-v2 .read-v2-mode{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important;width:100%;padding:5px!important;margin:0!important;background:#fff!important;border-radius:14px!important;border:1px solid #edf0f7!important}
+#rd.sikau-read-v2 .read-v2-mode button{min-width:0!important;min-height:48px!important;border-radius:11px!important;border:0!important;background:#fff!important;color:#394668!important;font-size:13px!important;font-weight:850!important}
+#rd.sikau-read-v2 .read-v2-mode button.on{background:linear-gradient(110deg,#ed286d,#f697b5)!important;color:#fff!important}
+#rd.sikau-read-v2>.content>.card.tight{display:none!important}
+#rd.sikau-read-v2:has(#readModeSeg button[data-rm="practice"].on)>.content>.card.tight{display:block!important}
+#rd.sikau-read-v2 #rbox{max-width:100%!important;min-width:0!important}
+#rd.sikau-read-v2 #storyReader{display:block!important;background:#fff!important;border-radius:17px!important;border:1px solid #e8eaf2!important;box-shadow:0 8px 22px #29345410!important;padding:13px!important;width:100%!important;max-width:100%!important;min-width:0!important}
+#rd.sikau-read-v2 #storyReader[data-read-v2=yes]>:not(.read-v2-layout){display:none!important}
+#rd.sikau-read-v2 .read-v2-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0;width:100%}
+#rd.sikau-read-v2 .read-v2-filters{display:grid;grid-template-columns:minmax(160px,185px) minmax(0,1fr);gap:8px;align-items:center;min-width:0}
+#rd.sikau-read-v2 .read-v2-filters h3{font-size:13px!important;margin:0!important;color:#2c365b!important}
+#rd.sikau-read-v2 .read-v2-filters .story-topic-list,#rd.sikau-read-v2 .read-v2-filters .story-level-list{display:flex!important;gap:7px!important;flex-wrap:wrap!important;max-width:100%!important;padding:3px 0!important;min-width:0}
+#rd.sikau-read-v2 .read-v2-filters .story-library-head{display:none!important}
+#rd.sikau-read-v2 .read-v2-filters .chip{display:inline-flex;align-items:center;justify-content:center;white-space:normal;min-height:37px!important;padding:8px 12px!important;border-radius:999px!important;background:#fff!important;border:1px solid #e3e5ef!important;color:#3a4566!important;font-size:12px!important;font-weight:750!important}
+#rd.sikau-read-v2 .read-v2-filters .chip.on{background:linear-gradient(125deg,#e82566,#f04a82)!important;color:white!important;border-color:#e82566!important}
+#rd.sikau-read-v2 .read-v2-selection{display:grid;grid-template-columns:minmax(160px,185px) minmax(0,1fr);gap:8px;align-items:center;min-width:0}
+#rd.sikau-read-v2 .read-v2-selection h3{font-size:13px!important;margin:0!important;color:#2c365b!important}
+#rd.sikau-read-v2 .read-v2-selection .story-library-head{display:none!important}
+#rd.sikau-read-v2 .story-book-list{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important;width:100%;max-width:100%;min-width:0;padding:0!important;margin:0!important}
+#rd.sikau-read-v2 .story-book-list .story-book{min-height:74px!important;border:1px solid #e7e8f1!important;background:#fff!important;border-radius:12px!important;padding:8px!important;display:flex;align-items:center;gap:8px;min-width:0;color:#2e3a5b!important;text-align:left}
+#rd.sikau-read-v2 .story-book-list .story-book.on{border-color:#ee2875!important;background:#fff1f7!important;box-shadow:0 2px 9px #ee286520!important}
+#rd.sikau-read-v2 .story-book-ico{flex:0 0 42px;font-size:30px!important;border-radius:10px;background:#fff0e4;display:grid;place-items:center;min-height:47px}
+#rd.sikau-read-v2 .story-book-text{min-width:0;flex:1}
+#rd.sikau-read-v2 .story-book-text b{display:block;font-size:11px!important;color:#233257;white-space:normal;overflow-wrap:break-word}
+#rd.sikau-read-v2 .story-book-text small{font-size:10px;color:#71809e}
+#rd.sikau-read-v2 .read-v2-reading{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:11px 17px;padding:12px;background:#fff;border:1px solid #edf0f7;border-radius:15px;min-width:0;align-items:start}
+#rd.sikau-read-v2 .read-v2-picture{grid-column:1;grid-row:1 / span 2;min-width:0}
+#rd.sikau-read-v2 .read-v2-picture .story-hero{display:block!important;object-fit:contain!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:1000/540;border-radius:13px!important}
+#rd.sikau-read-v2 .read-v2-storyinfo{grid-column:2;min-width:0;align-self:end}
+#rd.sikau-read-v2 .read-v2-storyinfo h2{font-size:17px!important;line-height:1.25!important;color:#2a3154!important;margin:0!important;padding:0!important}
+#rd.sikau-read-v2 .read-v2-storyinfo h3{font-size:15px!important;color:#32345c!important;margin:5px 0!important}
+#rd.sikau-read-v2 .read-v2-sentences{grid-column:2;min-width:0}
+#rd.sikau-read-v2 .read-v2-sentences .story-lines{display:grid;gap:7px!important}
+#rd.sikau-read-v2 .story-line{background:#fff8f8!important;border:1px solid #f0e8e9!important;border-radius:11px!important;padding:10px!important;min-width:0!important;overflow-wrap:break-word}
+#rd.sikau-read-v2 .story-line .rs{font-size:12px!important;line-height:1.6!important}
+#rd.sikau-read-v2 .story-line-number{background:#fff!important;border:1px solid #e8deed!important;border-radius:50%;height:24px;width:24px;flex:0 0 24px;display:grid;place-items:center;font-size:11px}
+#rd.sikau-read-v2 .story-actions{grid-column:1/-1;display:grid!important;grid-template-columns:1fr 1.15fr 1fr;gap:10px;min-width:0}
+#rd.sikau-read-v2 .story-actions button{min-height:47px!important;border-radius:11px!important;min-width:0!important;white-space:normal!important;font-size:12px!important;font-weight:850!important}
+#rd.sikau-read-v2 #storyQuizBox{min-width:0;max-width:100%}
+@media(max-width:1100px){#rd.sikau-read-v2 .story-book-list{grid-template-columns:repeat(3,minmax(0,1fr))!important}#rd.sikau-read-v2 .read-v2-reading{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}}
+@media(max-width:750px){#rd.sikau-read-v2 .read-v2-copy{width:90%}#rd.sikau-read-v2 .read-v2-hero:after{opacity:.35;inset:0 0 0 20%}#rd.sikau-read-v2 .read-v2-filters,#rd.sikau-read-v2 .read-v2-selection{grid-template-columns:1fr}#rd.sikau-read-v2 .story-book-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}#rd.sikau-read-v2 .read-v2-reading{grid-template-columns:1fr}#rd.sikau-read-v2 .read-v2-picture,#rd.sikau-read-v2 .read-v2-storyinfo,#rd.sikau-read-v2 .read-v2-sentences{grid-column:1;grid-row:auto}#rd.sikau-read-v2 .story-actions{grid-template-columns:1fr 1fr;gap:7px}#rd.sikau-read-v2 .story-actions #storyQuiz{grid-column:1/-1;grid-row:1}}
+@media(max-width:390px){#rd.sikau-read-v2 .read-v2-hero{padding:16px;min-height:174px}#rd.sikau-read-v2 .read-v2-hero h1{font-size:27px!important}#rd.sikau-read-v2 .read-v2-mode button{font-size:11px!important}#rd.sikau-read-v2 .story-book-list{grid-template-columns:1fr!important}}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2>.content{background:#12192a!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(#storyReader,.read-v2-reading){background:#252d42!important;border-color:#4b536b!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.read-v2-storyinfo h2,.read-v2-storyinfo h3,.read-v2-filters h3,.read-v2-selection h3){color:#f5eafa!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.story-line,.story-book-list .story-book){background:#30354c!important;color:#f6eef9!important;border-color:#596073!important}
