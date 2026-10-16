@@ -1098,6 +1098,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./all-tabs-responsive.js"></script>
 <script src="./words-studio.js?v=20261015-a"></script>
 <script src="./writing-coach-dashboard.js?v=20261015-b"></script>
+<script src="./reading-dashboard.js?v=20261015-2"></script>
 <script>
 'use strict';
 
@@ -2261,6 +2262,7 @@ function personalizeStudentLesson(){
   uiStep('responsive all tabs',()=>window.enhanceUnifiedStudentUI?.(doc));
   uiStep('words vocabulary',()=>window.enhanceWordsDashboard?.(doc));
   uiStep('writing coach',()=>window.enhanceWritingCoachDashboard?.(doc));
+  uiStep('reading dashboard',()=>window.enhanceReadingDashboard?.(doc));
   uiStep('beginner clarity',()=>enhanceBeginnerClarity(doc));
   uiStep('coach',()=>window.enhanceCoachDashboard?.(doc,first));
   uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
