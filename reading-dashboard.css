@@ -53,3 +53,60 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2>.content{background:#12192a!impo
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(#storyReader,.read-v2-reading){background:#252d42!important;border-color:#4b536b!important}
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.read-v2-storyinfo h2,.read-v2-storyinfo h3,.read-v2-filters h3,.read-v2-selection h3){color:#f5eafa!important}
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.story-line,.story-book-list .story-book){background:#30354c!important;color:#f6eef9!important;border-color:#596073!important}
+
+/* Screenshot-close reading presentation: replaces old wide story shelf / generic header. */
+#rd.sikau-read-exact>.content{gap:10px!important;background:#f8fbff!important}
+#rd.sikau-read-exact .read-v2-hero{min-height:158px!important;background:linear-gradient(100deg,#fff4f6,#f9e4f2)!important;padding:23px 28px!important;margin:0!important}
+#rd.sikau-read-exact .read-v2-hero::after{inset:0 0 0 38%;background:url("./assets/reading-nepal-book.svg") right center/cover no-repeat!important;opacity:1!important}
+#rd.sikau-read-exact .read-v2-mode{min-height:57px;border:1px solid #eff0f5!important;box-shadow:0 4px 14px #24304c0a!important}
+#rd.sikau-read-exact .read-v2-mode button{min-height:45px!important}
+#rd.sikau-read-exact #storyReader{border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important}
+#rd.sikau-read-exact .read-v2-layout{gap:10px!important}
+#rd.sikau-read-exact .read-v2-filters{grid-template-columns:185px minmax(0,1fr)!important;gap:7px 12px!important;background:transparent!important}
+#rd.sikau-read-exact .read-v2-filters h3,#rd.sikau-read-exact .read-v2-selection h3{font-size:12px!important;font-weight:850!important;color:#344160!important}
+#rd.sikau-read-exact .read-v2-filters .story-topic-list,#rd.sikau-read-exact .read-v2-filters .story-level-list{flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:thin!important;gap:7px!important;margin:0!important;padding:4px 0 8px!important}
+#rd.sikau-read-exact .read-v2-filters .chip{flex:0 0 auto!important;min-height:37px!important;padding:8px 11px!important;white-space:nowrap!important;background:white!important;box-shadow:0 2px 7px #333e5510!important}
+#rd.sikau-read-exact .read-v2-filters .chip.on{background:#ed2868!important}
+#rd.sikau-read-exact .read-v2-selection{grid-template-columns:110px minmax(0,1fr)!important;gap:9px 10px!important;align-items:center!important}
+#rd.sikau-read-exact .story-book-list{display:flex!important;overflow-x:auto!important;scrollbar-width:thin!important;flex-wrap:nowrap!important;gap:8px!important;padding:3px 1px 10px!important;margin:0!important}
+#rd.sikau-read-exact .story-book-list .story-book{flex:0 0 clamp(177px,18vw,235px)!important;min-height:78px!important;max-width:235px!important;border-radius:12px!important;padding:7px!important;gap:8px!important;box-shadow:0 3px 12px #3142640b!important}
+#rd.sikau-read-exact .story-book-ico.read-exact-thumb{display:grid!important;place-items:center!important;width:55px!important;height:60px!important;flex:0 0 55px!important;font-size:23px!important;background:linear-gradient(135deg,#f8bf84,#8d597c)!important;color:white!important}
+#rd.sikau-read-exact .read-exact-thumb[data-scene="tihar"]{background:linear-gradient(20deg,#362445bb,#df7e52a0),url("./assets/tihar-story-cover.svg") center/cover no-repeat!important;font-size:0!important}
+#rd.sikau-read-exact .read-exact-thumb[data-scene="temple"]{background:linear-gradient(30deg,#de9f7588,#799aba55),url("./assets/reading-nepal-book.svg") center/cover no-repeat!important}
+#rd.sikau-read-exact .read-exact-thumb[data-scene="dashain"]{background:linear-gradient(30deg,#f3ba7c66,#afa6df88),url("./assets/translate-nepal-scene.svg") center/cover no-repeat!important}
+#rd.sikau-read-exact .read-exact-thumb[data-scene="art"]{background:linear-gradient(125deg,#fbc88a,#b77aa9)!important}
+#rd.sikau-read-exact .story-book-text b{font-size:11px!important;line-height:1.35!important}
+#rd.sikau-read-exact .story-check{color:#e92666!important}
+#rd.sikau-read-exact .read-v2-reading{display:grid!important;grid-template-columns:minmax(0,1.1fr) minmax(0,1.28fr)!important;column-gap:18px!important;row-gap:10px!important;background:white!important;border:1px solid #e8ecf3!important;border-radius:17px!important;padding:14px!important;box-shadow:0 6px 24px #3239500d!important}
+#rd.sikau-read-exact .read-v2-picture{grid-column:1!important;grid-row:1 / span 2!important;align-self:start!important;min-width:0!important}
+#rd.sikau-read-exact .read-v2-picture .story-hero{aspect-ratio:1000/560!important;object-fit:cover!important;width:100%!important;border-radius:13px!important;box-shadow:none!important;margin:0!important;max-height:none!important}
+#rd.sikau-read-exact .read-v2-storyinfo{grid-column:2!important;grid-row:1!important;align-self:start!important}
+#rd.sikau-read-exact .read-v2-storyinfo .read-exact-current-title{font-size:19px!important;font-weight:900!important;color:#27334f!important;margin:0 0 6px!important}
+#rd.sikau-read-exact .read-v2-storyinfo h3{font-size:14px!important;margin:4px 0!important;color:#344164!important}
+#rd.sikau-read-exact .read-v2-sentences{grid-column:2!important;grid-row:2!important}
+#rd.sikau-read-exact .read-v2-sentences .story-lines{gap:7px!important}
+#rd.sikau-read-exact .story-line{display:flex!important;align-items:center!important;gap:11px!important;background:#fff9f7!important;border:1px solid #f0e8eb!important;padding:11px!important;box-shadow:none!important}
+#rd.sikau-read-exact .story-line-number{flex:0 0 23px!important;padding:0!important}
+#rd.sikau-read-exact .story-line .rs{font-size:12px!important;line-height:1.55!important;max-width:none!important}
+#rd.sikau-read-exact .story-line .speaker{min-width:34px!important;min-height:34px!important;border:1px solid #ffd1e2!important;border-radius:10px!important;background:white!important}
+#rd.sikau-read-exact .story-actions{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1.2fr 1fr!important;gap:10px!important}
+#rd.sikau-read-exact .story-actions #storyQuiz{background:linear-gradient(110deg,#ec1d65,#f279a2)!important;color:white!important}
+@media(max-width:1100px){
+ #rd.sikau-read-exact .read-v2-reading{grid-template-columns:1fr 1fr!important;gap:13px!important}
+ #rd.sikau-read-exact .read-v2-filters{grid-template-columns:125px minmax(0,1fr)!important}
+}
+@media(max-width:750px){
+ #rd.sikau-read-exact .read-v2-filters,#rd.sikau-read-exact .read-v2-selection{grid-template-columns:1fr!important}
+ #rd.sikau-read-exact .read-v2-reading{grid-template-columns:minmax(0,1fr)!important}
+ #rd.sikau-read-exact .read-v2-picture,#rd.sikau-read-exact .read-v2-storyinfo,#rd.sikau-read-exact .read-v2-sentences{grid-column:1!important;grid-row:auto!important}
+ #rd.sikau-read-exact .story-actions{grid-template-columns:1fr 1fr!important}
+ #rd.sikau-read-exact .story-actions #storyQuiz{grid-column:1/-1!important;grid-row:1!important}
+ #rd.sikau-read-exact .story-book-list .story-book{flex-basis:210px!important}
+ #rd.sikau-read-exact .read-v2-hero::after{inset:0 0 0 20%!important;opacity:.4!important}
+}
+@media(max-width:380px){
+ #rd.sikau-read-exact .story-book-list .story-book{flex-basis:195px!important}
+ #rd.sikau-read-exact .read-v2-reading{padding:10px!important}
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-reading{background:#242e42!important;border-color:#505a75!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{background:#31344a!important;color:#f8f0ff!important}

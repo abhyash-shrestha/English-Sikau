@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-labelledby="t">
+<title id="t">Tihar evening in Nepal with glowing diyas, marigolds, a cat, and Nepali pagoda roofs</title>
+<defs>
+<linearGradient id="s" x2=".7" y2="1"><stop stop-color="#422c68"/><stop offset=".57" stop-color="#98485f"/><stop offset="1" stop-color="#f09e61"/></linearGradient>
+<radialGradient id="glow"><stop stop-color="#ffe59f" stop-opacity=".94"/><stop offset=".35" stop-color="#ffc76d" stop-opacity=".3"/><stop offset="1" stop-color="#f5a54f" stop-opacity="0"/></radialGradient>
+<linearGradient id="roof" x2="0" y2="1"><stop stop-color="#382139"/><stop offset="1" stop-color="#6c3447"/></linearGradient>
+<linearGradient id="wall" x2=".7" y2="1"><stop stop-color="#9c4456"/><stop offset="1" stop-color="#522938"/></linearGradient>
+<linearGradient id="floor" x2="0" y2="1"><stop stop-color="#8a4552"/><stop offset="1" stop-color="#251f36"/></linearGradient>
+</defs>
+<rect width="1000" height="560" fill="url(#s)"/>
+<circle cx="635" cy="124" r="85" fill="#ffd4a0" opacity=".13"/>
+<path d="M0 289 145 166l110 87 139-133 111 153 113-99 122 106 114-112 146 138v255H0Z" fill="#3a365c" opacity=".52"/>
+<path d="M0 372 185 244l154 126 162-170 162 169 148-106 189 135v162H0Z" fill="#332e50" opacity=".75"/>
+<!-- left pagoda village -->
+<g fill="#251f37">
+<path d="M43 388V252h145v136Z"/><path d="M12 257 118 196l96 61-16 13H27Z"/><path d="M36 221 117 166l85 55-12 10H47Z"/><path d="M110 138h12v32h-12Z"/>
+<path d="M160 420V323h122v97Z"/><path d="m140 324 79-49 83 49-13 11H153Z"/>
+<path d="M286 404V279h107v125Z"/><path d="m267 283 74-44 70 44-15 8H283Z"/>
+</g>
+<g stroke="#f0ae77" stroke-width="5" fill="none"><path d="M42 252h155M50 221h136M150 324h143M288 281h109"/></g>
+<g fill="#f7bd78"><rect x="88" y="302" width="19" height="31" rx="3"/><rect x="136" y="302" width="19" height="31" rx="3"/><rect x="194" y="359" width="20" height="29" rx="3"/><rect x="241" y="356" width="15" height="24" rx="3"/><rect x="314" y="313" width="20" height="30" rx="3"/></g>
+<!-- courtyard and ornate house -->
+<path d="M0 425q230-50 440-5t560-25v165H0Z" fill="url(#floor)"/>
+<path d="M650 52h305v387H650Z" fill="url(#wall)"/>
+<path d="m622 97 178-91 188 91-24 27H651Z" fill="url(#roof)"/>
+<path d="m637 159 171-77 175 77-22 24H659Z" fill="#39253e"/>
+<path d="M656 112h294M672 174h279" stroke="#eeb66b" stroke-width="7"/>
+<path d="M720 441V218h180v223" fill="#3d2938" stroke="#b76a54" stroke-width="15"/>
+<path d="M741 421V241h139v180Z" fill="#56303b"/>
+<path d="M810 245v177M740 265h140" stroke="#a97063" stroke-width="5"/>
+<circle cx="793" cy="334" r="6" fill="#f5b66f"/>
+<g fill="#ef912e">
+<circle cx="702" cy="178" r="9"/><circle cx="715" cy="185" r="9"/><circle cx="728" cy="189" r="9"/><circle cx="741" cy="195" r="9"/><circle cx="754" cy="199" r="9"/><circle cx="767" cy="203" r="9"/><circle cx="780" cy="204" r="9"/><circle cx="793" cy="205" r="9"/><circle cx="806" cy="205" r="9"/><circle cx="820" cy="205" r="9"/><circle cx="834" cy="202" r="9"/><circle cx="846" cy="198" r="9"/><circle cx="860" cy="196" r="9"/><circle cx="872" cy="189" r="9"/><circle cx="885" cy="183" r="9"/><circle cx="899" cy="177" r="9"/>
+<circle cx="715" cy="231" r="8"/><circle cx="722" cy="242" r="8"/><circle cx="730" cy="254" r="8"/><circle cx="735" cy="267" r="8"/><circle cx="739" cy="281" r="8"/>
+<circle cx="899" cy="231" r="8"/><circle cx="890" cy="246" r="8"/><circle cx="887" cy="259" r="8"/><circle cx="884" cy="273" r="8"/>
+</g>
+<!-- festival string lights -->
+<path d="M30 115Q420 17 716 121" stroke="#402a46" stroke-width="4" fill="none"/>
+<g fill="#f8c972"><circle cx="72" cy="104" r="7"/><circle cx="142" cy="92" r="7"/><circle cx="211" cy="83" r="7"/><circle cx="279" cy="78" r="7"/><circle cx="350" cy="73" r="7"/><circle cx="422" cy="78" r="7"/><circle cx="495" cy="85" r="7"/><circle cx="565" cy="98" r="7"/><circle cx="635" cy="110" r="7"/></g>
+<!-- warm light circles -->
+<circle cx="598" cy="468" r="124" fill="url(#glow)"/><circle cx="324" cy="487" r="90" fill="url(#glow)"/><circle cx="844" cy="471" r="97" fill="url(#glow)"/>
+<!-- cat -->
+<g transform="translate(460 275)">
+<ellipse cx="105" cy="168" rx="98" ry="28" fill="#261d33" opacity=".3"/>
+<path d="M176 140q86-74 24-119" fill="none" stroke="#e19b69" stroke-width="28" stroke-linecap="round"/>
+<path d="M81 53Q112 17 165 51q30 35 22 94-67 37-137 0-10-57 31-92Z" fill="#e0a67e"/>
+<path d="M87 57 88 0l40 27L160 0l3 64" fill="#d79d76" stroke="#9e625b" stroke-width="6"/>
+<path d="M96 41 96 19l20 17M142 34l13-15 1 28" fill="#da8690"/>
+<ellipse cx="113" cy="90" rx="9" ry="12" fill="#3d3441"/><ellipse cx="150" cy="90" rx="9" ry="12" fill="#3d3441"/>
+<path d="M128 115q9-7 18 0-8 9-18 0Z" fill="#8e4f59"/>
+<path d="M126 126q13 8 27-3M117 116 75 104M118 125 78 126M155 115 194 103M154 126l37 5" stroke="#f2d0ac" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M68 72q-17 32-10 55m114-65q14 35 11 60" fill="none" stroke="#aa665b" stroke-width="12"/>
+<path d="M70 148v33M164 146v35" stroke="#da9c78" stroke-width="23" stroke-linecap="round"/>
+</g>
+<!-- diyas -->
+<g>
+<ellipse cx="297" cy="480" rx="79" ry="21" fill="#321e30" opacity=".4"/><ellipse cx="297" cy="467" rx="78" ry="18" fill="#cd7947"/><path d="M218 469q16 50 80 54 65-5 78-54" fill="#aa4a3d"/><path d="M291 445q-22-33 7-57 26 37 0 59" fill="#ffdf83"/><path d="M296 433q-12-18 3-33 14 20-3 33" fill="#fff6b2"/>
+<ellipse cx="727" cy="489" rx="100" ry="26" fill="#321e30" opacity=".4"/><ellipse cx="728" cy="473" rx="94" ry="23" fill="#cb7645"/><path d="M635 475q13 59 93 60 80-3 93-60" fill="#ab523f"/><path d="M715 450q-30-44 10-76 33 45 3 79" fill="#ffe085"/><path d="M721 433q-14-24 3-42 18 29-3 42" fill="#fff6ba"/>
+<ellipse cx="910" cy="510" rx="69" ry="17" fill="#321e30" opacity=".3"/><ellipse cx="910" cy="499" rx="64" ry="16" fill="#bf693d"/><path d="M846 499q14 40 65 43 52-4 63-43" fill="#a5463a"/><path d="M903 479q-18-26 7-48 24 29 4 49" fill="#ffe189"/>
+</g>
+<g fill="#e99a39"><circle cx="380" cy="468" r="12"/><circle cx="394" cy="479" r="11"/><circle cx="412" cy="488" r="11"/><circle cx="427" cy="495" r="10"/><circle cx="438" cy="507" r="10"/></g>
+<path d="M0 520q170-38 360 10t640-8v38H0Z" fill="#282437" opacity=".38"/>
+</svg>
