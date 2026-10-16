@@ -1100,6 +1100,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./writing-coach-dashboard.js?v=20261015-b"></script>
 <script src="./reading-dashboard.js?v=20261015-2"></script>
 <script src="./game-adventure.js?v=20261016-1"></script>
+<script src="./progress-dashboard.js?v=20261016-1"></script>
 <script>
 'use strict';
 
@@ -2265,6 +2266,7 @@ function personalizeStudentLesson(){
   uiStep('writing coach',()=>window.enhanceWritingCoachDashboard?.(doc));
   uiStep('reading dashboard',()=>window.enhanceReadingDashboard?.(doc));
   uiStep('game adventure',()=>window.enhanceGameDashboard?.(doc));
+  uiStep('progress dashboard',()=>window.enhanceProgressDashboard?.(doc));
   uiStep('beginner clarity',()=>enhanceBeginnerClarity(doc));
   uiStep('coach',()=>window.enhanceCoachDashboard?.(doc,first));
   uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
