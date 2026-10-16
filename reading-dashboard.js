@@ -1,13 +1,13 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261015-2',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261015-3',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 window.enhanceReadingDashboard=function(d){
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
  if(!rd||!content||!mode||!box)return;
  if(!d.getElementById('sikauReadStyle')){const link=mk(d,'link');link.id='sikauReadStyle';link.rel='stylesheet';link.href=url;d.head.append(link);}
- rd.classList.add('sikau-read-v2');
+ rd.classList.add('sikau-read-v2','sikau-read-exact');
  if(!content.querySelector('.read-v2-hero')){
    const hero=mk(d,'section','read-v2-hero');
    const copy=mk(d,'div','read-v2-copy');
@@ -60,6 +60,23 @@ window.enhanceReadingDashboard=function(d){
    view.append(picture,storyInfo,sentences,actions);
    layout.append(filters,selection,view);
    reader.append(layout);
+
+   const currentTitle=reader.querySelector('.story-book.on .story-book-text b')?.textContent||'';
+   const cover=reader.querySelector('.read-v2-picture img.story-hero');
+   if(cover&&/tihar/i.test(currentTitle)){
+     cover.src=new URL('./assets/tihar-story-cover.svg',document.baseURI).href;
+     cover.alt='Tihar evening with oil lamps, a temple, and a cat';
+   }
+   for(const button of reader.querySelectorAll('.story-book')){
+     const emoji=button.querySelector('.story-book-ico');
+     const name=button.querySelector('.story-book-text b')?.textContent||'';
+     if(emoji){
+       emoji.classList.add('read-exact-thumb');
+       emoji.dataset.scene=/tihar/i.test(name)?'tihar':/janakpur|temple/i.test(name)?'temple':/thangka/i.test(name)?'art':/dashain/i.test(name)?'dashain':'story';
+     }
+   }
+   reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
+
  }
  const observer=new d.defaultView.MutationObserver(()=>{organize();});
  observer.observe(box,{childList:true,subtree:false});
