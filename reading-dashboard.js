@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261015-3',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261016-4',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 window.enhanceReadingDashboard=function(d){
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
@@ -61,19 +61,31 @@ window.enhanceReadingDashboard=function(d){
    layout.append(filters,selection,view);
    reader.append(layout);
 
-   const currentTitle=reader.querySelector('.story-book.on .story-book-text b')?.textContent||'';
+
+   const selectedTopic=reader.querySelector('[data-storytopic].on')?.getAttribute('data-storytopic')||'adventure';
+   const allowed=['adventure','mystery','friendship','school','family','animals','travel','food','science','fantasy','culture','kindness'];
+   const themeId=allowed.includes(selectedTopic)?selectedTopic:'adventure';
+   const pictureURL=new URL('./assets/read-topics/'+themeId+'.svg',document.baseURI).href;
+   for(const button of reader.querySelectorAll('[data-storytopic]')){
+     const id=button.getAttribute('data-storytopic');
+     if(!allowed.includes(id))continue;
+     button.classList.add('read-art-topic');
+     button.style.setProperty('--read-topic-image','url("'+new URL('./assets/read-topics/'+id+'.svg',document.baseURI).href+'")');
+   }
    const cover=reader.querySelector('.read-v2-picture img.story-hero');
-   if(cover&&/tihar/i.test(currentTitle)){
-     cover.src=new URL('./assets/tihar-story-cover.svg',document.baseURI).href;
-     cover.alt='Tihar evening with oil lamps, a temple, and a cat';
+   if(cover){
+     const title=reader.querySelector('.story-book.on .story-book-text b')?.textContent||'';
+     cover.src=themeId==='culture'&&/tihar/i.test(title)?new URL('./assets/tihar-story-cover.svg',document.baseURI).href:pictureURL;
+     cover.alt='Illustration for '+(title||themeId)+' story';
    }
    for(const button of reader.querySelectorAll('.story-book')){
-     const emoji=button.querySelector('.story-book-ico');
-     const name=button.querySelector('.story-book-text b')?.textContent||'';
-     if(emoji){
-       emoji.classList.add('read-exact-thumb');
-       emoji.dataset.scene=/tihar/i.test(name)?'tihar':/janakpur|temple/i.test(name)?'temple':/thangka/i.test(name)?'art':/dashain/i.test(name)?'dashain':'story';
-     }
+     const icon=button.querySelector('.story-book-ico');
+     if(!icon)continue;
+     const bookID=button.dataset.storybook||'';
+     const sceneID=Number(bookID.split('-').pop())||0;
+     icon.classList.add('read-exact-thumb','read-topic-cover');
+     icon.style.setProperty('--read-cover','url("'+(themeId==='culture'&&/tihar/i.test(button.textContent)?new URL('./assets/tihar-story-cover.svg',document.baseURI).href:pictureURL)+'")');
+     icon.style.setProperty('--read-position',(15+(sceneID*11)%70)+'%');
    }
    reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
 

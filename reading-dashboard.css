@@ -110,3 +110,30 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.story-line,.story-book-list
 }
 html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-reading{background:#242e42!important;border-color:#505a75!important}
 html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{background:#31344a!important;color:#f8f0ff!important}
+
+/* Topic-specific illustrations: all 12 native categories and chapter covers. */
+#rd.sikau-read-exact .read-v2-filters .story-topic-list .read-art-topic{
+ display:inline-flex!important;gap:7px!important;align-items:center!important;
+ padding:6px 12px 6px 7px!important;min-height:48px!important;
+ border-radius:13px!important;font-size:12px!important;
+}
+#rd.sikau-read-exact .read-art-topic::before{
+ content:"";display:inline-block;flex:0 0 44px;width:44px;height:35px;
+ border-radius:8px;background-image:var(--read-topic-image);
+ background-position:center;background-size:cover;border:1px solid #ffffff9e;
+ box-shadow:0 2px 6px #323f5a2a;
+}
+#rd.sikau-read-exact .story-book-ico.read-topic-cover{
+ background-image:var(--read-cover)!important;
+ background-position:var(--read-position,center) center!important;
+ background-size:cover!important;
+ font-size:0!important;
+}
+#rd.sikau-read-exact .read-v2-picture .story-hero{
+ background:#dfd4e7;
+ object-fit:cover!important;
+}
+@media(max-width:750px){
+ #rd.sikau-read-exact .read-art-topic::before{flex-basis:34px;width:34px;height:31px}
+ #rd.sikau-read-exact .read-v2-filters .story-topic-list .read-art-topic{font-size:11px!important;min-height:42px!important}
+}
