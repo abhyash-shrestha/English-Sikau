@@ -521,3 +521,66 @@ html.sikau-refresh[data-sikau-theme="dark"].sikau-visa-nav-active .nav button.si
  }
  html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{display:none!important}
 }
+
+/* Visa navigation visibility fix: independent lesson screens, not shared panels */
+.sikau-convo>.sikau-convo-everyday[hidden],
+.sikau-convo>.sikau-visa-hub[hidden]{display:none!important}
+.sikau-convo.sikau-visa-focused>.sikau-convo-everyday{display:none!important}
+.sikau-convo.sikau-visa-standalone:not(.sikau-visa-focused)>.sikau-visa-hub{display:none!important}
+.sikau-convo-everyday{display:block;min-width:0}
+.sikau-visa-browser{background:#fff;border:1px solid #dfe6f1;border-radius:17px;
+ padding:clamp(14px,2vw,21px);margin:0 0 15px;min-width:0}
+.sikau-visa-browser-head{display:flex;align-items:center;justify-content:space-between;
+ gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.sikau-visa-browser-head h3{font-size:16px!important;line-height:1.3!important;
+ font-weight:900!important;color:#24395f!important;margin:0 0 5px!important}
+.sikau-visa-browser-head p{font-size:12px;line-height:1.45;color:#627491;margin:0}
+.sikau-visa-browser-count{flex:0 0 auto;padding:7px 11px;font-size:11px;font-weight:900;
+ border-radius:99px;background:#f7eaf2;color:#ae215b}
+.sikau-visa-browser-search{width:100%;min-width:0;min-height:47px;
+ padding:10px 13px;border:1px solid #d2deed;border-radius:12px;background:#f9fbff;
+ font-family:inherit;color:#253b60;font-size:13px;margin:0 0 12px}
+.sikau-visa-question-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px;min-width:0}
+.sikau-visa-question-choice{display:flex;align-items:flex-start;gap:10px;min-width:0;
+ text-align:left;border:1px solid #e1e6f2;border-radius:12px;padding:12px;
+ background:#fbfcff;color:#263b63;min-height:90px}
+.sikau-visa-question-choice:hover{background:#fff3f8;border-color:#e9a2c1}
+.sikau-visa-choice-bullet{display:grid;place-items:center;flex:0 0 35px;width:35px;
+ height:35px;border-radius:10px;background:#f8eaf2;font-size:17px}
+.sikau-visa-choice-copy{display:grid;gap:5px;flex:1;min-width:0}
+.sikau-visa-choice-copy strong{font-size:12px;font-weight:850;line-height:1.5;
+ overflow-wrap:anywhere;color:#263b63}
+.sikau-visa-choice-copy small{font-size:11px;line-height:1.45;color:#647791;
+ overflow-wrap:anywhere}
+.sikau-visa-choice-arrow{font-size:10px;flex:0 0 auto;white-space:nowrap;
+ font-weight:850;color:#bd246e;margin-top:9px}
+.sikau-visa-browser-more{display:block;margin:13px auto 0;border:1px solid #dce2f0;
+ border-radius:11px;background:#f6f8fd;color:#354d7b;padding:10px 19px;
+ min-height:42px;font-size:12px;font-weight:850}
+.sikau-visa-browser-empty{grid-column:1/-1;margin:0;padding:14px;color:#677791;
+ font-size:13px;line-height:1.6}
+@media(max-width:770px){
+ .sikau-visa-question-list{grid-template-columns:1fr}
+ .sikau-visa-question-choice{min-height:72px}
+}
+@media(max-width:450px){
+ .sikau-visa-browser{padding:12px}
+ .sikau-visa-choice-arrow{font-size:9px}
+ .sikau-visa-question-choice{padding:10px;gap:7px}
+ .sikau-visa-choice-bullet{flex-basis:29px;width:29px;height:29px}
+}
+html[data-sikau-theme="dark"] .sikau-visa-browser{
+ background:#222e44!important;border-color:#53647c!important}
+html[data-sikau-theme="dark"] .sikau-visa-browser-head h3,
+html[data-sikau-theme="dark"] .sikau-visa-choice-copy strong{color:#f8edff!important}
+html[data-sikau-theme="dark"] .sikau-visa-browser-head p,
+html[data-sikau-theme="dark"] .sikau-visa-choice-copy small{color:#d4dcef!important}
+html[data-sikau-theme="dark"] .sikau-visa-question-choice,
+html[data-sikau-theme="dark"] .sikau-visa-browser-more{
+ background:#2b3952!important;color:#eaf0ff!important;border-color:#5f7088!important}
+html[data-sikau-theme="dark"] .sikau-visa-browser-search{
+ background:#1c2a40!important;color:#f2ebff!important;border-color:#5c6b85!important}
+html[data-sikau-theme="dark"] .sikau-visa-choice-bullet{background:#513b52!important}
+html[data-sikau-theme="dark"] .sikau-visa-choice-arrow{color:#ffa9d0!important}
+html[data-sikau-theme="dark"] .sikau-visa-browser-count{background:#51394e!important;color:#ffe0f1!important}
