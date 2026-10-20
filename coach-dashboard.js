@@ -225,10 +225,13 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   const everyday=doc.getElementById('sikauCoachEveryday');
   hub.hidden=!visa;
   main.hidden=!visa;
+  // Inline display protection survives a late or cached stylesheet.
+  hub.style.setProperty('display',visa?'block':'none','important');
   hub.setAttribute('aria-hidden',String(!visa));
   if('inert' in hub)hub.inert=!visa;
   if(everyday){
    everyday.hidden=visa;
+   everyday.style.setProperty('display',visa?'none':'block','important');
    everyday.setAttribute('aria-hidden',String(visa));
    if('inert' in everyday)everyday.inert=visa;
   }
