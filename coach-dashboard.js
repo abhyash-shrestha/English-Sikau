@@ -36,6 +36,18 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
  add(doc,disclaimer,'strong','','Your real story is your strongest answer · साँचो कुरा नै राम्रो उत्तर हो');
  add(doc,disclaimer,'p','','Sample replies are structures—not facts about you. Never invent jobs, income, sponsors, documents, relationships or travel. A well-practiced answer does not guarantee a visa. This tool is for English practice, not legal advice.');
  const categoriesRoot=add(doc,main,'div','sikau-visa-categories');
+ const questionBrowser=add(doc,main,'section','sikau-visa-browser');
+ const browserHead=add(doc,questionBrowser,'div','sikau-visa-browser-head');
+ const browserCopy=add(doc,browserHead,'div','');
+ add(doc,browserCopy,'h3','','📚 Browse interview questions · प्रश्न छानेर अभ्यास');
+ add(doc,browserCopy,'p','','Choose a specific question or start the shuffled interview.');
+ const browserCount=add(doc,browserHead,'span','sikau-visa-browser-count','');
+ const searchInput=add(doc,questionBrowser,'input','sikau-visa-browser-search');
+ searchInput.type='search';searchInput.placeholder='Search questions: public charge, work gap, finances…';
+ searchInput.setAttribute('aria-label','Search visa interview questions in English or Nepali');
+ const questionsList=add(doc,questionBrowser,'div','sikau-visa-question-list');
+ const browserMore=add(doc,questionBrowser,'button','sikau-visa-browser-more','Show all questions · सबै प्रश्न');
+ browserMore.type='button';
  const learner=add(doc,main,'section','sikau-visa-learner');
  const officials=add(doc,main,'section','sikau-visa-official');
  const updatesHead=add(doc,officials,'div','sikau-visa-updates-head');
@@ -48,6 +60,7 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
  }
  const inputs=new Map();
  let kind='dv',deck=[],cursor=0,revealed=false,done=false,answerText='',last='',typed='',notes='';
+ let showAllQuestions=false;
  const pick=()=>visaQuestions[kind]||[];
  function shuffled(pool,avoid=''){
   const out=[...pool];
@@ -57,7 +70,8 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
  }
  function newDeck(){const avoid=deck[cursor]?.id||last;deck=shuffled(pick(),avoid);cursor=0;done=false;revealed=false;answerText='';typed='';notes='';}
  function chooseCategory(next){
-  kind=next;last='';newDeck();renderCategories();renderQuestion();
+  kind=next;last='';newDeck();showAllQuestions=false;searchInput.value='';
+  renderCategories();renderQuestionBrowser();renderQuestion();
  }
  function renderCategories(){
   categoriesRoot.replaceChildren();
@@ -68,10 +82,45 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
    const info=add(doc,b,'span','sikau-visa-category-copy');
    add(doc,info,'strong','',category.title);
    add(doc,info,'small','',category.ne);
-   add(doc,info,'em','',category.code);
+   add(doc,info,'em','',category.code+' · '+visaQuestions[category.id].length+' questions');
    b.addEventListener('click',()=>chooseCategory(category.id));
   }
  }
+
+ function goToQuestion(id){
+  const found=deck.findIndex(item=>item.id===id);
+  if(found<0)return;
+  [deck[0],deck[found]]=[deck[found],deck[0]];
+  cursor=0;done=false;revealed=false;typed='';notes='';
+  renderQuestionBrowser();renderQuestion();
+  learner.scrollIntoView?.({behavior:'smooth',block:'start'});
+ }
+ function renderQuestionBrowser(){
+  const term=normalize(searchInput.value||'');
+  const results=pick().filter(item=>!term||
+   normalize([item.q,item.ne,item.coach].join(' ')).includes(term));
+  questionsList.replaceChildren();
+  browserCount.textContent=results.length+' questions · प्रश्न';
+  const shown=showAllQuestions?results:results.slice(0,6);
+  if(!results.length){
+   add(doc,questionsList,'p','sikau-visa-browser-empty','No matching questions in this category. Try another search or category. · अर्को शब्द वा विषय खोज्नुहोस्।');
+  }
+  for(const question of shown){
+   const b=add(doc,questionsList,'button','sikau-visa-question-choice');
+   b.type='button';
+   b.setAttribute('aria-label','Practice: '+question.q);
+   add(doc,b,'span','sikau-visa-choice-bullet','🎤');
+   const copy=add(doc,b,'span','sikau-visa-choice-copy');
+   add(doc,copy,'strong','',question.q);
+   add(doc,copy,'small','',question.ne);
+   add(doc,b,'span','sikau-visa-choice-arrow','Practice →');
+   b.addEventListener('click',()=>goToQuestion(question.id));
+  }
+  browserMore.hidden=results.length<=6;
+  browserMore.textContent=showAllQuestions?'Show fewer · कम प्रश्न':'Show all '+results.length+' questions · सबै प्रश्न';
+ }
+ searchInput.addEventListener('input',()=>{showAllQuestions=false;renderQuestionBrowser();});
+ browserMore.addEventListener('click',()=>{showAllQuestions=!showAllQuestions;renderQuestionBrowser();});
  function isUncertain(text){
   return /\b(i (do not|don't|cannot|can't) know|i (do not|don't) remember|not sure|not certain|may i check|could you repeat|please repeat)\b/i.test(text);
  }
@@ -85,10 +134,10 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
  function advance(){
   const current=deck[cursor];last=current?.id||'';
   if(cursor===deck.length-1){done=true;}else{cursor++;revealed=false;answerText='';typed='';notes='';}
-  renderQuestion();
+  renderQuestionBrowser();renderQuestion();
  }
  function repeatOrShuffle(){
-  newDeck();renderQuestion();
+  newDeck();renderQuestionBrowser();renderQuestion();
  }
  function sendNative(answer,q){
   const field=ask.querySelector('textarea')||ask.querySelector('input[type="text"]');
