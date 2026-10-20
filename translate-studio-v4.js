@@ -24,6 +24,39 @@ const topics=[
  {icon:'💼',title:'Work & Job',ne:'काम र रोजगारी',kind:'work',pair:['I am looking for a new job.','म नयाँ काम खोज्दै छु।']},
  {icon:'📚',title:'School & Education',ne:'विद्यालय र शिक्षा',kind:'school',pair:['I study English every day.','म हरेक दिन अंग्रेजी पढ्छु।']}
 ];
+
+// Public bilingual practice only. Protected lesson, authorization and XP remain unchanged.
+const practiceTopics={"food":[["Momo","मःम"],["Rice","भात"],["Tea","चिया"],["Vegetables","तरकारी"],["Spicy","पिरो"],["I am hungry.","मलाई भोक लागेको छ।"],["I am thirsty.","मलाई तिर्खा लागेको छ।"],["Please give me some water.","कृपया मलाई अलिकति पानी दिनुहोस्।"],["I would like a cup of tea.","मलाई एक कप चिया चाहिन्छ।"],["This food is delicious.","यो खाना मिठो छ।"],["What are we cooking today?","आज हामी के पकाउँदै छौं?"],["I am learning to cook dal bhat.","म दालभात पकाउन सिक्दै छु।"],["Please add a little salt.","कृपया अलिकति नुन थप्नुहोस्।"],["Is this food spicy?","के यो खाना पिरो छ?"],["We are eating dinner together.","हामी सँगै बेलुकाको खाना खाँदै छौं।"],["My mother makes delicious sel roti.","मेरी आमाले मिठो सेलरोटी बनाउनुहुन्छ।"],["I bought fresh vegetables at the market.","मैले बजारबाट ताजा तरकारी किनेँ।"],["Can I have some more rice?","के म अलिकति थप भात लिन सक्छु?"],["Wash your hands before eating.","खानुअघि हात धुनुहोस्।"],["I prefer tea without sugar.","मलाई चिनीबिनाको चिया मन पर्छ।"]],"travel":[["Pokhara","पोखरा"],["Phewa Lake","फेवा ताल"],["Bus station","बस स्टेसन"],["Mountain","हिमाल"],["Travel ticket","यात्राको टिकट"],["Where is the bus station?","बस स्टेसन कहाँ छ?"],["How much is the bus ticket?","बसको टिकट कति पर्छ?"],["I want to visit Pokhara.","म पोखरा घुम्न चाहन्छु।"],["We are boating on Phewa Lake.","हामी फेवा तालमा डुङ्गा चढ्दै छौं।"],["Please show me the way.","कृपया मलाई बाटो देखाइदिनुहोस्।"],["How long does the journey take?","यात्रामा कति समय लाग्छ?"],["I have booked a hotel room.","मैले होटलको कोठा बुक गरेको छु।"],["The mountains look beautiful today.","आज हिमालहरू सुन्दर देखिएका छन्।"],["Can you take a photo of us?","के तपाईं हाम्रो फोटो खिचिदिन सक्नुहुन्छ?"],["I forgot my travel bag.","मैले आफ्नो यात्राको झोला बिर्सेँ।"],["Turn left at the next road.","अर्को बाटोमा बायाँ मोड्नुहोस्।"],["Is there a taxi nearby?","यहाँ नजिकै ट्याक्सी पाइन्छ?"],["We will leave early tomorrow.","हामी भोलि बिहानै निस्कनेछौं।"],["I want to explore Kathmandu.","म काठमाडौं घुम्न चाहन्छु।"],["The road is busy today.","आज बाटोमा धेरै सवारीसाधन छन्।"]],"festival":[["Dashain","दशैं"],["Tihar","तिहार"],["Deusi and Bhailo","देउसी र भैलो"],["Blessings","आशीर्वाद"],["Tradition","परम्परा"],["We celebrate Dashain with our family.","हामी परिवारसँग दशैं मनाउँछौं।"],["People light lamps during Tihar.","तिहारमा मानिसहरू दियो बाल्छन्।"],["I received tika and blessings.","मैले टीका र आशीर्वाद पाएँ।"],["We are preparing sel roti for the festival.","हामी चाडपर्वका लागि सेलरोटी बनाउँदै छौं।"],["What is your favorite Nepali festival?","तपाईंलाई सबैभन्दा मन पर्ने नेपाली चाड कुन हो?"],["My family sings Deusi and Bhailo.","मेरो परिवारले देउसी र भैलो गाउँछ।"],["We visit our relatives during Dashain.","हामी दशैंमा आफन्तहरूलाई भेट्न जान्छौं।"],["We are decorating our home with flowers.","हामी घरलाई फूलले सजाउँदै छौं।"],["Many people celebrate Holi with colors.","धेरै मानिसहरू होलीमा रङ खेल्छन्।"],["We respect different cultures and traditions.","हामी विभिन्न संस्कृति र परम्पराको सम्मान गर्छौं।"],["My grandmother tells us festival stories.","मेरी हजुरआमाले हामीलाई चाडपर्वका कथा सुनाउनुहुन्छ।"],["We are buying gifts for our family.","हामी परिवारका लागि उपहार किन्दै छौं।"],["Children enjoy playing on swings during Dashain.","बालबालिकाहरू दशैंमा पिङ खेल्न रमाउँछन्।"],["Our family is making a special meal.","हाम्रो परिवारले विशेष खाना बनाउँदै छ।"],["I want to learn more about Nepali traditions.","म नेपाली परम्पराबारे अझ धेरै जान्न चाहन्छु।"]],"conversation":[["Hello!","नमस्ते!"],["Good morning!","शुभ प्रभात!"],["Good night!","शुभ रात्रि!"],["How are you?","तपाईंलाई कस्तो छ?"],["I am fine, thank you.","मलाई ठीक छ, धन्यवाद।"],["What is your name?","तपाईंको नाम के हो?"],["My name is Sita.","मेरो नाम सीता हो।"],["Where are you from?","तपाईं कहाँबाट हुनुहुन्छ?"],["I am from Nepal.","म नेपालबाट हुँ।"],["What do you do?","तपाईं के काम गर्नुहुन्छ?"],["I am learning English.","म अंग्रेजी सिक्दै छु।"],["Can you speak slowly?","के तपाईं बिस्तारै बोल्न सक्नुहुन्छ?"],["Could you repeat that?","के तपाईं त्यो फेरि भन्न सक्नुहुन्छ?"],["I do not understand.","मैले बुझिनँ।"],["Can you help me, please?","के तपाईं मलाई मद्दत गर्न सक्नुहुन्छ?"],["Nice to meet you!","तपाईंलाई भेटेर खुशी लाग्यो!"],["How was your day?","तपाईंको दिन कस्तो बित्यो?"],["See you tomorrow!","भोलि भेटौंला!"],["Excuse me, where is the restroom?","माफ गर्नुहोस्, शौचालय कहाँ छ?"],["Have a wonderful day!","तपाईंको दिन शुभ रहोस्!"]],"shopping":[["Price","मूल्य"],["Discount","छुट"],["Receipt","रसिद"],["Cash","नगद"],["Change","फिर्ता पैसा"],["How much does this cost?","यसको मूल्य कति हो?"],["Do you have a smaller size?","के तपाईंसँग योभन्दा सानो साइज छ?"],["Can I pay by card?","के म कार्डबाट पैसा तिर्न सक्छु?"],["Please give me a receipt.","कृपया मलाई रसिद दिनुहोस्।"],["I am just looking, thank you.","म अहिले सामान हेर्दै मात्र छु, धन्यवाद।"],["Is there any discount?","के कुनै छुट छ?"],["This shirt is too expensive.","यो कमिज धेरै महँगो छ।"],["I would like to buy two notebooks.","म दुईवटा कापी किन्न चाहन्छु।"],["Where can I find fresh fruit?","ताजा फलफूल कहाँ पाउन सक्छु?"],["Do you accept cash?","के तपाईं नगद लिनुहुन्छ?"],["Can I return this item?","के म यो सामान फिर्ता गर्न सक्छु?"],["I need a shopping bag.","मलाई किनमेल गर्ने झोला चाहिन्छ।"],["Please check the price again.","कृपया मूल्य फेरि जाँच गर्नुहोस्।"],["The store closes at nine.","पसल नौ बजे बन्द हुन्छ।"],["Thank you for your help.","तपाईंको सहयोगका लागि धन्यवाद।"]],"family":[["Mother","आमा"],["Father","बुबा"],["Grandmother","हजुरआमा"],["Grandfather","हजुरबुबा"],["Relatives","आफन्तहरू"],["This is my family.","यो मेरो परिवार हो।"],["I have one younger brother.","मेरो एउटा भाइ छ।"],["My sister lives in Kathmandu.","मेरी दिदी काठमाडौंमा बस्नुहुन्छ।"],["We eat dinner together.","हामी सँगै बेलुकाको खाना खान्छौं।"],["I called my parents yesterday.","मैले हिजो मेरा आमाबुबालाई फोन गरेँ।"],["My grandparents tell wonderful stories.","मेरा हजुरबुबा र हजुरआमाले रमाइला कथा सुनाउनुहुन्छ।"],["I miss my family in Nepal.","मलाई नेपालमा भएको मेरो परिवारको याद आउँछ।"],["We help each other at home.","हामी घरमा एकअर्कालाई मद्दत गर्छौं।"],["My uncle is visiting us tomorrow.","मेरा काका भोलि हामीलाई भेट्न आउँदै हुनुहुन्छ।"],["Our family celebrates birthdays together.","हाम्रो परिवारले सँगै जन्मदिन मनाउँछ।"],["How many people are in your family?","तपाईंको परिवारमा कति जना हुनुहुन्छ?"],["I am proud of my parents.","म मेरा आमाबुबाप्रति गर्व गर्छु।"],["My daughter is going to school.","मेरी छोरी विद्यालय जाँदै छिन्।"],["We are planning a family picnic.","हामी पारिवारिक वनभोजको योजना बनाउँदै छौं।"],["I love spending time with my family.","मलाई परिवारसँग समय बिताउन मन पर्छ।"]],"work":[["Job","जागिर"],["Interview","अन्तर्वार्ता"],["Schedule","समयतालिका"],["Coworker","सहकर्मी"],["Salary","तलब"],["I am looking for a job.","म जागिर खोज्दै छु।"],["I have an interview tomorrow.","मेरो भोलि अन्तर्वार्ता छ।"],["What time does your shift start?","तपाईंको काम गर्ने पालो कति बजे सुरु हुन्छ?"],["I work five days a week.","म हप्तामा पाँच दिन काम गर्छु।"],["Please send me the schedule.","कृपया मलाई समयतालिका पठाउनुहोस्।"],["I need help with this task.","मलाई यो काममा मद्दत चाहिन्छ।"],["I finished my work early.","मैले आफ्नो काम चाँडै सकेँ।"],["My coworker is very helpful.","मेरो सहकर्मी धेरै सहयोगी हुनुहुन्छ।"],["Could you explain the instructions?","के तपाईं निर्देशनहरू बुझाइदिन सक्नुहुन्छ?"],["I am learning a new skill.","म नयाँ सीप सिक्दै छु।"],["I will arrive on time.","म समयमा आइपुग्नेछु।"],["Where should I put these boxes?","मैले यी बाकसहरू कहाँ राख्ने?"],["We have a meeting this afternoon.","आज दिउँसो हाम्रो बैठक छ।"],["I would like to request a day off.","म एक दिन बिदा माग्न चाहन्छु।"],["Thank you for the opportunity.","यो अवसरका लागि धन्यवाद।"]],"school":[["Teacher","शिक्षक"],["Student","विद्यार्थी"],["Homework","गृहकार्य"],["Classroom","कक्षाकोठा"],["Library","पुस्तकालय"],["I study English every day.","म हरेक दिन अंग्रेजी पढ्छु।"],["Please explain this word.","कृपया यो शब्दको अर्थ बुझाइदिनुहोस्।"],["I have finished my homework.","मैले आफ्नो गृहकार्य सकाएँ।"],["Can you check my answer?","के तपाईं मेरो उत्तर जाँचिदिन सक्नुहुन्छ?"],["I want to improve my pronunciation.","म आफ्नो उच्चारण सुधार्न चाहन्छु।"],["Our teacher is very kind.","हाम्रा शिक्षक धेरै दयालु हुनुहुन्छ।"],["I am reading an English story.","म अंग्रेजी कथा पढ्दै छु।"],["Please write the sentence again.","कृपया वाक्य फेरि लेख्नुहोस्।"],["What does this sentence mean?","यो वाक्यको अर्थ के हो?"],["I am practicing speaking English.","म अंग्रेजी बोल्ने अभ्यास गर्दै छु।"],["The exam starts at ten.","परीक्षा दस बजे सुरु हुन्छ।"],["I borrowed a book from the library.","मैले पुस्तकालयबाट एउटा किताब लिएँ।"],["We learn something new every day.","हामी हरेक दिन केही नयाँ सिक्छौं।"],["I made a mistake, but I will try again.","मैले गल्ती गरेँ, तर फेरि प्रयास गर्नेछु।"],["Can we practice together?","के हामी सँगै अभ्यास गर्न सक्छौं?"]]};
+const dailyPhrasePool=[["How are you feeling today?","आज तपाईंलाई कस्तो महसुस भइरहेको छ?"],["I hope you have a great day.","तपाईंको दिन राम्रो बितोस् भन्ने आशा गर्छु।"],["Can you speak a little slower?","के तपाईं अलि बिस्तारै बोल्न सक्नुहुन्छ?"],["I am trying my best.","म सक्दो प्रयास गर्दै छु।"],["Every day is a new opportunity.","हरेक दिन नयाँ अवसर हो।"],["I need a little more time.","मलाई अलिकति थप समय चाहिन्छ।"],["Please let me know.","कृपया मलाई खबर गर्नुहोस्।"],["I will call you later.","म तपाईंलाई पछि फोन गर्नेछु।"],["That sounds like a good idea.","त्यो राम्रो विचार जस्तो लाग्छ।"],["I am on my way.","म बाटोमा छु।"],["Could you wait a moment?","के तपाईं एकछिन पर्खन सक्नुहुन्छ?"],["Let's practice English together.","हामी सँगै अंग्रेजी अभ्यास गरौं।"],["I have a question.","मसँग एउटा प्रश्न छ।"],["Please correct my mistakes.","कृपया मेरा गल्तीहरू सच्याइदिनुहोस्।"],["I am happy to see you.","तपाईंलाई देखेर मलाई खुशी लाग्यो।"],["Let's meet after lunch.","हामी दिउँसोको खाना खाएपछि भेटौं।"],["I am busy right now.","म अहिले व्यस्त छु।"],["I will be there soon.","म छिट्टै त्यहाँ पुग्नेछु।"],["What would you like to eat?","तपाईं के खान चाहनुहुन्छ?"],["I forgot to bring my notebook.","मैले आफ्नो कापी ल्याउन बिर्सेँ।"],["It is raining outside.","बाहिर पानी परिरहेको छ।"],["Please take care of yourself.","कृपया आफ्नो ख्याल राख्नुहोस्।"],["I need directions to the station.","मलाई स्टेसन जाने बाटो चाहिएको छ।"],["Thank you for being patient.","धैर्य गर्नुभएकोमा धन्यवाद।"],["Can we start again?","के हामी फेरि सुरु गर्न सक्छौं?"],["I am proud of my progress.","म आफ्नो प्रगतिप्रति गर्व गर्छु।"],["I don't know the answer yet.","मलाई अहिलेसम्म उत्तर थाहा छैन।"],["I would like to learn more.","म अझ धेरै सिक्न चाहन्छु।"],["Let's try something different.","हामी केही फरक प्रयास गरौं।"],["Please send me a message.","कृपया मलाई सन्देश पठाउनुहोस्।"],["I am excited for tomorrow.","म भोलिका लागि उत्साहित छु।"],["Practice makes us better.","अभ्यासले हामीलाई अझ राम्रो बनाउँछ।"]];
+const conversationPool=[["What is your name?","तपाईंको नाम के हो?"],["Where do you live?","तपाईं कहाँ बस्नुहुन्छ?"],["How long have you lived here?","तपाईं यहाँ बसेको कति समय भयो?"],["Where are you going?","तपाईं कहाँ जाँदै हुनुहुन्छ?"],["What did you do yesterday?","तपाईंले हिजो के गर्नुभयो?"],["Do you like Nepali food?","के तपाईंलाई नेपाली खाना मन पर्छ?"],["Can we speak in English?","के हामी अंग्रेजीमा कुरा गर्न सक्छौं?"],["What do you like to do for fun?","तपाईंलाई रमाइलोका लागि के गर्न मन पर्छ?"],["How was your weekend?","तपाईंको सप्ताहन्त कस्तो बित्यो?"],["What time should we meet?","हामी कति बजे भेट्ने?"],["Would you like some tea?","के तपाईं चिया पिउन चाहनुहुन्छ?"],["Can you teach me this word?","के तपाईं मलाई यो शब्द सिकाउन सक्नुहुन्छ?"],["What is your favorite place in Nepal?","नेपालमा तपाईंलाई मन पर्ने ठाउँ कुन हो?"],["Have you visited Pokhara?","के तपाईं पोखरा जानुभएको छ?"],["What are you learning today?","आज तपाईं के सिक्दै हुनुहुन्छ?"],["Could you say that again?","के तपाईं त्यो फेरि भन्न सक्नुहुन्छ?"],["How do you pronounce this word?","यो शब्दको उच्चारण कसरी गर्ने?"],["Where did you buy that bag?","तपाईंले त्यो झोला कहाँ किन्नुभयो?"],["Are you free this afternoon?","के तपाईं आज दिउँसो फुर्सदमा हुनुहुन्छ?"],["Would you like to join us?","के तपाईं हामीसँग आउन चाहनुहुन्छ?"],["When does the class begin?","कक्षा कहिले सुरु हुन्छ?"],["How can I get to the library?","म पुस्तकालय कसरी पुग्न सक्छु?"],["May I ask you a question?","के म तपाईंलाई एउटा प्रश्न सोध्न सक्छु?"],["What is your favorite festival?","तपाईंलाई मन पर्ने चाड कुन हो?"],["Could you help me find a job?","के तपाईं मलाई जागिर खोज्न मद्दत गर्न सक्नुहुन्छ?"],["Do you have any recommendations?","के तपाईंसँग कुनै सुझाव छ?"],["What does this sign mean?","यो सङ्केतको अर्थ के हो?"],["How much time do we have?","हामीसँग कति समय छ?"],["Would you mind opening the window?","के तपाईं झ्याल खोलिदिनुहुन्छ?"],["What should we practice next?","अब हामीले के अभ्यास गर्ने?"]];
+const wordPool=[["Apple","स्याउ"],["Banana","केरा"],["Orange","सुन्तला"],["Water","पानी"],["Milk","दूध"],["Bread","रोटी"],["Rice","भात"],["Tea","चिया"],["Home","घर"],["Door","ढोका"],["Window","झ्याल"],["Chair","कुर्सी"],["Table","टेबल"],["Book","किताब"],["Pen","कलम"],["School","विद्यालय"],["Teacher","शिक्षक"],["Student","विद्यार्थी"],["Friend","साथी"],["Family","परिवार"],["Mother","आमा"],["Father","बुबा"],["Sister","दिदीबहिनी"],["Brother","दाजुभाइ"],["Mountain","हिमाल"],["River","नदी"],["Lake","ताल"],["Village","गाउँ"],["City","सहर"],["Market","बजार"],["Bus","बस"],["Train","रेल"],["Airport","विमानस्थल"],["Hospital","अस्पताल"],["Doctor","डाक्टर"],["Medicine","औषधि"],["Morning","बिहान"],["Evening","साँझ"],["Tomorrow","भोलि"],["Yesterday","हिजो"],["Happy","खुशी"],["Beautiful","सुन्दर"],["Important","महत्त्वपूर्ण"],["Practice","अभ्यास"],["Listen","सुन्नु"],["Speak","बोल्नु"],["Learn","सिक्नु"],["Write","लेख्नु"],["Read","पढ्नु"],["Help","मद्दत"],["Thank you","धन्यवाद"],["Excuse me","माफ गर्नुहोस्"]];
+const diceKinds=['word','phrase','question','sentence'];
+const diceQuestions=conversationPool.filter(p=>p[0].includes('?'));
+const diceSentences=Object.values(practiceTopics).flat().filter(p=>p[0].split(/\s+/).length>=5);
+const dicePhrases=dailyPhrasePool.filter(p=>p[0].split(/\s+/).length<=6);
+function makePracticePicker(){
+ const decks=new Map();
+ return function next(key,pool){
+  if(!pool.length)return null;
+  let deck=decks.get(key);
+  if(!deck||deck.size!==pool.length||!deck.remaining.length){
+   const remaining=Array.from({length:pool.length},(_,i)=>i);
+   for(let i=remaining.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [remaining[i],remaining[j]]=[remaining[j],remaining[i]];
+   }
+   if(deck&&remaining.length>1&&remaining[remaining.length-1]===deck.last){
+    [remaining[0],remaining[remaining.length-1]]=[remaining[remaining.length-1],remaining[0]];
+   }
+   deck={size:pool.length,last:deck?.last??-1,remaining};
+   decks.set(key,deck);
+  }
+  const index=deck.remaining.pop();
+  deck.last=index;
+  return pool[index];
+ };
+}
+const nextPractice=makePracticePicker();
 const mk=(d,tag,cls,txt)=>{const e=d.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
 const put=(d,parent,tag,cls,txt)=>{const e=mk(d,tag,cls,txt);parent.appendChild(e);return e};
 function safeInput(d,input,value){
@@ -130,7 +163,7 @@ window.enhanceTranslationDashboard=function(d){
   b.type='button';b.dataset.tool=key;
   put(d,b,'span','ttx-quick-icon',emoji);
   put(d,b,'strong','',name);put(d,b,'small','',ne);
-  put(d,b,'span','ttx-quick-footer',key==='photo'?'Upload an image · फोटो': 'Try an example · उदाहरण');
+  put(d,b,'span','ttx-quick-footer',key==='photo'?'Upload an image · फोटो': 'Click for a new example · नयाँ अभ्यास');
   quickButtons[key]=b;
  }
  const topicSection=put(d,root,'section','ttx-topic-section');
@@ -144,7 +177,8 @@ window.enhanceTranslationDashboard=function(d){
   put(d,media,'span','',topic.icon);
   put(d,b,'strong','',topic.title);
   put(d,b,'small','',topic.ne);
-  b.addEventListener('click',()=>choosePair(topic.pair));
+  b.title='Click again for another example · अर्को अभ्यासका लागि फेरि थिच्नुहोस्';
+  b.addEventListener('click',()=>choosePractice('topic-'+topic.kind,[topic.pair,...practiceTopics[topic.kind]]));
  }
  const exampleSection=put(d,root,'section','ttx-examples');
  const exampleHead=put(d,exampleSection,'div','ttx-section-head');
@@ -153,7 +187,7 @@ window.enhanceTranslationDashboard=function(d){
  more.type='button';
  const exampleGrid=put(d,exampleSection,'div','ttx-examples-grid');
 
- let auto=false,examplesOpen=false,wordIndex=-1;
+ let auto=false,examplesOpen=false;
  const saving=new Set();
  function directionUI(){
   const current=auto?'auto':nativeDirection(sec);
@@ -184,6 +218,16 @@ window.enhanceTranslationDashboard=function(d){
   notice.textContent='Ready. Press Translate to see the result. · अनुवाद थिच्नुहोस्।';
   input.focus({preventScroll:true});
   entry.scrollIntoView({behavior:'smooth',block:'nearest'});
+ }
+ function choosePractice(key,pool){
+  if(!pool||!pool.length)return;
+  let pair=nextPractice(key,pool);
+  const current=()=>nativeDirection(sec)==='ne'?pair[1]:pair[0];
+  for(let retry=0;retry<Math.min(4,pool.length-1)&&current()===input.value;retry++){
+   pair=nextPractice(key,pool);
+  }
+  choosePair(pair);
+  notice.textContent='New practice! Click again for another · नयाँ अभ्यास! अर्कोका लागि फेरि थिच्नुहोस्।';
  }
  function examplesRender(){
   exampleGrid.replaceChildren();
@@ -224,12 +268,18 @@ window.enhanceTranslationDashboard=function(d){
  upload.addEventListener('click',()=>showCamera(true));
  writing.addEventListener('click',()=>{if(!nativeTab(d,'hw'))notice.textContent='Select Write from the navigation · लेखन खोल्नुहोस्।';});
  quickButtons.photo.addEventListener('click',()=>showCamera(true));
+ // Mix words, phrases, questions and longer sentences on successive dice rolls.
+ quickButtons.word.querySelector('strong').textContent='Random Mix';
+ quickButtons.word.querySelector('small').textContent='शब्द र वाक्य';
  quickButtons.word.addEventListener('click',()=>{
-  const pairs=[['Hello!','नमस्ते!'],['Thank you.','धन्यवाद।'],['Friend','साथी'],['Water','पानी'],['Family','परिवार'],['School','विद्यालय'],['Book','किताब'],['Mountain','हिमाल']];
-  wordIndex=(wordIndex+1)%pairs.length;choosePair(pairs[wordIndex]);
+  const kind=nextPractice('dice-kind',diceKinds);
+  const pool=kind==='word'?wordPool:
+    kind==='phrase'?dicePhrases:
+    kind==='question'?diceQuestions:diceSentences;
+  choosePractice('dice-'+kind,pool);
  });
- quickButtons.phrase.addEventListener('click',()=>choosePair(samples[new Date().getDate()%samples.length].slice(1,3)));
- quickButtons.conversation.addEventListener('click',()=>choosePair(['Nice to meet you!','तपाईंलाई भेटेर खुशी लाग्यो!']));
+ quickButtons.phrase.addEventListener('click',()=>choosePractice('daily-phrase',dailyPhrasePool));
+ quickButtons.conversation.addEventListener('click',()=>choosePractice('conversation',conversationPool));
  let recognition=null;
  speech.addEventListener('click',()=>{
   const API=d.defaultView.SpeechRecognition||d.defaultView.webkitSpeechRecognition;
