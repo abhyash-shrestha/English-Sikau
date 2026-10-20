@@ -172,7 +172,7 @@ window.enhanceWordsDashboard=function(doc){
  moreTopics.type='button';moreTopics.setAttribute('aria-expanded','false');
  const catsArea=add(doc,topicPanel,'div','wv-categories');
  catsArea.setAttribute('aria-label','Vocabulary categories');
- moreTopics.addEventListener('click',()=>{allTopics=!allTopics;renderCategories();});
+ moreTopics.addEventListener('click',()=>{allTopics=!allTopics;if(!allTopics&&!cats.slice(0,7).some(c=>c[0]===category))category='all';render();});
  const filterPanel=add(doc,root,'section','wv-filter-panel');
  const filterHeading=add(doc,filterPanel,'div','wv-panel-header');
  const filterTitle=add(doc,filterHeading,'div','');
