@@ -210,3 +210,56 @@ html[data-sikau-theme="dark"] #learn .sikau-np-action{
  color:#ffeaf4!important;
  border-color:#a75c82!important;
 }
+
+/* Story Mode uses its own short NP control: render an actual caption inside
+   that SAME clickable control, instead of relying only on a ::after pseudo-label. */
+#rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action{
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 auto!important;
+ width:auto!important;
+ min-width:150px!important;
+ max-width:100%!important;
+ min-height:39px!important;
+ height:auto!important;
+ overflow:visible!important;
+ padding:7px 11px!important;
+ white-space:normal!important;
+ font-size:0!important;
+ line-height:1.4!important;
+ border-radius:10px!important;
+ border:1px solid #f49abb!important;
+ background:#fff0f6!important;
+ color:#a91657!important;
+ cursor:pointer!important;
+ box-shadow:0 2px 6px #c723661c!important;
+}
+#rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action::after{
+ content:none!important;
+}
+#rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action .sikau-story-np-caption{
+ display:inline!important;
+ font-size:12px!important;
+ font-weight:850!important;
+ line-height:1.4!important;
+ color:inherit!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+}
+#rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action:hover{
+ background:#fbe1ed!important;
+ border-color:#e95692!important;
+}
+#rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action:focus-visible{
+ outline:3px solid #e95692!important;
+ outline-offset:2px!important;
+}
+@media(max-width:480px){
+ #rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action{
+   flex:1 1 auto!important;min-width:0!important;
+ }
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-lines .story-line .sikau-story-nepali-action{
+ background:#58334e!important;color:#ffeaf4!important;border-color:#a75c82!important;
+}
