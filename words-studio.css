@@ -245,3 +245,10 @@ html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-count{
 html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status:not([hidden]){
  background:#193d35!important;border-color:#3f806a!important;color:#e0fff0!important
 }
+
+#words.sikau-words-v1 .wv-practice-status[data-kind="error"]:not([hidden]){
+ background:#fff4e8!important;border-color:#efcfac!important;color:#854112!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status[data-kind="error"]:not([hidden]){
+ background:#4e332a!important;border-color:#90654a!important;color:#ffe0bf!important
+}
