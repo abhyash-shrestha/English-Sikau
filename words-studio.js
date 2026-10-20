@@ -4,7 +4,7 @@
  */
 (function(){
 'use strict';
-const STYLE_URL=new URL('words-studio.css?v=20261020-help-answer-r1',document.baseURI).href;
+const STYLE_URL=new URL('words-studio.css?v=20261020-shuffle-220-r1',document.baseURI).href;
 const vocabulary=[
 ['adventure','साहसिक यात्रा','travel','noun',2,'An exciting or unusual experience or journey.','We went on an adventure in the mountains.','हामी पहाडमा साहसिक यात्रामा गयौं।'],
 ['beautiful','सुन्दर','nature','adjective',1,'Pleasant or lovely to see.','Pokhara is a beautiful city.','पोखरा एउटा सुन्दर सहर हो।'],
@@ -147,6 +147,7 @@ window.enhanceWordsDashboard=function(doc){
   stylesheet.id='sikauWordsStudioCSS';stylesheet.href=STYLE_URL;doc.head.appendChild(stylesheet);
  }
  let selected='adventure',category='all',query='',level='all',type='all',sort='default',tab='meaning',feedback='',quizValue='',allTopics=false;
+ let practiceOrder=[],practiceIndex=0,practiceSignature='';
  let items=combined(doc,wordBox);
  const root=el(doc,'div','wv-root');
  root.id='sikauWordsDashboard';
@@ -256,43 +257,61 @@ window.enhanceWordsDashboard=function(doc){
    }
   }
  }
- function advancePractice(correctWord){
-  const rows=filtered();
-  const currentIndex=rows.findIndex(entry=>entry.word===correctWord);
-  if(currentIndex<0)return;
-  quizValue='';
-  tab='practice';
-  if(rows.length===1){
-   feedback='🏆 Correct! You finished this set. Choose another topic or level for more practice. · सही उत्तर! थप अभ्यासका लागि अर्को विषय वा स्तर छान्नुहोस्।';
+
+ // Practice has its own shuffled deck, independent of the visible word list.
+ function shufflePractice(words,avoid=''){
+  const order=words.map(w=>w.word);
+  for(let i=order.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [order[i],order[j]]=[order[j],order[i]];
+  }
+  if(order.length>1&&order[0]===avoid)[order[0],order[1]]=[order[1],order[0]];
+  if(order.length>2&&order.every((word,i)=>word===words[i].word))[order[0],order[1]]=[order[1],order[0]];
+  return order;
+ }
+ function ensurePractice(rows,force=false){
+  const signature=rows.map(w=>w.word).join('\u001f');
+  if(!rows.length){practiceOrder=[];practiceIndex=0;practiceSignature='';return;}
+  if(!force&&practiceSignature===signature&&practiceOrder.length===rows.length)return;
+  practiceOrder=shufflePractice(rows,selected);
+  practiceIndex=0;practiceSignature=signature;selected=practiceOrder[0];quizValue='';
+ }
+ function startPractice(){
+  const rows=filtered();if(!rows.length)return;
+  tab='practice';feedback='';quizValue='';
+  ensurePractice(rows,true);oldSection.open=false;render();
+  const field=detail.querySelector('.wv-quiz-input');
+  if(field?.focus)field.focus({preventScroll:true});
+  if(doc.defaultView.innerWidth<850)detail.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function movePractice(currentWord,correct){
+  if(tab!=='practice'||selected!==currentWord)return;
+  const rows=filtered();ensurePractice(rows);
+  if(!practiceOrder.length)return;
+  if(practiceOrder.length===1){
+   feedback=correct
+    ?'🏆 Correct! You finished this set. Choose another topic or level for more practice. · सही उत्तर! थप अभ्यासका लागि अर्को विषय वा स्तर छान्नुहोस्।'
+    :'Only one word matches. Choose another topic or level to continue. · यो समूहमा एउटा मात्र शब्द छ। अर्को स्तर वा विषय छान्नुहोस्।';
   }else{
-   const wrapped=currentIndex===rows.length-1;
-   selected=rows[wrapped?0:currentIndex+1].word;
-   feedback=wrapped
-    ?'🏆 Set complete! Starting again from the first word. · सबै शब्द सकिए! पहिलो शब्दबाट फेरि सुरु गरौं।'
-    :'✅ Correct! On to the next word. · सही उत्तर! अब अर्को शब्द।';
+   if(practiceIndex===practiceOrder.length-1){
+    practiceOrder=shufflePractice(rows,selected);practiceIndex=0;
+    feedback=correct
+     ?'🏆 Set complete! Starting a new shuffled round. · सबै शब्द सकिए! नयाँ क्रमबाट फेरि सुरु गरौं।'
+     :'⏭️ New shuffled round · नयाँ क्रमबाट अभ्यास सुरु गरौं।';
+   }else{
+    practiceIndex++;
+    feedback=correct
+     ?'✅ Correct! On to the next challenge. · सही उत्तर! अब अर्को अभ्यास।'
+     :'⏭️ Skipped. Try this word next. · अर्को शब्द अभ्यास गर्नुहोस्।';
+   }
+   selected=practiceOrder[practiceIndex];
   }
-  render();
-  const nextInput=detail.querySelector('.wv-quiz-input');
-  if(nextInput&&typeof nextInput.focus==='function')nextInput.focus({preventScroll:true});
+  quizValue='';render();
+  const field=detail.querySelector('.wv-quiz-input');
+  if(field?.focus)field.focus({preventScroll:true});
  }
- function skipPractice(currentWord){
-  const rows=filtered();
-  const index=rows.findIndex(entry=>entry.word===currentWord);
-  if(index<0)return;
-  if(rows.length===1){
-   flash('Only one word matches. Choose another level or topic to continue. · यो समूहमा एउटा मात्र शब्द छ। अर्को स्तर वा विषय छान्नुहोस्।');
-   return;
-  }
-  const wrapped=index===rows.length-1;
-  selected=rows[wrapped?0:index+1].word;
-  tab='practice';quizValue='';
-  feedback=wrapped
-   ?'⏭️ Back to the first word for more practice. · थप अभ्यासका लागि पहिलो शब्दमा फर्कियौं।'
-   :'⏭️ Skipped. Try this word next. · अर्को शब्द अभ्यास गर्नुहोस्।';
-  render();
-  const nextInput=detail.querySelector('.wv-quiz-input');
-  if(nextInput&&typeof nextInput.focus==='function')nextInput.focus({preventScroll:true});
- }
+ function advancePractice(correctWord){movePractice(correctWord,true);}
+ function skipPractice(currentWord){movePractice(currentWord,false);}
  function choose(word){selected=word;tab='meaning';quizValue='';feedback='';render();}
  function resetFilters(){
   category='all';query='';level='all';type='all';sort='default';
@@ -308,10 +327,7 @@ window.enhanceWordsDashboard=function(doc){
    const options=rows.filter(w=>w.word!==selected);
    const pool=options.length?options:rows;
    choose(pool[Math.floor(Math.random()*pool.length)].word);
-  }else{
-   selected=(i<0?rows[0]:rows[i]).word;tab='practice';feedback='';quizValue='';render();
-   if(doc.defaultView.innerWidth<850)detail.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  }else{startPractice();}
  }
  nextButton.addEventListener('click',()=>studyMove('next'));
  randomButton.addEventListener('click',()=>studyMove('random'));
@@ -365,6 +381,13 @@ window.enhanceWordsDashboard=function(doc){
  }
  function renderList(rows){
   list.replaceChildren();
+  if(tab==='practice'&&rows.length){
+   const note=add(doc,list,'div','wv-quiz-list-hidden');
+   add(doc,note,'strong','','🔒 Quiz in progress · अभ्यास जारी छ');
+   add(doc,note,'p','','The English word list is hidden during practice so you can test your memory. · आफैं सम्झेर लेख्न अंग्रेजी शब्दसूची लुकाइएको छ।');
+   add(doc,note,'p','','Use Show Answer if you get stuck. · गाह्रो भए उत्तर हेर्नुहोस् थिच्नुहोस्।');
+   return;
+  }
   if(!rows.length){
    add(doc,list,'p','wv-empty','No matching words. Try another category or search. · शब्द भेटिएन।');
    return;
@@ -398,20 +421,25 @@ window.enhanceWordsDashboard=function(doc){
    b.type='button';if(tab===key)b.classList.add('active');
    b.setAttribute('aria-pressed',String(tab===key));
    add(doc,b,'span','',icon);const title=add(doc,b,'span','',label);add(doc,title,'small','',ne);
-   b.addEventListener('click',()=>{tab=key;renderDetail(w);});
+   b.addEventListener('click',()=>{
+    if(key==='practice')startPractice();
+    else{tab=key;feedback='';quizValue='';render();}
+   });
   }
  }
  function renderDetail(w){
   detail.replaceChildren();
   const overview=add(doc,detail,'div','wv-detail-head');
   const label=add(doc,overview,'div','wv-selected-word');
-  const title=add(doc,label,'h2','',w.word);
-  const speaker=add(doc,title,'button','wv-speak','🔊');speaker.type='button';
-  speaker.setAttribute('aria-label','Speak '+w.word);
-  speaker.addEventListener('click',()=>speak(doc,w.word,'en'));
-  const star=add(doc,title,'button','wv-save',w.saved?'★':'☆');star.type='button';
-  star.setAttribute('aria-label',w.saved?'Word saved — show saved word list':'Save '+w.word+' to dictionary');
-  star.addEventListener('click',()=>saveWord(w.word));
+  const title=add(doc,label,'h2','',tab==='practice'?'🧠 Recall the English word':w.word);
+  if(tab!=='practice'){
+   const speaker=add(doc,title,'button','wv-speak','🔊');speaker.type='button';
+   speaker.setAttribute('aria-label','Speak '+w.word);
+   speaker.addEventListener('click',()=>speak(doc,w.word,'en'));
+   const star=add(doc,title,'button','wv-save',w.saved?'★':'☆');star.type='button';
+   star.setAttribute('aria-label',w.saved?'Word saved — show saved word list':'Save '+w.word+' to dictionary');
+   star.addEventListener('click',()=>saveWord(w.word));
+  }
   const ne=add(doc,label,'p','wv-translation',w.ne);
   const tags=add(doc,label,'div','wv-tags');
   add(doc,tags,'span','wv-tag wv-part',w.type);
@@ -420,7 +448,13 @@ window.enhanceWordsDashboard=function(doc){
   illustration.setAttribute('role','img');
   illustration.setAttribute('aria-label','Decorative Nepal mountain landscape for vocabulary learning');
   add(doc,illustration,'span','wv-picture-emoji',w.category==='food'?'🥟':w.category==='culture'?'🪔':w.category==='family'?'👨‍👩‍👧':w.category==='work'?'💼':w.category==='school'?'📚':w.category==='health'?'🩺':'🏔️');
-  modeButtons(detail,w);
+  if(tab==='practice'){
+   const bar=add(doc,detail,'div','wv-quiz-topbar');
+   add(doc,bar,'span','','🎯 Memory challenge · स्मरण अभ्यास');
+   const exit=add(doc,bar,'button','wv-exit-quiz','← Back to learning · सिकाइमा फर्कनुहोस्');
+   exit.type='button';
+   exit.addEventListener('click',()=>{tab='meaning';feedback='';quizValue='';render();});
+  }else modeButtons(detail,w);
   const cols=add(doc,detail,'div','wv-detail-grid');
   const main=add(doc,cols,'div','wv-detail-main');
   const aside=add(doc,cols,'aside','wv-detail-side');
@@ -453,9 +487,7 @@ window.enhanceWordsDashboard=function(doc){
   }else{
    const question=add(doc,main,'div','wv-content-card wv-meaning');
    add(doc,question,'h3','','🎯 Quick Practice · छिटो अभ्यास');
-   const practiceWords=filtered();
-   const practiceIndex=practiceWords.findIndex(item=>item.word===w.word);
-   add(doc,question,'p','wv-quiz-count','Word '+(practiceIndex+1)+' of '+practiceWords.length+' · अभ्यास क्रम');
+   add(doc,question,'p','wv-quiz-count','Challenge '+(practiceIndex+1)+' of '+practiceOrder.length+' · अभ्यास क्रम');
    const status=add(doc,question,'p','wv-practice-status',feedback);
    status.dataset.kind=practiceFeedbackKind(feedback);
    status.setAttribute('role','status');
@@ -479,13 +511,15 @@ window.enhanceWordsDashboard=function(doc){
    answerPanel.setAttribute('aria-label','Practice answer and pronunciation');
    add(doc,answerPanel,'p','wv-answer-caption','Study the answer, then type it yourself · उत्तर हेरेर फेरि आफैं लेख्नुहोस्');
    const answerRow=add(doc,answerPanel,'div','wv-answer-row');
-   add(doc,answerRow,'strong','wv-answer-text',w.word);
+   const answerWord=add(doc,answerRow,'strong','wv-answer-text','');
    const hear=add(doc,answerRow,'button','wv-answer-listen','🔊 Listen · सुन्नुहोस्');
    hear.type='button';
-   hear.setAttribute('aria-label','Listen to '+w.word);
+   hear.setAttribute('aria-label','Listen to revealed word');
    hear.addEventListener('click',()=>speak(doc,w.word,'en'));
    add(doc,answerPanel,'p','wv-answer-ne',w.ne);
    reveal.addEventListener('click',()=>{
+    answerWord.textContent=w.word;
+    hear.setAttribute('aria-label','Listen to '+w.word);
     answerPanel.hidden=false;
     reveal.setAttribute('aria-expanded','true');
     reveal.textContent='👁 Answer shown · उत्तर देखियो';
@@ -502,6 +536,7 @@ window.enhanceWordsDashboard=function(doc){
    });
    input.addEventListener('keydown',e=>{if(e.key==='Enter')check.click();});
   }
+  if(tab!=='practice'){
   const example=add(doc,main,'div','wv-example-card');
   add(doc,example,'h3','','🔉 Everyday example · दैनिक उदाहरण');
   add(doc,example,'p','',sentenceFor(w));
@@ -517,15 +552,18 @@ window.enhanceWordsDashboard=function(doc){
   add(doc,practice,'p','','Can you use “'+w.word+'” in your own sentence?');
   const practiceB=add(doc,practice,'button','wv-practice-button','Practice this word →');
   practiceB.type='button';practiceB.addEventListener('click',()=>{tab='practice';quizValue='';feedback='';renderDetail(w);});
+  }
   add(doc,detail,'p','wv-feedback',feedback);
  }
  function render(){
   items=combined(doc,wordBox);
+  root.classList.toggle('wv-quiz-mode',tab==='practice');
   if(!allTopics&&!cats.slice(0,7).some(entry=>entry[0]===category))allTopics=true;
   renderCategories();
   const rows=filtered();
+  if(tab==='practice'&&rows.length)ensurePractice(rows);
   count.textContent='Words ('+rows.length+')';
-  resultLabel.textContent='Choose a word · शब्द छान्नुहोस्';
+  resultLabel.textContent=tab==='practice'?'Answers hidden · उत्तर लुकाइएको':'Choose a word · शब्द छान्नुहोस्';
   for(const [value,button] of Object.entries(levelButtons)){
    const active=value===level;
    button.classList.toggle('active',active);
@@ -536,7 +574,10 @@ window.enhanceWordsDashboard=function(doc){
   filterSummary.textContent='Showing '+rows.length+' of '+items.length+' words · '+(summary.join(' · ')||'All topics and levels');
   clearFilters.hidden=!hasFilters;
   [nextButton,randomButton,quizButton].forEach(b=>{b.disabled=rows.length===0;});
-  if(!rows.some(w=>w.word===selected)){selected=rows[0]?.word||'';tab='meaning';quizValue='';feedback='';}
+  if(!rows.some(w=>w.word===selected)){
+   selected=rows[0]?.word||'';quizValue='';feedback='';
+   if(!rows.length)tab='meaning';
+  }
   const chosen=rows.find(w=>w.word===selected);
   renderList(rows);
   if(chosen)renderDetail(chosen);
