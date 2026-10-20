@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261015-b',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261020-compact-topic-r1',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -141,7 +141,12 @@ window.enhanceWritingCoachDashboard=function(doc){
  add(doc,label,'small','','आजको लेखन विषय');
  const change=add(doc,top,'button','wc-change','⟳ Change topic · विषय फेर्नुहोस्');
  change.type='button';
- change.addEventListener('click',()=>dice.click()); // same native topic generator
+ change.setAttribute('aria-controls','topicCard');
+ // Use the native topic generator without displaying its duplicate overlay button.
+ // The original listener remains attached to #topicDice.
+ dice.setAttribute('aria-hidden','true');
+ dice.tabIndex=-1;
+ change.addEventListener('click',()=>dice.click());
  topicPanel.appendChild(topic); // do not clone/reset existing topic
  const prompts=add(doc,topicPanel,'div','wc-topic-prompts');
  for(const [emoji,text] of [['📌','Answer the topic'],['💡','Give an example'],['✅','Stay relevant']]){
