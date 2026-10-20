@@ -392,7 +392,8 @@ function hideRedundantCoachCultureLab(doc){
  const nodes=new Set();
  // Match the original native culture component and not every culture label.
  for(const node of doc.querySelectorAll('#cultureLab,.culture-lab')){
-  if(!coachRoot.contains(node))continue;
+  // The legacy culture card may be a sibling below #coachRoot in some builds.
+  // Its unique title identifies this exact unwanted panel, not other lessons.
   if(/Explore Nepal in English/i.test(node.textContent||''))nodes.add(node);
  }
  // Older private lesson versions use a generic .card instead of .culture-lab.
