@@ -1784,9 +1784,11 @@ function sikauReconcileSidebar(doc,requested){
  }
  for(const button of buttons){
   const active=button===chosen;
-  button.classList.toggle('on',active);
-  if(active)button.setAttribute('aria-current','page');
-  else button.removeAttribute('aria-current');
+  // Avoid repeated attribute mutations on a live lesson MutationObserver.
+  if(button.classList.contains('on')!==active)button.classList.toggle('on',active);
+  if(active){
+   if(button.getAttribute('aria-current')!=='page')button.setAttribute('aria-current','page');
+  }else if(button.hasAttribute('aria-current'))button.removeAttribute('aria-current');
  }
 }
 function sikauScheduleSidebarSync(doc,requested){
