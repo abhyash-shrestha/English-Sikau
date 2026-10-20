@@ -50,7 +50,7 @@ html.sikau-refresh #tr.sikau-studio-v4>.content,
 #tr.sikau-studio-v4 .ttx-panel-head strong{display:block;font:900 15px/1.25 system-ui;color:#222a51}
 #tr.sikau-studio-v4 .ttx-panel-head small{display:block;margin-top:3px;color:#5b6584;font:650 12px/1.2 system-ui}
 #tr.sikau-studio-v4 .ttx-output-language{background:#e8f1ff;color:#2467b4;font-size:11px;font-weight:900;border-radius:999px;border:1px solid #b6d6ff;padding:7px 9px}
-#tr.sikau-studio-v4 .ttx-directions{display:grid!important;grid-template-columns:1.1fr 1fr .82fr;gap:5px;align-items:stretch;width:100%;margin-bottom:12px}
+#tr.sikau-studio-v4 .ttx-directions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;align-items:stretch;width:100%;margin-bottom:12px}
 #tr.sikau-studio-v4 .ttx-dir-button{
  display:flex!important;flex-direction:column;align-items:center;justify-content:center;
  border:1px solid #e2e5f2!important;border-radius:12px!important;background:#f6f8fd!important;
@@ -215,7 +215,7 @@ html.sikau-refresh #tr.sikau-studio-v4>.content,
 @media(max-width:390px){
  #tr.sikau-studio-v4 .ttx-hero h1{font-size:27px!important}
  #tr.sikau-studio-v4 .ttx-hero-copy{width:95%!important}
- #tr.sikau-studio-v4 .ttx-directions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ #tr.sikau-studio-v4 .ttx-directions{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
  #tr.sikau-studio-v4 .ttx-dir-button{padding:8px 3px!important;min-height:57px!important}
  #tr.sikau-studio-v4 .ttx-dir-button strong{font-size:9px!important}
  #tr.sikau-studio-v4 .ttx-dir-button small{font-size:9px!important}
