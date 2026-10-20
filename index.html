@@ -1099,7 +1099,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
 <script src="./writing-coach-dashboard.js?v=20261020-clean-topic-grid-r2"></script>
 <script src="./reading-dashboard.js?v=20261015-2"></script>
-<script src="./game-adventure.js?v=20261020-60s-5s-r2"></script>
+<script src="./game-adventure.js?v=20261020-lightning-60s-5s-r3"></script>
 <script src="./progress-dashboard.js?v=20261016-1"></script>
 <script>
 'use strict';
@@ -2563,7 +2563,7 @@ async function openFile(token='',isTrial=false){
     const frame=$('lessonFrame');
     frame.removeAttribute('src');
     // Start the game studio inside authorized private lessons, after their own scripts.
-    const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=f88e40bc',location.href).href;
+    const gameScriptUrl=new URL('english-sikau-extra-game-topics.js?v=20261020-lightning-60s-5s-r3',location.href).href;
     const gameScriptTag='<scr'+'ipt src="'+gameScriptUrl+'"></scr'+'ipt>';
 
     // The currently deployed private lesson dice occasionally throws inside
@@ -2698,9 +2698,59 @@ async function openFile(token='',isTrial=false){
 `;
     // Direct insertion immediately before the private checker declaration:
     // previous last-closure insertion targeted unrelated navigation code.
+    const lightningTimingPatch=String.raw`
+/* Authenticated Lightning game: 60s start and +5s per newly correct answer.
+   Runs inside the existing authorized lesson closure; never changes XP or access. */
+(function(){
+ try{
+  if(typeof gameStartRush!=='function'||typeof gameRushAnswer!=='function')return;
+  if(window.__sikauLightningTimingV3)return;
+  var oldStart=gameStartRush;
+  gameStartRush=function(){
+   var result=oldStart.apply(this,arguments);
+   var round=typeof GAME_RUNNING!=='undefined'?GAME_RUNNING:null;
+   if(round&&round.mode==='rush'&&!round.done&&round.i===0&&round.correct===0){
+    round.seconds=60;
+    var clock=document.getElementById('gameSeconds');
+    if(clock)clock.textContent='60';
+    var bar=document.getElementById('gameTimeBar');
+    if(bar)bar.style.width='100%';
+   }
+   return result;
+  };
+  var oldAnswer=gameRushAnswer;
+  gameRushAnswer=function(){
+   var round=typeof GAME_RUNNING!=='undefined'?GAME_RUNNING:null;
+   var eligible=!!(round&&round.mode==='rush'&&!round.done&&!round.answered&&
+     Number.isFinite(round.seconds)&&round.seconds>0);
+   var beforeCorrect=eligible?round.correct:0;
+   var beforeSeconds=eligible?round.seconds:0;
+   var result=oldAnswer.apply(this,arguments);
+   if(eligible&&GAME_RUNNING===round&&round.correct===beforeCorrect+1&&
+      round.answered&&round.paused){
+    round.seconds=beforeSeconds+5;
+    var clock=document.getElementById('gameSeconds');
+    if(clock)clock.textContent=String(round.seconds);
+    var bar=document.getElementById('gameTimeBar');
+    if(bar)bar.style.width=Math.min(100,round.seconds/60*100)+'%';
+    var feedback=document.getElementById('gameFeedback');
+    if(feedback&&!feedback.querySelector('.sikau-lightning-bonus')){
+     var bonus=document.createElement('div');
+     bonus.className='sikau-lightning-bonus';
+     bonus.setAttribute('role','status');
+     bonus.textContent='⚡ +5 seconds! · सही उत्तरमा थप ५ सेकेन्ड';
+     feedback.appendChild(bonus);
+    }
+   }
+   return result;
+  };
+  window.__sikauLightningTimingV3=true;
+ }catch(error){console.warn('English Sikau Lightning timing patch unavailable:',error)}
+})();
+`;
     const qualityEntry=/async\s+function\s+checkWriting\s*\(\s*text\s*,\s*topic\s*,\s*wordCount\s*\)\s*\{/;
     const qualityInstalled=qualityEntry.test(repairedHtml);
-    const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>writingQualityPatch+'\n'+m):repairedHtml;
+    const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>lightningTimingPatch+'\n'+writingQualityPatch+'\n'+m):repairedHtml;
     if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+'</body>'):
