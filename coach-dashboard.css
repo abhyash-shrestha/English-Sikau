@@ -313,3 +313,7 @@ html[data-sikau-theme="dark"] .sikau-convo-complete h3{color:#fff!important}
 html[data-sikau-theme="dark"] .sikau-convo-complete p,
 html[data-sikau-theme="dark"] .sikau-convo-complete small{color:#cdd5e8!important}
 @media(prefers-reduced-motion:reduce){.sikau-convo-situation{transition:none}.sikau-convo-situation:hover{transform:none}}
+
+.sikau-convo-skip{display:block;margin:5px 0 0 auto;border:0;background:transparent;
+ color:#6a6f89;font-size:12px;font-weight:800;padding:9px 0;text-decoration:underline;text-underline-offset:3px}
+html[data-sikau-theme="dark"] .sikau-convo-skip{color:#d6d9ef!important}
