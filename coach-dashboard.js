@@ -49,8 +49,9 @@ window.enhanceCoachDashboard=function(doc){
  if(!doc?.body||!doc.head)return;
  const oldHero=doc.querySelector('.coach-top'),ask=doc.querySelector('.coach-ask');
  if(!oldHero||!ask||!oldHero.parentElement)return;
- if(doc.getElementById('sikauCoachConversations')?.isConnected)return;
- const previous=doc.getElementById('sikauCoachConversations');if(previous)previous.remove();
+ const previous=doc.getElementById('sikauCoachConversations');
+ if(previous&&(previous.isConnected||previous.parentElement))return;
+ if(previous)previous.remove();
  if(!doc.getElementById('sikauCoachDesignStyles')){
   const sheet=el(doc,'link');sheet.id='sikauCoachDesignStyles';sheet.rel='stylesheet';sheet.href=STYLE_URL;doc.head.appendChild(sheet);
  }else{
