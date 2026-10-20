@@ -10,7 +10,7 @@ const scenarios=[{"id":"return-shirt","emoji":"👕","title":"Return clothing","
 const topics=['All','Shopping','Healthcare','Food & Drink','Travel','Work','Services','Everyday'];
 function el(d,tag,cls,text){const n=d.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;}
 function add(d,p,tag,cls,text){const n=el(d,tag,cls,text);p.appendChild(n);return n;}
-function normalize(s){return String(s||'').toLowerCase().normalize('NFKC').replace(/[’']/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function normalize(s){return String(s||'').toLowerCase().normalize('NFKC').replace(/[’']/g,'').replace(/[^a-z0-9\u0900-\u097f ]/g,' ').replace(/\s+/g,' ').trim();}
 function validTyped(typed,step){
  const value=normalize(typed),model=normalize(step.answer);
  if(!value||value.length<4)return false;
@@ -241,6 +241,8 @@ window.enhanceCoachDashboard=function(doc){
     const copy=add(doc,result,'button','sikau-convo-secondary','🔊 Hear example · सुन्नुहोस्');copy.type='button';copy.addEventListener('click',()=>speak(doc,step.answer));
    });
   }
+  const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरणमा जानुहोस् →');
+  skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','🌱 Useful language');
   add(doc,note,'p','',step.hint);
