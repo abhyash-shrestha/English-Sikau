@@ -43,3 +43,15 @@ html[data-sikau-theme="dark"] #game.sikau-game-adventure :is(.game-map-stop,.gam
 html[data-sikau-theme="dark"] #game.sikau-game-adventure :is(.game-map-stop b,.game-shell:has(.game-map)>.game-caption,.game-mission b){color:#f8eeff!important}
 html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-mission{background:#2b3248!important}
 html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-modes button.on{background:#543551!important;color:#ffeaf7!important}
+
+/* Lightning: show a small time bonus below a verified correct answer. */
+#game .sikau-lightning-bonus{
+ display:flex;align-items:center;justify-content:center;
+ background:#e9f9ef;border:1px solid #a8dfba;color:#16643c;
+ border-radius:12px;padding:11px 14px;margin:10px 0 0;
+ font-size:13px;line-height:1.45;font-weight:900;text-align:center;
+}
+#game #gameTimeBar{max-width:100%!important}
+html[data-sikau-theme="dark"] #game .sikau-lightning-bonus{
+ background:#1f4237!important;color:#e0ffe9!important;border-color:#4b9969!important
+}
