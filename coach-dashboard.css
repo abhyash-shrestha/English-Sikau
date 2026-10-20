@@ -466,3 +466,58 @@ html[data-sikau-theme="dark"] .sikau-visa-source small{color:#d2def2!important}
 html[data-sikau-theme="dark"] .sikau-visa-feedback.info{background:#294360!important;border-color:#4f7ba9!important;color:#edf5ff!important}
 html[data-sikau-theme="dark"] .sikau-visa-feedback.warning{background:#453524!important;border-color:#86643f!important;color:#ffe7c1!important}
 html[data-sikau-theme="dark"] .sikau-visa-category-source a{color:#a6d4ff!important}
+
+/* Dedicated sidebar destination for U.S. Visa Interview. The Coach stays
+   exclusively for everyday conversation while the visa tab is selected. */
+.sikau-convo.sikau-visa-standalone:not(.sikau-visa-focused)>.sikau-visa-hub{display:none!important}
+.sikau-convo.sikau-visa-standalone .sikau-visa-switcher{display:none!important}
+#mobileModes.nav button.sikau-visa-nav,
+.nav button.sikau-visa-nav{
+ display:flex!important;align-items:center;gap:10px;min-height:54px;
+ min-width:0;width:100%;text-align:left;padding:10px 12px;
+ border:0;border-radius:13px;background:transparent;color:inherit;
+ cursor:pointer;font:inherit;transition:background .15s ease
+}
+.nav .sikau-visa-nav-icon{
+ flex:0 0 40px;width:40px;height:40px;border-radius:12px;
+ display:grid;place-items:center;background:#f1f5ff;font-size:23px
+}
+.nav .sikau-visa-nav-word{
+ display:flex;flex-direction:column;align-items:flex-start;
+ min-width:0;gap:3px;line-height:1.25;white-space:normal
+}
+.nav .sikau-visa-nav-word strong{font-weight:900;font-size:13px;line-height:1.25}
+.nav .sikau-visa-nav-word small{font-size:10px;font-weight:680;opacity:.82;line-height:1.35}
+html.sikau-visa-nav-active #mobileModes.nav button.sikau-visa-nav,
+html.sikau-visa-nav-active .nav button.sikau-visa-nav{
+ background:#ffedf5!important;color:#c20b54!important;
+ box-shadow:inset 3px 0 #e91665!important;font-weight:900
+}
+html.sikau-visa-nav-active #mobileModes.nav button[data-t="coach"].on,
+html.sikau-visa-nav-active .nav button[data-t="coach"].on{
+ background:transparent!important;color:inherit!important;box-shadow:none!important;
+ outline:0!important
+}
+html.sikau-refresh[data-sikau-theme="dark"] .nav button.sikau-visa-nav{color:#efe9ff!important}
+html.sikau-refresh[data-sikau-theme="dark"] .nav .sikau-visa-nav-icon{background:#344762!important}
+html.sikau-refresh[data-sikau-theme="dark"].sikau-visa-nav-active .nav button.sikau-visa-nav{
+ background:#573047!important;color:#ffdaed!important;box-shadow:inset 3px 0 #f079af!important
+}
+@media(max-width:700px){
+ html.sikau-refresh #mobileModes.nav button.sikau-visa-nav{
+  flex:0 0 76px!important;min-width:76px!important;width:76px!important;
+  min-height:60px!important;padding:6px 3px!important;gap:3px!important;
+  flex-direction:column;justify-content:center;text-align:center!important;
+  white-space:normal!important
+ }
+ html.sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{
+  flex:0 0 22px;width:22px;height:22px;font-size:19px;background:transparent
+ }
+ html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word{
+  display:flex;align-items:center;text-align:center;max-width:100%
+ }
+ html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word strong{
+  font-size:9px!important;line-height:1.16!important;overflow-wrap:anywhere
+ }
+ html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{display:none!important}
+}
