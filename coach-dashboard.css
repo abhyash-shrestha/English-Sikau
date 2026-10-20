@@ -623,3 +623,24 @@ html.sikau-home-active .nav button.sikau-visa-nav.on{
  background:transparent!important;color:inherit!important;
  outline:0!important;box-shadow:none!important
 }
+
+/* No 'US' badge above the Visa tab. Preserve the bilingual label centered
+   on desktop, tablet and mobile even if an older DOM contained that badge. */
+#mobileModes.nav button.sikau-visa-nav,
+.nav button.sikau-visa-nav{
+ flex-direction:column!important;
+ justify-content:center!important;
+ align-items:center!important;
+ text-align:center!important;
+ gap:3px!important;
+}
+#mobileModes.nav .sikau-visa-nav-icon,
+.nav .sikau-visa-nav-icon{display:none!important}
+#mobileModes.nav .sikau-visa-nav-word,
+.nav .sikau-visa-nav-word{
+ display:flex!important;
+ align-items:center!important;
+ text-align:center!important;
+ gap:3px!important;
+ width:100%;
+}
