@@ -260,7 +260,7 @@ function installVisaSidebar(doc,shell,visaController){
    if(String(target.dataset.t||'').toLowerCase()==='coach'){
     visaController.showEveryday();
    }
-  });
+  },true); // capture: native tab handlers may stop event bubbling
  }
  if(!visaButton.dataset.sikauVisaClick){
   visaButton.dataset.sikauVisaClick='1';
