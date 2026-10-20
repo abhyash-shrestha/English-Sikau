@@ -4,7 +4,7 @@
  */
 (function(){
 'use strict';
-const STYLE_URL=new URL('words-studio.css?v=20261020-organized-r1',document.baseURI).href;
+const STYLE_URL=new URL('words-studio.css?v=20261020-practice-next-r1',document.baseURI).href;
 const vocabulary=[
 ['adventure','साहसिक यात्रा','travel','noun',2,'An exciting or unusual experience or journey.','We went on an adventure in the mountains.','हामी पहाडमा साहसिक यात्रामा गयौं।'],
 ['beautiful','सुन्दर','nature','adjective',1,'Pleasant or lovely to see.','Pokhara is a beautiful city.','पोखरा एउटा सुन्दर सहर हो।'],
@@ -234,7 +234,32 @@ window.enhanceWordsDashboard=function(doc){
  root.appendChild(oldSection);
  content.insertBefore(root,content.firstChild);
  section.classList.add('sikau-words-v1');
- function flash(t){feedback=t;const node=detail.querySelector('.wv-feedback');if(node)node.textContent=t;}
+ function flash(t){
+  feedback=t;
+  for(const selector of ['.wv-feedback','.wv-practice-status']){
+   const node=detail.querySelector(selector);
+   if(node)node.textContent=t;
+  }
+ }
+ function advancePractice(correctWord){
+  const rows=filtered();
+  const currentIndex=rows.findIndex(entry=>entry.word===correctWord);
+  if(currentIndex<0)return;
+  quizValue='';
+  tab='practice';
+  if(rows.length===1){
+   feedback='🏆 Correct! You finished this set. Choose another topic or level for more practice. · सही उत्तर! थप अभ्यासका लागि अर्को विषय वा स्तर छान्नुहोस्।';
+  }else{
+   const wrapped=currentIndex===rows.length-1;
+   selected=rows[wrapped?0:currentIndex+1].word;
+   feedback=wrapped
+    ?'🏆 Set complete! Starting again from the first word. · सबै शब्द सकिए! पहिलो शब्दबाट फेरि सुरु गरौं।'
+    :'✅ Correct! On to the next word. · सही उत्तर! अब अर्को शब्द।';
+  }
+  render();
+  const nextInput=detail.querySelector('.wv-quiz-input');
+  if(nextInput&&typeof nextInput.focus==='function')nextInput.focus({preventScroll:true});
+ }
  function choose(word){selected=word;tab='meaning';quizValue='';feedback='';render();}
  function resetFilters(){
   category='all';query='';level='all';type='all';sort='default';
@@ -395,13 +420,28 @@ window.enhanceWordsDashboard=function(doc){
   }else{
    const question=add(doc,main,'div','wv-content-card wv-meaning');
    add(doc,question,'h3','','🎯 Quick Practice · छिटो अभ्यास');
+   const practiceWords=filtered();
+   const practiceIndex=practiceWords.findIndex(item=>item.word===w.word);
+   add(doc,question,'p','wv-quiz-count','Word '+(practiceIndex+1)+' of '+practiceWords.length+' · अभ्यास क्रम');
+   const status=add(doc,question,'p','wv-practice-status',feedback);
+   status.setAttribute('role','status');
+   status.setAttribute('aria-live','polite');
+   status.hidden=!feedback;
    add(doc,question,'p','','Write the English word for: '+w.ne);
    const input=add(doc,question,'input','wv-quiz-input');
    input.type='text';input.value=quizValue;input.placeholder='Type the English word…';
    input.setAttribute('aria-label','English translation for '+w.ne);
    input.addEventListener('input',()=>{quizValue=input.value;});
    const check=add(doc,question,'button','wv-check','Check Answer · उत्तर हेर्नुहोस्');check.type='button';
-   check.addEventListener('click',()=>{flash(quizValue.trim().toLowerCase()===w.word.toLowerCase()?'✅ Correct! राम्रो भयो!':'Try again. The word starts with “'+w.word.charAt(0)+'”. · फेरि प्रयास गर्नुहोस्।');});
+   check.addEventListener('click',()=>{
+    const answer=input.value.trim().replace(/\s+/g,' ').toLocaleLowerCase();
+    const expected=w.word.trim().replace(/\s+/g,' ').toLocaleLowerCase();
+    if(answer===expected)advancePractice(w.word);
+    else{
+     flash('Try again. The word starts with “'+w.word.charAt(0)+'”. · फेरि प्रयास गर्नुहोस्।');
+     status.hidden=false;
+    }
+   });
    input.addEventListener('keydown',e=>{if(e.key==='Enter')check.click();});
   }
   const example=add(doc,main,'div','wv-example-card');
