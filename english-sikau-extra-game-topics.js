@@ -29,7 +29,7 @@ window.EnglishSikauSupplementalTopicsV1.push(...[{"id":"kfood","name":"Kathmandu
  var modeCopy={
   quest:['🧭','Expedition','Explore a place · 6 challenges','अभियान'],
   match:['🧠','Match & Learn','Match English + Nepali words','शब्द मिलाउनुहोस्'],
-  rush:['⚡','Lightning','45-second speed challenge','छिटो उत्तर']
+  rush:['⚡','Lightning','60-second speed challenge','छिटो उत्तर']
  };
  gameModeNav=function(){
   return '<div class="sikau-game-mode-heading"><strong>🎮 Choose your game</strong><span>खेलको प्रकार छान्नुहोस् · Tap any card to switch</span></div>'+
@@ -111,13 +111,13 @@ window.EnglishSikauSupplementalTopicsV1.push(...[{"id":"kfood","name":"Kathmandu
   g.bags[key]=bag;
   g.bags[key+'-recent']=deck.slice(0,25).map(function(q){return q.rotationId});
   save();
-  GAME_RUNNING={mode:'rush',deck:deck,i:0,correct:0,wrong:0,seconds:45,combo:0,timer:null,paused:true,seen:0,done:false};
+  GAME_RUNNING={mode:'rush',deck:deck,i:0,correct:0,wrong:0,seconds:60,combo:0,timer:null,paused:true,seen:0,done:false};
   gameRushQuestion();
  };
  var styles=String.raw;
  var css='.sikau-game-mode-heading{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:7px;margin:13px 0 12px}.sikau-game-mode-heading strong{font-size:19px;color:#342039;font-weight:900}.sikau-game-mode-heading>span{color:#875e76;font-size:12px;font-weight:700}.game-modes.sikau-game-mode-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0;margin-bottom:24px;background:transparent}.sikau-game-mode-cards button{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:18px!important;border:2px solid #f0d9de;border-radius:20px!important;background:#fff!important;box-shadow:0 6px 20px #2f13350b;color:#34273c!important;min-height:174px;transition:transform .18s,border-color .18s,box-shadow .18s}.sikau-game-mode-cards button.on{border-color:#d21b59!important;background:linear-gradient(140deg,#fff0f4,#fff9f2)!important;box-shadow:0 8px 24px #cf24552a!important}.sikau-game-mode-cards button:hover{transform:translateY(-3px)}.sikau-game-mode-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#fff0dd;font-size:25px}.sikau-game-mode-copy{display:flex;flex-direction:column;gap:3px}.sikau-game-mode-copy b{font-size:17px}.sikau-game-mode-copy small{color:#70596b;font-size:12px;line-height:1.4}.sikau-game-mode-copy em{font-style:normal;font-size:11px;color:#9b5170}.sikau-game-mode-state{margin-top:auto;font-size:11px;font-weight:850;color:#c41b54}.sikau-topic-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 6px}.sikau-topic-tools>div:first-child{display:flex;flex-direction:column;gap:2px}.sikau-topic-tools strong{font-size:17px}.sikau-topic-tools span{font-size:12px;color:#7b6978}.sikau-topic-search{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #f0d9de;border-radius:12px;padding:7px 12px;min-width:min(100%,275px)}.sikau-topic-search input{min-width:0;width:100%;font:inherit;font-size:13px;border:0;background:transparent;color:#2f203a;outline:0}.sikau-topic-tags{display:flex;gap:7px;flex:1 1 100%;flex-wrap:wrap}.sikau-topic-tags button{border:1px solid #ebd9dc;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;background:#fff;color:#79465b}.sikau-topic-tags button.on{background:#c31d54;color:#fff;border-color:#c31d54}.game-map-stop[hidden]{display:none!important}.sikau-topic-empty{color:#a51f4e;font-weight:700}.game-map{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.game-map-stop{min-height:100px;padding:15px 12px;border-radius:19px;background:#fffaf7}.game-map-stop:hover{border-color:#d74771;box-shadow:0 8px 18px #3b1e3713}.game-map-stop.selected{background:#fff0f5}.game-map-stop b{font-size:15px}.game-map-stop small{font-size:11px}@media(max-width:850px){.game-modes.sikau-game-mode-cards,.game-map{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.game-modes.sikau-game-mode-cards,.game-map{grid-template-columns:1fr}.sikau-game-mode-cards button{min-height:110px;flex-direction:row;align-items:center;flex-wrap:wrap}.sikau-game-mode-copy{flex:1}.sikau-game-mode-state{margin:0 0 0 auto}.sikau-topic-search{width:100%}}@media(prefers-reduced-motion:reduce){.sikau-game-mode-cards button{transition:none!important}}';
  var style=document.createElement('style');style.id='sikau-game-studio-style';style.textContent=css;document.head.appendChild(style);
- window.__sikauGameStudioStatus={ready:true,topics:GAME_STOPS.length,addonVersion:'game-studio-v3'};
+ window.__sikauGameStudioStatus={ready:true,topics:GAME_STOPS.length,addonVersion:'game-studio-v4-60s-5s'};
  // Redraw the current game hub once to expose new selectable modes and places.
  if(typeof window.GAME_RUNNING==='undefined'||!window.GAME_RUNNING)gameHub();
 })();
