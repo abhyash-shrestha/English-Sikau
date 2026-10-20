@@ -238,7 +238,7 @@ window.enhanceWordsDashboard=function(doc){
   feedback=t;
   for(const selector of ['.wv-feedback','.wv-practice-status']){
    const node=detail.querySelector(selector);
-   if(node)node.textContent=t;
+   if(node){node.textContent=t;if(selector==='.wv-practice-status')node.dataset.kind=t.startsWith('Try again')?'error':'success';}
   }
  }
  function advancePractice(correctWord){
@@ -424,6 +424,7 @@ window.enhanceWordsDashboard=function(doc){
    const practiceIndex=practiceWords.findIndex(item=>item.word===w.word);
    add(doc,question,'p','wv-quiz-count','Word '+(practiceIndex+1)+' of '+practiceWords.length+' · अभ्यास क्रम');
    const status=add(doc,question,'p','wv-practice-status',feedback);
+   status.dataset.kind=feedback.startsWith('Try again')?'error':'success';
    status.setAttribute('role','status');
    status.setAttribute('aria-live','polite');
    status.hidden=!feedback;
