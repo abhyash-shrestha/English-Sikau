@@ -252,3 +252,56 @@ html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status:not([hid
 html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status[data-kind="error"]:not([hidden]){
  background:#4e332a!important;border-color:#90654a!important;color:#ffe0bf!important
 }
+
+/* Practice help: Check on the left, Next on the other side, reveal when stuck */
+#words.sikau-words-v1 .wv-quiz-actions{
+ display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:8px;margin:11px 0 8px;
+}
+#words.sikau-words-v1 .wv-quiz-actions button{
+ min-width:0;min-height:45px;padding:9px 10px;border-radius:10px;
+ font-size:12px;font-weight:800;line-height:1.3;white-space:normal;
+}
+#words.sikau-words-v1 .wv-quiz-actions .wv-check{
+ background:#e91461;color:#fff;border-color:#e91461
+}
+#words.sikau-words-v1 .wv-show-answer{
+ background:#fff9e9;color:#81531c;border:1px solid #e5d1a1
+}
+#words.sikau-words-v1 .wv-next-word{
+ background:#edf4ff;color:#254f9e;border:1px solid #cddbf3
+}
+#words.sikau-words-v1 .wv-revealed-answer{
+ margin-top:10px;padding:13px 14px;background:#fffbee;
+ border:1px solid #e8dba9;border-radius:12px
+}
+#words.sikau-words-v1 .wv-revealed-answer[hidden]{display:none!important}
+#words.sikau-words-v1 .wv-answer-caption,
+#words.sikau-words-v1 .wv-answer-ne{
+ font-size:12px;line-height:1.55;color:#795b29;margin:0 0 6px
+}
+#words.sikau-words-v1 .wv-answer-ne{margin:6px 0 0}
+#words.sikau-words-v1 .wv-answer-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+#words.sikau-words-v1 .wv-answer-text{font-size:clamp(18px,2vw,23px);color:#293b59;overflow-wrap:anywhere}
+#words.sikau-words-v1 .wv-answer-listen{
+ border:1px solid #d1dbea;border-radius:9px;background:#fff;
+ color:#37537b;font-weight:800;font-size:12px;min-height:35px;padding:7px 10px
+}
+#words.sikau-words-v1 .wv-practice-status[data-kind="info"]:not([hidden]){
+ background:#edf4ff!important;border-color:#cddbf3!important;color:#284e87!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-actions :is(.wv-check,.wv-show-answer,.wv-next-word){
+ color:#fff!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-actions .wv-check{background:#c91b64!important;border-color:#e95394!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-show-answer{background:#594832!important;border-color:#8d704b!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-next-word{background:#334b71!important;border-color:#5875a0!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-revealed-answer{background:#3d3540!important;border-color:#77634f!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 :is(.wv-answer-caption,.wv-answer-ne,.wv-answer-text){color:#fff3dd!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-answer-listen{background:#30425e!important;border-color:#61708b!important;color:#fff!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status[data-kind="info"]:not([hidden]){background:#263d60!important;border-color:#5975a8!important;color:#e6edff!important}
+@media(max-width:640px){
+ #words.sikau-words-v1 .wv-quiz-actions{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"check next" "reveal reveal"}
+ #words.sikau-words-v1 .wv-quiz-actions .wv-check{grid-area:check}
+ #words.sikau-words-v1 .wv-quiz-actions .wv-next-word{grid-area:next}
+ #words.sikau-words-v1 .wv-quiz-actions .wv-show-answer{grid-area:reveal}
+}
