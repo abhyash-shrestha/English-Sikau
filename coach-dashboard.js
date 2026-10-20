@@ -55,7 +55,7 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   if(out.length>1&&out[0].id===avoid)[out[0],out[1]]=[out[1],out[0]];
   return out;
  }
- function newDeck(){deck=shuffled(pick(),last);cursor=0;done=false;revealed=false;answerText='';typed='';notes='';}
+ function newDeck(){const avoid=deck[cursor]?.id||last;deck=shuffled(pick(),avoid);cursor=0;done=false;revealed=false;answerText='';typed='';notes='';}
  function chooseCategory(next){
   kind=next;last='';newDeck();renderCategories();renderQuestion();
  }
