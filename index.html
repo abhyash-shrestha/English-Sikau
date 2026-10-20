@@ -1093,7 +1093,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
-<script src="./coach-dashboard.js?v=20261020-single-selected-nav-r1"></script>
+<script src="./coach-dashboard.js?v=20261020-exclusive-nav-r2"></script>
 <script src="./translate-studio-v4.js?v=20261020-two-directions-r1"></script>
 <script src="./all-tabs-responsive.js"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
@@ -1763,8 +1763,42 @@ function sikauFestivalPreview(doc,mount){
   mount.replaceChildren(panel);mount.dataset.sikauPreview=today;
 }
 
+/* One authoritative sidebar selection. The private course router and our
+ * separate Festivals / Visa destinations can each add '.on'; only the
+ * destination actually visible should retain that class and aria-current.
+ * Reconcile AFTER the private router's click and its startup Translate load. */
+function sikauReconcileSidebar(doc,requested){
+ const nav=doc?.querySelector('#mobileModes.nav')||doc?.querySelector('.nav');
+ if(!nav)return;
+ const root=doc.documentElement;
+ const buttons=Array.from(nav.querySelectorAll('button[data-t],button.sikau-visa-nav'));
+ if(!buttons.length)return;
+ const home=nav.querySelector('.sikau-home-nav');
+ const visa=nav.querySelector('.sikau-visa-nav');
+ let chosen=null;
+ if(root.classList.contains('sikau-home-active'))chosen=home;
+ else if(root.classList.contains('sikau-visa-nav-active'))chosen=visa;
+ else if(requested)chosen=buttons.find(b=>String(b.dataset.t||'')===requested);
+ if(!chosen||!buttons.includes(chosen)){
+  chosen=buttons.find(b=>b!==home&&b!==visa&&b.classList.contains('on'))||null;
+ }
+ for(const button of buttons){
+  const active=button===chosen;
+  button.classList.toggle('on',active);
+  if(active)button.setAttribute('aria-current','page');
+  else button.removeAttribute('aria-current');
+ }
+}
+function sikauScheduleSidebarSync(doc,requested){
+ const sync=()=>sikauReconcileSidebar(doc,requested);
+ const raf=doc?.defaultView?.requestAnimationFrame;
+ if(typeof raf==='function')raf.call(doc.defaultView,sync);
+ else sync();
+}
 function enhanceLearningHome(doc,firstName){
   if(!doc?.body||!doc.head)return;
+  // The separate Coach script shares the same iframe document.
+  if(doc.defaultView)doc.defaultView.sikauScheduleSidebarSync=sikauScheduleSidebarSync;
   const nav=doc.querySelector('.nav')||
     doc.querySelector('button[data-t]')?.closest('nav');
   const content=doc.querySelector('main .content')||doc.querySelector('.content');
@@ -1884,7 +1918,9 @@ function enhanceLearningHome(doc,firstName){
       root.classList.add('sikau-home-active');
       home.hidden=false;
       homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
-      // Keep the normal tab state intact; only hide its content visually.
+      // A native lesson (often Translate) may still be marked active beneath Home.
+      // Keep its lesson data, but clear its duplicate selected highlight.
+      sikauScheduleSidebarSync(doc,'nepali-festivals');
       home.scrollIntoView({block:'start',behavior:'auto'});
     });
   }
@@ -1901,6 +1937,10 @@ function enhanceLearningHome(doc,firstName){
       if(panel)panel.hidden=true;
       const homeButton=nav.querySelector('.sikau-home-nav');
       if(homeButton){homeButton.classList.remove('on');homeButton.removeAttribute('aria-current');}
+      // Wait for the protected router to finish toggling native '.on' classes.
+      // This also handles the standalone Visa button (which has no data-t).
+      const requested=b.classList.contains('sikau-visa-nav')?'visa':String(b.dataset.t||'');
+      sikauScheduleSidebarSync(doc,requested);
     },true);
   }
 
@@ -1955,12 +1995,17 @@ function enhanceLearningHome(doc,firstName){
         homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
       }
     }
+    // Initial festival loading temporarily selects Translate. Remove that
+    // leftover native highlight after the festival home is restored.
+    sikauScheduleSidebarSync(doc,'nepali-festivals');
   }else{
     const active=doc.documentElement.classList.contains('sikau-home-active');
     home.hidden=!active;
     homeTab.classList.toggle('on',active);
     if(active)homeTab.setAttribute('aria-current','page');
     else homeTab.removeAttribute('aria-current');
+    // Protected-page personalization can reapply native nav classes.
+    sikauScheduleSidebarSync(doc,active?'nepali-festivals':null);
   }
 }
 
