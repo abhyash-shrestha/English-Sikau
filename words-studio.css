@@ -305,3 +305,62 @@ html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status[data-kin
  #words.sikau-words-v1 .wv-quiz-actions .wv-next-word{grid-area:next}
  #words.sikau-words-v1 .wv-quiz-actions .wv-show-answer{grid-area:reveal}
 }
+
+/* Vocabulary studio: real recall mode (no on-screen English answer clues). */
+#words.sikau-words-v1 .wv-quiz-mode .wv-today,
+#words.sikau-words-v1 .wv-quiz-mode .wv-study-actions,
+#words.sikau-words-v1 .wv-quiz-mode .wv-original{
+ display:none!important
+}
+#words.sikau-words-v1 .wv-quiz-mode .wv-detail-grid{
+ grid-template-columns:minmax(0,1fr)!important
+}
+#words.sikau-words-v1 .wv-quiz-mode .wv-detail-side,
+#words.sikau-words-v1 .wv-quiz-mode .wv-picture{display:none!important}
+#words.sikau-words-v1 .wv-quiz-mode .wv-detail-head{justify-content:flex-start}
+#words.sikau-words-v1 .wv-quiz-mode .wv-selected-word h2{
+ font-size:clamp(19px,2vw,26px)!important;letter-spacing:normal!important
+}
+#words.sikau-words-v1 .wv-quiz-list-hidden{
+ display:grid;align-content:center;gap:12px;min-height:240px;padding:22px 16px;
+ text-align:center;border:1px dashed #c7d2e8;background:#f7faff;border-radius:15px
+}
+#words.sikau-words-v1 .wv-quiz-list-hidden strong{font-size:15px;color:#253a60}
+#words.sikau-words-v1 .wv-quiz-list-hidden p{
+ margin:0;color:#647597;font-size:12px;line-height:1.65
+}
+#words.sikau-words-v1 .wv-quiz-topbar{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+ gap:9px;padding:10px 0;border-bottom:1px solid #e8ebf4;margin-bottom:12px;
+ color:#536383;font-size:12px;font-weight:850
+}
+#words.sikau-words-v1 .wv-exit-quiz{
+ min-height:40px;padding:8px 11px;border:1px solid #d8dfea;
+ border-radius:10px;background:#f7f9fe;color:#254573;font-size:12px;font-weight:850
+}
+#words.sikau-words-v1 .wv-quiz-mode .wv-meaning{
+ background:linear-gradient(125deg,#fff4fa,#f4f7ff)!important;
+ padding:clamp(14px,2vw,22px);border:1px solid #f1dbe8
+}
+#words.sikau-words-v1 .wv-quiz-mode .wv-quiz-count{
+ font-size:13px!important;padding:7px 12px
+}
+#words.sikau-words-v1 .wv-quiz-mode .wv-quiz-input{
+ min-height:54px!important;font-size:16px!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-list-hidden{
+ background:#25344d!important;border-color:#61718d!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-list-hidden strong{color:#f4ecff!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-list-hidden p,
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-topbar{color:#d3def3!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-exit-quiz{
+ background:#34465e!important;border-color:#60708f!important;color:#fff!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-mode .wv-meaning{
+ background:#29384f!important;border-color:#5d6a82!important
+}
+@media(max-width:850px){
+ #words.sikau-words-v1 .wv-quiz-mode .wv-board{grid-template-columns:1fr!important}
+ #words.sikau-words-v1 .wv-quiz-mode .wv-quiz-list-hidden{min-height:100px;padding:12px}
+}
