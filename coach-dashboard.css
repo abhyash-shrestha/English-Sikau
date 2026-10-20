@@ -317,3 +317,152 @@ html[data-sikau-theme="dark"] .sikau-convo-complete small{color:#cdd5e8!importan
 .sikau-convo-skip{display:block;margin:5px 0 0 auto;border:0;background:transparent;
  color:#6a6f89;font-size:12px;font-weight:800;padding:9px 0;text-decoration:underline;text-underline-offset:3px}
 html[data-sikau-theme="dark"] .sikau-convo-skip{color:#d6d9ef!important}
+
+/* US Visa Interview Coach · 2026-10-20 — primary practice view */
+.sikau-convo.sikau-visa-focused> :not(.sikau-visa-hub){display:none!important}
+.sikau-visa-hub{font-family:Inter,system-ui,"Noto Sans Devanagari",sans-serif;color:#1d3156;min-width:0}
+.sikau-visa-hub *{box-sizing:border-box}
+.sikau-visa-hub [hidden]{display:none!important}
+.sikau-visa-hub :is(button,input,textarea,a):focus-visible{outline:3px solid #4b82ff!important;outline-offset:3px}
+.sikau-visa-hub button{cursor:pointer;touch-action:manipulation}
+.sikau-visa-hub button:disabled{opacity:.6;cursor:default}
+.sikau-visa-switcher{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px;
+ border:1px solid #dae2ef;padding:6px;background:#f6f8fd;border-radius:15px}
+.sikau-visa-switch{min-height:48px;border:1px solid transparent;border-radius:11px;background:transparent;
+ color:#314563;font-size:13px;font-weight:850;padding:10px 13px;line-height:1.4}
+.sikau-visa-switch.active{background:#e51560!important;color:#fff!important;border-color:#e51560!important;box-shadow:0 4px 12px #b6185b30}
+.sikau-visa-hero{background:linear-gradient(112deg,#1a2a5c,#503273 58%,#a61e60);border-radius:20px;
+ padding:clamp(18px,2.6vw,31px);min-height:180px;display:flex;align-items:center;justify-content:space-between;gap:22px;color:#fff}
+.sikau-visa-hero-copy{min-width:0}
+.sikau-visa-kicker{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.08em;
+ color:#fff1db;padding:7px 10px;border-radius:999px;background:#ffffff22;margin-bottom:8px}
+.sikau-visa-hero h2{font-size:clamp(25px,3vw,38px)!important;line-height:1.17!important;
+ color:#fff!important;margin:8px 0!important;font-weight:920}
+.sikau-visa-hero p{color:#fff0fa;font-weight:780;font-size:clamp(13px,1.6vw,17px);line-height:1.5;margin:4px 0 7px}
+.sikau-visa-hero small{font-size:12px;line-height:1.6;color:#e9ddf1;display:block;max-width:650px}
+.sikau-visa-stats{flex:0 0 134px;text-align:center;background:#ffffff22;border:1px solid #ffffff38;padding:19px 12px;border-radius:16px}
+.sikau-visa-stats strong{font-size:36px;line-height:1;display:block;font-weight:940;color:#fff}
+.sikau-visa-stats span{display:block;font-size:12px;line-height:1.4;margin-top:6px;color:#ffe7ef}
+.sikau-visa-caution{margin:13px 0 17px;border-radius:13px;border:1px solid #e9dabc;background:#fffae8;padding:12px 15px}
+.sikau-visa-caution strong{font-size:13px;line-height:1.45;color:#78501c}
+.sikau-visa-caution p{margin:5px 0 0;font-size:12px;line-height:1.6;color:#745d37}
+.sikau-visa-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 17px}
+.sikau-visa-category{display:flex;gap:11px;align-items:center;text-align:left;background:#fff;
+ border:1px solid #dfe6f1;border-radius:14px;padding:13px;min-width:0;min-height:94px;color:#273956}
+.sikau-visa-category.active{background:#fff1f7!important;border-color:#e91d73!important;box-shadow:inset 3px 0 #e91d73}
+.sikau-visa-icon{width:43px;height:43px;flex:0 0 43px;display:grid;place-items:center;background:#f1f3fa;
+ border-radius:12px;font-size:24px}
+.sikau-visa-category-copy{display:grid;min-width:0;gap:3px}
+.sikau-visa-category-copy strong{font-size:14px;font-weight:900;color:#233353;line-height:1.25}
+.sikau-visa-category-copy small{font-size:12px;color:#697b94;line-height:1.3}
+.sikau-visa-category-copy em{font-style:normal;font-size:10px;font-weight:840;color:#ad296b}
+.sikau-visa-learner{border:1px solid #dce4f0;border-radius:18px;background:#fff;
+ padding:clamp(14px,2vw,22px);min-width:0;box-shadow:0 8px 24px #29385f0b}
+.sikau-visa-question-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+ gap:12px;padding-bottom:13px;border-bottom:1px solid #e5e9f3}
+.sikau-visa-question-head strong{font-size:15px;font-weight:900;color:#283857}
+.sikau-visa-shuffle,.sikau-visa-secondary{border:1px solid #dce3ef;border-radius:11px;
+ background:#f3f6fc;color:#2e4568;font-size:12px;line-height:1.4;font-weight:840;
+ min-height:42px;padding:9px 12px}
+.sikau-visa-progress{display:flex;gap:12px;align-items:center;margin:17px 0;
+ color:#62728d;font-size:12px;font-weight:850}
+.sikau-visa-progress span{white-space:nowrap}
+.sikau-visa-track{height:9px;border-radius:99px;background:#e8edf6;overflow:hidden;flex:1}
+.sikau-visa-track-fill{height:100%;background:linear-gradient(90deg,#e61667,#e98e36);border-radius:inherit}
+.sikau-visa-prompt{background:linear-gradient(125deg,#f4f6ff,#fbf2fb);border:1px solid #e4e3f2;
+ border-radius:15px;padding:clamp(15px,2vw,24px)}
+.sikau-visa-officer{font-size:12px;font-weight:900;color:#ad2966}
+.sikau-visa-prompt h3{color:#243856!important;font-size:clamp(17px,2vw,24px)!important;
+ font-weight:900!important;line-height:1.4!important;margin:8px 0!important}
+.sikau-visa-prompt p{margin:4px 0 13px;color:#485f84;font-size:14px;line-height:1.5;font-weight:750}
+.sikau-visa-control-row{display:flex;gap:8px;flex-wrap:wrap}
+.sikau-visa-response{padding:18px 0 6px}
+.sikau-visa-label{display:block;font-size:13px;font-weight:900;margin:0 0 9px;color:#253958}
+.sikau-visa-input{display:block;width:100%;min-width:0;min-height:114px;resize:vertical;
+ border:1.5px solid #cbd6e8;background:#fbfcff;color:#1e3555;
+ border-radius:12px;padding:14px;font-family:inherit;font-size:14px;line-height:1.6}
+.sikau-visa-action-row{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:8px;margin:13px 0 0}
+.sikau-visa-action-row button{min-width:0;line-height:1.45;padding:10px 9px}
+.sikau-visa-primary{background:#e51560;color:#fff!important;border:1px solid #e51560;border-radius:11px;
+ min-height:43px;padding:9px 14px;font-size:12px;font-weight:860}
+.sikau-visa-feedback:not(:empty){border-radius:12px;padding:12px;margin:13px 0 3px;font-size:13px;line-height:1.65}
+.sikau-visa-feedback.warning{background:#fff5e9;border:1px solid #efcfa0;color:#805126}
+.sikau-visa-feedback.info{background:#edf5ff;border:1px solid #cddbf0;color:#2c517f}
+.sikau-visa-guide{background:#f4f8ff;border:1px solid #d6e2f4;border-radius:13px;
+ padding:clamp(13px,1.8vw,19px);margin-top:13px}
+.sikau-visa-guide h4{font-size:15px;margin:0 0 12px;color:#253c65}
+.sikau-visa-guide strong{font-size:12px;color:#73418a;display:block;margin:11px 0 5px}
+.sikau-visa-guide p{font-size:13px;line-height:1.65;margin:0;color:#435c80}
+.sikau-visa-guide blockquote{border-left:3px solid #e51560;background:#fff;padding:13px 15px;
+ border-radius:0 10px 10px 0;margin:7px 0;color:#263e5d;font-size:14px;line-height:1.65}
+.sikau-visa-ai{display:block;text-align:left;background:transparent;border:0;
+ padding:14px 0 4px;color:#b11766;font-size:13px;font-weight:900}
+.sikau-visa-ai-notice{font-size:12px;line-height:1.5;color:#657793;margin:4px 0}
+.sikau-visa-category-source{font-size:12px;color:#6e7a8f;margin:13px 0 0}
+.sikau-visa-category-source a{color:#145bb2;text-decoration:underline;text-underline-offset:3px}
+.sikau-visa-done{text-align:center;padding:25px 14px}
+.sikau-visa-done h3{color:#253960!important;font-size:24px!important}
+.sikau-visa-done p{color:#657895;line-height:1.65}
+.sikau-visa-official{margin:17px 0 0;border:1px solid #e2e8f1;border-radius:18px;background:#fff;
+ padding:clamp(15px,2vw,22px)}
+.sikau-visa-updates-head h3{color:#2a3554;font-size:18px!important;margin:0 0 8px!important}
+.sikau-visa-updates-head p{color:#687995;font-size:12px;line-height:1.6;margin:0 0 13px}
+.sikau-visa-sources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sikau-visa-source{display:grid;gap:5px;text-decoration:none!important;padding:12px 14px;
+ border-radius:11px;border:1px solid #e0e7f1;background:#f8faff;min-width:0}
+.sikau-visa-source strong{color:#25517f;font-size:12px;font-weight:850;line-height:1.45}
+.sikau-visa-source small{color:#697a95;font-size:11px;line-height:1.5}
+@media(max-width:1100px){.sikau-visa-categories{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.sikau-visa-action-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){
+ .sikau-visa-switcher{grid-template-columns:1fr;padding:5px}
+ .sikau-visa-switch{min-height:43px;font-size:12px}
+ .sikau-visa-hero{align-items:flex-start;gap:12px;flex-wrap:wrap;border-radius:15px;padding:17px}
+ .sikau-visa-stats{flex:1 1 100%;padding:9px 12px;display:flex;justify-content:center;align-items:center;gap:12px;text-align:left}
+ .sikau-visa-stats strong{font-size:24px}
+ .sikau-visa-stats span{margin:0}
+ .sikau-visa-categories{gap:7px}
+ .sikau-visa-category{padding:10px;min-height:88px;gap:7px}
+ .sikau-visa-icon{width:33px;height:33px;flex:0 0 33px;font-size:20px}
+ .sikau-visa-category-copy strong{font-size:12px}
+ .sikau-visa-category-copy small{font-size:11px}
+ .sikau-visa-category-copy em{font-size:9px}
+ .sikau-visa-question-head{align-items:flex-start}
+ .sikau-visa-shuffle{width:100%}
+ .sikau-visa-progress{flex-wrap:wrap}
+ .sikau-visa-track{flex:1 1 100%}
+ .sikau-visa-action-row{gap:7px}
+ .sikau-visa-action-row button{font-size:11px;padding:9px 5px}
+ .sikau-visa-sources{grid-template-columns:1fr}
+}
+html[data-sikau-theme="dark"] .sikau-visa-hub{color:#f1eaff}
+html[data-sikau-theme="dark"] :is(.sikau-visa-switcher,.sikau-visa-category,.sikau-visa-learner,.sikau-visa-official){
+ background:#222d42!important;border-color:#4c5972!important;color:#f7efff!important
+}
+html[data-sikau-theme="dark"] .sikau-visa-switcher{background:#1b2638!important}
+html[data-sikau-theme="dark"] .sikau-visa-switch:not(.active){color:#d7e1f4!important}
+html[data-sikau-theme="dark"] .sikau-visa-category.active{background:#563047!important;border-color:#ee78a5!important}
+html[data-sikau-theme="dark"] .sikau-visa-icon{background:#39475d!important}
+html[data-sikau-theme="dark"] :is(.sikau-visa-category-copy strong,.sikau-visa-question-head strong,.sikau-visa-label,.sikau-visa-prompt h3,.sikau-visa-guide h4,.sikau-visa-updates-head h3){
+ color:#fbf0ff!important
+}
+html[data-sikau-theme="dark"] :is(.sikau-visa-category-copy small,.sikau-visa-updates-head p,.sikau-visa-category-source,.sikau-visa-category-copy em,.sikau-visa-ai-notice){
+ color:#d2dcef!important
+}
+html[data-sikau-theme="dark"] .sikau-visa-caution{background:#3f3427!important;border-color:#77604a!important}
+html[data-sikau-theme="dark"] .sikau-visa-caution :is(p,strong){color:#fff0c9!important}
+html[data-sikau-theme="dark"] .sikau-visa-prompt{background:#28364f!important;border-color:#59657e!important}
+html[data-sikau-theme="dark"] .sikau-visa-prompt p{color:#d7e0f3!important}
+html[data-sikau-theme="dark"] .sikau-visa-officer{color:#ffc0d9!important}
+html[data-sikau-theme="dark"] .sikau-visa-input{background:#182638!important;color:#f6f0ff!important;border-color:#586980!important}
+html[data-sikau-theme="dark"] .sikau-visa-secondary,
+html[data-sikau-theme="dark"] .sikau-visa-shuffle{background:#33445e!important;color:#f6eefe!important;border-color:#60728b!important}
+html[data-sikau-theme="dark"] .sikau-visa-guide{background:#2b3a55!important;border-color:#61728e!important}
+html[data-sikau-theme="dark"] .sikau-visa-guide :is(p,strong){color:#efeaff!important}
+html[data-sikau-theme="dark"] .sikau-visa-guide blockquote{background:#202c43!important;color:#fff2fa!important}
+html[data-sikau-theme="dark"] .sikau-visa-source{background:#2d3950!important;border-color:#556984!important}
+html[data-sikau-theme="dark"] .sikau-visa-source strong{color:#c5e1ff!important}
+html[data-sikau-theme="dark"] .sikau-visa-source small{color:#d2def2!important}
+html[data-sikau-theme="dark"] .sikau-visa-feedback.info{background:#294360!important;border-color:#4f7ba9!important;color:#edf5ff!important}
+html[data-sikau-theme="dark"] .sikau-visa-feedback.warning{background:#453524!important;border-color:#86643f!important;color:#ffe7c1!important}
+html[data-sikau-theme="dark"] .sikau-visa-category-source a{color:#a6d4ff!important}
