@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261020-compact-topic-r1',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261020-clean-topic-grid-r2',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -22,10 +22,20 @@ function renderRealFeedback(doc,result,summary,original){
  const error=result.querySelector('.card.bad');
  if(!score){
    summary.hidden=true;
-   if(error){original.open=true;original.querySelector('summary').textContent='Writing checker message · लेखन जाँचको सन्देश';}
+   if(error){
+     original.hidden=false;
+     original.open=true;
+     original.querySelector('summary').textContent='Writing checker message · लेखन जाँचको सन्देश';
+   }else{
+     // Do not display an empty "See complete writing feedback" bar before
+     // a student has checked their writing.
+     original.hidden=true;
+     original.open=false;
+   }
    return;
  }
  summary.hidden=false;
+ original.hidden=false;
  original.querySelector('summary').textContent='See complete writing feedback · सबै प्रतिक्रिया हेर्नुहोस्';
  summary.replaceChildren();
  const header=add(doc,summary,'div','wc-feedback-heading');
@@ -148,10 +158,9 @@ window.enhanceWritingCoachDashboard=function(doc){
  dice.tabIndex=-1;
  change.addEventListener('click',()=>dice.click());
  topicPanel.appendChild(topic); // do not clone/reset existing topic
- const prompts=add(doc,topicPanel,'div','wc-topic-prompts');
- for(const [emoji,text] of [['📌','Answer the topic'],['💡','Give an example'],['✅','Stay relevant']]){
-   const chip=add(doc,prompts,'span','',emoji+' '+text);
- }
+ // The old decorative "Answer the topic / Give an example / Stay relevant"
+ // chips slipped beneath the bottom edge of the native prompt card on
+ // narrower columns. The clear bilingual prompt already gives this guidance.
  const editorPanel=add(doc,layout,'section','wc-editor-panel');
  const editorHead=add(doc,editorPanel,'div','wc-editor-heading');
  add(doc,editorHead,'strong','','✏️ Write your answer · उत्तर लेख्नुहोस्');
@@ -176,6 +185,7 @@ window.enhanceWritingCoachDashboard=function(doc){
  summaries.hidden=true;
  summaries.setAttribute('aria-label','Results from real writing check');
  const full=add(doc,root,'details','wc-native-feedback');
+ full.hidden=true; // Reveal only after actual native feedback or an error.
  const summary=add(doc,full,'summary','','See complete writing feedback · सबै प्रतिक्रिया हेर्नुहोस्');
  full.appendChild(feedback);
  root.appendChild(full);
