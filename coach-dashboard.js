@@ -80,7 +80,7 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   if(v.length<8)return {type:'warning',message:'Try a complete sentence. · पूरा वाक्य लेखेर अभ्यास गर्नुहोस्।'};
   if(isUncertain(v))return {type:'info',message:'It is okay to be unsure. State what you genuinely know, ask to clarify or check records, and never guess details. · थाहा नभए स्पष्ट भन्नुहोस्, विवरण नबनाउनुहोस्।'};
   if(v.split(/\s+/).length<5)return {type:'info',message:'Good start. Add a genuine reason, timeline or supporting fact if relevant. · मिल्ने साँचो कारण वा तथ्य थप्नुहोस्।'};
-  return {type:'info',message:'Good speaking practice. Check that each fact is accurate and matches your application. This quick coach does not verify legal eligibility or fully grade grammar. · विवरण सत्य छ कि छैन जाँच्नुहोस्।'};
+  return {type:'info',message:'Draft ready for review. This basic check cannot tell whether your answer is relevant, accurate, grammatical or legally sufficient. Compare with the answer guide or ask AI Coach for feedback. · उत्तर नमुनासँग मिलाउनुहोस् वा AI Coach बाट सुधार माग्नुहोस्।'};
  }
  function advance(){
   const current=deck[cursor];last=current?.id||'';
