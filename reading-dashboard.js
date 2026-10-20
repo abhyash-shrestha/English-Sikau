@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261020-np-practice-story-r2',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261020-story-np-label-r3',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 window.enhanceReadingDashboard=function(d){
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
@@ -31,11 +31,49 @@ window.enhanceReadingDashboard=function(d){
    const roots=[d.getElementById('rd'),d.getElementById('learn')].filter(Boolean);
    const label='Click Garnus नेपालीमा';
    const accessibleLabel='Click Garnus नेपालीमा · नेपाली अनुवाद हेर्न थिच्नुहोस्';
+
+   // The Story renderer can use a different control shape from Practice.
+   // Read the native label without counting our own additional caption.
+   function originalActionLabel(control){
+     if(control.matches('input'))return String(control.value||'').trim();
+     const extra=control.querySelector('.sikau-story-np-caption');
+     const raw=Array.from(control.childNodes).filter(node=>node!==extra).map(node=>node.textContent||'').join('');
+     return raw.replace(/\s+/g,' ').trim();
+   }
+   function isNepaliAction(control){
+     const original=originalActionLabel(control);
+     return /^(?:🇳🇵\s*)?NP(?:\s*🇳🇵)?$/i.test(original)||
+       (/^NP[\s·:-]/i.test(original)&&original.length<42&&/nepali|नेपाली/i.test(original))||
+       (/^(?:show\s+)?nepali(?:\s+translation)?$/i.test(original));
+   }
+   function decorateStory(root){
+     const reader=root.querySelector('#storyReader');
+     if(!reader)return;
+     for(const line of reader.querySelectorAll('.story-line')){
+       const controls=Array.from(line.querySelectorAll('button,[role="button"],[onclick],a[href],input[type="button"]'));
+       // Only style a short existing Nepali action, not the story's speaker/audio.
+       for(const control of controls){
+         if(control.classList.contains('speaker')||/speaker|listen|audio/i.test(control.getAttribute('aria-label')||''))continue;
+         if(!isNepaliAction(control))continue;
+         if(control.matches('input')){control.value='Click Garnus नेपालीमा';control.setAttribute('aria-label',accessibleLabel);control.classList.add('sikau-story-nepali-action');continue;}
+         if(!control.classList.contains('sikau-story-nepali-action'))control.classList.add('sikau-story-nepali-action');
+         control.setAttribute('aria-label',accessibleLabel);
+         control.setAttribute('title',accessibleLabel);
+         if(!control.querySelector('.sikau-story-np-caption')){
+           const caption=d.createElement('span');
+           caption.className='sikau-story-np-caption';
+           caption.textContent=label;
+           caption.setAttribute('aria-hidden','true');
+           control.appendChild(caption); // Never replaces the native clickable control or listeners.
+         }
+       }
+     }
+   }
    function update(root){
      const buttons=root.querySelectorAll('button,[role="button"]');
      for(const button of buttons){
        // A short "NP" control is the original app's Nepali-language action.
-       const current=(button.textContent||'').replace(/\s+/g,' ').trim();
+       const current=originalActionLabel(button);
        const isNP=/^(?:🇳🇵\s*)?NP$/i.test(current);
        if(isNP){
          if(!button.classList.contains('sikau-np-action'))button.classList.add('sikau-np-action');
@@ -48,6 +86,7 @@ window.enhanceReadingDashboard=function(d){
          if(button.title===accessibleLabel)button.removeAttribute('title');
        }
      }
+     if(root.id==='rd')decorateStory(root);
    }
    for(const root of roots){
      if(!npRootsObserved.has(root)){
