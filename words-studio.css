@@ -227,3 +227,21 @@ html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-filter-footer{border-col
 html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-category.active{
  background:#d8206b!important;border-color:#d8206b!important;color:#fff!important
 }
+
+/* Quick Practice progress and immediate feedback */
+#words.sikau-words-v1 .wv-quiz-count{
+ display:inline-block;font-size:11px!important;font-weight:850;color:#6f4388!important;
+ background:#f5edff;border-radius:999px;padding:6px 10px;margin:4px 0 7px!important
+}
+#words.sikau-words-v1 .wv-practice-status:not([hidden]){
+ background:#edfbf1;border:1px solid #c3e8cf;border-radius:10px;
+ color:#176439!important;font-weight:750;line-height:1.55;
+ padding:10px;margin:8px 0!important
+}
+#words.sikau-words-v1 .wv-practice-status[hidden]{display:none!important}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-quiz-count{
+ background:#443955!important;color:#f5daff!important
+}
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-practice-status:not([hidden]){
+ background:#193d35!important;border-color:#3f806a!important;color:#e0fff0!important
+}
