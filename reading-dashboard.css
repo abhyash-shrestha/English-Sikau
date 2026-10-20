@@ -137,3 +137,26 @@ html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{background:#31344
  #rd.sikau-read-exact .read-art-topic::before{flex-basis:34px;width:34px;height:31px}
  #rd.sikau-read-exact .read-v2-filters .story-topic-list .read-art-topic{font-size:11px!important;min-height:42px!important}
 }
+
+/* The native story translation action used to say only "NP".
+   Keep it clickable and readable, including on narrow phones. */
+#rd.sikau-read-exact .story-line{flex-wrap:wrap!important}
+#rd.sikau-read-exact .story-line .rs{min-width:0!important;flex:1 1 145px!important}
+#rd.sikau-read-exact .story-line button.read-v2-nepali-button{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;width:auto!important;max-width:100%!important;
+  min-width:120px!important;min-height:38px!important;height:auto!important;
+  border:1px solid #f49abb!important;border-radius:10px!important;
+  background:#fff0f6!important;color:#a91657!important;
+  padding:7px 12px!important;white-space:normal!important;
+  font-size:12px!important;font-weight:850!important;line-height:1.35!important;
+  box-shadow:0 2px 6px #c723661c!important;cursor:pointer!important;
+}
+#rd.sikau-read-exact .story-line button.read-v2-nepali-button:hover{background:#fbe1ed!important;border-color:#e95692!important}
+#rd.sikau-read-exact .story-line button.read-v2-nepali-button:focus-visible{outline:3px solid #f075a6!important;outline-offset:2px!important}
+@media(max-width:430px){
+  #rd.sikau-read-exact .story-line button.read-v2-nepali-button{flex:1 1 100%!important;min-width:0!important}
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line button.read-v2-nepali-button{
+  background:#58334e!important;color:#ffeaf4!important;border-color:#a75c82!important
+}
