@@ -1,7 +1,7 @@
 /* English Sikau Game visual enhancement. Leaves original game engine and handlers intact. */
 (function(){
 'use strict';
-const file=new URL('game-adventure.css?v=20261020-60s-5s-r2',document.baseURI).href;
+const file=new URL('game-adventure.css?v=20261020-lightning-60s-5s-r3',document.baseURI).href;
 
 /* Lightning timing. The protected engine owns gameplay and awards.
  * This presentation-layer adapter updates the actual round state:
@@ -10,6 +10,7 @@ const file=new URL('game-adventure.css?v=20261020-60s-5s-r2',document.baseURI).h
  */
 function installLightningTiming(d){
  const view=d?.defaultView;
+ if(view?.__sikauLightningTimingV3)return true;
  if(!view||!('GAME_RUNNING' in view)||
     typeof view.gameStartRush!=='function'||
     typeof view.gameRushAnswer!=='function')return false;
