@@ -1,12 +1,57 @@
 /* English Sikau Game visual enhancement. Leaves original game engine and handlers intact. */
 (function(){
 'use strict';
-const file=new URL('game-adventure.css?v=20261016-1',document.baseURI).href;
+const file=new URL('game-adventure.css?v=20261020-plus-10s-r1',document.baseURI).href;
+
+/* Lightning bonus integrates with the already-authorized private game engine.
+ * The original gameRushAnswer decides if an answer is correct. This wrapper
+ * awards exactly +10 ACTUAL seconds only after that engine accepts a fresh,
+ * correct response; it does not alter correctness, scores, XP or access.
+ */
+function installLightningCorrectTimeBonus(d){
+ const view=d?.defaultView;
+ if(!view||typeof view.gameRushAnswer!=='function'||!('GAME_RUNNING' in view))return false;
+ const original=view.gameRushAnswer;
+ if(original.__sikauCorrectTimeBonusV1)return true;
+ function lightningAnswerWithBonus(answer){
+  const round=view.GAME_RUNNING;
+  const eligible=!!(round&&round.mode==='rush'&&!round.done&&!round.answered&&
+    Number.isFinite(round.seconds)&&round.seconds>0);
+  const previousCorrect=eligible?round.correct:null;
+  const oldTime=eligible?round.seconds:null;
+  // Native private engine handles the answer and pauses the timer first.
+  const result=original.apply(this,arguments);
+  if(eligible&&view.GAME_RUNNING===round&&round.mode==='rush'&&!round.done&&
+     round.answered&&round.paused&&round.correct===previousCorrect+1&&
+     round.seconds<=oldTime){
+   round.seconds+=10;
+   const clock=d.getElementById('gameSeconds');
+   if(clock)clock.textContent=String(round.seconds);
+   const bar=d.getElementById('gameTimeBar');
+   if(bar)bar.style.width=Math.min(100,round.seconds/45*100)+'%';
+   const feedback=d.getElementById('gameFeedback');
+   if(feedback&&!feedback.querySelector('.sikau-lightning-bonus')){
+    const bonus=d.createElement('div');
+    bonus.className='sikau-lightning-bonus';
+    bonus.setAttribute('role','status');
+    bonus.textContent='⚡ +10 seconds! · सही उत्तरमा थप १० सेकेन्ड';
+    feedback.appendChild(bonus);
+   }
+  }
+  return result;
+ }
+ lightningAnswerWithBonus.__sikauCorrectTimeBonusV1=true;
+ lightningAnswerWithBonus.__sikauOriginalAnswer=original;
+ view.gameRushAnswer=lightningAnswerWithBonus;
+ return true;
+}
 const destinations={ktm:['Kathmandu','काठमाडौं'],bkt:['Bhaktapur','भक्तपुर'],pkr:['Pokhara','पोखरा'],ctn:['Chitwan','चितवन'],nch:['Namche','नाम्चे'],evt:['Everest','सगरमाथा']};
 const make=(d,t,c,v)=>{const e=d.createElement(t);if(c)e.className=c;if(v!=null)e.textContent=v;return e;};
 window.enhanceGameDashboard=function(d){
  const sec=d?.getElementById('game'),content=sec?.querySelector(':scope > .content'),host=sec?.querySelector('#gameRoot');
  if(!sec||!content||!host)return;
+ // Install even when the adventure screen is already mounted.
+ installLightningCorrectTimeBonus(d);
  if(!d.getElementById('sikauGameStyle')){const l=make(d,'link');l.id='sikauGameStyle';l.rel='stylesheet';l.href=file;d.head.append(l);}
  sec.classList.add('sikau-game-adventure');
  if(!content.querySelector('.game-v5-header')){
@@ -58,6 +103,11 @@ window.enhanceGameDashboard=function(d){
    const emoji=mission.querySelector('.game-mission-emoji');
    if(emoji){emoji.classList.add('game-v5-mission-cover');emoji.style.backgroundImage='url("'+new URL('./assets/game/'+stage+'.svg',document.baseURI).href+'")';}
    const go=shell.querySelector('#gameStart');
+   if(go&&/sprint|lightning/i.test(go.textContent)){
+    const hint=Array.from(shell.querySelectorAll('.course-small'))
+      .find(p=>/Fast choices across Nepal/i.test(p.textContent||''));
+    if(hint)hint.textContent='⚡ Every correct answer adds 10 seconds! · प्रत्येक सही उत्तरमा थप १० सेकेन्ड। The clock pauses while you review answers.';
+   }
    if(go){
     go.classList.add('game-v5-start');
     go.textContent=/match/i.test(go.textContent)?'▶ Start Matching · शब्द मिलाउनुहोस्':/sprint|lightning/i.test(go.textContent)?'▶ Start Lightning · द्रुत खेल':'▶ Start Mission · मिसन सुरु गरौं';
