@@ -598,3 +598,16 @@ html.sikau-visa-nav-active .sikau-convo.sikau-visa-standalone > .sikau-visa-hub:
 .sikau-convo.sikau-visa-standalone:not(.sikau-visa-focused) > .sikau-convo-everyday:not([hidden]){
  display:block!important
 }
+
+/* Unrelated old 'Explore Nepal in English' culture-search card is not part
+   of the Coach or U.S. Visa practice experience. Hide only that native
+   panel, not festival lessons or cultural vocabulary in other modules. */
+#coach #cultureLab,
+#coach .culture-lab,
+#coachRoot #cultureLab,
+#coachRoot .culture-lab,
+.sikau-convo-board > #cultureLab,
+.sikau-convo-board > .culture-lab,
+[data-sikau-coach-extra-hidden="true"]{
+ display:none!important;
+}
