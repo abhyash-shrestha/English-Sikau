@@ -3,7 +3,7 @@
    translation providers, OCR, scoring, and native event handlers remain intact. */
 (function(){
 'use strict';
-const CSS_URL=new URL('./translate-studio-v4.css?v=20261015-r1',document.baseURI).href;
+const CSS_URL=new URL('./translate-studio-v4.css?v=20261020-two-directions-r1',document.baseURI).href;
 const samples=[
  ['👋','Hello!','नमस्ते!','ttx-rose'],
  ['📍','I am going to Pokhara.','म पोखरा जाँदै छु।','ttx-blue'],
@@ -65,13 +65,10 @@ function safeInput(d,input,value){
  input.dispatchEvent(new d.defaultView.Event('input',{bubbles:true}));
 }
 function nativeDirection(section){return section.querySelector('#dirSel button.on')?.dataset.d||'ne'}
-function nativeSwitch(section,want,input,preserve=false){
+function nativeSwitch(section,want){
  const b=section.querySelector('#dirSel button[data-d="'+want+'"]');
- if(!b)return;
- if(nativeDirection(section)===want)return;
- const text=preserve?input.value:'';
- b.click(); // real private app changes its translation direction and clears output
- if(preserve&&text)safeInput(section.ownerDocument,input,text);
+ if(!b||nativeDirection(section)===want)return;
+ b.click(); // original native translation-direction handler
 }
 function nativeMode(section,want){
  const b=section.querySelector('#trModeSel button[data-tm="'+want+'"]');
@@ -122,8 +119,7 @@ window.enhanceTranslationDashboard=function(d){
  const selectors=put(d,entry,'div','ttx-directions');
  const btns={};
  [['ne','🇳🇵 Nepali → English','नेपाली → अंग्रेजी'],
-  ['en','🇬🇧 English → Nepali','अंग्रेजी → नेपाली'],
-  ['auto','⇄ Both Ways','दुवै तरिका']].forEach(([v,label,ne])=>{
+  ['en','🇬🇧 English → Nepali','अंग्रेजी → नेपाली']].forEach(([v,label,ne])=>{
   const b=put(d,selectors,'button','ttx-dir-button');
   b.type='button';b.dataset.direction=v;
   put(d,b,'strong','',label);put(d,b,'small','',ne);btns[v]=b;
@@ -187,10 +183,10 @@ window.enhanceTranslationDashboard=function(d){
  more.type='button';
  const exampleGrid=put(d,exampleSection,'div','ttx-examples-grid');
 
- let auto=false,examplesOpen=false;
+ let examplesOpen=false;
  const saving=new Set();
  function directionUI(){
-  const current=auto?'auto':nativeDirection(sec);
+  const current=nativeDirection(sec);
   Object.entries(btns).forEach(([key,button])=>{
     const active=key===current;button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',String(active));
@@ -201,8 +197,7 @@ window.enhanceTranslationDashboard=function(d){
    'Type or paste English text here…\nयहाँ अंग्रेजी लेख्नुहोस्…';
  }
  Object.entries(btns).forEach(([key,b])=>b.addEventListener('click',()=>{
-  auto=key==='auto';
-  if(!auto)nativeSwitch(sec,key,input,false);
+  nativeSwitch(sec,key);
   directionUI();
  }));
  function ensureTyping(){
@@ -295,16 +290,6 @@ window.enhanceTranslationDashboard=function(d){
    recognition.start();notice.textContent='Listening… · सुन्दैछ…';
   }catch(_){recognition=null;notice.textContent='Unable to start the microphone · माइक्रोफोन सुरु भएन।';}
  });
- // In Both Ways mode, detect Devanagari only at the point of translation,
- // so the existing native submit runs exactly once and XP is not duplicated.
- go.addEventListener('click',()=>{
-  if(auto&&input.value.trim()){
-   const written=input.value;
-   const detected=/[\u0900-\u097F]/.test(written)?'ne':'en';
-   nativeSwitch(sec,detected,input,true);
-   directionUI();
-  }
- },true);
  function resultText(){
   return (output.innerText||output.textContent||'').trim();
  }
@@ -336,7 +321,7 @@ window.enhanceTranslationDashboard=function(d){
  });
  observer.observe(output,{subtree:true,childList:true,characterData:true});
  const clearResult=()=>{placeholder.hidden=!!output.textContent.trim();emptyIcon.hidden=!!output.textContent.trim();};
- dir.addEventListener('click',()=>{auto=false;d.defaultView.setTimeout(directionUI,0)});
+ dir.addEventListener('click',()=>{d.defaultView.setTimeout(directionUI,0)});
  input.addEventListener('input',updateCounter);
  clear?.addEventListener('click',()=>{d.defaultView.setTimeout(()=>{updateCounter();clearResult();},0)});
  // When the private camera is open, native controls should remain visible.
