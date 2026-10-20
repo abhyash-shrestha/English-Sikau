@@ -4,7 +4,7 @@
  */
 (function(){
 'use strict';
-const STYLE_URL=new URL('words-studio.css?v=20261015-a',document.baseURI).href;
+const STYLE_URL=new URL('words-studio.css?v=20261020-organized-r1',document.baseURI).href;
 const vocabulary=[
 ['adventure','साहसिक यात्रा','travel','noun',2,'An exciting or unusual experience or journey.','We went on an adventure in the mountains.','हामी पहाडमा साहसिक यात्रामा गयौं।'],
 ['beautiful','सुन्दर','nature','adjective',1,'Pleasant or lovely to see.','Pokhara is a beautiful city.','पोखरा एउटा सुन्दर सहर हो।'],
@@ -68,12 +68,12 @@ const cats=[
 ['travel','✈️','Travel','यात्रा'],
 ['family','👪','Family','परिवार'],
 ['school','🎓','School','विद्यालय'],
+['saved','⭐','Saved','सुरक्षित'],
 ['work','💼','Work','काम'],
 ['emotions','❤️','Emotions','भावना'],
 ['nature','🌳','Nature','प्रकृति'],
 ['culture','🪔','Culture','संस्कृति'],
-['health','🩺','Health','स्वास्थ्य'],
-['saved','⭐','Saved','सुरक्षित']
+['health','🩺','Health','स्वास्थ्य']
 ];
 const categories=Object.fromEntries(cats.map(c=>[c[0],c]));
 function el(d,tag,cls,text){
@@ -138,7 +138,7 @@ window.enhanceWordsDashboard=function(doc){
   const stylesheet=el(doc,'link');stylesheet.rel='stylesheet';
   stylesheet.id='sikauWordsStudioCSS';stylesheet.href=STYLE_URL;doc.head.appendChild(stylesheet);
  }
- let selected='adventure',category='all',query='',level='all',type='all',sort='default',tab='meaning',feedback='',quizValue='';
+ let selected='adventure',category='all',query='',level='all',type='all',sort='default',tab='meaning',feedback='',quizValue='',allTopics=false;
  let items=combined(doc,wordBox);
  const root=el(doc,'div','wv-root');
  root.id='sikauWordsDashboard';
@@ -158,29 +158,71 @@ window.enhanceWordsDashboard=function(doc){
  todayButton.type='button';
  const today=vocabulary[Math.floor(Date.now()/86400000)%vocabulary.length];
  todayTerm.textContent=today.word;todayNe.textContent=today.ne;todayExample.textContent=today.example;
- todayButton.addEventListener('click',()=>{selected=today.word;render();detail.scrollIntoView({behavior:'smooth',block:'nearest'});});
- const catsArea=add(doc,root,'div','wv-categories');
+
+ todayButton.addEventListener('click',()=>{
+  resetFilters();selected=today.word;render();
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+ });
+ const topicPanel=add(doc,root,'section','wv-topic-panel');
+ const topicHeading=add(doc,topicPanel,'div','wv-panel-header');
+ const topicTitle=add(doc,topicHeading,'div','');
+ add(doc,topicTitle,'strong','','📚 Explore by topic · विषयअनुसार सिक्नुहोस्');
+ add(doc,topicTitle,'small','','Pick a topic to explore relevant English words.');
+ const moreTopics=add(doc,topicHeading,'button','wv-show-topics','More topics · थप विषयहरू');
+ moreTopics.type='button';moreTopics.setAttribute('aria-expanded','false');
+ const catsArea=add(doc,topicPanel,'div','wv-categories');
  catsArea.setAttribute('aria-label','Vocabulary categories');
- const filterRow=add(doc,root,'div','wv-filterrow');
- const search=add(doc,filterRow,'label','wv-search');
+ moreTopics.addEventListener('click',()=>{allTopics=!allTopics;renderCategories();});
+ const filterPanel=add(doc,root,'section','wv-filter-panel');
+ const filterHeading=add(doc,filterPanel,'div','wv-panel-header');
+ const filterTitle=add(doc,filterHeading,'div','');
+ add(doc,filterTitle,'strong','','🔎 Find words · शब्द खोज्नुहोस्');
+ add(doc,filterTitle,'small','','Search first, or choose a level for practice.');
+ const searchLine=add(doc,filterPanel,'div','wv-searchline');
+ const search=add(doc,searchLine,'label','wv-search');
  const searchIcon=add(doc,search,'span','','⌕');searchIcon.setAttribute('aria-hidden','true');
  const searchInput=add(doc,search,'input','','');
- searchInput.type='search';searchInput.placeholder='Search words in English or Nepali… · शब्द खोज्नुहोस्';
+ searchInput.type='search';searchInput.placeholder='Search in English or Nepali… · नेपाली वा अंग्रेजीमा खोज्नुहोस्';
  searchInput.setAttribute('aria-label','Search vocabulary words');
- const levelSelect=add(doc,filterRow,'select','wv-select');
- levelSelect.setAttribute('aria-label','Filter by level');
- [['all','All Levels · सबै स्तर'],['1','Level 1'],['2','Level 2'],['3','Level 3']].forEach(([v,t])=>{const option=add(doc,levelSelect,'option','',t);option.value=v;});
- const typeSelect=add(doc,filterRow,'select','wv-select');
+ const filterRow=add(doc,filterPanel,'div','wv-filterrow');
+ const levelArea=add(doc,filterRow,'div','wv-level-filter');
+ add(doc,levelArea,'span','wv-filter-label','Level · सिकाइ स्तर');
+ const levelChips=add(doc,levelArea,'div','wv-level-chips');
+ const levelButtons={};
+ for(const [v,t] of [['all','All levels · सबै'],['1','Level 1'],['2','Level 2'],['3','Level 3']]){
+  const b=add(doc,levelChips,'button','wv-level-chip',t);
+  b.type='button';b.dataset.level=v;
+  b.addEventListener('click',()=>{level=v;render();});
+  levelButtons[v]=b;
+ }
+ const advanced=add(doc,filterRow,'div','wv-advanced-filters');
+ const typeField=add(doc,advanced,'label','wv-filter-field');
+ add(doc,typeField,'span','wv-filter-label','Type · प्रकार');
+ const typeSelect=add(doc,typeField,'select','wv-select');
  typeSelect.setAttribute('aria-label','Filter by word type');
- [['all','Word Type · शब्द प्रकार'],['noun','Noun'],['verb','Verb'],['adjective','Adjective'],['adverb','Adverb'],['phrase','Phrase'],['interjection','Greeting']].forEach(([v,t])=>{const option=add(doc,typeSelect,'option','',t);option.value=v;});
- const sortSelect=add(doc,filterRow,'select','wv-select');
+ [['all','All word types'],['noun','Noun'],['verb','Verb'],['adjective','Adjective'],['adverb','Adverb'],['phrase','Phrase'],['interjection','Greeting']].forEach(([v,t])=>{const option=add(doc,typeSelect,'option','',t);option.value=v;});
+ const sortField=add(doc,advanced,'label','wv-filter-field');
+ add(doc,sortField,'span','wv-filter-label','Sort · क्रम');
+ const sortSelect=add(doc,sortField,'select','wv-select');
  sortSelect.setAttribute('aria-label','Sort words');
- [['default','Sort: Suggested'],['az','A to Z'],['za','Z to A'],['level','Level: Easy First']].forEach(([v,t])=>{const option=add(doc,sortSelect,'option','',t);option.value=v;});
+ [['default','Suggested'],['az','A to Z'],['za','Z to A'],['level','Easy first']].forEach(([v,t])=>{const option=add(doc,sortSelect,'option','',t);option.value=v;});
+ const filterFooter=add(doc,filterPanel,'div','wv-filter-footer');
+ const filterSummary=add(doc,filterFooter,'span','wv-filter-summary','');
+ filterSummary.setAttribute('role','status');filterSummary.setAttribute('aria-live','polite');
+ const clearFilters=add(doc,filterFooter,'button','wv-reset','Clear filters · हटाउनुहोस्');
+ clearFilters.type='button';clearFilters.addEventListener('click',resetFilters);
  const board=add(doc,root,'div','wv-board');
  const left=add(doc,board,'section','wv-list-pane');
  const leftHead=add(doc,left,'div','wv-list-head');
  const count=add(doc,leftHead,'h2','','Words');
  const resultLabel=add(doc,leftHead,'small','','');
+ const studyActions=add(doc,left,'div','wv-study-actions');
+ const nextButton=add(doc,studyActions,'button','wv-study-button','Next word →');
+ nextButton.type='button';
+ const randomButton=add(doc,studyActions,'button','wv-study-button','🎲 Surprise me');
+ randomButton.type='button';
+ const quizButton=add(doc,studyActions,'button','wv-study-button wv-study-primary','✏️ Practice');
+ quizButton.type='button';
  const list=add(doc,left,'div','wv-list');
  list.setAttribute('aria-label','Select a word to learn');
  const detail=add(doc,board,'section','wv-detail-pane');
@@ -194,6 +236,28 @@ window.enhanceWordsDashboard=function(doc){
  section.classList.add('sikau-words-v1');
  function flash(t){feedback=t;const node=detail.querySelector('.wv-feedback');if(node)node.textContent=t;}
  function choose(word){selected=word;tab='meaning';quizValue='';feedback='';render();}
+ function resetFilters(){
+  category='all';query='';level='all';type='all';sort='default';
+  searchInput.value='';typeSelect.value='all';sortSelect.value='default';
+  render();
+ }
+ function studyMove(kind){
+  const rows=filtered();
+  if(!rows.length)return;
+  const i=rows.findIndex(w=>w.word===selected);
+  if(kind==='next')choose(rows[(i+1)%rows.length].word);
+  else if(kind==='random'){
+   const options=rows.filter(w=>w.word!==selected);
+   const pool=options.length?options:rows;
+   choose(pool[Math.floor(Math.random()*pool.length)].word);
+  }else{
+   selected=(i<0?rows[0]:rows[i]).word;tab='practice';feedback='';quizValue='';render();
+   if(doc.defaultView.innerWidth<850)detail.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+ }
+ nextButton.addEventListener('click',()=>studyMove('next'));
+ randomButton.addEventListener('click',()=>studyMove('random'));
+ quizButton.addEventListener('click',()=>studyMove('practice'));
  function saveWord(word){
   const view=doc.defaultView, entry=items.find(x=>x.word===word);
   if(!entry)return;
@@ -227,7 +291,8 @@ window.enhanceWordsDashboard=function(doc){
  }
  function renderCategories(){
   catsArea.replaceChildren();
-  for(const [id,emoji,label,ne] of cats){
+  const visible=allTopics?cats:cats.slice(0,7);
+  for(const [id,emoji,label,ne] of visible){
    const b=add(doc,catsArea,'button','wv-category');
    b.type='button';b.setAttribute('aria-pressed',String(category===id));
    if(category===id)b.classList.add('active');
@@ -237,6 +302,8 @@ window.enhanceWordsDashboard=function(doc){
    add(doc,wording,'small','',ne);
    b.addEventListener('click',()=>{category=id;render();});
   }
+  moreTopics.textContent=allTopics?'Show fewer · कम देखाउनुहोस्':'More topics ('+(cats.length-7)+') · थप विषयहरू';
+  moreTopics.setAttribute('aria-expanded',String(allTopics));
  }
  function renderList(rows){
   list.replaceChildren();
@@ -356,18 +423,33 @@ window.enhanceWordsDashboard=function(doc){
  }
  function render(){
   items=combined(doc,wordBox);
+  if(!allTopics&&!cats.slice(0,7).some(entry=>entry[0]===category))allTopics=true;
   renderCategories();
   const rows=filtered();
   count.textContent='Words ('+rows.length+')';
-  resultLabel.textContent='Browse and select · छानेर सिक्नुहोस्';
-  if(!items.some(w=>w.word===selected))selected=rows[0]?.word||'';
-  const chosen=items.find(x=>x.word===selected);
+  resultLabel.textContent='Choose a word · शब्द छान्नुहोस्';
+  for(const [value,button] of Object.entries(levelButtons)){
+   const active=value===level;
+   button.classList.toggle('active',active);
+   button.setAttribute('aria-pressed',String(active));
+  }
+  const summary=[category!=='all'?categories[category]?.[2]:null,level!=='all'?'Level '+level:null,type!=='all'?type:null,query?'Search: '+query:null].filter(Boolean);
+  const hasFilters=category!=='all'||level!=='all'||type!=='all'||sort!=='default'||!!query;
+  filterSummary.textContent='Showing '+rows.length+' of '+items.length+' words · '+(summary.join(' · ')||'All topics and levels');
+  clearFilters.hidden=!hasFilters;
+  [nextButton,randomButton,quizButton].forEach(b=>{b.disabled=rows.length===0;});
+  if(!rows.some(w=>w.word===selected)){selected=rows[0]?.word||'';tab='meaning';quizValue='';feedback='';}
+  const chosen=rows.find(w=>w.word===selected);
   renderList(rows);
   if(chosen)renderDetail(chosen);
-  else{detail.replaceChildren();add(doc,detail,'p','wv-empty','Select a category to start learning.');}
+  else{
+   detail.replaceChildren();
+   add(doc,detail,'p','wv-empty','No matching words. Try another level or topic. · यो फिल्टरमा शब्द भेटिएन।');
+   const reset=add(doc,detail,'button','wv-reset','Clear filters · फिल्टर हटाउनुहोस्');
+   reset.type='button';reset.addEventListener('click',resetFilters);
+  }
  }
  searchInput.addEventListener('input',()=>{query=searchInput.value.trim().toLowerCase();render();});
- levelSelect.addEventListener('change',()=>{level=levelSelect.value;render();});
  typeSelect.addEventListener('change',()=>{type=typeSelect.value;render();});
  sortSelect.addEventListener('change',()=>{sort=sortSelect.value;render();});
  // Native renderWords may replace the saved-word list; refresh visual library only
