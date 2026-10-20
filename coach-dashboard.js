@@ -80,7 +80,7 @@ window.enhanceCoachDashboard=function(doc){
  ai.type='button';
  const banner=add(doc,shell,'div','sikau-convo-intro');
  add(doc,banner,'strong','','Pick a place, then start talking · ठाउँ छानेर कुराकानी सुरु गर्नुहोस्');
- const toggleNe=add(doc,banner,'button','sikau-convo-language','🇳🇵 Nepali help: On');toggleNe.type='button';
+ const toggleNe=add(doc,banner,'button','sikau-convo-language','🇳🇵 Nepali translations: On');toggleNe.type='button';
  const browser=add(doc,shell,'section','sikau-convo-browser');
  const filters=add(doc,browser,'div','sikau-convo-filters');
  const topicsRow=add(doc,filters,'div','sikau-convo-topics');
@@ -89,7 +89,7 @@ window.enhanceCoachDashboard=function(doc){
  const searchInput=add(doc,searchBox,'input','','');searchInput.type='search';searchInput.placeholder='Search: hospital, restaurant, directions…';
  searchInput.setAttribute('aria-label','Search real life situations');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Each situation has a guided conversation and Nepali support · हरेक परिस्थितिमा अंग्रेजी र नेपाली सहायता');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','Guided bilingual conversations. Writing mode checks key phrases; use Ask AI Coach for deeper grammar feedback. · लेख्ने अभ्यासमा मुख्य शब्द जाँचिन्छ। विस्तृत सुधारका लागि AI Coach प्रयोग गर्नुहोस्।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -262,7 +262,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
  toggleNe.addEventListener('click',()=>{
   showNepali=!showNepali;
-  toggleNe.textContent='🇳🇵 Nepali help: '+(showNepali?'On':'Off');
+  toggleNe.textContent='🇳🇵 Nepali translations: '+(showNepali?'On':'Off');
   if(active)renderStage();else drawCards();
  });
  surprise.addEventListener('click',()=>{
