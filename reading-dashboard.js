@@ -35,8 +35,8 @@ window.enhanceReadingDashboard=function(d){
      const buttons=root.querySelectorAll('button,[role="button"]');
      for(const button of buttons){
        // A short "NP" control is the original app's Nepali-language action.
-       const current=(button.textContent||'').replace(/\\s+/g,' ').trim();
-       const isNP=/^(?:🇳🇵\\s*)?NP$/i.test(current);
+       const current=(button.textContent||'').replace(/\s+/g,' ').trim();
+       const isNP=/^(?:🇳🇵\s*)?NP$/i.test(current);
        if(isNP){
          if(!button.classList.contains('sikau-np-action'))button.classList.add('sikau-np-action');
          if(button.getAttribute('aria-label')!==accessibleLabel)button.setAttribute('aria-label',accessibleLabel);
