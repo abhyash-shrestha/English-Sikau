@@ -223,3 +223,7 @@ html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-filter-footer{border-col
  #words.sikau-words-v1 .wv-study-actions{grid-template-columns:1fr 1fr}
  #words.sikau-words-v1 .wv-study-primary{grid-column:1/-1}
 }
+
+html[data-sikau-theme="dark"] #words.sikau-words-v1 .wv-category.active{
+ background:#d8206b!important;border-color:#d8206b!important;color:#fff!important
+}
