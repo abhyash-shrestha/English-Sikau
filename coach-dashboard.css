@@ -611,3 +611,15 @@ html.sikau-visa-nav-active .sikau-convo.sikau-visa-standalone > .sikau-visa-hub:
 [data-sikau-coach-extra-hidden="true"]{
  display:none!important;
 }
+
+/* One selected sidebar destination at a time, including the two custom tabs. */
+html.sikau-visa-nav-active #mobileModes.nav button.sikau-home-nav.on,
+html.sikau-visa-nav-active .nav button.sikau-home-nav.on{
+ background:transparent!important;color:inherit!important;
+ outline:0!important;box-shadow:none!important
+}
+html.sikau-home-active #mobileModes.nav button.sikau-visa-nav.on,
+html.sikau-home-active .nav button.sikau-visa-nav.on{
+ background:transparent!important;color:inherit!important;
+ outline:0!important;box-shadow:none!important
+}

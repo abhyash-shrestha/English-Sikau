@@ -1093,7 +1093,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
-<script src="./coach-dashboard.js?v=20261020-clean-coach-footer-r1"></script>
+<script src="./coach-dashboard.js?v=20261020-single-selected-nav-r1"></script>
 <script src="./translate-studio-v4.js?v=20261020-two-directions-r1"></script>
 <script src="./all-tabs-responsive.js"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
@@ -1870,7 +1870,18 @@ function enhanceLearningHome(doc,firstName){
     if(first)nav.insertBefore(homeTab,first);else nav.prepend(homeTab);
     homeTab.addEventListener('click',function(event){
       event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
-      doc.documentElement.classList.add('sikau-home-active');
+      // Festival and Visa are separate custom tabs; selecting either must
+      // clear the previous custom tab, not just the original lesson buttons.
+      const root=doc.documentElement;
+      root.classList.remove('sikau-visa-nav-active');
+      root.dataset.sikauVisaMode='everyday';
+      const visaButton=nav.querySelector('.sikau-visa-nav');
+      if(visaButton){
+        visaButton.classList.remove('on');
+        visaButton.removeAttribute('aria-current');
+      }
+      nav.__sikauVisaController?.showEveryday();
+      root.classList.add('sikau-home-active');
       home.hidden=false;
       homeTab.classList.add('on');homeTab.setAttribute('aria-current','page');
       // Keep the normal tab state intact; only hide its content visually.
@@ -1881,7 +1892,9 @@ function enhanceLearningHome(doc,firstName){
   if(!nav.dataset.sikauHomeListening){
     nav.dataset.sikauHomeListening='true';
     nav.addEventListener('click',function(event){
-      const b=event.target.closest('button[data-t]');
+      // Visa is a standalone sidebar button without data-t; include it
+      // so clicking Visa also closes the Festivals selection.
+      const b=event.target.closest('button[data-t],button.sikau-visa-nav');
       if(!b||b.classList.contains('sikau-home-nav'))return;
       doc.documentElement.classList.remove('sikau-home-active');
       const panel=doc.getElementById('sikauHomeScreen');
