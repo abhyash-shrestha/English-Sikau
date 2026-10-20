@@ -584,3 +584,17 @@ html[data-sikau-theme="dark"] .sikau-visa-browser-search{
 html[data-sikau-theme="dark"] .sikau-visa-choice-bullet{background:#513b52!important}
 html[data-sikau-theme="dark"] .sikau-visa-choice-arrow{color:#ffa9d0!important}
 html[data-sikau-theme="dark"] .sikau-visa-browser-count{background:#51394e!important;color:#ffe0f1!important}
+
+/* Dedicated Visa screen stays isolated even when the protected Coach rerenders.
+   The parent frame retains HTML.sikau-visa-nav-active across content rebuilds. */
+html.sikau-visa-nav-active .sikau-convo-standalone > .sikau-convo-everyday,
+html.sikau-visa-nav-active .sikau-convo.sikau-visa-standalone > .sikau-convo-everyday,
+.sikau-convo.sikau-visa-focused > .sikau-convo-everyday{display:none!important}
+html.sikau-visa-nav-active .sikau-convo.sikau-visa-standalone > .sikau-visa-hub:not([hidden]){
+ display:block!important
+}
+.sikau-convo.sikau-visa-standalone > .sikau-visa-hub[hidden],
+.sikau-convo.sikau-visa-standalone > .sikau-convo-everyday[hidden]{display:none!important}
+.sikau-convo.sikau-visa-standalone:not(.sikau-visa-focused) > .sikau-convo-everyday:not([hidden]){
+ display:block!important
+}
