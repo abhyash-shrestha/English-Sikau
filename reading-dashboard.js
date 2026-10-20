@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261016-4',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261020-nepali-label-r1',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 window.enhanceReadingDashboard=function(d){
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
@@ -22,9 +22,37 @@ window.enhanceReadingDashboard=function(d){
      b.textContent=story?'📖 Story mode · कथा पढौं':'📋 Practice mode · अभ्यास';
    }
  }
+ let watchedStoryLines=null,storyLinesObserver=null;
+ // Give the existing Nepali-translation button a descriptive label.
+ // Preserve the original button and its event listener, including after chapter changes.
+ function explainNepaliButtons(reader){
+   const lines=reader.querySelector('.story-lines');
+   if(!lines)return;
+   const relabel=()=>{
+     for(const button of lines.querySelectorAll('button')){
+       if(button.classList.contains('speaker'))continue;
+       const label=(button.textContent||'').trim();
+       if(!/^NP$/i.test(label)&&!button.classList.contains('read-v2-nepali-button'))continue;
+       if(!button.classList.contains('read-v2-nepali-button')){
+         button.classList.add('read-v2-nepali-button');
+         button.setAttribute('title','Tap for Nepali translation · नेपाली अनुवाद हेर्न थिच्नुहोस्');
+         button.setAttribute('aria-label','Nepali translation · नेपाली अनुवाद हेर्न थिच्नुहोस्');
+       }
+       if(/^NP$/i.test(label))button.textContent='🇳🇵 नेपालीमा हेर्नुहोस्';
+     }
+   };
+   if(watchedStoryLines!==lines){
+     storyLinesObserver?.disconnect();
+     watchedStoryLines=lines;
+     storyLinesObserver=new d.defaultView.MutationObserver(relabel);
+     storyLinesObserver.observe(lines,{childList:true,subtree:true,characterData:true});
+   }
+   relabel();
+ }
  function organize(){
    const reader=box.querySelector('#storyReader');
-   if(!reader||reader.dataset.readV2==='yes')return;
+   if(!reader)return;
+   if(reader.dataset.readV2==='yes'){explainNepaliButtons(reader);return;}
    const topic=reader.querySelector('.story-topic-list'),levels=reader.querySelector('.story-level-list'),books=reader.querySelector('.story-book-list'),img=reader.querySelector('.story-hero'),lines=reader.querySelector('.story-lines'),actions=reader.querySelector('.story-actions');
    if(!topic||!levels||!books||!img||!lines||!actions)return;
    reader.dataset.readV2='yes';
@@ -88,6 +116,7 @@ window.enhanceReadingDashboard=function(d){
      icon.style.setProperty('--read-position',(15+(sceneID*11)%70)+'%');
    }
    reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
+   explainNepaliButtons(reader);
 
  }
  const observer=new d.defaultView.MutationObserver(()=>{organize();});
