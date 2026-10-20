@@ -253,3 +253,100 @@ html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-check-item small{color:#b
  #hw.sikau-writing-v1 .wc-topic-panel #topicEn{font-size:13px!important}
  #hw.sikau-writing-v1 .wc-topic-prompts span{font-size:9px!important}
 }
+
+/* Writing Studio: no overlapped topic-footer chips and no empty grid space.
+ * Topic occupies a full-width row. The input/checklist sit below it.
+ * Native writing controls and the private writing evaluator are retained.
+ */
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid{
+ display:grid!important;
+ grid-template-columns:minmax(0,2fr) minmax(225px,.85fr)!important;
+ grid-template-rows:auto auto!important;
+ align-items:start!important;
+ gap:12px!important;
+ margin-bottom:14px!important;
+}
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-topic-panel{
+ grid-column:1/-1!important;
+ grid-row:1!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ align-self:start!important;
+ padding:15px!important;
+ overflow:visible!important;
+}
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-editor-panel{
+ grid-column:1!important;
+ grid-row:2!important;
+ min-width:0!important;
+ height:auto!important;
+ align-self:start!important;
+}
+#hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-checklist{
+ grid-column:2!important;
+ grid-row:2!important;
+ min-width:0!important;
+ height:auto!important;
+ align-self:start!important;
+ display:block!important;
+}
+#hw.sikau-writing-v1 .wc-topic-panel .wc-topic-prompts{
+ display:none!important;
+}
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard{
+ margin:0!important;
+ margin-bottom:0!important;
+ height:auto!important;
+ min-height:0!important;
+ overflow:visible!important;
+ position:relative!important;
+}
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard :is(#topicNe,#topicEn,#topicHint){
+ display:block!important;
+ height:auto!important;
+ max-height:none!important;
+ overflow:visible!important;
+ position:static!important;
+ transform:none!important;
+ word-break:normal!important;
+ overflow-wrap:anywhere!important;
+}
+#hw.sikau-writing-v1 .wc-topic-panel #topicCard #topicHint{
+ display:inline-flex!important;
+}
+#hw.sikau-writing-v1 .wc-dashboard .wc-native-feedback[hidden],
+#hw.sikau-writing-v1 .wc-dashboard .wc-real-feedback[hidden]{
+ display:none!important;
+}
+#hw.sikau-writing-v1 .wc-dashboard .wc-native-feedback{
+ margin:12px 0 0!important;
+}
+@media(max-width:900px){
+ #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto!important;
+  gap:12px!important;
+ }
+ #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-topic-panel{
+  grid-column:1!important;grid-row:1!important;
+ }
+ #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-editor-panel{
+  grid-column:1!important;grid-row:2!important;
+ }
+ #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-checklist{
+  grid-column:1!important;grid-row:3!important;
+ }
+}
+@media(max-width:540px){
+ #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid>.wc-topic-panel{
+  padding:12px!important;
+ }
+ #hw.sikau-writing-v1 .wc-topic-panel #topicCard{
+  padding:12px!important;
+ }
+ #hw.sikau-writing-v1 .wc-topic-panel #topicNe{
+  font-size:clamp(16px,4.5vw,19px)!important;
+  line-height:1.52!important;
+ }
+}
