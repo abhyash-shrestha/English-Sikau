@@ -2,7 +2,7 @@
    never fetches private content, never changes Appwrite, scoring, or routes. */
 (function(){
 'use strict';
-const href=new URL('all-tabs-responsive.css?v=20261021-light-toolbar-contrast-r1',document.baseURI).href;
+const href=new URL('all-tabs-responsive.css?v=20261021-dark-contrast-r1',document.baseURI).href;
 const pages={
  words:['📚','Words & Dictionary','शब्दहरू · नयाँ शब्द सिकौं','Search words, learn meanings and build vocabulary.'],
  hw:['✍️','Writing Practice','लेखन अभ्यास','Choose a topic, write your answer and learn from feedback.'],
