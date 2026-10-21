@@ -1093,9 +1093,9 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
-<script src="./coach-dashboard.js?v=20261020-visa-label-only-r1"></script>
+<script src="./coach-dashboard.js?v=20261021-nav-r2"></script>
 <script src="./translate-studio-v4.js?v=20261021-mobile-upload-r1"></script>
-<script src="./all-tabs-responsive.js"></script>
+<script src="./all-tabs-responsive.js?v=20261021-nav-r2"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
 <script src="./writing-coach-dashboard.js?v=20261020-clean-topic-grid-r2"></script>
 <script src="./reading-dashboard.js?v=20261021-remove-flag-tip-r5"></script>
@@ -1896,9 +1896,9 @@ function enhanceLearningHome(doc,firstName){
     homeTab.className='sikau-home-nav';
     homeTab.dataset.t='nepali-festivals';homeTab.dataset.sikauHome='true';
     homeTab.setAttribute('aria-label','Nepali Festivals · नेपाली चाडपर्व');
-    const emoji=doc.createElement('span');emoji.className='sikau-home-emoji';
+    const emoji=doc.createElement('i');emoji.className='sikau-home-emoji';
     emoji.textContent='🎉';emoji.setAttribute('aria-hidden','true');
-    const words=doc.createElement('span');words.className='sikau-home-nav-label';
+    const words=doc.createElement('span');words.className='sikau-nav-word sikau-home-nav-label';
     const word=doc.createElement('strong');word.textContent='Nepali Festivals';
     const ne=doc.createElement('small');ne.lang='ne';ne.textContent='नेपाली चाडपर्व';
     words.append(word,ne);homeTab.append(emoji,words);
@@ -2308,6 +2308,32 @@ function sikauImproveLessonControls(doc){
   }
 }
 
+function sikauPolishStudentNavigation(doc){
+ const nav=doc?.querySelector('#mobileModes.nav')||doc?.querySelector('.nav');
+ if(!nav||!doc.head)return;
+ const coach=nav.querySelector('button[data-t="coach"]');
+ if(coach){
+  const title=coach.querySelector('.sikau-nav-word strong');
+  if(title&&title.textContent!=='Coach')title.textContent='Coach';
+  const ne=coach.querySelector('.sikau-nav-word small');
+  if(ne&&ne.textContent!=='कोच')ne.textContent='कोच';
+  if(coach.getAttribute('aria-label')!=='Coach · कोच')coach.setAttribute('aria-label','Coach · कोच');
+ }
+ const festival=nav.querySelector('.sikau-home-nav');
+ if(festival)festival.querySelector('.sikau-home-nav-label')?.classList.add('sikau-nav-word');
+ const visa=nav.querySelector('.sikau-visa-nav');
+ if(visa){
+  let icon=visa.querySelector('.sikau-visa-nav-icon');
+  if(!icon){icon=doc.createElement('i');icon.className='sikau-visa-nav-icon';visa.prepend(icon);}
+  if(icon.textContent!=='🏛️')icon.textContent='🏛️';
+  icon.setAttribute('aria-hidden','true');
+ }
+ if(!doc.getElementById('sikauNavParityStyle')){
+  const style=doc.createElement('style');style.id='sikauNavParityStyle';
+  style.textContent="\n/* Make custom sidebar destinations peers of the original course tabs. */\nhtml.sikau-refresh #mobileModes.nav button.sikau-home-nav,\nhtml.sikau-refresh #mobileModes.nav button.sikau-visa-nav{\n display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;\n gap:10px!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;\n min-width:0!important;min-height:54px!important;max-height:none!important;height:auto!important;\n margin:0!important;padding:9px 12px!important;text-align:left!important;overflow:hidden!important;\n border-radius:13px!important;border:0!important;cursor:pointer!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-emoji,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n display:grid!important;place-items:center!important;flex:0 0 40px!important;width:40px!important;\n height:40px!important;background:#fff1f5!important;border-radius:12px!important;\n padding:0!important;margin:0!important;font:normal 22px/1 system-ui,sans-serif!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word{\n display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;\n gap:2px!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;\n text-align:left!important;line-height:1.25!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label strong,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word strong{\n display:block!important;color:inherit!important;text-align:left!important;\n font:850 13px/1.25 system-ui,sans-serif!important;margin:0!important;overflow-wrap:break-word!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label small,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{\n display:block!important;color:inherit!important;opacity:.8!important;\n font:650 10px/1.3 system-ui,sans-serif!important\n}\nhtml.sikau-refresh.sikau-home-active #mobileModes.nav button.sikau-home-nav.on,\nhtml.sikau-refresh.sikau-visa-nav-active #mobileModes.nav button.sikau-visa-nav.on{\n background:#ffeaf2!important;color:#c4145c!important;\n box-shadow:inset 3px 0 #ea1260!important;outline:0!important\n}\n@media(max-width:767px){\n html.sikau-refresh #mobileModes.nav button.sikau-home-nav,\n html.sikau-refresh #mobileModes.nav button.sikau-visa-nav{\n  flex:0 0 75px!important;width:75px!important;max-width:75px!important;min-width:75px!important;\n  min-height:62px!important;height:auto!important;max-height:none!important;\n  flex-direction:column!important;align-items:center!important;justify-content:center!important;\n  text-align:center!important;gap:3px!important;padding:6px 3px!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-emoji,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n  flex:0 0 23px!important;width:26px!important;height:23px!important;\n  font-size:20px!important;background:transparent!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word{\n  flex:0 1 auto!important;width:100%!important;align-items:center!important;\n  text-align:center!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label strong,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word strong{\n  font-size:9px!important;line-height:1.15!important;\n  text-align:center!important;overflow-wrap:anywhere!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label small,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{display:none!important}\n}\nhtml[data-sikau-theme=\"dark\"].sikau-refresh.sikau-home-active #mobileModes.nav button.sikau-home-nav.on,\nhtml[data-sikau-theme=\"dark\"].sikau-refresh.sikau-visa-nav-active #mobileModes.nav button.sikau-visa-nav.on{\n background:#402844!important;color:#ffd0e4!important;\n box-shadow:inset 3px 0 #ff77a9!important\n}\nhtml[data-sikau-theme=\"dark\"].sikau-refresh #mobileModes.nav .sikau-home-emoji,\nhtml[data-sikau-theme=\"dark\"].sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n background:#48334f!important\n}";
+  doc.head.appendChild(style);
+ }
+}
 function personalizeStudentLesson(){
   if(!openedAccess||!user)return;
   updateStudentWelcome();
@@ -2331,6 +2357,7 @@ function personalizeStudentLesson(){
   uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
   uiStep('festival calendar',()=>enhanceFestivalCalendar(doc));
   uiStep('festival home',()=>enhanceLearningHome(doc,first));
+  uiStep('navigation consistency',()=>sikauPolishStudentNavigation(doc));
   const buildLabel=$('sikauUiBuild');
   if(buildLabel){
     const active=doc.documentElement.classList.contains('sikau-refresh');
