@@ -55,3 +55,21 @@ html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-modes button.on{b
 html[data-sikau-theme="dark"] #game .sikau-lightning-bonus{
  background:#1f4237!important;color:#e0ffe9!important;border-color:#4b9969!important
 }
+
+
+/* Scenic game heading previously inherited white type on a pastel background. */
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-v5-header{
+ background:linear-gradient(105deg,#273149 0%,#38324e 55%,#80647f 82%,#f1d7e4 100%)!important;
+ border-color:#695b78!important;
+}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-v5-header h1{color:#fff3fa!important;opacity:1!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-v5-header h1 span,
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-v5-eyebrow{color:#ffb9d8!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-v5-header p{color:#ece7f6!important;opacity:1!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-map-stop small,
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-shell:has(.game-map)>.course-small{color:#cbd6ec!important;opacity:1!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-mission{background:#2c344b!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-mission .course-small{color:#cbd6ea!important}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-shell:has(.game-map)>.game-plot{
+ background:#313b52!important;color:#ecf1fa!important;
+}
