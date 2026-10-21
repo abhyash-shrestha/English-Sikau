@@ -31,6 +31,7 @@ function polishWriting(source){
  s=s.replace(/\bI was sleep\b/gi,'I was asleep');
  s=s.replace(/\bI eating\b/gi,/\bevery day\b|\bdaily routine\b/i.test(s)?'I eat':'I am eating');
  s=s.replace(/\bI going to\b/gi,'I am going to');
+ s=s.replace(/\b(I\s+(?:eat|wake|work|brush|go|drink|cook|read)[^.!?]{0,80}?)\s+and\s+goes\b/gi,(_,before)=>before+' and go');
  s=s.replace(/\bI\s+(wakes|goes|wants|knows|likes|eats|drinks|says|makes|works|does|has)\b/gi,(_,verb)=>'I '+base[verb.toLowerCase()]);
  s=s.replace(/\b(will|can|could|should|would|must|may|might|don't|doesn't|didn't)\s+(wakes|goes|wants|knows|likes|eats|drinks|says|makes|works|does|has)\b/gi,(_,aux,verb)=>aux+' '+base[verb.toLowerCase()]);
  s=s.replace(/\b(he|she|it|my friend|my mother|my father|my wife|my husband)\s+(say|make|want|work|go|need|like|have|eat|know|do)\b/gi,(_,subject,verb)=>subject+' '+plural[verb.toLowerCase()]);
@@ -51,7 +52,7 @@ function polishWriting(source){
  s=s.replace(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi,x=>x[0].toUpperCase()+x.slice(1).toLowerCase());
  s=s.replace(/\b(\d{1,2})\s*(am|pm)\b/gi,(_,time,period)=>time+' '+period.toLowerCase().split('').join('.')+'.');
  s=s.replace(/([a-z])\s+but\s+/gi,'$1, but ');
- s=s.replace(/(^|[.!?]\s+)([a-z])/g,(_,prefix,x)=>prefix+x.toUpperCase());
+ s=s.replace(/(^|[!?]\s+|(?<!\ba\.m|\bp\.m)\.\s+)([a-z])/g,(_,prefix,x)=>prefix+x.toUpperCase());
  s=s.replace(/\s+([,.;!?])/g,'$1').trim();
  if(s&&!/[.!?]$/.test(s))s+='.';
  return s;
