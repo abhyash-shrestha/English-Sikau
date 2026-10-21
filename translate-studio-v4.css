@@ -235,3 +235,12 @@ html.sikau-refresh[data-sikau-theme="dark"] #tr.sikau-studio-v4 .ttx-result-acti
 html.sikau-refresh[data-sikau-theme="dark"] #tr.sikau-studio-v4 .ttx-quick{background:#323c53!important;border-color:#55637a!important}
 html.sikau-refresh[data-sikau-theme="dark"] #tr.sikau-studio-v4 .ttx-examples{background:#202c49!important}
 @media(prefers-reduced-motion:reduce){#tr.sikau-studio-v4 *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Do not let the shared beginner-label helper append "Level up" to Upload. */
+#tr.sikau-studio-v4 button.ttx-mini.ttx-upload::after{content:none!important;display:none!important}
+#tr.sikau-studio-v4 button.ttx-mini.ttx-upload{min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+@media(max-width:600px){
+ #tr.sikau-studio-v4 .ttx-input-tools{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+ #tr.sikau-studio-v4 .ttx-input-tools>.ttx-mini{width:100%!important;max-width:100%!important;padding:9px 3px!important;font-size:clamp(10px,2.4vw,12px)!important}
+ #tr.sikau-studio-v4 .ttx-input-tools>.ttx-character-count{grid-column:1/-1}
+}
