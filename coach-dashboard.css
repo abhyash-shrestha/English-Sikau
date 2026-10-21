@@ -820,3 +820,22 @@ html[data-sikau-theme="dark"] .sikau-visa-reinterview-button[aria-pressed="true"
  background:#d51667;border-color:#d51667;color:#fff
 }
 html[data-sikau-theme="dark"] .sikau-visa-reinterview-tag{color:#ffaccf}
+
+
+/* Coach variety: small readable guidance; no change to existing card layout. */
+.sikau-convo-variety-hint{
+ color:#536588;font-size:12px;font-weight:750;
+ line-height:1.5;margin:6px 1px 11px!important;
+}
+.sikau-convo-round-label{
+ display:inline-flex;align-items:center;gap:4px;
+ width:max-content;max-width:100%;
+ color:#9b2767!important;background:#fff0f7;
+ border:1px solid #edcadc;border-radius:99px;
+ padding:4px 9px;margin-top:4px;
+ font-size:11px;font-weight:850
+}
+html[data-sikau-theme="dark"] .sikau-convo-variety-hint{color:#cbd6ec}
+html[data-sikau-theme="dark"] .sikau-convo-round-label{
+ background:#462941;color:#ffe0ef!important;border-color:#936484
+}
