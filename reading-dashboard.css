@@ -217,3 +217,34 @@ html[data-sikau-theme="dark"] #learn .sikau-see-nepali{
 html[data-sikau-theme="dark"] #rd .sikau-nepali-help{
  background:#342c48!important;color:#f3e6ff!important;border-color:#5e4a70!important
 }
+
+
+/* Dark Read: retain the scenic book illustration but place every caption and
+   story control on a contrast-safe surface. No reading state is modified. */
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .read-v2-hero,
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-hero{
+ background:linear-gradient(103deg,#273047 0%,#36314f 55%,#6a527e 79%,#edcde0 100%)!important;
+ border-color:#675b78!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .read-v2-hero :is(h1,h2){color:#fff4fa!important;opacity:1!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .read-v2-hero p{color:#ede6f5!important;opacity:1!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-reading{background:#252d42!important;color:#f5edfb!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-storyinfo :is(.read-exact-current-title,h2,h3),
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-filters h3,
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-selection h3{color:#f6eefa!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-book-list .story-book,
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-filters .chip:not(.on){
+ background:#303951!important;border-color:#586582!important;color:#f6f0fb!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-book-list .story-book.on{
+ background:#492d49!important;border-color:#f17cb0!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-book-text :is(b,small),
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-storyinfo .read-exact-current-title{color:#f5eaf8!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-filters .chip.on{color:#fff!important;background:#d51f66!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-mode{background:#283147!important;border-color:#586480!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .read-v2-mode button:not(.on){background:#35405a!important;color:#f4edfa!important}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{
+ background:#303850!important;border-color:#56617c!important;color:#f5effa!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line :is(.rs,.story-line-text,.story-line-english){color:#f5effa!important}
