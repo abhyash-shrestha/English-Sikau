@@ -211,3 +211,68 @@ html.sikau-refresh #mobileModes.nav .sikau-nav-word small{font-size:10px;line-he
  html.sikau-refresh #mobileModes.nav .sikau-nav-word small{display:none}
 }
 html.sikau-refresh[data-sikau-theme="dark"] #mobileModes.nav .sikau-nav-word small{color:#bcb8cd}
+
+
+/* Light mode: the protected app's secondary header was inherited from a
+   dark-gradient design, leaving light-on-light buttons nearly invisible.
+   Keep its real controls and behavior; only fix their readable appearance. */
+html.sikau-refresh[data-sikau-theme="light"] .app-header{
+ background:#eef3fb!important;
+ color:#213351!important;
+ border-bottom:1px solid #d4deee!important;
+ box-shadow:0 3px 12px rgba(21,40,73,.07)!important;
+ opacity:1!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .app-header-top,
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns{
+ opacity:1!important;
+ visibility:visible!important;
+ color:#243552!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select){
+ color:#1d3154!important;
+ background:#ffffff!important;
+ border:1px solid #c7d3e5!important;
+ border-radius:10px!important;
+ opacity:1!important;
+ -webkit-text-fill-color:#1d3154!important;
+ box-shadow:0 2px 5px rgba(24,39,75,.06)!important;
+ font-weight:750!important;
+ text-shadow:none!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select):hover{
+ background:#e4edfc!important;
+ border-color:#91a8cd!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select):focus-visible{
+ outline:3px solid #3b72d8!important;
+ outline-offset:2px!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select):disabled{
+ color:#66748d!important;
+ opacity:.68!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select) :is(span,small,strong,b){
+ color:inherit!important;
+ -webkit-text-fill-color:currentColor!important;
+ opacity:1!important;
+ text-shadow:none!important;
+}
+html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(option,optgroup){
+ color:#203452!important;
+ background:#fff!important;
+}
+@media (max-width:767px){
+ html.sikau-refresh[data-sikau-theme="light"] .app-header{
+  padding:7px 12px!important;
+  min-height:48px!important;
+ }
+ html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns{
+  gap:7px!important;
+  max-width:100%;
+ }
+ html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(button,select){
+  min-height:38px!important;
+  padding:6px 8px!important;
+ }
+}
