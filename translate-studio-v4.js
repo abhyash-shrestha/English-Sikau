@@ -4,16 +4,6 @@
 (function(){
 'use strict';
 const CSS_URL=new URL('./translate-studio-v4.css?v=20261021-mobile-upload-r1',document.baseURI).href;
-const samples=[
- ['👋','Hello!','नमस्ते!','ttx-rose'],
- ['📍','I am going to Pokhara.','म पोखरा जाँदै छु।','ttx-blue'],
- ['💬','What is your name?','तपाईंको नाम के हो?','ttx-purple'],
- ['📚','I like learning English.','मलाई अंग्रेजी सिक्न मन पर्छ।','ttx-green'],
- ['☀️','The weather is nice today.','आज मौसम राम्रो छ।','ttx-amber'],
- ['🙏','Thank you for helping me.','मलाई मद्दत गर्नुभएकोमा धन्यवाद।','ttx-rose'],
- ['🍲','I would like to eat momo.','म मःम खान चाहन्छु।','ttx-amber'],
- ['👨‍👩‍👧','This is my family.','यो मेरो परिवार हो।','ttx-green']
-];
 const topics=[
  {icon:'🥟',title:'Food & Cooking',ne:'खाना र पकाउने',kind:'food',pair:['Momo is delicious.','मःम मिठो छ।']},
  {icon:'🏔️',title:'Places & Travel',ne:'ठाउँहरू र यात्रा',kind:'travel',pair:['We are visiting Phewa Lake in Pokhara.','हामी पोखराको फेवा ताल घुम्न जाँदै छौं।']},
@@ -176,14 +166,6 @@ window.enhanceTranslationDashboard=function(d){
   b.title='Click again for another example · अर्को अभ्यासका लागि फेरि थिच्नुहोस्';
   b.addEventListener('click',()=>choosePractice('topic-'+topic.kind,[topic.pair,...practiceTopics[topic.kind]]));
  }
- const exampleSection=put(d,root,'section','ttx-examples');
- const exampleHead=put(d,exampleSection,'div','ttx-section-head');
- put(d,exampleHead,'h2','','🔠 Example Translations · उदाहरण अनुवादहरू');
- const more=put(d,exampleHead,'button','ttx-more','More examples →');
- more.type='button';
- const exampleGrid=put(d,exampleSection,'div','ttx-examples-grid');
-
- let examplesOpen=false;
  const saving=new Set();
  function directionUI(){
   const current=nativeDirection(sec);
@@ -224,19 +206,6 @@ window.enhanceTranslationDashboard=function(d){
   choosePair(pair);
   notice.textContent='New practice! Click again for another · नयाँ अभ्यास! अर्कोका लागि फेरि थिच्नुहोस्।';
  }
- function examplesRender(){
-  exampleGrid.replaceChildren();
-  (examplesOpen?samples:samples.slice(0,5)).forEach(([emoji,en,ne,tint])=>{
-    const b=put(d,exampleGrid,'button','ttx-example '+tint);b.type='button';
-    put(d,b,'span','ttx-example-icon',emoji);
-    const info=put(d,b,'span','ttx-example-text');
-    put(d,info,'strong','',ne);put(d,info,'small','',en);
-    b.addEventListener('click',()=>choosePair([en,ne]));
-  });
-  more.textContent=examplesOpen?'Show fewer ↑':'More examples →';
- }
- more.addEventListener('click',()=>{examplesOpen=!examplesOpen;examplesRender();});
- examplesRender();
  function updateCounter(){
   const c=sec.querySelector('.ttx-character-count');
   if(c)c.textContent=input.value.length+' / 500';
@@ -339,7 +308,6 @@ window.enhanceTranslationDashboard=function(d){
  root.insertBefore(hero,root.firstChild);
  hero.insertAdjacentElement('afterend',workspace);
  workspace.insertAdjacentElement('afterend',topicSection);
- topicSection.insertAdjacentElement('afterend',exampleSection);
  sec.dataset.sikauStudio='4';
  sec.classList.add('sikau-studio-v4');
  directionUI();updateCounter();clearResult();
