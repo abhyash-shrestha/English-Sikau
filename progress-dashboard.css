@@ -63,3 +63,31 @@ html[data-sikau-theme="dark"] #pg.sikau-progress-v1 :is(.pv-card,.pv-section,.pv
 html[data-sikau-theme="dark"] #pg.sikau-progress-v1 :is(.pv-section-header strong,.pv-card-title strong,.pv-line strong,.pv-activity-line strong){color:#f8f0ff!important}
 html[data-sikau-theme="dark"] #pg.sikau-progress-v1 :is(.pv-secondary,.pv-section-header small,.pv-card-title small){color:#c8cedf!important}
 @media(prefers-reduced-motion:reduce){#pg.sikau-progress-v1 *{transition:none!important}}
+
+
+/* Both modern Progress cards and protected legacy progress badges need
+   legible foreground/background pairs in dark mode. */
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-card-value,
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-large-value{color:#ff91bf!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-streak .pv-card-value{color:#ffb187!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-chapters .pv-card-value{color:#9fceff!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-level .pv-card-value{color:#c9b3ff!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 :is(.pv-line small,.pv-day small,.pv-label,.pv-activity-line b){color:#d4dbed!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-award{
+ background:#303951!important;opacity:1!important;
+}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-award.earned{background:#52344d!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-award :is(b,small){color:#eef0ff!important}
+html[data-sikau-theme="dark"] #pg.sikau-progress-v1 .pv-original>summary{color:#ffafd0!important}
+html[data-sikau-theme="dark"] #pg #pgo #masteryInfo{
+ background:#3c3449!important;color:#f5eaf8!important;border:1px solid #796781!important;
+}
+html[data-sikau-theme="dark"] #pg #pgo #masteryInfo :is(span,small,p,b,strong){
+ color:#f3e6f9!important;opacity:1!important;
+}
+html[data-sikau-theme="dark"] #pg #pgo :is(.pill,.badge,.tag,.level-tag),
+html[data-sikau-theme="dark"] #pg .chips .pill{
+ background:#343f59!important;color:#f5effc!important;
+ border:1px solid #687792!important;opacity:1!important;text-shadow:none!important;
+}
+html[data-sikau-theme="dark"] #pg #pgo :is(.pill,.badge,.tag,.level-tag) :is(span,small,strong,b){color:inherit!important;opacity:1!important}
