@@ -73,3 +73,56 @@ html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-mission .course-s
 html[data-sikau-theme="dark"] #game.sikau-game-adventure .game-shell:has(.game-map)>.game-plot{
  background:#313b52!important;color:#ecf1fa!important;
 }
+
+
+/* Game answer verdict: unmistakable, readable feedback across all game modes. */
+#game.sikau-game-adventure .sikau-answer-verdict{
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+ gap:14px!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;
+ border-radius:16px!important;padding:16px 20px!important;margin:0 0 14px!important;
+ border:2px solid!important;box-shadow:none!important;text-align:left!important;
+ font-family:inherit!important;line-height:1.2!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict.sikau-answer-wrong{
+ background:#fff0f2!important;border-color:#ed607b!important;color:#971630!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict.sikau-answer-correct{
+ background:#e9f9f1!important;border-color:#54b885!important;color:#146544!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-symbol{
+ display:grid!important;place-items:center!important;flex:0 0 52px!important;
+ width:52px!important;height:52px!important;border-radius:14px!important;
+ background:#ffffffa8!important;font:normal 33px/1.1 system-ui,sans-serif!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-message{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;
+ min-width:0!important;gap:5px!important;white-space:normal!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-message strong{
+ display:block!important;color:inherit!important;font-size:clamp(24px,2.8vw,34px)!important;
+ letter-spacing:.025em!important;font-weight:950!important;line-height:1.07!important;
+ text-shadow:none!important;overflow-wrap:anywhere!important;
+}
+#game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-message small{
+ display:block!important;color:inherit!important;font-size:clamp(12px,1.3vw,15px)!important;
+ font-weight:800!important;line-height:1.45!important;opacity:.92!important;
+}
+@media(max-width:600px){
+ #game.sikau-game-adventure .sikau-answer-verdict{padding:12px!important;gap:9px!important;border-radius:13px!important;}
+ #game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-symbol{
+  flex-basis:42px!important;width:42px!important;height:42px!important;font-size:27px!important;
+ }
+ #game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-message strong{font-size:clamp(20px,5.2vw,26px)!important}
+}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .sikau-answer-verdict.sikau-answer-wrong{
+ background:#512c3d!important;border-color:#ff849f!important;color:#ffe0e8!important;
+}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .sikau-answer-verdict.sikau-answer-correct{
+ background:#1c473c!important;border-color:#78e5b4!important;color:#dcffeb!important;
+}
+html[data-sikau-theme="dark"] #game.sikau-game-adventure .sikau-answer-verdict .sikau-answer-symbol{
+ background:#ffffff12!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #game.sikau-game-adventure .sikau-answer-verdict{animation:none!important;transition:none!important}
+}
