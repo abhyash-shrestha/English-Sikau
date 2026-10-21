@@ -2308,6 +2308,91 @@ function sikauImproveLessonControls(doc){
   }
 }
 
+
+/* The Visa tab intentionally has no native data-t: route it separately while
+   letting students drag it among native tabs and keep their custom order. */
+function sikauEnableVisaTabReordering(doc,nav){
+ const visa=nav?.querySelector('button.sikau-visa-nav');
+ if(!visa||visa.parentElement!==nav||nav.dataset.sikauVisaSortable==='1')return;
+ nav.dataset.sikauVisaSortable='1';
+ const key='english-sikau-visa-tab-order-v1';
+ const tabs=()=>Array.from(nav.children).filter(b=>
+   b.matches?.('button[data-t],button.sikau-visa-nav,button.sikau-home-nav')&&
+   !b.classList.contains('nav-more')&&b.dataset.t!=='more');
+ const id=b=>b.classList.contains('sikau-visa-nav')?'us-visa-interview':
+   b.classList.contains('sikau-home-nav')?'nepali-festivals':b.dataset.t||'';
+ const load=()=>{try{const v=JSON.parse(window.localStorage.getItem(key)||'null');return Array.isArray(v)?v:null;}catch(_){return null;}};
+ const save=()=>{try{window.localStorage.setItem(key,JSON.stringify(tabs().map(id)));}catch(_){}};
+ const old=load();
+ if(old?.includes('us-visa-interview')){
+   const current=tabs(),keys=new Map(current.map(b=>[id(b),b]));
+   const ordered=old.map(k=>keys.get(k)).filter(Boolean);
+   for(const b of current)if(!ordered.includes(b))ordered.push(b);
+   if(ordered.length===current.length&&ordered.some((b,i)=>b!==current[i])){
+     const after=current.at(-1).nextSibling;
+     for(const b of ordered)nav.insertBefore(b,after);
+   }
+ }
+ const locate=event=>{
+   const b=event.target?.closest?.('button[data-t],button.sikau-visa-nav,button.sikau-home-nav');
+   return b?.parentElement===nav&&tabs().includes(b)?b:null;
+ };
+ let source=null;
+ const move=(a,b,before)=>{
+   if(!a||!b||a===b||a.parentElement!==nav||b.parentElement!==nav)return;
+   nav.insertBefore(a,before?b:b.nextSibling);save();
+ };
+ visa.draggable=true;
+ visa.title='Drag to move · तानेर स्थान बदल्नुहोस्';
+ visa.setAttribute('aria-keyshortcuts','Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
+ nav.addEventListener('dragstart',e=>{
+   source=locate(e);
+   if(source===visa&&e.dataTransfer){
+     e.dataTransfer.effectAllowed='move';
+     try{e.dataTransfer.setData('text/plain','english-sikau-visa-nav')}catch(_){}
+   }
+ },true);
+ nav.addEventListener('dragover',e=>{
+   const target=locate(e);
+   if(!source||!target||(source!==visa&&target!==visa))return;
+   e.preventDefault();e.stopImmediatePropagation();
+   if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+ },true);
+ nav.addEventListener('drop',e=>{
+   const target=locate(e);
+   if(!source||!target||(source!==visa&&target!==visa))return;
+   e.preventDefault();e.stopImmediatePropagation();
+   const r=target.getBoundingClientRect();
+   const mobile=doc.defaultView?.matchMedia?.('(max-width:767px)')?.matches;
+   const before=mobile?e.clientX<r.left+r.width/2:e.clientY<r.top+r.height/2;
+   move(source,target,before);source=null;
+ },true);
+ nav.addEventListener('dragend',()=>{
+   source=null;
+   if(load())doc.defaultView?.setTimeout?.(save,120);
+ },true);
+ visa.addEventListener('keydown',e=>{
+   if(!e.altKey||!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
+   const list=tabs(),idx=list.indexOf(visa);
+   const dir=['ArrowUp','ArrowLeft'].includes(e.key)?-1:1;
+   if(!list[idx+dir])return;
+   e.preventDefault();move(visa,list[idx+dir],dir<0);visa.focus({preventScroll:true});
+ });
+ nav.addEventListener('click',e=>{
+   const b=e.target?.closest?.('button,a,[role="button"]');
+   if(!b||!/^Reset order\b/i.test((b.textContent||'').trim()))return;
+   try{window.localStorage.removeItem(key)}catch(_){}
+ },true);
+ // Continue respecting the native reorder when the learner has set Visa's place.
+ nav.addEventListener('pointerup',()=>{
+   if(load())doc.defaultView?.setTimeout?.(save,150);
+ },true);
+ if(!doc.getElementById('sikauVisaSortableStyle')){
+   const style=doc.createElement('style');style.id='sikauVisaSortableStyle';
+   style.textContent='#mobileModes.nav button.sikau-visa-nav{cursor:grab!important}#mobileModes.nav button.sikau-visa-nav:active{cursor:grabbing!important}';
+   doc.head.appendChild(style);
+ }
+}
 function sikauPolishStudentNavigation(doc){
  const nav=doc?.querySelector('#mobileModes.nav')||doc?.querySelector('.nav');
  if(!nav||!doc.head)return;
@@ -2328,6 +2413,7 @@ function sikauPolishStudentNavigation(doc){
   if(icon.textContent!=='🏛️')icon.textContent='🏛️';
   icon.setAttribute('aria-hidden','true');
  }
+ sikauEnableVisaTabReordering(doc,nav);
  if(!doc.getElementById('sikauNavParityStyle')){
   const style=doc.createElement('style');style.id='sikauNavParityStyle';
   style.textContent="\n/* Make custom sidebar destinations peers of the original course tabs. */\nhtml.sikau-refresh #mobileModes.nav button.sikau-home-nav,\nhtml.sikau-refresh #mobileModes.nav button.sikau-visa-nav{\n display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;\n gap:10px!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;\n min-width:0!important;min-height:54px!important;max-height:none!important;height:auto!important;\n margin:0!important;padding:9px 12px!important;text-align:left!important;overflow:hidden!important;\n border-radius:13px!important;border:0!important;cursor:pointer!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-emoji,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n display:grid!important;place-items:center!important;flex:0 0 40px!important;width:40px!important;\n height:40px!important;background:#fff1f5!important;border-radius:12px!important;\n padding:0!important;margin:0!important;font:normal 22px/1 system-ui,sans-serif!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word{\n display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;\n gap:2px!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;\n text-align:left!important;line-height:1.25!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label strong,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word strong{\n display:block!important;color:inherit!important;text-align:left!important;\n font:850 13px/1.25 system-ui,sans-serif!important;margin:0!important;overflow-wrap:break-word!important\n}\nhtml.sikau-refresh #mobileModes.nav .sikau-home-nav-label small,\nhtml.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{\n display:block!important;color:inherit!important;opacity:.8!important;\n font:650 10px/1.3 system-ui,sans-serif!important\n}\nhtml.sikau-refresh.sikau-home-active #mobileModes.nav button.sikau-home-nav.on,\nhtml.sikau-refresh.sikau-visa-nav-active #mobileModes.nav button.sikau-visa-nav.on{\n background:#ffeaf2!important;color:#c4145c!important;\n box-shadow:inset 3px 0 #ea1260!important;outline:0!important\n}\n@media(max-width:767px){\n html.sikau-refresh #mobileModes.nav button.sikau-home-nav,\n html.sikau-refresh #mobileModes.nav button.sikau-visa-nav{\n  flex:0 0 75px!important;width:75px!important;max-width:75px!important;min-width:75px!important;\n  min-height:62px!important;height:auto!important;max-height:none!important;\n  flex-direction:column!important;align-items:center!important;justify-content:center!important;\n  text-align:center!important;gap:3px!important;padding:6px 3px!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-emoji,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n  flex:0 0 23px!important;width:26px!important;height:23px!important;\n  font-size:20px!important;background:transparent!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word{\n  flex:0 1 auto!important;width:100%!important;align-items:center!important;\n  text-align:center!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label strong,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word strong{\n  font-size:9px!important;line-height:1.15!important;\n  text-align:center!important;overflow-wrap:anywhere!important\n }\n html.sikau-refresh #mobileModes.nav .sikau-home-nav-label small,\n html.sikau-refresh #mobileModes.nav .sikau-visa-nav-word small{display:none!important}\n}\nhtml[data-sikau-theme=\"dark\"].sikau-refresh.sikau-home-active #mobileModes.nav button.sikau-home-nav.on,\nhtml[data-sikau-theme=\"dark\"].sikau-refresh.sikau-visa-nav-active #mobileModes.nav button.sikau-visa-nav.on{\n background:#402844!important;color:#ffd0e4!important;\n box-shadow:inset 3px 0 #ff77a9!important\n}\nhtml[data-sikau-theme=\"dark\"].sikau-refresh #mobileModes.nav .sikau-home-emoji,\nhtml[data-sikau-theme=\"dark\"].sikau-refresh #mobileModes.nav .sikau-visa-nav-icon{\n background:#48334f!important\n}";
