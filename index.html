@@ -1093,7 +1093,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js?v=20261021-mobile-festival-date-r1"></script>
-<script src="./coach-dashboard.js?v=20261021-visa-cleanup-r2"></script>
+<script src="./coach-dashboard.js?v=20261021-visa-panels-gone-r3"></script>
 <script src="./translate-studio-v4.js?v=20261021-mobile-upload-r1"></script>
 <script src="./all-tabs-responsive.js?v=20261021-light-toolbar-contrast-r1"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
@@ -2472,6 +2472,42 @@ function sikauPolishStudentNavigation(doc){
   doc.head.appendChild(style);
  }
 }
+/* Retired Coach/Visa presentation panels must stay hidden even when an
+   older protected lesson build or cached Coach script recreates them.
+   This changes presentation only; interview practice remains available. */
+function sikauHideRetiredCoachSections(doc){
+  if(!doc?.body)return;
+  if(doc.head&&!doc.getElementById('sikauRetiredCoachSectionsStyle')){
+    const style=doc.createElement('style');
+    style.id='sikauRetiredCoachSectionsStyle';
+    style.textContent='.sikau-visa-official,[data-sikau-retired-adventure-hidden="true"]{display:none!important}';
+    doc.head.appendChild(style);
+  }
+  for(const panel of doc.querySelectorAll('.sikau-visa-official')){
+    panel.hidden=true;
+    panel.style.setProperty('display','none','important');
+    panel.setAttribute('aria-hidden','true');
+  }
+  for(const heading of doc.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,[role="heading"]')){
+    if(!/Choose your learning adventure/i.test((heading.textContent||'').trim())||
+       heading.closest('[data-sikau-retired-adventure-hidden="true"]'))continue;
+    let panel=heading.parentElement,depth=0;
+    while(panel&&panel!==doc.body&&depth++<12){
+      const content=panel.textContent||'';
+      if(content.includes('Mistake Garden')&&content.includes('Your English Life')){
+        if(content.length>6000||
+           panel.matches('main,#coach,#coachRoot,.page,[data-page],.sikau-convo,.sikau-visa-main')||
+           panel.querySelector('#sikauCoachConversations,.sikau-visa-main'))break;
+        panel.hidden=true;
+        panel.style.setProperty('display','none','important');
+        panel.setAttribute('aria-hidden','true');
+        panel.setAttribute('data-sikau-retired-adventure-hidden','true');
+        break;
+      }
+      panel=panel.parentElement;
+    }
+  }
+}
 function personalizeStudentLesson(){
   if(!openedAccess||!user)return;
   updateStudentWelcome();
@@ -2492,6 +2528,7 @@ function personalizeStudentLesson(){
   uiStep('progress dashboard',()=>window.enhanceProgressDashboard?.(doc));
   uiStep('beginner clarity',()=>enhanceBeginnerClarity(doc));
   uiStep('coach',()=>window.enhanceCoachDashboard?.(doc,first));
+  uiStep('remove retired Coach/Visa panels',()=>sikauHideRetiredCoachSections(doc));
   uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
   uiStep('festival calendar',()=>enhanceFestivalCalendar(doc));
   uiStep('festival home',()=>enhanceLearningHome(doc,first));
@@ -2585,6 +2622,7 @@ function personalizeStudentLesson(){
   enhanceMobileStudentLayout(doc);
   sikauApplyLessonTheme(doc);
   sikauImproveLessonControls(doc);
+  sikauHideRetiredCoachSections(doc);
 }
 $('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
 // Keep the visible festival schedule current across Nepal midnight, even without navigation.
