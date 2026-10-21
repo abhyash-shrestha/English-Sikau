@@ -2347,6 +2347,11 @@ function sikauEnableVisaTabReordering(doc,nav){
  };
  visa.draggable=false;visa.removeAttribute('draggable');
  visa.setAttribute('aria-keyshortcuts','Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
+ // Native reorder libraries also listen for mouse/touch starts. Keep them
+ // away from the custom Visa button while preserving ordinary clicks.
+ const onlyVisaStart=e=>{if(e.target?.closest?.('button.sikau-visa-nav'))e.stopImmediatePropagation()};
+ nav.addEventListener('mousedown',onlyVisaStart,true);
+ nav.addEventListener('touchstart',onlyVisaStart,{capture:true,passive:true});
  nav.addEventListener('pointerdown',e=>{
   if(e.button>0||!e.target?.closest?.('button.sikau-visa-nav'))return;
   e.stopImmediatePropagation();
@@ -2387,6 +2392,16 @@ function sikauEnableVisaTabReordering(doc,nav){
   try{localStorage.removeItem(storage)}catch(_){}
   doc.defaultView?.setTimeout(()=>put(nav.querySelector('button[data-t="coach"]'),false,false),80);
  },true);
+ // Clean cloned custom tabs after native drags; never change native tab nodes.
+ let repairing=false;
+ new doc.defaultView.MutationObserver(()=>{
+  if(repairing)return;
+  repairing=true;
+  doc.defaultView.requestAnimationFrame(()=>{
+   repairing=false;
+   sikauEnableVisaTabReordering(doc,nav);
+  });
+ }).observe(nav,{childList:true});
  if(!doc.getElementById('sikauVisaSortableStyle')){
   const style=doc.createElement('style');style.id='sikauVisaSortableStyle';
   style.textContent='#mobileModes.nav button.sikau-visa-nav{cursor:grab!important;touch-action:none!important}#mobileModes.nav .sikau-visa-drop{outline:2px dashed #d62474!important}';
