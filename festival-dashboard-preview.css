@@ -31,14 +31,14 @@
 #sikauHomeScreen .sfd .sfd-search input{width:100%;min-width:0;min-height:38px;background:transparent!important;border:0!important;box-shadow:none!important;outline:0!important;font-size:12px;color:#292144}
 #sikauHomeScreen .sfd .sfd-search:focus-within{outline:2px solid #bb4677;outline-offset:2px}
 #sikauHomeScreen .sfd .sfd-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-#sikauHomeScreen .sfd .sfd-card{border:1px solid #f0edf0;border-radius:16px;padding:9px 9px 12px;background:#fff;box-shadow:0 5px 22px #2424420a;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#sikauHomeScreen .sfd .sfd-card{position:relative;border:1px solid #f0edf0;border-radius:16px;padding:9px 9px 12px;background:#fff;box-shadow:0 5px 22px #2424420a;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 #sikauHomeScreen .sfd .sfd-card:hover{box-shadow:0 11px 25px #86154917;transform:translateY(-2px)}
 #sikauHomeScreen .sfd .sfd-visual{height:112px;position:relative;overflow:hidden;border-radius:11px;background:linear-gradient(125deg,#ffce92,#fa789b 52%,#c6a5f1)}
 #sikauHomeScreen .sfd .sfd-visual:before{content:"";position:absolute;left:-9%;right:-4%;bottom:-49px;height:92px;border-radius:45% 65% 0 0;background:#42548840;transform:rotate(-6deg)}
 #sikauHomeScreen .sfd .sfd-visual:after{content:"";position:absolute;left:12%;right:-25%;bottom:-64px;height:94px;border-radius:44% 50% 0 0;background:#35425e58;transform:rotate(9deg)}
 #sikauHomeScreen .sfd .sfd-visual-emoji{position:absolute;left:12%;bottom:6px;z-index:1;font-size:56px;line-height:1;filter:drop-shadow(0 6px 4px #2b1f3a42)}
 #sikauHomeScreen .sfd .sfd-visual-note{position:absolute;left:13px;top:12px;max-width:48%;color:#ffffffdd;font-size:10px;letter-spacing:.08em;font-weight:800;text-shadow:0 1px 5px #0005}
-#sikauHomeScreen .sfd .sfd-date{position:absolute;z-index:2;right:8px;top:8px;padding:7px 9px;border-radius:9px;background:#fff;color:#c31051;font-weight:850;font-size:10px;line-height:1.2;box-shadow:0 2px 8px #513b3127;max-width:59%;text-align:right}
+#sikauHomeScreen .sfd .sfd-date{position:absolute;z-index:2;right:17px;top:17px;padding:7px 9px;border-radius:9px;background:#fff;color:#c31051;font-weight:850;font-size:10px;line-height:1.2;box-shadow:0 2px 8px #513b3127;max-width:59%;text-align:right}
 #sikauHomeScreen .sfd .sfd-dashain{background:linear-gradient(128deg,#f9c877 4%,#ff9e86 54%,#9bb7f7)}
 #sikauHomeScreen .sfd .sfd-tihar{background:radial-gradient(circle at 27% 30%,#ffcc78 0,#ff965e 17%,transparent 24%),linear-gradient(123deg,#282039,#934b45,#f1a956)}
 #sikauHomeScreen .sfd .sfd-chhath{background:radial-gradient(circle at 75% 51%,#fff6b3 0,#ffd88a 10%,transparent 21%),linear-gradient(145deg,#f09c66,#f7cb95 43%,#90a4c8)}
@@ -86,3 +86,27 @@ html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-search input{color:#faf
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-learn{background:#3b2a46!important;color:#ffd5e6!important;border-color:#ad648a!important}
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-panel-title{border-color:#4b5066!important}
 @media(prefers-reduced-motion:reduce){#sikauHomeScreen .sfd .sfd-btn,#sikauHomeScreen .sfd .sfd-card{transform:none!important;transition:none!important}}
+
+/* Festival date badges: keep them separate from illustration captions in
+   two-column and phone layouts, including long multi-day date ranges. */
+@media(max-width:1160px){
+  #sikauHomeScreen .sfd .sfd-date{
+    position:static;z-index:auto;display:block;align-self:flex-end;
+    box-sizing:border-box;width:max-content;max-width:100%;min-width:0;
+    margin:9px 2px 0;padding:6px 9px;border:1px solid #f3d6e4;
+    border-radius:9px;background:#fff5f9;color:#a91651;
+    font-size:11px;line-height:1.4;font-weight:800;text-align:right;
+    white-space:normal;overflow-wrap:anywhere;box-shadow:none;
+  }
+  #sikauHomeScreen .sfd .sfd-visual-note{
+    max-width:calc(100% - 24px);line-height:1.3;
+  }
+}
+@media(max-width:570px){
+  #sikauHomeScreen .sfd .sfd-date{
+    font-size:10px;padding:6px 7px;line-height:1.35;
+  }
+}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-date{
+  background:#35283e;color:#ffe4ef;border-color:#6f4e65;
+}
