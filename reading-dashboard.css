@@ -141,6 +141,8 @@ html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{background:#31344
 
 /* Clear, platform-independent translation actions. The native flag/NP text is
    kept for the lesson's own event handlers but hidden visually. */
+#rd.sikau-read-exact .story-line button.sikau-see-nepali,
+#rd.sikau-read-exact .story-line [role="button"].sikau-see-nepali,
 #rd .sikau-see-nepali,#learn .sikau-see-nepali{
  display:inline-flex!important;
  flex-direction:column!important;
