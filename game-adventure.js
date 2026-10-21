@@ -1,7 +1,7 @@
 /* English Sikau Game visual enhancement. Leaves original game engine and handlers intact. */
 (function(){
 'use strict';
-const file=new URL('game-adventure.css?v=20261021-dark-contrast-r1',document.baseURI).href;
+const file=new URL('game-adventure.css?v=20261021-big-answer-verdict-hotfix-r2',document.baseURI).href;
 
 /* Lightning timing. The protected engine owns gameplay and awards.
  * This presentation-layer adapter updates the actual round state:
@@ -74,6 +74,132 @@ function installLightningTiming(d){
  }
  return true;
 }
+
+/* Large, easy-to-read feedback for Expedition, Matching and Lightning.
+ * Detect what the protected game itself says; do not re-grade answers.
+ * Never changes question state, timers, points, XP or click handlers. */
+function sikauAnswerVerdict(text,className=''){
+ const content=String(text||'').replace(/\s+/g,' ').trim();
+ if(!content)return null;
+ const classes=String(className||'');
+ // An explicit mistake notice outranks text explaining the correct option.
+ if(/learn from this mistake|learn from (?:your|the) mistake|wrong answer(?!s\b)|incorrect answer(?!s\b)|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|try again|गलत उत्तर|गल्तीबाट सिक्नुहोस्|मिलेन/i.test(content)
+    ||/(?:^|\s)(?:wrong|incorrect|is-wrong|is-incorrect|error)(?:\s|$)/i.test(classes))
+   return 'wrong';
+ if(/(?:^|[!.\s])(?:correct!|well done!|great job!|nice work!|excellent!|perfect!|right answer!|you got it!|that.s right!|सही उत्तर)/i.test(content)
+    ||/(?:^|\s)(?:is-correct|answer-correct|correct-choice)(?:\s|$)/i.test(classes))
+   return 'correct';
+ return null;
+}
+function installAnswerVerdicts(d,host){
+ if(!d?.defaultView?.MutationObserver||!host||host.dataset.sikauAnswerVerdict==='1')return;
+ host.dataset.sikauAnswerVerdict='1';
+ const view=d.defaultView;
+ const feedbackSelector='#gameFeedback,.game-feedback,.game-answer-feedback,.game-review,.game-explanation,.game-response,.game-status,.game-result-feedback,.game-match-feedback,.game-rush-feedback,.game-quest-feedback,.game-learn,.game-lesson,.game-hint-box';
+ const scoreClassSelector='.game-option.wrong,.game-choice.wrong,.game-answer.wrong,.game-tile.wrong,.game-match-card.wrong,.game-match-card.incorrect,.game-match-tile.wrong,.game-card.wrong,.game-card.incorrect,.game-answer.incorrect,.game-choice.incorrect,.game-option.incorrect,.game-pick.wrong,.game-pick.incorrect,.game-pair.wrong,.game-chip.wrong,[data-game-answer].incorrect';
+ const markerPattern=/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|गलत उत्तर|गल्तीबाट सिक्नुहोस्|सही उत्तर|correct!|well done!|great job!|nice work!|excellent!|perfect!/i;
+ const isVisible=el=>{
+  if(!el?.isConnected||el.hidden||el.closest('[hidden],[aria-hidden="true"]'))return false;
+  const style=view.getComputedStyle?.(el);
+  if(style?.display==='none'||style?.visibility==='hidden')return false;
+  // getClientRects also rejects CSS-hidden ancestors.
+  return typeof el.getClientRects!=='function'||el.getClientRects().length>0;
+ };
+ function findResult(){
+  // Game hub, map, and mission picker are NOT an active question.
+  // Its explanation text contains "Wrong answers explain the rule" and must
+  // never trigger a wrong-answer sign before the student has played.
+  const hubMap=host.querySelector('.game-map');
+  if(hubMap&&isVisible(hubMap))return null;
+  const explicit=[...host.querySelectorAll(feedbackSelector)].filter(isVisible);
+  for(const box of explicit){
+   if(box.closest('.sikau-answer-verdict'))continue;
+   const text=[...box.childNodes].filter(n=>!(n.nodeType===1&&n.classList?.contains('sikau-answer-verdict'))).map(n=>n.textContent||'').join(' ').slice(0,1100);
+   const result=sikauAnswerVerdict(text,box.className);
+   if(result)return {result,anchor:box};
+  }
+  // Older private lessons render "Learn from this mistake" in an unlabelled
+  // feedback box. Locate the smallest visible text element and its card.
+  const leaves=[...host.querySelectorAll('strong,b,span,p,h3,h4,h5,div,small')]
+    .filter(el=>isVisible(el)&&!el.closest('.sikau-answer-verdict')&&
+      (el.textContent||'').length<=250&&markerPattern.test(el.textContent||'')&&
+      ![...el.children].some(child=>markerPattern.test(child.textContent||'')));
+  for(const leaf of leaves){
+   const result=sikauAnswerVerdict(leaf.textContent||'',leaf.className);
+   if(!result)continue;
+   let anchor=leaf;
+   for(let n=leaf,depth=0;n&&n!==host&&depth<5;n=n.parentElement,depth++){
+    if(n.matches?.(feedbackSelector)){anchor=n;break;}
+    if(n.parentElement===host)break;
+    if(/feedback|explain|learn|review|result|hint|message|notice|answer-state/i.test(String(n.className||''))){
+      anchor=n;break;
+    }
+    const text=(n.textContent||'').trim();
+    if(n!==leaf&&text.length>=35&&text.length<=1200){
+      anchor=n;break;
+    }
+    if(n.parentElement?.matches?.('.game-shell')&&text.length<1100){anchor=n;break;}
+   }
+   return {result,anchor};
+  }
+  // Some matching games color a selected wrong card instead of writing prose.
+  const incorrect=host.querySelector(scoreClassSelector);
+  if(incorrect&&isVisible(incorrect)){
+   const shell=incorrect.closest('.game-shell')||host;
+   const anchor=shell.querySelector('#gameFeedback,.game-feedback')||shell;
+   return {result:'wrong',anchor};
+  }
+  return null;
+ }
+ let scheduled=false,lastAnchor=null,lastResult=null;
+ function update(){
+  scheduled=false;
+  const signal=findResult();
+  const previous=[...host.querySelectorAll('.sikau-answer-verdict')];
+  if(!signal){
+   previous.forEach(el=>el.remove());lastAnchor=null;lastResult=null;
+   return;
+  }
+  const {result,anchor}=signal;
+  if(!anchor?.isConnected)return;
+  if(lastAnchor===anchor&&lastResult===result&&previous.length===1&&previous[0].parentElement===anchor)return;
+  previous.forEach(el=>el.remove());
+  const banner=d.createElement('div');
+  banner.className='sikau-answer-verdict sikau-answer-'+result;
+  banner.setAttribute('role','status');
+  banner.setAttribute('aria-live','polite');
+  const symbol=d.createElement('span');
+  symbol.className='sikau-answer-symbol';
+  symbol.setAttribute('aria-hidden','true');
+  symbol.textContent=result==='wrong'?'❌':'✅';
+  const copy=d.createElement('span');
+  copy.className='sikau-answer-message';
+  const title=d.createElement('strong');
+  title.textContent=result==='wrong'?'WRONG ANSWER':'CORRECT!';
+  const nepali=d.createElement('small');
+  nepali.textContent=result==='wrong'?'गलत उत्तर · सही उत्तर सिक्नुहोस्':'सही उत्तर · राम्रो गर्नुभयो!';
+  copy.append(title,nepali);banner.append(symbol,copy);
+  anchor.prepend(banner);
+  lastAnchor=anchor;lastResult=result;
+ }
+ const schedule=()=>{
+  if(scheduled)return;scheduled=true;
+  view.requestAnimationFrame(update);
+ };
+ const observer=new view.MutationObserver(records=>{
+  // Our own prepend/remove causes a childList mutation. Ignoring only
+  // these banner changes prevents the renderer triggering itself forever.
+  const ownChanges=records.length>0&&records.every(record=>{
+   if(record.type!=='childList')return false;
+   const nodes=[...record.addedNodes,...record.removedNodes];
+   return nodes.length>0&&nodes.every(node=>node.nodeType===1&&
+     node.classList?.contains('sikau-answer-verdict'));
+  });
+  if(!ownChanges)schedule();
+ });
+ observer.observe(host,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden','aria-hidden']});
+ schedule();
+}
 const destinations={ktm:['Kathmandu','काठमाडौं'],bkt:['Bhaktapur','भक्तपुर'],pkr:['Pokhara','पोखरा'],ctn:['Chitwan','चितवन'],nch:['Namche','नाम्चे'],evt:['Everest','सगरमाथा']};
 const make=(d,t,c,v)=>{const e=d.createElement(t);if(c)e.className=c;if(v!=null)e.textContent=v;return e;};
 window.enhanceGameDashboard=function(d){
@@ -81,6 +207,7 @@ window.enhanceGameDashboard=function(d){
  if(!sec||!content||!host)return;
  // Install even when the adventure screen is already mounted.
  installLightningTiming(d);
+ installAnswerVerdicts(d,host);
  if(!d.getElementById('sikauGameStyle')){const l=make(d,'link');l.id='sikauGameStyle';l.rel='stylesheet';l.href=file;d.head.append(l);}
  sec.classList.add('sikau-game-adventure');
  if(!content.querySelector('.game-v5-header')){

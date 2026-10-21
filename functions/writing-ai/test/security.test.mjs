@@ -9,7 +9,7 @@ const NOW=Date.parse('2026-10-21T14:00:00Z');
 const input={action:'writing-review',answer:'I wakes up early every day.',topicEn:'Describe your daily routine.',topicNe:'आफ्नो दिनचर्याबारे लेख्नुहोस्।'};
 const person={$id:'student-1',status:true,emailVerification:true,labels:['sikaupaid','sikauaiapproved']};
 const env={GROQ_API_KEY:'unit-test-provider-value',WRITING_AI_ENABLED:'true',GROQ_FREE_TIER_CONFIRMED:'true',WRITING_AI_DATABASE_ID:'test-db',WRITING_AI_QUOTA_TABLE_ID:'ai-quotas'};
-const fixture=()=>({relevance:'on_topic',scores:{relevance:30,grammar:24,completeness:10,clarity:17},corrected:'I wake up early every day.',model_answer:'Every morning, I wake up early and prepare for my day. I eat breakfast before leaving home. In the evening, I read a book and plan the following day.',feedback:[{before:'I wakes up',after:'I wake up',why_en:'Use the base verb with I in the simple present.',why_ne:'“I” सँग “wake” प्रयोग गर्नुहोस्।'}],tip_en:'Describe the rest of your day.',tip_ne:'दिनका अरू कामहरू पनि वर्णन गर्नुहोस्।'});
+const fixture=()=>({relevance:'on_topic',ratings:{grammar:'minor_errors',completeness:'partly_complete',clarity:'mostly_clear'},corrected:'I wake up early every day.',model_answer:'Every morning, I wake up early and prepare for my day. I eat breakfast before leaving home. In the evening, I read a book and plan the following day.',feedback:[{before:'I wakes up',after:'I wake up',why_type:'agreement'}],tip_en:'Describe the rest of your day.'});
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 const context=(body=input)=>({req:{method:'POST',headers:{'x-appwrite-trigger':'http','x-appwrite-user-jwt':'unit-test-jwt','x-appwrite-user-id':'student-1','x-appwrite-key':'unit-test-server-value'},bodyJson:body,bodyText:JSON.stringify(body)},res:{json:(body,status=200,headers={})=>({body,status,headers})}});
 const trial=()=>({ok:true,used:true,active:true,startedAt:new Date(NOW-1000).toISOString(),expiresAt:new Date(NOW+3599000).toISOString(),serverNow:new Date(NOW).toISOString()});
@@ -28,12 +28,14 @@ function harness({user=person,providerStatus=200,providerBody,accountStatus=200,
 
 test('verified paid account receives a schema-validated AI result and no secrets',async()=>{
  const h=harness(),result=await h.handler(context());
- assert.equal(result.status,200);assert.equal(result.body.engine,'groq-free');assert.equal(result.body.review.score,81);
+ assert.equal(result.status,200);assert.equal(result.body.engine,'groq-free');assert.equal(result.body.review.score,80);
  assert.equal(result.body.review.corrected,'I wake up early every day.');
+ assert.match(result.body.review.feedback[0].why_ne,/क्रियाको रूप/);
  assert.equal(h.reservations.length,1);assert.equal(h.calls.length,2);
  const sent=JSON.parse(h.calls[1].options.body);
  assert.equal(sent.model,'openai/gpt-oss-20b');assert.equal(sent.response_format.json_schema.strict,true);
- assert.equal(sent.include_reasoning,false);assert.equal(sent.max_completion_tokens,2400);
+ assert.equal(sent.include_reasoning,false);assert.equal(sent.max_completion_tokens,3200);
+ assert.equal(sent.reasoning_effort,'medium');
  assert.ok(!h.calls[1].options.body.includes('student-1'));
  assert.ok(!JSON.stringify(result).includes('unit-test-'));
  assert.match(result.headers['Cache-Control'],/no-store/);
@@ -116,16 +118,16 @@ test('429 from application quota includes a bounded retry hint',async()=>{
  const h=harness({quotaError:new QuotaError('busy','Wait.','पर्खनुहोस्।',120)});
  const r=await h.handler(context());assert.equal(r.status,429);assert.equal(r.body.retryAfter,120);assert.ok(!h.calls.some(x=>x.url.includes('api.groq.com')));
 });
-test('scores derive from four validated rubric components and relevance caps',()=>{
+test('scores derive from validated rating bands and rubric points and relevance caps',()=>{
  for(const [relevance,score] of [['on_topic',100],['partial',65],['off_topic',10]]){
-  const x={...fixture(),relevance,scores:{relevance:30,grammar:30,completeness:20,clarity:20}};
+  const x={...fixture(),relevance,ratings:{grammar:'accurate',completeness:'complete',clarity:'clear'}};
   assert.equal(normalizeReview(x,input.answer).score,score);
  }
- for(const grammar of [-1,31,NaN,'30',1.5])assert.throws(()=>normalizeReview({...fixture(),scores:{...fixture().scores,grammar}},input.answer));
+ for(const grammar of [-1,31,NaN,'30',1.5])assert.throws(()=>normalizeReview({...fixture(),ratings:{...fixture().ratings,grammar}},input.answer));
 });
-test('invented feedback quotes, missing Nepali and excessive fixes are rejected',()=>{
+test('invented feedback quotes, invalid explanation types and excessive fixes are rejected',()=>{
  const x=fixture();x.feedback[0].before='I did not write this';assert.throws(()=>normalizeReview(x,input.answer));
- const y=fixture();y.tip_ne='Roman text only';assert.throws(()=>normalizeReview(y,input.answer));
+ const y=fixture();y.feedback[0].why_type='unsupported';assert.throws(()=>normalizeReview(y,input.answer));
  const z=fixture();z.feedback=Array(4).fill(z.feedback[0]);assert.throws(()=>normalizeReview(z,input.answer));
 });
 test('perfect writing can have no mistakes; a short valid correction is accepted',()=>{

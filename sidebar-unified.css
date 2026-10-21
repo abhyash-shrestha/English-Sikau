@@ -1,0 +1,85 @@
+/* English Sikau: identical selected, hover, focus, and drag styling for every tab. */
+/* Last stylesheet applied in the authenticated lesson iframe. */
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified,
+html.sikau-refresh #mobileModes.nav > button.sikau-home-nav.sikau-nav-unified,
+html.sikau-refresh #mobileModes.nav > button.sikau-visa-nav.sikau-nav-unified{
+ border:1px solid transparent!important;
+ outline:0!important;
+ outline-offset:0!important;
+ border-radius:13px!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ color:#34436d!important;
+ min-width:0;
+ transition:background-color .14s ease,color .14s ease,box-shadow .14s ease!important;
+ -webkit-tap-highlight-color:transparent;
+ user-select:none;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified:hover:not(.on){
+ background:#f4f2f8!important;color:#243158!important;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified.on,
+html.sikau-refresh.sikau-home-active #mobileModes.nav > button.sikau-home-nav.sikau-nav-unified.on,
+html.sikau-refresh.sikau-visa-nav-active #mobileModes.nav > button.sikau-visa-nav.sikau-nav-unified.on{
+ border-color:transparent!important;
+ outline:0!important;
+ background:#ffeaf2!important;
+ color:#c4145c!important;
+ box-shadow:inset 3px 0 0 #e91663!important;
+ font-weight:850!important;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified:focus:not(:focus-visible),
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified.on:focus:not(:focus-visible){
+ outline:0!important;
+ outline-offset:0!important;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified:focus-visible{
+ outline:2px solid #2463dd!important;
+ outline-offset:2px!important;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified.sikau-nav-dragging{
+ opacity:.55!important;
+ cursor:grabbing!important;
+}
+html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified.sikau-nav-drop-target{
+ outline:2px dashed #d61261!important;
+ outline-offset:2px!important;
+}
+@media(min-width:768px){
+ html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified{cursor:grab!important;}
+}
+@media(max-width:767px){
+ html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified.on,
+ html.sikau-refresh.sikau-home-active #mobileModes.nav > button.sikau-home-nav.sikau-nav-unified.on,
+ html.sikau-refresh.sikau-visa-nav-active #mobileModes.nav > button.sikau-visa-nav.sikau-nav-unified.on{
+  box-shadow:inset 0 -3px 0 #e91663!important;
+ }
+ html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified{
+  touch-action:pan-x!important;
+ }
+}
+html[data-sikau-theme="dark"].sikau-refresh #mobileModes.nav > button.sikau-nav-unified{
+ background:transparent!important;
+ color:#e0e6f3!important;
+ border-color:transparent!important;
+}
+html[data-sikau-theme="dark"].sikau-refresh #mobileModes.nav > button.sikau-nav-unified:hover:not(.on){
+ background:#303d53!important;color:#fff!important;
+}
+html[data-sikau-theme="dark"].sikau-refresh #mobileModes.nav > button.sikau-nav-unified.on,
+html[data-sikau-theme="dark"].sikau-refresh.sikau-home-active #mobileModes.nav > button.sikau-home-nav.sikau-nav-unified.on,
+html[data-sikau-theme="dark"].sikau-refresh.sikau-visa-nav-active #mobileModes.nav > button.sikau-visa-nav.sikau-nav-unified.on{
+ color:#ffe5f0!important;background:#542642!important;
+ border-color:transparent!important;
+ box-shadow:inset 3px 0 0 #ff77a9!important;
+}
+@media(max-width:767px){
+ html[data-sikau-theme="dark"].sikau-refresh #mobileModes.nav > button.sikau-nav-unified.on,
+ html[data-sikau-theme="dark"].sikau-refresh.sikau-home-active #mobileModes.nav > button.sikau-home-nav.sikau-nav-unified.on,
+ html[data-sikau-theme="dark"].sikau-refresh.sikau-visa-nav-active #mobileModes.nav > button.sikau-visa-nav.sikau-nav-unified.on{
+  box-shadow:inset 0 -3px 0 #ff77a9!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html.sikau-refresh #mobileModes.nav > button.sikau-nav-unified{transition:none!important}
+}

@@ -1,17 +1,17 @@
 # English Sikau AI Writing Coach
 
-This implementation is **not live**. The frontend feature flag remains `writingAI:null` until the backend, privacy settings and real model behavior have been verified.
+The shared backend is deployed, with `WRITING_AI_ENABLED=false`. The live website is **not using AI yet**: `writingAI:null` remains until an authorized end-to-end account test and visual QA pass. See `VALIDATION.md` for observed results and the remaining blocker.
 
 ## Verified deployment constraint — 21 October 2026
 
 The signed-in Appwrite organization is on **Free** and already uses both allowed Functions:
 
-- Trial Manager: `6acaf5fe00349b7b8d3d`, Node.js 22, active deployment `6ace11cdafb2432f9aec`.
+- Trial Manager: `6acaf5fe00349b7b8d3d`, Node.js 22, active writing-capable deployment `6ad8e0368fbe5d6d31b8`; original rollback deployment `6ace11cdafb2432f9aec`.
 - Trial Pass: `6acc34ea0003a1c0c25a`.
 
 A third Function cannot be created on this plan. Do not upgrade, delete either existing Function, create duplicate Groq organizations, or change existing student records.
 
-A prepared alternative is `src/shared-handler.js`: add only the `writing-review` action to the existing Trial Manager deployment. All other actions pass the original request/response context straight to its unchanged handler. Trial checks for writing invoke the existing `status` handler directly, avoiding recursive Function executions. This changes the entrypoint of a production access service and requires separate production approval under the owner's instructions.
+The owner approved and deployed the shared alternative, `src/shared-handler.js`: add only the `writing-review` action to the existing Trial Manager deployment. All other actions pass the original request/response context straight to its unchanged handler. Trial checks for writing invoke the existing `status` handler directly, avoiding recursive Function executions. The owner separately approved the production entrypoint change, 35-second timeout and disabled execution logging. Original trial source, membership labels and trial dates are preserved.
 
 To prepare a package, download the current Trial Manager source, then run:
 
@@ -45,7 +45,7 @@ Eligibility requires an active verified account, the server-managed `sikaupaid` 
 
 Groq currently publishes, for `openai/gpt-oss-20b`, free limits of 30 requests/minute, 1,000 requests/day, 8,000 tokens/minute and 200,000 tokens/day. Actual organization limits are authoritative: <https://console.groq.com/docs/rate-limits>.
 
-This pilot uses atomic server-side counters shared across all runtime instances: five attempts per account per UTC day, sixteen attempts for the whole app per UTC day, and two overlapping cooldown windows preventing requests less than 60 seconds apart. Depending on timing, the cooldown can last up to two minutes. Provider failures consume a reservation and are never automatically retried or refunded. Quota checks fail closed; there is no in-memory fallback. A conservative input byte bound plus 2,400 maximum output/reasoning tokens limits each request. Provider limits still apply, including rolling windows and other uses of the same organization; the pilot cannot reserve capacity for unrelated applications. Only a confirmed free account with no paid upgrade meets the zero-cost launch requirement.
+This pilot uses atomic server-side counters shared across all runtime instances: five attempts per account per UTC day, sixteen attempts for the whole app per UTC day, and two overlapping cooldown windows preventing requests less than 60 seconds apart. Depending on timing, the cooldown can last up to two minutes. Provider failures consume a reservation and are never automatically retried or refunded. Quota checks fail closed; there is no in-memory fallback. A 7,500-byte serialized input bound plus 3,200 maximum output/reasoning tokens and a 512-token protocol reserve keeps sixteen app reservations below 180,000 tokens/day. The model uses medium reasoning; reasoning is never returned to students. Provider limits still apply, including rolling windows and other uses of the same organization; the pilot cannot reserve capacity for unrelated applications. Only a confirmed free account with no paid upgrade meets the zero-cost launch requirement.
 
 The quota table stores counts and hashed account references, never writing, names, email addresses or model responses. Counters currently accumulate; review dedicated-table retention as usage grows. Do not apply cleanup to student/trial/progress tables.
 
@@ -63,7 +63,11 @@ The frontend asks before sending the assignment and paragraph. It sends no accou
 
 AI is the primary checker when configured: it does not wait for the old rule-based engine. The existing basic checker is an explicit fallback. Editing writing or changing topics invalidates pending results. Quota/error responses show a short bilingual message without inventing a score. Successful responses show a score/relevance, polished original paragraph with Copy, up to three English/Nepali fixes and an expandable fictional model answer.
 
-The backend validates rubric component types/ranges, recomputes the total, caps off-topic scores at 10 and partial scores at 65, rejects incomplete/refused/truncated results, requires Nepali feedback, and rejects feedback quoting text absent from the student's original. Prompt instructions preserve facts, require context-appropriate tense and distinguish correction from invented examples. These checks do not prove factual preservation or grammar accuracy; real Groq evaluation remains required.
+The AI judges rating bands; the server maps them to stable rubric points. Relevance earns 30/15/0 for on-topic/partial/off-topic. Grammar bands earn 30/26/20/12/4; completeness 20/15/8/0; clarity 20/16/8/0. Partial totals are capped at 65 and off-topic at 10. These are advisory estimates, not standardized educational grades.
+
+Real model tests found misleading free-form bilingual explanations and unstable raw numeric scores. The model now selects up to three original quotes, corrections and explanation categories. The server supplies reviewed, short English/Nepali teaching strings for those categories. Those strings do not correct writing or assess the topic; correction, rating, error selection and model answers remain AI-generated, including for unseen topics.
+
+The backend rejects unknown ratings/categories, incomplete/refused/truncated output and feedback quoting text absent from the original. The prompt preserves facts, requires context-appropriate tense and separates correction from fictional examples. These checks cannot prove semantic accuracy; the recorded real-model study covers seventeen synthetic scenarios and includes three failed initial responses.
 
 ## Verification and activation
 
@@ -73,13 +77,13 @@ npm test
 node --test ../../test/browser-security.test.mjs
 ```
 
-Run the prepared shared deployment against the current legacy trial-security suite before upload. Use `test/grammar-cases.json` for real model evaluation; test long paragraphs as well as the sixteen listed scenarios. Record actual returned corrections, scores, latency and failures. Do not claim canned/mock responses establish grammar quality. The five previously reported phrases and unseen topics still require live evaluation.
+Run the prepared shared deployment against the current legacy trial-security suite before upload. Use `test/grammar-cases.json` for real model evaluation. Recorded Groq Playground results are in `test/quality-results-20261021.json`: seventeen scenarios, including a 210-word paragraph, plus three failed initial responses that each passed one manual retest. All five reported correction examples passed in context. Playground used JSON-object mode; the deployed strict-schema path, server quota writes and authorized live account still require end-to-end verification. Production does not retry automatically.
 
 After the backend passes staged authorization/quota/provider tests, finish real phone/tablet/desktop light/dark visual QA and test the live site with a properly authorized account. Only then set `CFG.writingAI` to the verified Function ID and publish. Keep the basic fallback and kill switch.
 
 ## Rollback
 
-1. Set `WRITING_AI_ENABLED=false` to stop writing-provider calls while leaving legacy actions routed normally.
+1. Set `WRITING_AI_ENABLED=false` **and redeploy** to stop writing-provider calls while leaving legacy actions routed normally. Appwrite displays that variable changes require redeployment.
 2. Restore `CFG.writingAI:null` and republish the frontend.
 3. If the shared deployment causes any regression, reactivate Trial Manager deployment `6ace11cdafb2432f9aec` and restore entrypoint `src/main.js` and its saved settings. Do not delete trials or change dates/labels.
-4. Baseline frontend commit: `87ed33fbe645226c4cf038b5d425e358af3f12fc`. Use a revert commit for frontend rollback rather than rewriting main history.
+4. Pre-activation main baseline: `60b11538a18183070189ad433de45a23dea79737` (original PR base: `87ed33fbe645226c4cf038b5d425e358af3f12fc`). Revert only the writing merge and preserve the newer sidebar/game/map/cleanup changes; never reset main history.
