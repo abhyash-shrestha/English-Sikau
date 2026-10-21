@@ -294,7 +294,19 @@ function installVisaSidebar(doc,shell,visaController){
  const coachButton=Array.from(nav.querySelectorAll('button[data-t]'))
    .find(button=>String(button.dataset.t||'').toLowerCase()==='coach');
  if(!coachButton)return false;
- let visaButton=nav.querySelector('.sikau-visa-nav');
+ // The private nav's sorter may briefly clone a custom button. Keep one
+ // real Visa destination and its original event handler, never two copies.
+ const existingVisa=Array.from(nav.querySelectorAll(':scope > button.sikau-visa-nav'));
+ let visaButton=(nav.__sikauVisaOriginal?.parentElement===nav?nav.__sikauVisaOriginal:null)||
+   existingVisa.find(button=>button.__sikauVisaBound===true)||
+   existingVisa[0]||null;
+ if(visaButton){
+  for(const extra of existingVisa)if(extra!==visaButton)extra.remove();
+  // A DOM clone carries dataset attributes but does NOT carry JS listeners.
+  if(visaButton.dataset.sikauVisaClick&&!visaButton.__sikauVisaBound)
+   delete visaButton.dataset.sikauVisaClick;
+ }
+
  if(!visaButton){
   visaButton=doc.createElement('button');
   visaButton.type='button';visaButton.className='sikau-visa-nav';
@@ -311,6 +323,7 @@ function installVisaSidebar(doc,shell,visaController){
  if(!visaIcon){visaIcon=doc.createElement('i');visaIcon.className='sikau-visa-nav-icon';visaButton.prepend(visaIcon);}
  if(visaIcon.textContent!=='🏛️')visaIcon.textContent='🏛️';
  visaIcon.setAttribute('aria-hidden','true');
+ nav.__sikauVisaOriginal=visaButton;
  shell.classList.add('sikau-visa-standalone');
  // The protected lessons may rebuild #coach after navigation. Listeners on the
  // persistent sidebar must always address the CURRENT screen, not the old one.
@@ -359,7 +372,8 @@ function installVisaSidebar(doc,shell,visaController){
     nav.__sikauVisaController?.showEveryday();
   },true);
  }
- if(!visaButton.dataset.sikauVisaClick){
+ if(!visaButton.__sikauVisaBound){
+  visaButton.__sikauVisaBound=true;
   visaButton.dataset.sikauVisaClick='1';
   visaButton.addEventListener('click',event=>{
    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
