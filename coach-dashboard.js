@@ -598,7 +598,7 @@ window.enhanceCoachDashboard=function(doc){
  ai.type='button';
  const banner=add(doc,shell,'div','sikau-convo-intro');
  add(doc,banner,'strong','','Pick a place, then start talking · ठाउँ छानेर कुराकानी सुरु गर्नुहोस्');
- const toggleNe=add(doc,banner,'button','sikau-convo-language','🇳🇵 Nepali translations: On');toggleNe.type='button';
+ // Nepali translations remain visible by default, without a separate Coach toggle.
  const browser=add(doc,shell,'section','sikau-convo-browser');
  const filters=add(doc,browser,'div','sikau-convo-filters');
  const topicsRow=add(doc,filters,'div','sikau-convo-topics');
@@ -780,11 +780,7 @@ window.enhanceCoachDashboard=function(doc){
   });
  }
  searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
- toggleNe.addEventListener('click',()=>{
-  showNepali=!showNepali;
-  toggleNe.textContent='🇳🇵 Nepali translations: '+(showNepali?'On':'Off');
-  if(active)renderStage();else drawCards();
- });
+
  surprise.addEventListener('click',()=>{
   const options=scenarios.filter(s=>s.id!==lastId);
   const list=options.length?options:scenarios;
