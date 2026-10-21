@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261021-simple-feedback-r1',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261021-ai-ready-r1',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -100,7 +100,7 @@ function getModelAnswer(result){
  }
  return model;
 }
-function renderRealFeedback(doc,result,summary,original,textarea){
+function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,aiPending=false,aiUnavailable=false){
  const score=result.querySelector('.wc-score .num');
  const error=result.querySelector('.card.bad');
  if(!score){
@@ -115,13 +115,14 @@ function renderRealFeedback(doc,result,summary,original,textarea){
  original.hidden=true;original.open=false;
  summary.hidden=false;summary.replaceChildren();
  const allText=result.innerText||result.textContent||'';
- const offTopic=/Off-topic answer/i.test(allText);
- const partly=/Partly on-topic/i.test(allText);
+ const offTopic=aiReview?aiReview.relevance==='off_topic':/Off-topic answer/i.test(allText);
+ const partly=aiReview?aiReview.relevance==='partial':/Partly on-topic/i.test(allText);
  const nativeCorrected=nativeSection(result,/Corrected version|Grammar-only correction/i);
  const originalAnswer=textarea?.value?.trim()||'';
  const existing=previewFrom(nativeCorrected);
- const improved=polishWriting(existing||originalAnswer);
- const scoreLabel=(score.textContent||'').trim();
+ const improved=(aiReview?.corrected && typeof aiReview.corrected==='string')
+   ?aiReview.corrected:polishWriting(existing||originalAnswer);
+ const scoreLabel=aiReview?String(Math.max(0,Math.min(100,Number(aiReview.score)||0))):(score.textContent||'').trim();
  const mistakes=[...result.querySelectorAll('.mistake')].filter(n=>n.querySelector('.wrong,.right')).map(n=>({
     wrong:(n.querySelector('.wrong')?.textContent||'').trim(),
     right:(n.querySelector('.right')?.textContent||'').trim(),
@@ -143,16 +144,16 @@ function renderRealFeedback(doc,result,summary,original,textarea){
  const stats=add(doc,summary,'div','wc-simple-stats');
  const scoreBox=add(doc,stats,'div','wc-simple-score');
  add(doc,scoreBox,'strong','',scoreLabel+'/100');
- add(doc,scoreBox,'span','','Writing score · लेखाइको अंक');
+ add(doc,scoreBox,'span','',aiReview?'AI estimated score · एआई अनुमानित अंक':'Writing score · लेखाइको अंक');
  const info=add(doc,stats,'div','wc-simple-status');
  const topicStatus=offTopic?'⚠️ Off-topic · विषय मिलेन':partly?'⚠️ Partly on topic · आंशिक मिल्यो':'✓ Topic checked · विषय जाँचियो';
  add(doc,info,'strong','',topicStatus);
- add(doc,info,'small','',unique.length+' detected feedback item(s) · '+unique.length+' गल्ती/सुझाव');
+ add(doc,info,'small','',aiReview?'AI-powered review · एआई लेखन जाँच':aiPending?'AI reviewing… · एआई जाँच हुँदैछ':aiUnavailable?'Basic checker used · सामान्य जाँच':'Basic grammar review · सामान्य जाँच');
  if(offTopic)add(doc,info,'p','','Answer the assigned question before fixing grammar. · पहिले सोधिएको विषयमा लेख्नुहोस्।');
  const corrected=add(doc,summary,'section','wc-simple-card wc-simple-corrected');
- add(doc,corrected,'h3','','✓ Improved version · सुधारिएको उत्तर');
+ add(doc,corrected,'h3','',aiReview?'✓ AI corrected version · एआईले सुधारेको उत्तर':'✓ Improved version · सुधारिएको उत्तर');
  add(doc,corrected,'p','wc-simple-text',improved||'Your corrected paragraph was not available.');
- add(doc,corrected,'p','wc-simple-note','Automatic corrections can miss context-dependent errors. · स्वचालित सुधारमा केही गल्ती छुट्न सक्छन्।');
+ add(doc,corrected,'p','wc-simple-note',aiReview?'AI suggestions can still be inaccurate; compare with your own meaning. · एआईको सुझाव पनि जाँच्नुहोस्।':aiPending?'AI is checking the full paragraph. This is the basic result. · एआई जाँच हुँदैछ।':'Rule-based corrections can miss context-dependent errors. · स्वचालित सुधारमा गल्ती छुट्न सक्छ।');
  if(improved){
    const copy=add(doc,corrected,'button','wc-simple-copy','Copy corrected answer · उत्तर कपी गर्नुहोस्');
    copy.type='button';
@@ -172,7 +173,12 @@ function renderRealFeedback(doc,result,summary,original,textarea){
  const key=add(doc,summary,'section','wc-simple-card');
  add(doc,key,'h3','','Important fixes · मुख्य सुधारहरू');
  const tips=[];
- const example=(re,before,after,ne)=>{if(re.test(originalAnswer))tips.push({before,after,ne});};
+ if(aiReview && Array.isArray(aiReview.feedback)){
+  for(const item of aiReview.feedback.slice(0,3)){
+   if(item?.before&&item?.after)tips.push({before:String(item.before).slice(0,180),after:String(item.after).slice(0,180),ne:String(item.why_ne||'').slice(0,300)});
+  }
+ }
+ const example=(re,before,after,ne)=>{if(!aiReview&&re.test(originalAnswer))tips.push({before,after,ne});};
  example(/\bwe has\b/i,'we has','we have','“We” पछि “have” प्रयोग हुन्छ।');
  example(/\blast dashain[^.!?]*we goes\b/i,'we goes','we went','बितेको Dashain बारे past tense मा “went” लेख्नुहोस्।');
  example(/\bI (?:didnt|didn't) saw my grandparents\b/i,"didn't saw","hadn't seen",'नभेटेको अवधि बताउँदा “hadn’t seen” प्रयोग गर्नुहोस्।');
@@ -183,7 +189,7 @@ function renderRealFeedback(doc,result,summary,original,textarea){
  example(/\bI will goes?\b/i,'I will goes','I will go','“Will” पछि क्रियाको मूल रूप आउँछ।');
  example(/\bthis memory are\b/i,'this memory are','this memory is','एउटा सम्झनासँग “is” प्रयोग हुन्छ।');
  example(/\bI never wants\b/i,'I never wants','I never want','“I” पछि “want” हुन्छ।');
- if(!tips.length){
+ if(!tips.length&&!aiReview){
   for(const m of unique.filter(x=>!/(?:capitalization|\bminor\b)/i.test(x.category)&&!/^[a-z]$/i.test(x.wrong)).slice(0,3)){
    tips.push({before:m.wrong,after:m.right||'Review',ne:'सुधार गरेर वाक्य फेरि पढ्नुहोस्।'});
   }
@@ -198,8 +204,8 @@ function renderRealFeedback(doc,result,summary,original,textarea){
    add(doc,li,'small','',t.ne);
   }
  }else add(doc,key,'p','wc-simple-text','No specific grammar suggestions were returned.');
- add(doc,key,'p','wc-simple-tip','💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
- const model=getModelAnswer(result);
+ add(doc,key,'p','wc-simple-tip',aiReview?.tip_ne?'💡 '+String(aiReview.tip_ne).slice(0,450):'💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
+ const model=aiReview?.model_answer||getModelAnswer(result);
  if(model){
    const examples=add(doc,summary,'details','wc-simple-model');
    add(doc,examples,'summary','','See model answer · नमुना उत्तर हेर्नुहोस्');
@@ -295,9 +301,40 @@ window.enhanceWritingCoachDashboard=function(doc){
   const view=doc.defaultView;
   (view.requestAnimationFrame||((f)=>view.setTimeout(f,0)))(()=>{
    scheduled=false;
-   renderRealFeedback(doc,feedback,summaries,full,textarea);
+   const grade=feedback.querySelector('.wc-score .num');
+   const answer=textarea.value.trim();
+   const topicEn=(doc.getElementById('topicEn')?.textContent||'').trim();
+   const topicNe=(doc.getElementById('topicNe')?.textContent||'').trim();
+   const key=JSON.stringify([answer,topicEn,topicNe]);
+   if(onlineAI&&grade&&answer.length>=15&&topicEn&&key!==lastAIKey){
+      lastAIKey=key;aiPending=true;aiReview=null;aiUnavailable=false;
+      window.sikauWritingAI({answer,topicEn,topicNe})
+        .then(data=>{
+          if(lastAIKey!==key)return;
+          aiReview=data?.status==='ok'&&data?.review?data.review:null;
+          aiUnavailable=!aiReview;
+          aiPending=false;
+          renderRealFeedback(doc,feedback,summaries,full,textarea,aiReview,aiPending,aiUnavailable);
+        }).catch(()=>{
+          if(lastAIKey!==key)return;
+          aiPending=false;aiUnavailable=true;
+          renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,true);
+        });
+   }
+   renderRealFeedback(doc,feedback,summaries,full,textarea,aiReview,aiPending,aiUnavailable);
   });
  };
+ // AI is optional and disabled until the separate authenticated Appwrite
+ // Function has been deployed with a private provider key.
+ let lastAIKey='',aiReview=null,aiPending=false,aiUnavailable=false;
+ const onlineAI=typeof window.sikauWritingAI==='function' && window.sikauWritingAIConfigured===true;
+ if(onlineAI){
+  add(doc,editorPanel,'p','wc-ai-privacy','🤖 AI review sends your assignment and writing to Groq when you press Check my writing. Do not include private personal information. · एआई जाँचमा आफ्नो लेख र प्रश्न पठाइन्छ। व्यक्तिगत गोप्य जानकारी नलेख्नुहोस्।');
+ }
+ check.addEventListener('click',()=>{
+   // A new user-initiated check invalidates previous AI results, even for the same text.
+   lastAIKey='';aiReview=null;aiPending=false;aiUnavailable=false;
+ },{capture:true});
  const observer=new doc.defaultView.MutationObserver(update);
  observer.observe(feedback,{childList:true,subtree:true,characterData:true});
  update();
