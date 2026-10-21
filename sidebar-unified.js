@@ -57,7 +57,7 @@
    nav.classList.add('sikau-unified-sidebar');
    let saved=safeRead(win,STORAGE);
    let useLegacy=!Array.isArray(saved);
-   let suppressClick=false,drag=null,drop=null,frame=0,longPress=0;
+   let suppressClick=false,drag=null,touchDrag=null,drop=null,frame=0,longPress=0;
    const update=()=>{
      for(const b of tabs(nav)){
        b.classList.add('sikau-nav-unified');
@@ -79,7 +79,7 @@
      if(!info||!info.anchor)return;
      const visa=nav.querySelector(':scope > button.sikau-visa-nav');
      const target=tabs(nav).find(b=>id(b)===info.anchor);
-     if(visa&&target&&visa!==target)move(nav,visa,target,!!info.before);
+     if(visa&&target&&visa!==target&&move(nav,visa,target,!!info.before))persist();
    };
    const refresh=()=>{
      update();
@@ -101,69 +101,97 @@
      longPress=0;
      drop?.classList.remove('sikau-nav-drop-target');drop=null;
      drag?.button?.classList.remove('sikau-nav-dragging');
-     drag=null;
+     touchDrag?.button?.classList.remove('sikau-nav-dragging');
+     drag=null;touchDrag=null;
+   };
+   const highlight=(moving,x,y)=>{
+     moving.classList.add('sikau-nav-dragging');
+     const target=point(x,y);
+     if(drop!==target){
+       drop?.classList.remove('sikau-nav-drop-target');
+       drop=target===moving?null:target;
+       drop?.classList.add('sikau-nav-drop-target');
+     }
+   };
+   const applyDrop=(moving,x,y)=>{
+     const target=point(x,y);
+     if(target&&target!==moving){
+       const box=target.getBoundingClientRect();
+       const mobile=win.matchMedia?.('(max-width:767px)')?.matches;
+       const before=mobile?x<box.left+box.width/2:y<box.top+box.height/2;
+       if(move(nav,moving,target,before))persist();
+     }
+     suppressClick=true;
+     win.setTimeout(()=>{suppressClick=false;},450);
    };
    const start=e=>{
      const button=lookup(e);
      if(!button||e.button>0)return;
-     // All tab buttons use the same drag system, including Festivals/Visa.
-     // Suppress original native-sorter pointer handling without blocking click.
      e.stopImmediatePropagation();
+     if(e.pointerType==='touch')return; // Touch uses a deliberate long-press.
      clear();
-     drag={button,pointer:e.pointerId,x:e.clientX,y:e.clientY,active:e.pointerType!=='touch',moved:false};
-     if(e.pointerType==='touch'){
-       longPress=win.setTimeout(()=>{
-         if(!drag||drag.pointer!==e.pointerId)return;
-         drag.active=true;
-         if(win.navigator?.vibrate)try{win.navigator.vibrate(10);}catch(_){}
-       },320);
-     }
+     drag={button,pointer:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
    };
    const dragMove=e=>{
      if(!drag||drag.pointer!==e.pointerId)return;
-     const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
-     if(!drag.active){
-       // Short swipes still scroll the bottom navigation on mobile.
-       if(Math.hypot(dx,dy)>9)clear();
-       return;
-     }
-     if(!drag.moved&&Math.hypot(dx,dy)<9)return;
+     if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<9)return;
      drag.moved=true;
-     drag.button.classList.add('sikau-nav-dragging');
+     highlight(drag.button,e.clientX,e.clientY);
      if(e.cancelable)e.preventDefault();
-     const target=point(e.clientX,e.clientY);
-     if(drop!==target){
-       drop?.classList.remove('sikau-nav-drop-target');
-       drop=target!==drag.button?target:null;
-       drop?.classList.add('sikau-nav-drop-target');
-     }
    };
    const dragEnd=e=>{
      if(!drag||drag.pointer!==e.pointerId)return;
-     const state=drag;
-     if(state.moved){
-       suppressClick=true;
-       const target=point(e.clientX,e.clientY);
-       if(target&&target!==state.button){
-         const rect=target.getBoundingClientRect();
-         const mobile=win.matchMedia?.('(max-width:767px)')?.matches;
-         const before=mobile?e.clientX<rect.left+rect.width/2:e.clientY<rect.top+rect.height/2;
-         if(move(nav,state.button,target,before))persist();
-       }
-       win.setTimeout(()=>{suppressClick=false;},450);
+     if(drag.moved)applyDrop(drag.button,e.clientX,e.clientY);
+     clear();
+   };
+   // Touch: a quick tap opens the tab, a swipe scrolls, a hold then move reorders.
+   const touchStart=e=>{
+     const button=lookup(e);
+     if(!button)return;
+     e.stopImmediatePropagation();
+     clear();
+     const t=e.changedTouches?.[0];
+     if(!t)return;
+     touchDrag={button,id:t.identifier,x:t.clientX,y:t.clientY,active:false,moved:false};
+     longPress=win.setTimeout(()=>{
+       if(!touchDrag||touchDrag.id!==t.identifier)return;
+       touchDrag.active=true;
+     },320);
+   };
+   const touchMove=e=>{
+     if(!touchDrag)return;
+     const t=Array.from(e.touches||[]).find(p=>p.identifier===touchDrag.id);
+     if(!t)return;
+     const distance=Math.hypot(t.clientX-touchDrag.x,t.clientY-touchDrag.y);
+     if(!touchDrag.active){
+       if(distance>9)clear();
+       return;
+     }
+     if(distance<9&&!touchDrag.moved)return;
+     touchDrag.moved=true;
+     if(e.cancelable)e.preventDefault();
+     highlight(touchDrag.button,t.clientX,t.clientY);
+   };
+   const touchEnd=e=>{
+     if(!touchDrag)return;
+     const t=Array.from(e.changedTouches||[]).find(p=>p.identifier===touchDrag.id);
+     if(!t)return;
+     if(touchDrag.moved){
+       if(e.cancelable)e.preventDefault();
+       applyDrop(touchDrag.button,t.clientX,t.clientY);
      }
      clear();
    };
-   // Capture listeners stop the legacy sorter, not lesson routing or clicking.
+   // Legacy sorter uses mouse/touch down; intercept only those for tab items.
    nav.addEventListener('pointerdown',start,true);
    nav.addEventListener('mousedown',e=>{if(lookup(e))e.stopImmediatePropagation();},true);
-   nav.addEventListener('touchstart',e=>{if(lookup(e))e.stopImmediatePropagation();},{capture:true,passive:true});
+   nav.addEventListener('touchstart',touchStart,{capture:true,passive:true});
    doc.addEventListener('pointermove',dragMove,{capture:true,passive:false});
    doc.addEventListener('pointerup',dragEnd,true);
-   doc.addEventListener('pointercancel',clear,true);
-   doc.addEventListener('touchmove',e=>{
-     if(drag?.active&&drag?.moved&&e.cancelable)e.preventDefault();
-   },{capture:true,passive:false});
+   doc.addEventListener('pointercancel',()=>{drag?.button?.classList.remove('sikau-nav-dragging');drag=null;},true);
+   doc.addEventListener('touchmove',touchMove,{capture:true,passive:false});
+   doc.addEventListener('touchend',touchEnd,true);
+   doc.addEventListener('touchcancel',clear,true);
    nav.addEventListener('dragstart',e=>{
      if(lookup(e)){e.preventDefault();e.stopImmediatePropagation();}
    },true);
