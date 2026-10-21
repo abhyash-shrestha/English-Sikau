@@ -13,4 +13,4 @@ This feature is optional until its private backend exists. No secret belongs in 
 
 Free provider limits and Appwrite platform quotas still apply. No paid tier is required, but free access is not unlimited. Browser code retains the original local checker as fallback. Your private lesson authorization and XP/progress are untouched.
 
-The server requires a signed-in, email-verified account JWT validated using the Appwrite /account endpoint. Consider server-side per-account rate limiting with Appwrite TablesDB for larger public usage.
+The server requires a signed-in, email-verified account JWT validated using the Appwrite /account endpoint. It also verifies that the user has the permanent paid label or an active server-confirmed trial through the existing trial status function. If the entitlement check fails, it refuses the AI request. Consider server-side per-account rate limiting with Appwrite TablesDB for larger public usage.
