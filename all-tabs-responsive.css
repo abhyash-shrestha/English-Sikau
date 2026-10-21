@@ -276,3 +276,13 @@ html.sikau-refresh[data-sikau-theme="light"] .app-header .header-btns :is(option
   padding:6px 8px!important;
  }
 }
+
+
+/* Generic dark theme must not overwrite the original ink on cream badges.
+   The Progress tab's secure native stats keep their own dark surfaces. */
+html.sikau-refresh[data-sikau-theme="dark"] #pg #pgo #masteryInfo{
+ background:#3c3449!important;color:#f8efff!important;border-color:#796781!important;
+}
+html.sikau-refresh[data-sikau-theme="dark"] #pg #pgo .chips .pill{
+ background:#354158!important;color:#f5effc!important;border-color:#667994!important;
+}
