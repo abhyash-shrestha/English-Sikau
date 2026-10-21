@@ -1126,7 +1126,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
   </div>
 </div>
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
-<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified pilot progress · प्रमाणित अभ्यास प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>These pilot totals are separate from your original learning scores. · यी छुट्टै अभ्यास तथ्याङ्क हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
+<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js?v=20261021-dark-contrast-r1"></script>
 <script src="./coach-dashboard.js?v=20261021-visa-panels-gone-r3"></script>
@@ -1137,6 +1137,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./writing-coach-dashboard.js?v=20261021-ai-ready-r1"></script>
 <script src="./reading-dashboard.js?v=20261021-dark-contrast-r1"></script>
 <script src="./game-adventure.js?v=20261021-dark-contrast-r1"></script>
+<script src="./nepal-explorer.js?v=20261021-r1"></script>
 <script src="./progress-dashboard.js?v=20261021-dark-contrast-r1"></script>
 <script>
 'use strict';
@@ -2582,6 +2583,7 @@ function personalizeStudentLesson(){
   uiStep('writing coach',()=>window.enhanceWritingCoachDashboard?.(doc));
   uiStep('reading dashboard',()=>window.enhanceReadingDashboard?.(doc));
   uiStep('game adventure',()=>window.enhanceGameDashboard?.(doc));
+  uiStep('nepal explorer map',()=>window.enhanceNepalJourney?.(doc,user.$id));
   uiStep('progress dashboard',()=>window.enhanceProgressDashboard?.(doc));
   uiStep('beginner clarity',()=>enhanceBeginnerClarity(doc));
   uiStep('coach',()=>window.enhanceCoachDashboard?.(doc,first));
@@ -3109,7 +3111,7 @@ async function refreshCloudStoryProgress(){
   try{
     const p=await window.__englishSikauReadVerifiedProgress();
     if(!user||user.$id!==id||readNumber!==version||!openedAccess)return;
-    target.textContent='⭐ '+p.xp+' verified pilot XP  ·  🔥 '+p.streak+' UTC-day streak  ·  📚 '+p.chapters+' verified chapters  ·  🏆 '+p.mastery+' pilot mastery';
+    target.textContent='⭐ '+p.xp+' verified chapter XP  ·  🔥 '+p.streak+' UTC-day streak  ·  📚 '+p.chapters+' verified chapters  ·  🏆 '+p.mastery+' pilot mastery';
   }catch(err){
     if(user&&user.$id===id&&readNumber===version&&openedAccess)
       target.textContent='Cloud progress temporarily unavailable. Original app progress is unchanged.';
