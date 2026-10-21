@@ -387,3 +387,9 @@ html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-tip{background:#38
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li{border-color:#526078}
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li strong{color:#9ce8c8}
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-details,.wc-simple-model)>summary{color:#a7d3ff}
+
+/* Shown only when the optional authenticated AI review is switched on. */
+#hw.sikau-writing-v1 .wc-ai-privacy{font-size:11px;line-height:1.65;color:#667187;margin:12px 1px 2px;padding:10px 12px;border-radius:10px;background:#f4f6fb;border:1px solid #e4e8f0}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-ai-privacy{color:#e5e9f4;background:#303a50;border-color:#5c6a84}
+#hw.sikau-writing-v1 .wc-simple-fixes li small{flex-basis:100%;color:#647086;font-size:12px;line-height:1.5}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li small{color:#d6ddec}
