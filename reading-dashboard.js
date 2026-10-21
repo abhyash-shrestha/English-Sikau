@@ -51,18 +51,15 @@ function installClearNepaliActions(d){
          }
        }
      }
-     // Update instructions from older story versions that incorrectly say "flag".
+     // Clear only the obsolete translation tips injected by earlier UI versions.
+     // The bilingual "See Nepali" button now explains its own purpose.
+     root.querySelectorAll('.sikau-translation-hint,.sikau-nepali-help').forEach(hint=>hint.remove());
      for(const hint of root.querySelectorAll('p,small,.course-small')){
        const text=(hint.textContent||'').trim();
-       if(text.length<180&&/^Tap the flag next to a sentence to see Nepali/i.test(text))
-         hint.textContent='Tap “See Nepali” beside a sentence to read its meaning. · नेपाली अर्थ हेर्न “See Nepali” थिच्नुहोस्।';
-     }
-     const lines=root.querySelector('#storyReader .story-lines');
-     if(lines&&lines.parentElement&&!lines.parentElement.querySelector('.sikau-nepali-help')){
-       const note=d.createElement('p');
-       note.className='sikau-nepali-help';
-       note.textContent='Tap “See Nepali” to read the Nepali meaning. · नेपाली अर्थ हेर्न “See Nepali” थिच्नुहोस्।';
-       lines.parentElement.insertBefore(note,lines);
+       if(text.length<220&&(
+          /^(?:🇳🇵\s*)?Tap the flag next to a sentence to see Nepali/i.test(text)||
+          /^Tap [“"]See Nepali[”"] (?:beside a sentence|to read the Nepali meaning)/i.test(text)
+       ))hint.remove();
      }
    }
  }
