@@ -110,3 +110,19 @@ html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-panel-title{border-colo
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-date{
   background:#35283e;color:#ffe4ef;border-color:#6f4e65;
 }
+
+
+/* Dark-theme legibility: the illustrated festival hero was kept pastel while
+   the old theme forced white headings onto it. Give its copy a dark surface. */
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-hero{
+ background:linear-gradient(106deg,#252840 0%,#332b4b 50%,#624564 76%,#f1cde1 100%)!important;
+ border:1px solid #655775!important;
+}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-hero h1{color:#fff5fa!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-hero h1 span{color:#ffb6d8!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-hero .sfd-eyebrow{color:#ffbdd8!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-hero p{color:#f0e9f8!important;opacity:1!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-main-head h3 span,
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-card-title span{color:#ff9dc9!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-panel b,
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-study h4{color:#ffc0d9!important}
