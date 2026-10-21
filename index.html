@@ -782,8 +782,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   box-shadow:inset 0 1px 0 #ffffff12}
 #protected .student-welcome-avatar{font-size:24px;line-height:1}
 #protected .student-welcome-copy{display:flex;min-width:0;flex-direction:column;gap:2px}
-#protected #studentTopGreeting{font-size:clamp(13px,1.3vw,17px);line-height:1.15;color:#fff7ec;font-weight:900;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#protected #studentTopGreeting{font-size:clamp(13px,1.3vw,17px);line-height:1.3;color:#fff7ec;font-weight:900;
+  white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
 #protected #studentTopNepali{font-size:12px;color:#f8d3e2;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
 #protected .student-access-tag{font-weight:850;white-space:nowrap;border-radius:999px;padding:6px 11px;
   border:1px solid #fff5;background:#ffe5ad22;color:#ffdfa6;font-size:11px}
@@ -1115,8 +1115,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
     <div><strong>English <em>Sikau</em></strong><small>अंग्रेजी सिकौं · Learn · Speak · Grow</small></div>
   </div>
   <div class="student-topbar-welcome" role="status" aria-live="polite">
-    <span class="student-welcome-avatar" aria-hidden="true">👋</span>
-    <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back!</strong><span id="studentTopNepali" lang="ne">नमस्ते 🙏</span></div>
+    <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back 👋 नमस्ते 🙏</strong></div>
     <span id="sessionNote" class="student-access-tag"></span>
   </div>
   <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
@@ -1625,9 +1624,8 @@ function studentFirstName(){
 function updateStudentWelcome(){
   if(!openedAccess||!user)return;
   const first=studentFirstName();
-  const en=$('studentTopGreeting'),ne=$('studentTopNepali');
-  if(en)en.textContent='Welcome back, '+first+'! 👋';
-  if(ne)ne.textContent='नमस्ते, '+first+' 🙏';
+  const greeting=$('studentTopGreeting');
+  if(greeting)greeting.textContent='Welcome back 👋 नमस्ते, '+first+' 🙏';
   const ref=$('studentMembershipReference');
   if(ref)ref.textContent='Membership ✅ Lifetime · Account reference: '+accountReference(user)+' · सदस्यता पुष्टि';
 }
