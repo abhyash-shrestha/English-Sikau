@@ -2312,87 +2312,88 @@ function sikauImproveLessonControls(doc){
 /* The Visa tab intentionally has no native data-t: route it separately while
    letting students drag it among native tabs and keep their custom order. */
 function sikauEnableVisaTabReordering(doc,nav){
- const visa=nav?.querySelector('button.sikau-visa-nav');
- if(!visa||visa.parentElement!==nav||nav.dataset.sikauVisaSortable==='1')return;
- nav.dataset.sikauVisaSortable='1';
- const key='english-sikau-visa-tab-order-v1';
- const tabs=()=>Array.from(nav.children).filter(b=>
-   b.matches?.('button[data-t],button.sikau-visa-nav,button.sikau-home-nav')&&
-   !b.classList.contains('nav-more')&&b.dataset.t!=='more');
- const id=b=>b.classList.contains('sikau-visa-nav')?'us-visa-interview':
-   b.classList.contains('sikau-home-nav')?'nepali-festivals':b.dataset.t||'';
- const load=()=>{try{const v=JSON.parse(window.localStorage.getItem(key)||'null');return Array.isArray(v)?v:null;}catch(_){return null;}};
- const save=()=>{try{window.localStorage.setItem(key,JSON.stringify(tabs().map(id)));}catch(_){}};
- const old=load();
- if(old?.includes('us-visa-interview')){
-   const current=tabs(),keys=new Map(current.map(b=>[id(b),b]));
-   const ordered=old.map(k=>keys.get(k)).filter(Boolean);
-   for(const b of current)if(!ordered.includes(b))ordered.push(b);
-   if(ordered.length===current.length&&ordered.some((b,i)=>b!==current[i])){
-     const after=current.at(-1).nextSibling;
-     for(const b of ordered)nav.insertBefore(b,after);
-   }
+ const existing=Array.from(nav.querySelectorAll(':scope > button.sikau-visa-nav'));
+ let visa=nav.__sikauVisaOriginal;
+ if(visa?.parentElement!==nav&&existing.length)existing[0].replaceWith(visa);
+ if(!visa||visa.parentElement!==nav)visa=nav.querySelector(':scope > button.sikau-visa-nav');
+ if(!visa)return;
+ nav.__sikauVisaOriginal=visa;
+ for(const extra of nav.querySelectorAll(':scope > button.sikau-visa-nav'))
+  if(extra!==visa)extra.remove();
+ if(nav.dataset.sikauVisaPointerV2)return;
+ nav.dataset.sikauVisaPointerV2='1';
+ const storage='english-sikau-visa-placement-v2';
+ try{localStorage.removeItem('english-sikau-visa-tab-order-v1')}catch(_){}
+ const tabs=()=>Array.from(nav.children).filter(b=>b.matches?.('button[data-t],button.sikau-home-nav,button.sikau-visa-nav')&&!b.matches('.nav-more')&&b.dataset.t!=='more');
+ const id=b=>b?.matches('.sikau-home-nav')?'nepali-festivals':b?.matches('.sikau-visa-nav')?'us-visa-interview':b?.dataset.t;
+ function put(target,before,save){
+  if(!target||target===visa||target.parentElement!==nav)return;
+  nav.insertBefore(visa,before?target:target.nextSibling);
+  if(save)try{localStorage.setItem(storage,JSON.stringify({anchor:id(target),before}))}catch(_){}
  }
- const locate=event=>{
-   const b=event.target?.closest?.('button[data-t],button.sikau-visa-nav,button.sikau-home-nav');
-   return b?.parentElement===nav&&tabs().includes(b)?b:null;
+ try{
+  const data=JSON.parse(localStorage.getItem(storage)||'null');
+  const target=tabs().find(b=>id(b)===data?.anchor);
+  if(target)put(target,!!data.before,false);
+ }catch(_){}
+ const find=(x,y)=>{
+  const b=doc.elementFromPoint(x,y)?.closest?.('button[data-t],button.sikau-home-nav,button.sikau-visa-nav');
+  return b?.parentElement===nav&&tabs().includes(b)?b:null;
  };
- let source=null;
- const move=(a,b,before)=>{
-   if(!a||!b||a===b||a.parentElement!==nav||b.parentElement!==nav)return;
-   nav.insertBefore(a,before?b:b.nextSibling);save();
+ let gesture=null,hover=null,skipClick=false;
+ const clear=()=>{
+  hover?.classList.remove('sikau-visa-drop');hover=null;
+  visa.classList.remove('sikau-visa-dragging');gesture=null;
  };
- visa.draggable=true;
- visa.title='Drag to move · तानेर स्थान बदल्नुहोस्';
+ visa.draggable=false;visa.removeAttribute('draggable');
  visa.setAttribute('aria-keyshortcuts','Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
- nav.addEventListener('dragstart',e=>{
-   source=locate(e);
-   if(source===visa&&e.dataTransfer){
-     e.dataTransfer.effectAllowed='move';
-     try{e.dataTransfer.setData('text/plain','english-sikau-visa-nav')}catch(_){}
+ nav.addEventListener('pointerdown',e=>{
+  if(e.button>0||!e.target?.closest?.('button.sikau-visa-nav'))return;
+  e.stopImmediatePropagation();
+  gesture={pointer:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+ },true);
+ doc.addEventListener('pointermove',e=>{
+  if(!gesture||e.pointerId!==gesture.pointer)return;
+  if(!gesture.moved&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<9)return;
+  gesture.moved=true;visa.classList.add('sikau-visa-dragging');
+  if(e.cancelable)e.preventDefault();
+  const target=find(e.clientX,e.clientY);
+  if(target!==hover){hover?.classList.remove('sikau-visa-drop');hover=target===visa?null:target;hover?.classList.add('sikau-visa-drop');}
+ },{passive:false});
+ doc.addEventListener('pointerup',e=>{
+  if(!gesture||e.pointerId!==gesture.pointer)return;
+  if(gesture.moved){
+   skipClick=true;
+   const target=find(e.clientX,e.clientY);
+   if(target&&target!==visa){
+    const r=target.getBoundingClientRect(),mobile=doc.defaultView?.matchMedia('(max-width:767px)')?.matches;
+    put(target,mobile?e.clientX<r.left+r.width/2:e.clientY<r.top+r.height/2,true);
    }
+   doc.defaultView?.setTimeout(()=>skipClick=false,300);
+  }
+  clear();
  },true);
- nav.addEventListener('dragover',e=>{
-   const target=locate(e);
-   if(!source||!target||(source!==visa&&target!==visa))return;
-   e.preventDefault();e.stopImmediatePropagation();
-   if(e.dataTransfer)e.dataTransfer.dropEffect='move';
- },true);
- nav.addEventListener('drop',e=>{
-   const target=locate(e);
-   if(!source||!target||(source!==visa&&target!==visa))return;
-   e.preventDefault();e.stopImmediatePropagation();
-   const r=target.getBoundingClientRect();
-   const mobile=doc.defaultView?.matchMedia?.('(max-width:767px)')?.matches;
-   const before=mobile?e.clientX<r.left+r.width/2:e.clientY<r.top+r.height/2;
-   move(source,target,before);source=null;
- },true);
- nav.addEventListener('dragend',()=>{
-   source=null;
-   if(load())doc.defaultView?.setTimeout?.(save,120);
- },true);
+ doc.addEventListener('pointercancel',clear,true);
+ nav.addEventListener('click',e=>{if(skipClick){skipClick=false;e.preventDefault();e.stopImmediatePropagation()}},true);
+ visa.addEventListener('dragstart',e=>{e.preventDefault();e.stopImmediatePropagation()},true);
  visa.addEventListener('keydown',e=>{
-   if(!e.altKey||!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
-   const list=tabs(),idx=list.indexOf(visa);
-   const dir=['ArrowUp','ArrowLeft'].includes(e.key)?-1:1;
-   if(!list[idx+dir])return;
-   e.preventDefault();move(visa,list[idx+dir],dir<0);visa.focus({preventScroll:true});
+  if(!e.altKey||!/^Arrow(Up|Down|Left|Right)$/.test(e.key))return;
+  const list=tabs(),direction=/Up|Left/.test(e.key)?-1:1,target=list[list.indexOf(visa)+direction];
+  if(target){e.preventDefault();put(target,direction<0,true);visa.focus()}
  });
- nav.addEventListener('click',e=>{
-   const b=e.target?.closest?.('button,a,[role="button"]');
-   if(!b||!/^Reset order\b/i.test((b.textContent||'').trim()))return;
-   try{window.localStorage.removeItem(key)}catch(_){}
- },true);
- // Continue respecting the native reorder when the learner has set Visa's place.
- nav.addEventListener('pointerup',()=>{
-   if(load())doc.defaultView?.setTimeout?.(save,150);
+ doc.addEventListener('click',e=>{
+  const b=e.target?.closest?.('button,a,[role="button"]');
+  if(!b||!/^Reset order\b/i.test((b.textContent||'').trim()))return;
+  try{localStorage.removeItem(storage)}catch(_){}
+  doc.defaultView?.setTimeout(()=>put(nav.querySelector('button[data-t="coach"]'),false,false),80);
  },true);
  if(!doc.getElementById('sikauVisaSortableStyle')){
-   const style=doc.createElement('style');style.id='sikauVisaSortableStyle';
-   style.textContent='#mobileModes.nav button.sikau-visa-nav{cursor:grab!important}#mobileModes.nav button.sikau-visa-nav:active{cursor:grabbing!important}';
-   doc.head.appendChild(style);
+  const style=doc.createElement('style');style.id='sikauVisaSortableStyle';
+  style.textContent='#mobileModes.nav button.sikau-visa-nav{cursor:grab!important;touch-action:none!important}#mobileModes.nav .sikau-visa-drop{outline:2px dashed #d62474!important}';
+  doc.head.append(style);
  }
 }
+
 function sikauPolishStudentNavigation(doc){
  const nav=doc?.querySelector('#mobileModes.nav')||doc?.querySelector('.nav');
  if(!nav||!doc.head)return;
