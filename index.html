@@ -1122,6 +1122,38 @@ const SIKAU_THEME_STORAGE='english-sikau-theme-v1';
 let sikauTheme=document.documentElement.getAttribute('data-sikau-theme')==='dark'?'dark':'light';
 const sikauLessonDarkCSS=String.raw`
 /* Dark palette for protected English Sikau lesson HTML (srcdoc iframe). */
+
+/* Personal classroom label is a dynamically renamed chip, not a button.
+   In the private lesson's legacy light header it still inherits white text,
+   which made “Abhyash · मेरो कक्षा” invisible against the pale toolbar. */
+html[data-sikau-theme="light"] .app-header .sikau-personal-classroom,
+html[data-theme="light"] .app-header .sikau-personal-classroom{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:#1f3151!important;
+  -webkit-text-fill-color:#1f3151!important;
+  background:#ffffff!important;
+  border:1px solid #b8c9df!important;
+  border-radius:11px!important;
+  padding:7px 11px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  min-height:36px!important;
+  opacity:1!important;
+  visibility:visible!important;
+  text-shadow:none!important;
+  box-shadow:0 2px 7px #172b4820!important;
+}
+html[data-sikau-theme="light"] .app-header .sikau-personal-classroom :is(span,small,strong,b,i,em),
+html[data-theme="light"] .app-header .sikau-personal-classroom :is(span,small,strong,b,i,em){
+  color:inherit!important;
+  -webkit-text-fill-color:inherit!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Leave the existing dark-mode chip unchanged. */
+
 html[data-sikau-theme="dark"]{
  color-scheme:dark;
  --bg:#121827;--bg-2:#1b2134;--card:#22283a;--card-2:#242b3e;
