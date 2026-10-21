@@ -3,7 +3,7 @@
    trial, score, payment or Appwrite functionality is modified here. */
 (function(){
 'use strict';
-var stylesheetUrl = new URL('festival-dashboard-preview.css?v=20261021-festival-date-layout-r1', document.baseURI).href;
+var stylesheetUrl = new URL('festival-dashboard-preview.css?v=20261021-dark-contrast-r1', document.baseURI).href;
 function el(doc,tag,cls,value){
   var node=doc.createElement(tag);
   if(cls)node.className=cls;
