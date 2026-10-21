@@ -3,7 +3,7 @@
    translation providers, OCR, scoring, and native event handlers remain intact. */
 (function(){
 'use strict';
-const CSS_URL=new URL('./translate-studio-v4.css?v=20261020-two-directions-r1',document.baseURI).href;
+const CSS_URL=new URL('./translate-studio-v4.css?v=20261021-mobile-upload-r1',document.baseURI).href;
 const samples=[
  ['👋','Hello!','नमस्ते!','ttx-rose'],
  ['📍','I am going to Pokhara.','म पोखरा जाँदै छु।','ttx-blue'],
@@ -248,7 +248,9 @@ window.enhanceTranslationDashboard=function(d){
  const nativeCount=put(d,tools,'span','ttx-character-count','0 / 500');
  const speech=put(d,tools,'button','ttx-mini ttx-mic','🎙️ Speak');
  const camera=put(d,tools,'button','ttx-mini ttx-camera','📸 Camera');
- const upload=put(d,tools,'button','ttx-mini ttx-upload','⬆ Upload');
+ const upload=put(d,tools,'button','ttx-mini ttx-upload','Upload');
+ upload.title='Upload an image · फोटो अपलोड गर्नुहोस्';
+ upload.setAttribute('aria-label','Upload an image · फोटो अपलोड गर्नुहोस्');
  const writing=put(d,tools,'button','ttx-mini ttx-writing','✏️ Write');
  [speech,camera,upload,writing].forEach(b=>b.type='button');
  function showCamera(openUpload){
