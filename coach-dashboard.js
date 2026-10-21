@@ -529,9 +529,43 @@ function hideRedundantCoachCultureLab(doc){
  }
  return nodes.size;
 }
+/* Hide only the retired native Coach adventure picker shown beneath the
+ * real-life practice section. Original scoring, conversations, and other
+ * lessons remain untouched. This is repeated safely after native rerenders. */
+function hideRedundantCoachAdventurePanel(doc){
+ if(!doc?.body)return 0;
+ const oldHero=doc.querySelector('.coach-top');
+ const coachRoot=doc.querySelector('#coach')||doc.querySelector('#coachRoot')||
+   oldHero?.closest?.('.page,section[data-page],section[id]')||
+   oldHero?.parentElement?.parentElement;
+ if(!coachRoot)return 0;
+ let hidden=0;
+ for(const heading of coachRoot.querySelectorAll('h1,h2,h3,h4,h5,strong')){
+  if(!/Choose your learning adventure/i.test((heading.textContent||'').trim()))continue;
+  let panel=heading.parentElement;
+  while(panel&&panel!==coachRoot&&panel!==doc.body){
+   const copy=panel.textContent||'';
+   if(copy.includes('Mistake Garden')&&copy.includes('Your English Life')){
+    // The first matching ancestor must be the small, self-contained picker.
+    // Never hide the main Coach container or its new practice sections.
+    if(copy.length>2500||panel.contains(oldHero)||
+       panel.querySelector('#sikauCoachConversations'))break;
+    panel.hidden=true;
+    panel.style?.setProperty?.('display','none','important');
+    panel.setAttribute('aria-hidden','true');
+    panel.setAttribute('data-sikau-retired-adventure-hidden','true');
+    hidden++;
+    break;
+   }
+   panel=panel.parentElement;
+  }
+ }
+ return hidden;
+}
 window.enhanceCoachDashboard=function(doc){
  if(!doc?.body||!doc.head)return;
  hideRedundantCoachCultureLab(doc);
+ hideRedundantCoachAdventurePanel(doc);
  const oldHero=doc.querySelector('.coach-top'),ask=doc.querySelector('.coach-ask');
  if(!oldHero||!ask||!oldHero.parentElement)return;
  const previous=doc.getElementById('sikauCoachConversations');
@@ -799,5 +833,6 @@ window.enhanceCoachDashboard=function(doc){
  const visaController=enhanceVisaInterviewCoach(doc,shell,ask);
  installVisaSidebar(doc,shell,visaController);
  hideRedundantCoachCultureLab(doc);
+ hideRedundantCoachAdventurePanel(doc);
 };
 })();
