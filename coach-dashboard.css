@@ -706,7 +706,7 @@ html.sikau-home-active .nav button.sikau-visa-nav.on{
  }
  #coach .sikau-visa-learner{
    grid-column:2;grid-row:4;align-self:start;min-width:0;
-   position:sticky;top:12px;
+   position:static;top:auto;
  }
  #coach .sikau-visa-official{grid-row:5;margin:0!important}
  #coach .sikau-visa-question-list{
@@ -749,3 +749,15 @@ html.sikau-home-active .nav button.sikau-visa-nav.on{
 #coach .sikau-convo-stage,
 #coach .sikau-visa-browser,
 #coach .sikau-visa-learner{max-width:100%;min-width:0}
+
+/* Visa question answering must scroll naturally with the page.
+   Keep it in the desktop grid row so following official-information cards
+   begin below BOTH columns; prevent overlap at every viewport width. */
+html.sikau-refresh #coach .sikau-visa-main > .sikau-visa-learner{
+ position:static!important;
+ top:auto!important;
+ bottom:auto!important;
+ align-self:start!important;
+ max-height:none!important;
+ overflow:visible!important;
+}
