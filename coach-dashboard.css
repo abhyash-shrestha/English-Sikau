@@ -644,3 +644,108 @@ html.sikau-home-active .nav button.sikau-visa-nav.on{
  gap:3px!important;
  width:100%;
 }
+
+
+/* 2026-10-20: Expand Coach and Visa into the available desktop workspace.
+   Previously the legacy Coach grid confined the new module to its first half.
+   Override only the authenticated Coach page; other lesson tabs stay unchanged. */
+@media (min-width:800px) {
+ html.sikau-refresh #coach .content:has(.sikau-convo-board) {
+   display:block!important;
+   width:100%!important;
+   max-width:1600px!important;
+   min-width:0!important;
+   margin-inline:auto!important;
+ }
+ html.sikau-refresh #coach #coachRoot:has(.sikau-convo-board),
+ html.sikau-refresh #coach .sikau-convo-board {
+   display:block!important;
+   grid-template-columns:none!important;
+   grid-column:1/-1!important;
+   width:100%!important;
+   max-width:none!important;
+   min-width:0!important;
+ }
+ html.sikau-refresh #coach .sikau-convo,
+ html.sikau-refresh #coach .sikau-convo-everyday,
+ html.sikau-refresh #coach .sikau-visa-hub,
+ html.sikau-refresh #coach .sikau-visa-main {
+   box-sizing:border-box!important;
+   width:100%!important;
+   max-width:none!important;
+   min-width:0!important;
+   margin-left:0!important;
+   margin-right:0!important;
+ }
+ html.sikau-refresh #coach .sikau-convo-hero,
+ html.sikau-refresh #coach .sikau-visa-hero {
+   width:100%!important;
+ }
+}
+/* Container queries respond to usable lesson width, not the browser width:
+   the desktop sidebar consumes space, but phone layouts remain unchanged. */
+#coach .sikau-convo{container-type:inline-size}
+#coach .sikau-visa-main>*{min-width:0}
+@container (min-width:1000px) {
+ #coach .sikau-visa-main {
+   display:grid;
+   grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);
+   column-gap:18px;
+   row-gap:15px;
+   align-items:start;
+ }
+ #coach .sikau-visa-hero,
+ #coach .sikau-visa-caution,
+ #coach .sikau-visa-categories,
+ #coach .sikau-visa-official {grid-column:1/-1}
+ #coach .sikau-visa-hero{grid-row:1}
+ #coach .sikau-visa-caution{grid-row:2;margin:0!important}
+ #coach .sikau-visa-categories{grid-row:3;margin:0!important}
+ #coach .sikau-visa-browser{
+   grid-column:1;grid-row:4;margin:0!important;min-width:0;
+ }
+ #coach .sikau-visa-learner{
+   grid-column:2;grid-row:4;align-self:start;min-width:0;
+   position:sticky;top:12px;
+ }
+ #coach .sikau-visa-official{grid-row:5;margin:0!important}
+ #coach .sikau-visa-question-list{
+   grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ #coach .sikau-convo-cards{
+   grid-template-columns:repeat(4,minmax(0,1fr));
+ }
+}
+@container (min-width:1350px){
+ #coach .sikau-visa-categories{
+   grid-template-columns:repeat(6,minmax(0,1fr));
+ }
+ #coach .sikau-visa-category{
+   flex-direction:column;
+   align-items:flex-start;
+   gap:9px;
+ }
+ #coach .sikau-visa-question-list{
+   grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ #coach .sikau-convo-cards{
+   grid-template-columns:repeat(5,minmax(0,1fr));
+ }
+}
+@media (min-width:800px) and (max-width:1199px){
+ /* Keep wider tablets in one readable column, not two cramped panels. */
+ #coach .sikau-visa-categories{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:799px){
+ #coach .sikau-convo{container-type:normal}
+ #coach .sikau-visa-main{display:block}
+ #coach .sikau-visa-learner{position:static}
+}
+/* Fluid cards with legible line breaks across wide laptop/desktop layouts. */
+#coach .sikau-convo-situation,
+#coach .sikau-visa-category,
+#coach .sikau-visa-question-choice{min-width:0;overflow-wrap:break-word}
+#coach .sikau-convo-browser,
+#coach .sikau-convo-stage,
+#coach .sikau-visa-browser,
+#coach .sikau-visa-learner{max-width:100%;min-width:0}
