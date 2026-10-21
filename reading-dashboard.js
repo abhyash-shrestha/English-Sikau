@@ -1,9 +1,89 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261020-story-np-label-r3',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261021-readable-nepali-r4',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
+
+/* English Sikau bilingual translation controls.
+   Native Nepali flags show as a flag on Apple but can render as "NP" on Windows.
+   Preserve the native button, its original text and its original click handler. */
+const enhancedTranslationDocs=new WeakSet();
+function installClearNepaliActions(d){
+ if(!d?.body||enhancedTranslationDocs.has(d))return;
+ enhancedTranslationDocs.add(d);
+ const accessible='See Nepali · नेपाली हेर्नुहोस्';
+ const priorLabels=new WeakMap();
+ function nativeLabel(control){
+   return String(control.matches('input')?control.value:(control.textContent||''))
+     .replace(/[\u200B-\u200D\uFE0E\uFE0F]/g,'').replace(/\s+/g,' ').trim();
+ }
+ function isNepaliControl(control){
+   const label=nativeLabel(control);
+   // Do not replace English/audio actions or a sentence's own text.
+   if(/^(?:NP|🇳🇵|नेपाली|Nepali|Click Garnus नेपालीमा)$/i.test(label))return true;
+   if(control.matches('input')&&label===accessible)return true;
+   const hint=(control.getAttribute('aria-label')||'')+' '+(control.getAttribute('title')||'');
+   return !label && /(?:nepali|नेपाली)/i.test(hint) &&
+     !!control.closest('.story-line,.reader-line,.reading-line,.practice-line');
+ }
+ function update(){
+   for(const root of [d.getElementById('rd'),d.getElementById('learn')]){
+     if(!root)continue;
+     for(const control of root.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"],a[onclick]')){
+       const native=isNepaliControl(control);
+       if(native){
+         if(!priorLabels.has(control))priorLabels.set(control,{
+           aria:control.getAttribute('aria-label'),title:control.getAttribute('title')
+         });
+         if(!control.classList.contains('sikau-see-nepali'))control.classList.add('sikau-see-nepali');
+         if(control.getAttribute('aria-label')!==accessible)control.setAttribute('aria-label',accessible);
+         if(control.getAttribute('title')!==accessible)control.setAttribute('title',accessible);
+         // Generated CSS text does not render on replaced input elements.
+         if(control.matches('input')&&control.value!==accessible)control.value=accessible;
+       }else if(control.classList.contains('sikau-see-nepali')){
+         control.classList.remove('sikau-see-nepali');
+         const prior=priorLabels.get(control);
+         if(prior){
+           if(prior.aria==null)control.removeAttribute('aria-label');
+           else control.setAttribute('aria-label',prior.aria);
+           if(prior.title==null)control.removeAttribute('title');
+           else control.setAttribute('title',prior.title);
+         }
+       }
+     }
+     // Update instructions from older story versions that incorrectly say "flag".
+     for(const hint of root.querySelectorAll('p,small,.course-small')){
+       const text=(hint.textContent||'').trim();
+       if(text.length<180&&/^Tap the flag next to a sentence to see Nepali/i.test(text))
+         hint.textContent='Tap “See Nepali” beside a sentence to read its meaning. · नेपाली अर्थ हेर्न “See Nepali” थिच्नुहोस्।';
+     }
+     const lines=root.querySelector('#storyReader .story-lines');
+     if(lines&&lines.parentElement&&!lines.parentElement.querySelector('.sikau-nepali-help')){
+       const note=d.createElement('p');
+       note.className='sikau-nepali-help';
+       note.textContent='Tap “See Nepali” to read the Nepali meaning. · नेपाली अर्थ हेर्न “See Nepali” थिच्नुहोस्।';
+       lines.parentElement.insertBefore(note,lines);
+     }
+   }
+ }
+ let pending=false;
+ const schedule=()=>{
+   if(pending)return;
+   pending=true;
+   const view=d.defaultView;
+   const render=()=>{pending=false;update();};
+   if(typeof view?.requestAnimationFrame==='function')view.requestAnimationFrame(render);
+   else render();
+ };
+ if(typeof d.defaultView?.MutationObserver==='function'){
+   const observer=new d.defaultView.MutationObserver(schedule);
+   observer.observe(d.body,{childList:true,subtree:true,characterData:true});
+ }
+ update();
+}
+
 window.enhanceReadingDashboard=function(d){
+ installClearNepaliActions(d);
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
  if(!rd||!content||!mode||!box)return;
  if(!d.getElementById('sikauReadStyle')){const link=mk(d,'link');link.id='sikauReadStyle';link.rel='stylesheet';link.href=url;d.head.append(link);}
@@ -23,87 +103,10 @@ window.enhanceReadingDashboard=function(d){
    }
  }
 
- // NP means "show the Nepali version" in both Story and Practice modes.
- // Only enhance the native interactive control; never alter its underlying text,
- // innerHTML, onclick handler, chapter state, or language-toggle logic.
- const npRootsObserved=new WeakSet();
- function explainNepaliButtons(){
-   const roots=[d.getElementById('rd'),d.getElementById('learn')].filter(Boolean);
-   const label='Click Garnus नेपालीमा';
-   const accessibleLabel='Click Garnus नेपालीमा · नेपाली अनुवाद हेर्न थिच्नुहोस्';
-
-   // The Story renderer can use a different control shape from Practice.
-   // Read the native label without counting our own additional caption.
-   function originalActionLabel(control){
-     if(control.matches('input'))return String(control.value||'').trim();
-     const extra=control.querySelector('.sikau-story-np-caption');
-     const raw=Array.from(control.childNodes).filter(node=>node!==extra).map(node=>node.textContent||'').join('');
-     return raw.replace(/\s+/g,' ').trim();
-   }
-   function isNepaliAction(control){
-     const original=originalActionLabel(control);
-     return /^(?:🇳🇵\s*)?NP(?:\s*🇳🇵)?$/i.test(original)||
-       (/^NP[\s·:-]/i.test(original)&&original.length<42&&/nepali|नेपाली/i.test(original))||
-       (/^(?:show\s+)?nepali(?:\s+translation)?$/i.test(original));
-   }
-   function decorateStory(root){
-     const reader=root.querySelector('#storyReader');
-     if(!reader)return;
-     for(const line of reader.querySelectorAll('.story-line')){
-       const controls=Array.from(line.querySelectorAll('button,[role="button"],[onclick],a[href],input[type="button"]'));
-       // Only style a short existing Nepali action, not the story's speaker/audio.
-       for(const control of controls){
-         if(control.classList.contains('speaker')||/speaker|listen|audio/i.test(control.getAttribute('aria-label')||''))continue;
-         if(!isNepaliAction(control))continue;
-         if(control.matches('input')){control.value='Click Garnus नेपालीमा';control.setAttribute('aria-label',accessibleLabel);control.classList.add('sikau-story-nepali-action');continue;}
-         if(!control.classList.contains('sikau-story-nepali-action'))control.classList.add('sikau-story-nepali-action');
-         control.setAttribute('aria-label',accessibleLabel);
-         control.setAttribute('title',accessibleLabel);
-         if(!control.querySelector('.sikau-story-np-caption')){
-           const caption=d.createElement('span');
-           caption.className='sikau-story-np-caption';
-           caption.textContent=label;
-           caption.setAttribute('aria-hidden','true');
-           control.appendChild(caption); // Never replaces the native clickable control or listeners.
-         }
-       }
-     }
-   }
-   function update(root){
-     const buttons=root.querySelectorAll('button,[role="button"]');
-     for(const button of buttons){
-       // A short "NP" control is the original app's Nepali-language action.
-       const current=originalActionLabel(button);
-       const isNP=/^(?:🇳🇵\s*)?NP$/i.test(current);
-       if(isNP){
-         if(!button.classList.contains('sikau-np-action'))button.classList.add('sikau-np-action');
-         if(button.getAttribute('aria-label')!==accessibleLabel)button.setAttribute('aria-label',accessibleLabel);
-         if(button.title!==accessibleLabel)button.title=accessibleLabel;
-       }else if(button.classList.contains('sikau-np-action')){
-         // If the lesson switches to English or a different action, do not mask it.
-         button.classList.remove('sikau-np-action');
-         if(button.getAttribute('aria-label')===accessibleLabel)button.removeAttribute('aria-label');
-         if(button.title===accessibleLabel)button.removeAttribute('title');
-       }
-     }
-     if(root.id==='rd')decorateStory(root);
-   }
-   for(const root of roots){
-     if(!npRootsObserved.has(root)){
-       npRootsObserved.add(root);
-       // Story chapters, practice questions and view switches redraw nested nodes.
-       // React to those changes, rather than just direct #rbox children.
-       new d.defaultView.MutationObserver(()=>update(root)).observe(root,{
-         childList:true,subtree:true,characterData:true
-       });
-     }
-     update(root);
-   }
- }
  function organize(){
    const reader=box.querySelector('#storyReader');
    if(!reader)return;
-   if(reader.dataset.readV2==='yes'){explainNepaliButtons();return;}
+   if(reader.dataset.readV2==='yes')return;
    const topic=reader.querySelector('.story-topic-list'),levels=reader.querySelector('.story-level-list'),books=reader.querySelector('.story-book-list'),img=reader.querySelector('.story-hero'),lines=reader.querySelector('.story-lines'),actions=reader.querySelector('.story-actions');
    if(!topic||!levels||!books||!img||!lines||!actions)return;
    reader.dataset.readV2='yes';
@@ -167,11 +170,9 @@ window.enhanceReadingDashboard=function(d){
      icon.style.setProperty('--read-position',(15+(sceneID*11)%70)+'%');
    }
    reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
-   explainNepaliButtons();
 
  }
- explainNepaliButtons();
- const observer=new d.defaultView.MutationObserver(()=>{organize();explainNepaliButtons();});
+ const observer=new d.defaultView.MutationObserver(()=>{organize();});
  observer.observe(box,{childList:true,subtree:false});
  organize();
 };
