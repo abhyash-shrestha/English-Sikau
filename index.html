@@ -1850,7 +1850,9 @@ function enhanceLearningHome(doc,firstName){
       '.sikau-home-nav .sikau-home-nav-label small{font-size:11px;font-weight:650;opacity:.8}',
       '.nav button.sikau-home-nav.on{background:#fff0f5!important;color:#be164c!important;outline:2px solid #c44070;outline-offset:-2px}',
       'html.sikau-home-active .nav button[data-t]:not(.sikau-home-nav).on{background:transparent!important;color:inherit!important;outline:0!important;box-shadow:none!important}',
-      'html.sikau-home-active .sikau-original-lesson-content{display:none!important}',
+      'html.sikau-home-active body > section[id]:not(#sikauHomeScreen){display:none!important}',
+      'html.sikau-home-active #sikauHomeScreen:not([hidden]){display:block!important}',
+      'body > #sikauHomeScreen{box-sizing:border-box;position:relative;width:min(100%,1400px)!important;max-width:1400px!important;min-width:0!important;margin:0 auto!important;overflow:visible!important}',
       '#sikauHomeScreen{max-width:1250px;width:100%;margin:0 auto;padding:clamp(16px,2.5vw,32px) clamp(14px,2.5vw,34px) 42px;color:#30253a}',
       '#sikauHomeScreen[hidden]{display:none!important}',
       '#sikauHomeScreen .sikau-home-intro{padding:clamp(19px,3vw,30px);border:1px solid #eedfe5;border-radius:22px;background:linear-gradient(110deg,#fff9f5,#f8f5ff);box-shadow:0 7px 22px #512d3c0a}',
@@ -1914,9 +1916,11 @@ function enhanceLearningHome(doc,firstName){
     loading.textContent='📅 Loading the published festival calendar… · चाडपर्वको पात्रो खुल्दैछ…';
     mount.append(loading);
     home.append(intro,heading,hint,mount);
-    parent.insertBefore(home,content.nextSibling);
-  }else if(home.parentElement!==parent){
-    parent.insertBefore(home,content.nextSibling);
+    // Standalone body-level destination rather than a child of Coach.
+    doc.body.insertBefore(home,doc.body.querySelector(':scope > section[id]:not(#sikauHomeScreen)')||nav);
+  }else if(home.parentElement!==doc.body){
+    // Migrate a legacy home screen nested inside a course section.
+    doc.body.insertBefore(home,doc.body.querySelector(':scope > section[id]:not(#sikauHomeScreen)')||nav);
   }
   const title=home.querySelector('h2');
   if(title && title.textContent!=='🎉 Nepali Festivals · नेपाली चाडपर्व')
@@ -1955,7 +1959,7 @@ function enhanceLearningHome(doc,firstName){
       // A native lesson (often Translate) may still be marked active beneath Home.
       // Keep its lesson data, but clear its duplicate selected highlight.
       sikauScheduleSidebarSync(doc,'nepali-festivals');
-      home.scrollIntoView({block:'start',behavior:'auto'});
+      doc.defaultView?.scrollTo?.({top:0,behavior:'instant'});
     });
   }
   // Exit Home whenever an existing private-app tab is chosen.
