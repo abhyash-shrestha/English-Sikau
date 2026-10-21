@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261021-readable-nepali-r4',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261021-dark-contrast-r1',document.baseURI).href;
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 
 /* English Sikau bilingual translation controls.
