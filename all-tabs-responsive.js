@@ -39,7 +39,7 @@ window.enhanceUnifiedStudentUI=function(doc){
  }
  // Preserve native navigation identity: do not duplicate buttons or intercept clicks.
  const labels={
-  coach:['AI Coach','एआई कोच'],
+  coach:['Coach','कोच'],
   tr:['Translate','अनुवाद'],
   words:['Words','शब्दहरू'],
   hw:['Write','लेखन'],
