@@ -1,7 +1,7 @@
 /* English Sikau Game visual enhancement. Leaves original game engine and handlers intact. */
 (function(){
 'use strict';
-const file=new URL('game-adventure.css?v=20261021-big-answer-verdict-r1',document.baseURI).href;
+const file=new URL('game-adventure.css?v=20261021-big-answer-verdict-hotfix-r2',document.baseURI).href;
 
 /* Lightning timing. The protected engine owns gameplay and awards.
  * This presentation-layer adapter updates the actual round state:
@@ -83,7 +83,7 @@ function sikauAnswerVerdict(text,className=''){
  if(!content)return null;
  const classes=String(className||'');
  // An explicit mistake notice outranks text explaining the correct option.
- if(/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|try again|गलत उत्तर|गल्तीबाट सिक्नुहोस्|मिलेन/i.test(content)
+ if(/learn from this mistake|learn from (?:your|the) mistake|wrong answer(?!s\b)|incorrect answer(?!s\b)|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|try again|गलत उत्तर|गल्तीबाट सिक्नुहोस्|मिलेन/i.test(content)
     ||/(?:^|\s)(?:wrong|incorrect|is-wrong|is-incorrect|error)(?:\s|$)/i.test(classes))
    return 'wrong';
  if(/(?:^|[!.\s])(?:correct!|well done!|great job!|nice work!|excellent!|perfect!|right answer!|you got it!|that.s right!|सही उत्तर)/i.test(content)
@@ -101,9 +101,16 @@ function installAnswerVerdicts(d,host){
  const isVisible=el=>{
   if(!el?.isConnected||el.hidden||el.closest('[hidden],[aria-hidden="true"]'))return false;
   const style=view.getComputedStyle?.(el);
-  return style?.display!=='none'&&style?.visibility!=='hidden';
+  if(style?.display==='none'||style?.visibility==='hidden')return false;
+  // getClientRects also rejects CSS-hidden ancestors.
+  return typeof el.getClientRects!=='function'||el.getClientRects().length>0;
  };
  function findResult(){
+  // Game hub, map, and mission picker are NOT an active question.
+  // Its explanation text contains "Wrong answers explain the rule" and must
+  // never trigger a wrong-answer sign before the student has played.
+  const hubMap=host.querySelector('.game-map');
+  if(hubMap&&isVisible(hubMap))return null;
   const explicit=[...host.querySelectorAll(feedbackSelector)].filter(isVisible);
   for(const box of explicit){
    if(box.closest('.sikau-answer-verdict'))continue;
@@ -179,7 +186,17 @@ function installAnswerVerdicts(d,host){
   if(scheduled)return;scheduled=true;
   view.requestAnimationFrame(update);
  };
- const observer=new view.MutationObserver(schedule);
+ const observer=new view.MutationObserver(records=>{
+  // Our own prepend/remove causes a childList mutation. Ignoring only
+  // these banner changes prevents the renderer triggering itself forever.
+  const ownChanges=records.length>0&&records.every(record=>{
+   if(record.type!=='childList')return false;
+   const nodes=[...record.addedNodes,...record.removedNodes];
+   return nodes.length>0&&nodes.every(node=>node.nodeType===1&&
+     node.classList?.contains('sikau-answer-verdict'));
+  });
+  if(!ownChanges)schedule();
+ });
  observer.observe(host,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden','aria-hidden']});
  schedule();
 }
