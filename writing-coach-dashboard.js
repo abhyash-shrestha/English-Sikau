@@ -55,8 +55,39 @@ function polishWriting(source){
  s=s.replace(/(^|[!?]\s+|(?<!\ba\.m|\bp\.m)\.\s+)([a-z])/g,(_,prefix,x)=>prefix+x.toUpperCase());
  s=s.replace(/\s+([,.;!?])/g,'$1').trim();
  if(s&&!/[.!?]$/.test(s))s+='.';
- return s;
+ return polishNarrative(s);
 }
+function polishNarrative(text){
+ let pastStory=false;
+ const past={go:'went',goes:'went',eat:'ate',eats:'ate',cook:'cooked',cooks:'cooked',tell:'told',tells:'told',take:'took',takes:'took',taked:'took',make:'made',makes:'made',visit:'visited',visits:'visited',play:'played',plays:'played',say:'said',says:'said',see:'saw',saw:'saw',have:'had',has:'had',spend:'spent',spends:'spent',meet:'met',meets:'met',dance:'danced',dances:'danced'};
+ return String(text||'').split(/(?<=[.!?])\s+(?=[A-Z])/).map(part=>{
+  let s=part;
+  if(/^\s*(?:this memory|these memories|today|nowadays|now\b|in the future|next (?:week|month|year|monday)|every day|my daily routine|I never)\b/i.test(s))pastStory=false;
+  if(/^\s*(?:yesterday|last (?:Dashain|Tihar|week|month|year|night|summer|winter|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b/i.test(s))pastStory=true;
+  s=s.replace(/\bmy family are\b/gi,'my family is')
+   .replace(/\bthis memory are\b/gi,'this memory is')
+   .replace(/\bwe has\b/gi,'we have')
+   .replace(/\b(everyone|everybody) help each others?\b/gi,'$1 helps one another')
+   .replace(/\b(everyone|everybody) help\b/gi,'$1 helps')
+   .replace(/\b(\d+|two|three|four|five|six|seven|eight|nine|ten) (member|person|brother|sister|cousin|day|friend)\b/gi,(_,n,noun)=>n+' '+noun.toLowerCase()+'s')
+   .replace(/\bthat days\b/gi,'those days')
+   .replace(/\bgrandparents house\b/gi,"grandparents' house")
+   .replace(/\bI didn't (?:saw|see|seen) my grandparents for (?:a )?long time\b/gi,"I hadn't seen my grandparents for a long time")
+   .replace(/\b(I|we|they) (didn't|did not) (saw|went|ate|took|seen)\b/gi,(_,sub,aux,verb)=>sub+' '+aux+' '+({saw:'see',went:'go',ate:'eat',took:'take',seen:'see'}[verb.toLowerCase()]))
+   .replace(/\bI (never|always|often|sometimes|really|usually) (wants|goes|knows|likes|eats|has)\b/gi,(_,adverb,verb)=>'I '+adverb+' '+({wants:'want',goes:'go',knows:'know',likes:'like',eats:'eat',has:'have'}[verb.toLowerCase()]))
+   .replace(/\bit (remind|make|help)\b/gi,(_,verb)=>'it '+({remind:'reminds',make:'makes',help:'helps'}[verb.toLowerCase()]));
+  if(pastStory){
+   const who='(?:I|we|they|he|she|my (?:mom|mother|dad|father|grandmother|grandfather|friend|family)|everyone|everybody)';
+   const matcher=new RegExp('\\b('+who+')\\s+('+Object.keys(past).join('|')+')\\b','gi');
+   s=s.replace(matcher,(_,subject,verb)=>subject+' '+past[verb.toLowerCase()]);
+  }
+  s=s.replace(/\bdashain\b/gi,'Dashain').replace(/\btihar\b/gi,'Tihar')
+     .replace(/^(Last (?:Dashain|Tihar|week|month|year|night|summer|winter|weekend)|Yesterday)\s+(?!,)/i,'$1, ')
+     .replace(/^([a-z])/,x=>x.toUpperCase());
+  return s;
+ }).join(' ');
+}
+
 function getModelAnswer(result){
  const teaching=nativeSection(result,/कसरी राम्रो उत्तर लेख्ने|Learn to write/i);
  const modelSection=nativeSection(result,/Model answer|नमुना उत्तर/i);
@@ -139,25 +170,35 @@ function renderRealFeedback(doc,result,summary,original,textarea){
    });
  }
  const key=add(doc,summary,'section','wc-simple-card');
- add(doc,key,'h3','','What to improve · के सुधार्ने?');
- if(unique.length){
-   const ul=add(doc,key,'ul','wc-simple-fixes');
-   for(const item of unique.slice(0,4)){
-     const li=add(doc,ul,'li');
-     add(doc,li,'span','',item.wrong);
-     add(doc,li,'span','wc-simple-arrow','→');
-     add(doc,li,'strong','',item.right||'Review');
-   }
- }else add(doc,key,'p','wc-simple-text','No specific corrections were returned.');
- const why=add(doc,key,'p','wc-simple-tip',/\bI (?:wake|go|want|know|eat)\b/i.test(improved)&&/\bI (?:wakes|goes|wants|knows|eats)\b/i.test(originalAnswer)?'💡 After “I”, use the base verb: I wake, I go, I want. · “I” पछि क्रियाको मूल रूप प्रयोग गर्नुहोस्।':'💡 Read your improved answer and compare it with your original. · पुरानो र सुधारिएको उत्तर तुलना गर्नुहोस्।');
- if(unique.length>4){
-   const details=add(doc,key,'details','wc-simple-details');
-   add(doc,details,'summary','','See all detected corrections ('+unique.length+') · सबै सुधार हेर्नुहोस्');
-   const ul=add(doc,details,'ul','wc-simple-fixes');
-   for(const item of unique.slice(4)){
-     const li=add(doc,ul,'li');add(doc,li,'span','',item.wrong);add(doc,li,'span','wc-simple-arrow','→');add(doc,li,'strong','',item.right||'Review');
-   }
+ add(doc,key,'h3','','Important fixes · मुख्य सुधारहरू');
+ const tips=[];
+ const example=(re,before,after,ne)=>{if(re.test(originalAnswer))tips.push({before,after,ne});};
+ example(/\bwe has\b/i,'we has','we have','“We” पछि “have” प्रयोग हुन्छ।');
+ example(/\blast dashain[^.!?]*we goes\b/i,'we goes','we went','बितेको Dashain बारे past tense मा “went” लेख्नुहोस्।');
+ example(/\bI (?:didnt|didn't) saw my grandparents\b/i,"didn't saw","hadn't seen",'नभेटेको अवधि बताउँदा “hadn’t seen” प्रयोग गर्नुहोस्।');
+ example(/\btaked\b/i,'taked','took','“Take” को past tense “took” हो।');
+ example(/\bI wakes\b/i,'I wakes','I wake','“I” पछि “wake” लेख्नुहोस्।');
+ example(/\bI eating\b/i,'I eating','I eat','दिनचर्यामा “I eat” प्रयोग हुन्छ।');
+ example(/\byesterday I go\b/i,'yesterday I go','yesterday I went','हिजोको कुरा गर्दा “went” प्रयोग हुन्छ।');
+ example(/\bI will goes?\b/i,'I will goes','I will go','“Will” पछि क्रियाको मूल रूप आउँछ।');
+ example(/\bthis memory are\b/i,'this memory are','this memory is','एउटा सम्झनासँग “is” प्रयोग हुन्छ।');
+ example(/\bI never wants\b/i,'I never wants','I never want','“I” पछि “want” हुन्छ।');
+ if(!tips.length){
+  for(const m of unique.filter(x=>!/(?:capitalization|\bminor\b)/i.test(x.category)&&!/^[a-z]$/i.test(x.wrong)).slice(0,3)){
+   tips.push({before:m.wrong,after:m.right||'Review',ne:'सुधार गरेर वाक्य फेरि पढ्नुहोस्।'});
+  }
  }
+ if(tips.length){
+  const ul=add(doc,key,'ul','wc-simple-fixes');
+  for(const t of tips.slice(0,3)){
+   const li=add(doc,ul,'li');
+   add(doc,li,'span','',t.before);
+   add(doc,li,'span','wc-simple-arrow','→');
+   add(doc,li,'strong','',t.after);
+   add(doc,li,'small','',t.ne);
+  }
+ }else add(doc,key,'p','wc-simple-text','No specific grammar suggestions were returned.');
+ add(doc,key,'p','wc-simple-tip','💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
  const model=getModelAnswer(result);
  if(model){
    const examples=add(doc,summary,'details','wc-simple-model');
