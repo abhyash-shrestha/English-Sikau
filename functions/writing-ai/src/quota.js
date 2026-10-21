@@ -9,7 +9,9 @@ const safeId=id=>typeof id==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,35}$/.test(
 // This dedicated table contains counters ONLY, never writing or identities.
 export async function reserveQuota({fetchImpl,env,req,userId,now}){
  const database=env.WRITING_AI_DATABASE_ID,table=env.WRITING_AI_QUOTA_TABLE_ID;
- const key=req.headers?.['x-appwrite-key'];
+ // In the shared deployment reuse the same server-only row credential the
+ // unchanged Trial Manager already uses, avoiding new Function scopes.
+ const key=(env.TRIAL_SERVER_API_KEY||'').trim()||req.headers?.['x-appwrite-key'];
  if(!safeId(database)||!safeId(table)||!key||table===env.TRIAL_TABLE_ID||table===env.PROGRESS_TABLE_ID)throw Error('quota configuration');
  const base='https://fra.cloud.appwrite.io/v1/tablesdb/'+database+'/tables/'+table+'/rows';
  const headers={'X-Appwrite-Project':'6ac9b80d0009575e5d4d','X-Appwrite-Key':key,'Content-Type':'application/json'};

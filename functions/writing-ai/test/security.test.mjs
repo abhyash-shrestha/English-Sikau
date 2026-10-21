@@ -152,8 +152,14 @@ function quotaStore(){
   row.count+=body.value;return json(row);
  };
  const reserve=(userId,now)=>reserveQuota({fetchImpl,env,req:context().req,userId,now});
- return {rows,calls,reserve};
+ return {rows,calls,reserve,fetchImpl};
 }
+test('shared quotas reuse the existing server credential without adding Function scopes',async()=>{
+ const q=quotaStore();
+ await reserveQuota({fetchImpl:q.fetchImpl,env:{...env,TRIAL_SERVER_API_KEY:'unit-test-legacy-server-value'},req:{headers:{}},userId:'student',now:NOW});
+ assert.equal(q.calls[0].options.headers['X-Appwrite-Key'],'unit-test-legacy-server-value');
+ assert.ok(q.calls.every(x=>!String(x.options.body).includes('unit-test-legacy-server-value')));
+});
 test('60 concurrent requests across instances reserve only one provider slot',async()=>{
  const q=quotaStore(),results=await Promise.allSettled(Array.from({length:60},(_,i)=>q.reserve('user-'+i,NOW)));
  assert.equal(results.filter(x=>x.status==='fulfilled').length,1);
