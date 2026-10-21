@@ -87,15 +87,6 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
  const browserMore=add(doc,questionBrowser,'button','sikau-visa-browser-more','Show all questions · सबै प्रश्न');
  browserMore.type='button';
  const learner=add(doc,main,'section','sikau-visa-learner');
- const officials=add(doc,main,'section','sikau-visa-official');
- const updatesHead=add(doc,officials,'div','sikau-visa-updates-head');
- add(doc,updatesHead,'h3','','📰 Latest official information · आधिकारिक जानकारी');
- add(doc,updatesHead,'p','','Reference links checked October 20, 2026. This website does not automatically verify legal changes after that date. Open the U.S. government pages before an interview; updates or court orders may change without notice.');
- const sources=add(doc,officials,'div','sikau-visa-sources');
- for(const [label,url,description] of visaOfficialSources){
-  const a=add(doc,sources,'a','sikau-visa-source');a.href=url;a.target='_blank';a.rel='noopener noreferrer';
-  add(doc,a,'strong','',label+' ↗');add(doc,a,'small','',description);
- }
  const inputs=new Map();
  let kind='dv',deck=[],cursor=0,revealed=false,done=false,answerText='',last='',typed='',notes='';
  let showAllQuestions=false,reinterviewOnly=false;
@@ -286,6 +277,8 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   const link=add(doc,source,'a','',section.title+' · travel.state.gov ↗');link.href=section.source;link.target='_blank';link.rel='noopener noreferrer';
  }
  function switchView(visa){
+  // Keep the private legacy adventure picker out of both Coach and Visa.
+  hideRedundantCoachAdventurePanel(doc);
   // Isolate the two screens at the DOM level, not just by a CSS class.
   const everyday=doc.getElementById('sikauCoachEveryday');
   hub.hidden=!visa;
@@ -534,24 +527,25 @@ function hideRedundantCoachCultureLab(doc){
  * lessons remain untouched. This is repeated safely after native rerenders. */
 function hideRedundantCoachAdventurePanel(doc){
  if(!doc?.body)return 0;
- const oldHero=doc.querySelector('.coach-top');
- const coachRoot=doc.querySelector('#coach')||doc.querySelector('#coachRoot')||
-   oldHero?.closest?.('.page,section[data-page],section[id]')||
-   oldHero?.parentElement?.parentElement;
- if(!coachRoot)return 0;
+ // The legacy picker can appear outside #coach in some protected builds,
+ // including while the separate Visa Interview destination is selected.
+ // Search the rendered document rather than assuming a particular page root.
+ const labels=doc.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,[role="heading"],.section-title,.card-title');
  let hidden=0;
- for(const heading of coachRoot.querySelectorAll('h1,h2,h3,h4,h5,strong')){
-  if(!/Choose your learning adventure/i.test((heading.textContent||'').trim()))continue;
-  let panel=heading.parentElement;
-  while(panel&&panel!==coachRoot&&panel!==doc.body){
+ for(const heading of labels){
+  if(!/Choose your learning adventure/i.test((heading.textContent||'').trim())||
+     heading.closest('[data-sikau-retired-adventure-hidden="true"]'))continue;
+  let panel=heading.parentElement, depth=0;
+  while(panel&&panel!==doc.body&&depth++<10){
    const copy=panel.textContent||'';
    if(copy.includes('Mistake Garden')&&copy.includes('Your English Life')){
-    // The first matching ancestor must be the small, self-contained picker.
-    // Never hide the main Coach container or its new practice sections.
-    if(copy.length>2500||panel.contains(oldHero)||
-       panel.querySelector('#sikauCoachConversations'))break;
+    // Only remove the small legacy adventure section. Never hide the native
+    // Coach page, the Visa question hub, or the replacement conversation UI.
+    if(copy.length>4000||panel.id==='coach'||panel.id==='coachRoot'||
+       panel.matches('.page,[data-page],.sikau-convo,.sikau-visa-main')||
+       panel.querySelector('#sikauCoachConversations,.sikau-visa-main'))break;
     panel.hidden=true;
-    panel.style?.setProperty?.('display','none','important');
+    panel.style.setProperty('display','none','important');
     panel.setAttribute('aria-hidden','true');
     panel.setAttribute('data-sikau-retired-adventure-hidden','true');
     hidden++;
