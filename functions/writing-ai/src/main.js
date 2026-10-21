@@ -48,7 +48,12 @@ export function createWritingAI({fetchImpl=fetch,clock=()=>Date.now(),env=proces
     return reply('verified','An active, verified account is required.','सक्रिय र इमेल पुष्टि भएको खाता चाहिन्छ।',403);
    if(req.headers['x-appwrite-user-id']&&req.headers['x-appwrite-user-id']!==person.$id)
     return reply('signin','Please sign in again.','फेरि साइन इन गर्नुहोस्।',401);
-   if(!Array.isArray(person.labels)||!person.labels.includes('sikaupaid')){
+   const roles=Array.isArray(person.labels)?person.labels:[];
+   // Preserve the owner's existing internal test membership without changing
+   // paid labels or trial dates. This exception is bound to one server-set ID
+   // and still requires reviewed pilot enrollment and every normal quota.
+   const approvedQA=env.WRITING_AI_QA_USER_ID===person.$id&&roles.includes('sikautestpaid');
+   if(!roles.includes('sikaupaid')&&!approvedQA){
     let state;
     if(trialStatusFor)state=await trialStatusFor({req,person});
     else{
@@ -65,7 +70,7 @@ export function createWritingAI({fetchImpl=fetch,clock=()=>Date.now(),env=proces
   }catch(_){return reply('verification','We could not verify access. Please try again.','पहुँच पुष्टि भएन। फेरि प्रयास गर्नुहोस्।');}
 
   // Server-controlled pilot enrollment; never trust browser age/preferences.
-  if(!person.labels?.includes('sikauaiapproved'))
+  if(!Array.isArray(person.labels)||!person.labels.includes('sikauaiapproved'))
    return reply('eligibility','AI review is not enabled for this account yet. You can use the basic checker.','यो खातामा एआई जाँच खुलाइएको छैन। सामान्य जाँच प्रयोग गर्न सक्नुहुन्छ।',403);
   // A narrow contact-data guard, not a claim of complete anonymization.
   const submitted=[input.answer,input.topicEn,input.topicNe].join('\n');

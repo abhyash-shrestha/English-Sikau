@@ -45,6 +45,23 @@ test('active trial is checked server-side using status only',async()=>{
  assert.equal((await h.handler(context())).status,200);
  assert.deepEqual(JSON.parse(JSON.parse(h.calls[1].options.body).body),{action:'status'});
 });
+test('one server-bound existing QA member can review with normal quota reservation',async()=>{
+ const h=harness({user:{...person,labels:['sikautestpaid','sikauaiapproved']},overrides:{env:{...env,WRITING_AI_QA_USER_ID:person.$id}}});
+ assert.equal((await h.handler(context())).status,200);
+ assert.equal(h.reservations.length,1);
+ assert.ok(!h.calls.some(x=>x.url.includes('/executions')));
+});
+for(const [name,labels,qaId] of [
+ ['unbound test membership',['sikautestpaid','sikauaiapproved'],undefined],
+ ['another test account',['sikautestpaid','sikauaiapproved'],'someone-else'],
+ ['missing existing test role',['sikauaiapproved'],person.$id],
+ ['missing reviewed pilot role',['sikautestpaid'],person.$id]
+])test(name+' cannot use the QA exception',async()=>{
+ const h=harness({user:{...person,labels},trialState:{ok:true,used:false},overrides:{env:{...env,WRITING_AI_QA_USER_ID:qaId}}});
+ const result=await h.handler(context({...input,qaUserId:person.$id,labels:['sikautestpaid','sikauaiapproved']}));
+ assert.equal(result.status,403);assert.equal(h.reservations.length,0);
+ assert.ok(!h.calls.some(x=>x.url.includes('api.groq.com')));
+});
 test('obvious contact details are blocked before quota or provider access',async()=>{
  for(const answer of ['Contact me at someone@example.invalid.','My phone number is +977 981 234 5678.']){
   const h=harness();const r=await h.handler(context({...input,answer}));

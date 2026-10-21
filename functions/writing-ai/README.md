@@ -34,12 +34,13 @@ Environment variables:
 | `GROQ_FREE_TIER_CONFIRMED` | Set `true` only after inspecting the actual Groq account plan and limits. |
 | `WRITING_AI_DATABASE_ID` | Existing project database containing a dedicated quota table. |
 | `WRITING_AI_QUOTA_TABLE_ID` | Dedicated AI-only table; never the trial or learning progress table. |
+| `WRITING_AI_QA_USER_ID` | Optional server-only binding to one existing internal test member. Requires `sikautestpaid` AND `sikauaiapproved`; never taken from the browser. Leave unset until that specific pilot grant is approved. |
 
 Create the quota table with one required integer column named `count`, minimum 0, maximum at least 16. Give it **no client read/create/update/delete permissions** and leave row-level security disabled so row permissions cannot grant extra client access. Counter rows also use empty permissions. In the shared deployment, reuse the existing server-only `TRIAL_SERVER_API_KEY` row credential already used by the unchanged legacy handler. The inspected Trial Manager has zero dynamic-key scopes; no new Function scopes are needed in this shared configuration. A standalone Function can instead use an Appwrite-injected dynamic key with `rows.read` and `rows.write`. No user-directory or administrative write scopes are needed. Missing configuration or storage failure blocks AI calls. Do not broaden existing credentials without reviewing their scope.
 
 Execution must require authenticated users. Do not create a public writing domain. For a shared Function, inspect the existing domain and execution configuration before deployment; the writing action additionally validates the caller JWT through `/account` and rejects unauthenticated direct-domain requests. Disable execution logging. Review Appwrite execution-response retention: application code does not log essays, but disabling stdout/stderr logs is not a guarantee that Appwrite retains no response bodies.
 
-Eligibility requires an active verified account, the server-managed `sikaupaid` membership or an active original one-hour trial, **and** the server-managed `sikauaiapproved` pilot label. Browser-submitted labels, age, paid flags and preferences never grant access. Do not mass-enroll accounts or change memberships. Pilot enrollment does not assert parental consent and must initially be limited to reviewed adult accounts.
+Student eligibility requires an active verified account, the server-managed `sikaupaid` membership or an active original one-hour trial, **and** the server-managed `sikauaiapproved` pilot label. The prepared QA extension additionally recognizes one existing internal test member only when its ID matches server variable `WRITING_AI_QA_USER_ID`, its existing `sikautestpaid` role remains present, and it has reviewed pilot enrollment. The QA path keeps every input/privacy/provider/quota check; it grants no membership or trial. This extension is not yet deployed. Browser-submitted labels, age, paid flags and preferences never grant access. Do not mass-enroll accounts or change memberships. Pilot enrollment does not assert parental consent and must initially be limited to reviewed adult accounts.
 
 ## Free allowance protection
 
@@ -78,6 +79,8 @@ node --test ../../test/browser-security.test.mjs
 ```
 
 Run the prepared shared deployment against the current legacy trial-security suite before upload. Use `test/grammar-cases.json` for real model evaluation. Recorded Groq Playground results are in `test/quality-results-20261021.json`: seventeen scenarios, including a 210-word paragraph, plus three failed initial responses that each passed one manual retest. All five reported correction examples passed in context. Playground used JSON-object mode; the deployed strict-schema path, server quota writes and authorized live account still require end-to-end verification. Production does not retry automatically.
+
+A temporary `writing-ai-verify.html` page is prepared on the draft branch for authenticated synthetic backend checks. It uses the same tested pinned SDK loader, contains no lessons or credentials, and is not published yet. Remove it after verification. Pilot enrollment is awaiting explicit account-specific approval; no access label or QA binding has been saved.
 
 After the backend passes staged authorization/quota/provider tests, finish real phone/tablet/desktop light/dark visual QA and test the live site with a properly authorized account. Only then set `CFG.writingAI` to the verified Function ID and publish. Keep the basic fallback and kill switch.
 
