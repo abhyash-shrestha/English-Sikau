@@ -83,7 +83,7 @@ function sikauAnswerVerdict(text,className=''){
  if(!content)return null;
  const classes=String(className||'');
  // An explicit mistake notice outranks text explaining the correct option.
- if(/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|doesn.t match|no match|try another pair|that.s not right|try again|गलत उत्तर|गल्तीबाट सिक्नुहोस्|मिलेन/i.test(content)
+ if(/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|try again|गलत उत्तर|गल्तीबाट सिक्नुहोस्|मिलेन/i.test(content)
     ||/(?:^|\s)(?:wrong|incorrect|is-wrong|is-incorrect|error)(?:\s|$)/i.test(classes))
    return 'wrong';
  if(/(?:^|[!.\s])(?:correct!|well done!|great job!|nice work!|excellent!|perfect!|right answer!|you got it!|that.s right!|सही उत्तर)/i.test(content)
@@ -96,8 +96,8 @@ function installAnswerVerdicts(d,host){
  host.dataset.sikauAnswerVerdict='1';
  const view=d.defaultView;
  const feedbackSelector='#gameFeedback,.game-feedback,.game-answer-feedback,.game-review,.game-explanation,.game-response,.game-status,.game-result-feedback,.game-match-feedback,.game-rush-feedback,.game-quest-feedback,.game-learn,.game-lesson,.game-hint-box';
- const scoreClassSelector='.game-option.wrong,.game-choice.wrong,.game-answer.wrong,.game-tile.wrong,.game-match-card.wrong,.game-card.incorrect,.game-answer.incorrect,.game-choice.incorrect,.game-option.incorrect,.game-pick.wrong,.game-pick.incorrect,[data-game-answer].incorrect';
- const markerPattern=/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|doesn.t match|no match|try another pair|that.s not right|गलत उत्तर|गल्तीबाट सिक्नुहोस्|सही उत्तर|correct!|well done!|great job!|nice work!|excellent!|perfect!/i;
+ const scoreClassSelector='.game-option.wrong,.game-choice.wrong,.game-answer.wrong,.game-tile.wrong,.game-match-card.wrong,.game-match-card.incorrect,.game-match-tile.wrong,.game-card.wrong,.game-card.incorrect,.game-answer.incorrect,.game-choice.incorrect,.game-option.incorrect,.game-pick.wrong,.game-pick.incorrect,.game-pair.wrong,.game-chip.wrong,[data-game-answer].incorrect';
+ const markerPattern=/learn from this mistake|learn from (?:your|the) mistake|wrong answer|incorrect answer|not quite|not a match|not the right pair|wrong pair|doesn.t match|do not match|don.t match|no match|try another pair|that.s not right|गलत उत्तर|गल्तीबाट सिक्नुहोस्|सही उत्तर|correct!|well done!|great job!|nice work!|excellent!|perfect!/i;
  const isVisible=el=>{
   if(!el?.isConnected||el.hidden||el.closest('[hidden],[aria-hidden="true"]'))return false;
   const style=view.getComputedStyle?.(el);
