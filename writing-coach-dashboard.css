@@ -350,3 +350,40 @@ html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-check-item small{color:#b
   line-height:1.52!important;
  }
 }
+
+/* Writing results: simple layout and focused teaching, with accessible contrast. */
+#hw.sikau-writing-v1 .wc-real-feedback{width:100%;max-width:900px;margin:14px auto 24px!important}
+#hw.sikau-writing-v1 .wc-simple-head{margin:0 0 13px}
+#hw.sikau-writing-v1 .wc-simple-head h2{font-size:23px!important;line-height:1.35;margin:0 0 3px!important;color:#243554!important}
+#hw.sikau-writing-v1 .wc-simple-head p{font-size:13px;color:#637189;margin:0}
+#hw.sikau-writing-v1 .wc-simple-stats{display:grid;grid-template-columns:minmax(110px,.3fr) 1fr;gap:14px;border:1px solid #e1e5ee;border-radius:15px;background:#fff;padding:17px;margin-bottom:12px}
+#hw.sikau-writing-v1 .wc-simple-score strong{display:block;font-size:30px;color:#243554;line-height:1.15}
+#hw.sikau-writing-v1 .wc-simple-score span,#hw.sikau-writing-v1 .wc-simple-status small{display:block;font-size:12px;color:#65758c;margin-top:5px}
+#hw.sikau-writing-v1 .wc-simple-status{border-left:1px solid #e1e5ee;padding-left:15px;align-self:center;min-width:0}
+#hw.sikau-writing-v1 .wc-simple-status strong{font-size:14px;color:#196f58}
+#hw.sikau-writing-v1 .wc-simple-status p{font-size:12px;color:#a13b57;margin:8px 0 0}
+#hw.sikau-writing-v1 .wc-simple-card,#hw.sikau-writing-v1 .wc-simple-model{border:1px solid #e1e5ee;border-radius:15px;background:#fff!important;padding:17px;margin-bottom:12px;min-width:0}
+#hw.sikau-writing-v1 .wc-simple-corrected{background:#f5fbf8!important;border-color:#c2e5d5}
+#hw.sikau-writing-v1 .wc-simple-card h3{font-size:16px!important;line-height:1.35;color:#243554!important;margin:0 0 11px!important}
+#hw.sikau-writing-v1 .wc-simple-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.8;color:#28364b;margin:0}
+#hw.sikau-writing-v1 .wc-simple-note{font-size:11px;line-height:1.5;color:#647187;margin:10px 0 0}
+#hw.sikau-writing-v1 .wc-simple-copy{border:0!important;background:#d30860!important;color:#fff!important;border-radius:10px!important;font-weight:800;font-size:13px;padding:10px 15px;min-height:42px;margin-top:13px}
+#hw.sikau-writing-v1 .wc-simple-fixes{padding:0;list-style:none;margin:0}
+#hw.sikau-writing-v1 .wc-simple-fixes li{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid #e7ebf0;font-size:14px}
+#hw.sikau-writing-v1 .wc-simple-fixes li:last-child{border:0}
+#hw.sikau-writing-v1 .wc-simple-fixes li>span:first-child{text-decoration:line-through;color:#ac375a}
+#hw.sikau-writing-v1 .wc-simple-fixes li strong{color:#157c5c}
+#hw.sikau-writing-v1 .wc-simple-arrow{color:#718197}
+#hw.sikau-writing-v1 .wc-simple-tip{font-size:13px;color:#485d7b;background:#f1f5fa;padding:11px;border-radius:9px;line-height:1.6;margin:12px 0 0}
+#hw.sikau-writing-v1 .wc-simple-details{margin-top:10px}
+#hw.sikau-writing-v1 :is(.wc-simple-details,.wc-simple-model)>summary{font-size:13px;font-weight:800;color:#2559a0;cursor:pointer}
+#hw.sikau-writing-v1 .wc-simple-model .wc-simple-text{margin-top:12px}
+@media(max-width:600px){#hw.sikau-writing-v1 .wc-simple-stats{padding:12px;gap:8px;grid-template-columns:minmax(94px,.4fr) 1fr}#hw.sikau-writing-v1 .wc-simple-status{padding-left:10px}#hw.sikau-writing-v1 .wc-simple-score strong{font-size:24px}#hw.sikau-writing-v1 .wc-simple-card{padding:14px}#hw.sikau-writing-v1 .wc-simple-text{font-size:14px}}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-stats,.wc-simple-card,.wc-simple-model){background:#253148!important;border-color:#54627b!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-head h2,.wc-simple-score strong,.wc-simple-card h3,.wc-simple-text){color:#f4f1fc!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-head p,.wc-simple-score span,.wc-simple-status small,.wc-simple-note){color:#cdd7e6!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-status strong{color:#9ce8c8!important}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-tip{background:#38465f;color:#f1f0fa}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li{border-color:#526078}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li strong{color:#9ce8c8}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-details,.wc-simple-model)>summary{color:#a7d3ff}
