@@ -2,7 +2,7 @@
 No synthetic XP, weekly minutes, percentages, or recent events. */
 (function(){
 'use strict';
-const cssURL=new URL('progress-dashboard.css?v=20261016-1',document.baseURI).href;
+const cssURL=new URL('progress-dashboard.css?v=20261021-dark-contrast-r1',document.baseURI).href;
 const el=(d,t,c,v)=>{const n=d.createElement(t);if(c)n.className=c;if(v!==undefined)n.textContent=String(v);return n};
 const add=(d,p,t,c,v)=>{const n=el(d,t,c,v);p.append(n);return n};
 const safe=(x)=>Number.isFinite(+x)?Math.max(0,+x):0;
