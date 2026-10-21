@@ -107,7 +107,7 @@ function installAnswerVerdicts(d,host){
   const explicit=[...host.querySelectorAll(feedbackSelector)].filter(isVisible);
   for(const box of explicit){
    if(box.closest('.sikau-answer-verdict'))continue;
-   const text=(box.innerText||box.textContent||'').slice(0,1100);
+   const text=[...box.childNodes].filter(n=>!(n.nodeType===1&&n.classList?.contains('sikau-answer-verdict'))).map(n=>n.textContent||'').join(' ').slice(0,1100);
    const result=sikauAnswerVerdict(text,box.className);
    if(result)return {result,anchor:box};
   }
