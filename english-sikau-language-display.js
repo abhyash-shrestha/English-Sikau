@@ -80,7 +80,6 @@
   try{
    const mode=modes.has(s.value)?s.value:'en-ne';
    h.dataset.sikauDisplayLanguage=mode;
-   try{window.localStorage.setItem('sikau_lang_pref',mode)}catch(_){}
    // In Roman-only mode the Roman text, not the hidden Devanagari copy,
    // must remain accessible to assistive technology.
    for(const node of d.querySelectorAll('.sikau-lang-roman'))
@@ -98,11 +97,12 @@
   if(pending)return;pending=true;
   requestAnimationFrame(()=>{pending=false;paint()});
  }
- s.addEventListener('change',schedule);
+ s.addEventListener('change',()=>{try{localStorage.setItem('sikau_lang_pref',s.value)}catch(_){}schedule()});
  d.addEventListener('click',event=>{
   if(event.target?.closest?.('.nav button,.sikau-home-nav,.sikau-visa-nav'))schedule();
  },true);
  observer=new MutationObserver(schedule);
- paint();
+ if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',paint,{once:true});
+ else paint();
  window.__sikauLanguageDisplay={apply:schedule,getMode:()=>s.value};
 })();
