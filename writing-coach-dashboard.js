@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261020-clean-topic-grid-r2',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261021-simple-feedback-r1',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -16,99 +16,156 @@ function previewFrom(section,limit){
  const text=(body?.innerText||body?.textContent||'').trim();
  return limit&&text.length>limit?text.slice(0,limit).trimEnd()+'…':text;
 }
-function renderRealFeedback(doc,result,summary,original){
- // Don't claim results until the private checker has actually returned.
+
+/* Conservative client-side polish for recurring ESL mistakes missed by the
+ * protected grammar service. Keep the student's original ideas, not the
+ * unrelated model answer. This is a supplement, not an AI or final validator. */
+function polishWriting(source){
+ let s=String(source||'').trim().replace(/\s+/g,' ');
+ if(!s)return '';
+ const base={wakes:'wake',goes:'go',wants:'want',knows:'know',likes:'like',eats:'eat',drinks:'drink',says:'say',makes:'make',works:'work',does:'do',has:'have'};
+ const plural={say:'says',make:'makes',want:'wants',work:'works',go:'goes',need:'needs',like:'likes',have:'has',eat:'eats',know:'knows',do:'does'};
+ s=s.replace(/\bi\b/g,'I');
+ const contractions={dont:"don't",doesnt:"doesn't",didnt:"didn't",cant:"can't",wont:"won't",isnt:"isn't",arent:"aren't",wasnt:"wasn't",werent:"weren't"};
+ s=s.replace(/\b(dont|doesnt|didnt|cant|wont|isnt|arent|wasnt|werent)\b/gi,x=>contractions[x.toLowerCase()]||x);
+ s=s.replace(/\bI was sleep\b/gi,'I was asleep');
+ s=s.replace(/\bI eating\b/gi,/\bevery day\b|\bdaily routine\b/i.test(s)?'I eat':'I am eating');
+ s=s.replace(/\bI going to\b/gi,'I am going to');
+ s=s.replace(/\b(I\s+(?:eat|wake|work|brush|go|drink|cook|read)[^.!?]{0,80}?)\s+and\s+goes\b/gi,(_,before)=>before+' and go');
+ s=s.replace(/\bI\s+(wakes|goes|wants|knows|likes|eats|drinks|says|makes|works|does|has)\b/gi,(_,verb)=>'I '+base[verb.toLowerCase()]);
+ s=s.replace(/\b(will|can|could|should|would|must|may|might|don't|doesn't|didn't)\s+(wakes|goes|wants|knows|likes|eats|drinks|says|makes|works|does|has)\b/gi,(_,aux,verb)=>aux+' '+base[verb.toLowerCase()]);
+ s=s.replace(/\b(he|she|it|my friend|my mother|my father|my wife|my husband)\s+(say|make|want|work|go|need|like|have|eat|know|do)\b/gi,(_,subject,verb)=>subject+' '+plural[verb.toLowerCase()]);
+ s=s.replace(/\bI\s+is\b/gi,'I am').replace(/\b(you|we|they)\s+is\b/gi,(_,p)=>p+' are');
+ s=s.replace(/\b(he|she|it)\s+are\b/gi,(_,p)=>p+' is');
+ s=s.replace(/\b(?:in future)\b/gi,'in the future');
+ s=s.replace(/\bgoing to do exercise\b/gi,'going to exercise');
+ s=s.replace(/\bto gym\b/gi,'to the gym');
+ s=s.replace(/\bmore healthy\b/gi,'healthier');
+ s=s.replace(/\bits (a|an|good|not|better|really)\b/gi,(_,next)=>"it's "+next);
+ // Time expression limits past-tense changes to sentences mentioning yesterday.
+ s=s.replace(/(^|[.!?]\s*)(yesterday\b[^.!?]*)/gi,(_,prefix,clause)=>{
+   let t=clause.replace(/\bI go\b/gi,'I went').replace(/\bI eat\b/gi,'I ate')
+     .replace(/\bI wake up\b/gi,'I woke up').replace(/\bI see\b/gi,'I saw')
+     .replace(/\bI buy\b/gi,'I bought');
+   return prefix+t;
+ });
+ s=s.replace(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi,x=>x[0].toUpperCase()+x.slice(1).toLowerCase());
+ s=s.replace(/\b(\d{1,2})\s*(am|pm)\b/gi,(_,time,period)=>time+' '+period.toLowerCase().split('').join('.')+'.');
+ s=s.replace(/([a-z])\s+but\s+/gi,'$1, but ');
+ s=s.replace(/(^|[!?]\s+|(?<!\ba\.m|\bp\.m)\.\s+)([a-z])/g,(_,prefix,x)=>prefix+x.toUpperCase());
+ s=s.replace(/\s+([,.;!?])/g,'$1').trim();
+ if(s&&!/[.!?]$/.test(s))s+='.';
+ return s;
+}
+function getModelAnswer(result){
+ const teaching=nativeSection(result,/कसरी राम्रो उत्तर लेख्ने|Learn to write/i);
+ const modelSection=nativeSection(result,/Model answer|नमुना उत्तर/i);
+ let model=previewFrom(modelSection);
+ if(!model&&teaching){
+   const marker=[...teaching.querySelectorAll('div')].find(n=>n.children.length===0&&/राम्रो नमुना उत्तर|^Model answer/i.test(n.textContent.trim()));
+   let cursor=marker?.nextElementSibling;
+   while(cursor&&!cursor.classList.contains('ds-body'))cursor=cursor.nextElementSibling;
+   model=(cursor?.textContent||'').trim();
+ }
+ return model;
+}
+function renderRealFeedback(doc,result,summary,original,textarea){
  const score=result.querySelector('.wc-score .num');
  const error=result.querySelector('.card.bad');
  if(!score){
    summary.hidden=true;
-   if(error){
-     original.hidden=false;
-     original.open=true;
-     original.querySelector('summary').textContent='Writing checker message · लेखन जाँचको सन्देश';
-   }else{
-     // Do not display an empty "See complete writing feedback" bar before
-     // a student has checked their writing.
-     original.hidden=true;
-     original.open=false;
-   }
+   original.hidden=!error;
+   original.open=!!error;
+   original.querySelector('summary').textContent='Writing checker message · लेखन जाँचको सन्देश';
    return;
  }
- summary.hidden=false;
- original.hidden=false;
- original.querySelector('summary').textContent='See complete writing feedback · सबै प्रतिक्रिया हेर्नुहोस्';
- summary.replaceChildren();
- const header=add(doc,summary,'div','wc-feedback-heading');
- add(doc,header,'h2','','Your Writing Feedback · तपाईंको लेखाइको प्रतिक्रिया');
- add(doc,header,'p','','These results come from your actual Writing Coach check. · तपाईंको वास्तविक जाँचको नतिजा।');
- const row=add(doc,summary,'div','wc-feedback-grid');
- function card(color,icon,title,ne){
-   const element=add(doc,row,'section','wc-feedback-card wc-feedback-'+color);
-   const cap=add(doc,element,'div','wc-feedback-title');
-   add(doc,cap,'span','wc-feedback-icon',icon);
-   const label=add(doc,cap,'div');
-   add(doc,label,'strong','',title);add(doc,label,'small','',ne);
-   return element;
+ // The private result is kept in the DOM for the native checker, but its very
+ // long duplicated lesson is not displayed. A compact view is rendered instead.
+ original.hidden=true;original.open=false;
+ summary.hidden=false;summary.replaceChildren();
+ const allText=result.innerText||result.textContent||'';
+ const offTopic=/Off-topic answer/i.test(allText);
+ const partly=/Partly on-topic/i.test(allText);
+ const nativeCorrected=nativeSection(result,/Corrected version|Grammar-only correction/i);
+ const originalAnswer=textarea?.value?.trim()||'';
+ const existing=previewFrom(nativeCorrected);
+ const improved=polishWriting(existing||originalAnswer);
+ const scoreLabel=(score.textContent||'').trim();
+ const mistakes=[...result.querySelectorAll('.mistake')].filter(n=>n.querySelector('.wrong,.right')).map(n=>({
+    wrong:(n.querySelector('.wrong')?.textContent||'').trim(),
+    right:(n.querySelector('.right')?.textContent||'').trim(),
+    category:(n.textContent||'').trim()
+ }));
+ const unique=[],seen=new Set();
+ for(const m of mistakes){
+    const key=(m.wrong+'→'+m.right).toLowerCase();
+    if(!m.wrong||seen.has(key))continue;seen.add(key);unique.push(m);
  }
- const corrected=card('blue','✅','Corrected Version','सुधारिएको उत्तर');
- const correctedSection=nativeSection(result,/Corrected version|Grammar-only correction/i);
- const correctedText=previewFrom(correctedSection,460);
- add(doc,corrected,'p','wc-feedback-text',correctedText||'Open the complete feedback for corrections. · विस्तृत प्रतिक्रिया हेर्नुहोस्।');
- if(correctedText){
-   const b=add(doc,corrected,'button','wc-feedback-button','Copy corrected version · कपी गर्नुहोस्');
-   b.type='button';
-   b.addEventListener('click',async()=>{
-     try{await doc.defaultView.navigator.clipboard.writeText(previewFrom(correctedSection));b.textContent='Copied · कपी भयो';}
-     catch(_){b.textContent='Please select and copy the text · पाठ छानेर कपी गर्नुहोस्';}
+ unique.sort((a,b)=>{
+   const weight=x=>/Grammar|Verb tense/i.test(x.category)?0:/Spelling/i.test(x.category)?1:2;
+   return weight(a)-weight(b);
+ });
+ const heading=add(doc,summary,'div','wc-simple-head');
+ const main=add(doc,heading,'div');
+ add(doc,main,'h2','','Your writing results · लेखाइको नतिजा');
+ add(doc,main,'p','','Short, clear feedback to help you improve.');
+ const stats=add(doc,summary,'div','wc-simple-stats');
+ const scoreBox=add(doc,stats,'div','wc-simple-score');
+ add(doc,scoreBox,'strong','',scoreLabel+'/100');
+ add(doc,scoreBox,'span','','Writing score · लेखाइको अंक');
+ const info=add(doc,stats,'div','wc-simple-status');
+ const topicStatus=offTopic?'⚠️ Off-topic · विषय मिलेन':partly?'⚠️ Partly on topic · आंशिक मिल्यो':'✓ Topic checked · विषय जाँचियो';
+ add(doc,info,'strong','',topicStatus);
+ add(doc,info,'small','',unique.length+' detected feedback item(s) · '+unique.length+' गल्ती/सुझाव');
+ if(offTopic)add(doc,info,'p','','Answer the assigned question before fixing grammar. · पहिले सोधिएको विषयमा लेख्नुहोस्।');
+ const corrected=add(doc,summary,'section','wc-simple-card wc-simple-corrected');
+ add(doc,corrected,'h3','','✓ Improved version · सुधारिएको उत्तर');
+ add(doc,corrected,'p','wc-simple-text',improved||'Your corrected paragraph was not available.');
+ add(doc,corrected,'p','wc-simple-note','Automatic corrections can miss context-dependent errors. · स्वचालित सुधारमा केही गल्ती छुट्न सक्छन्।');
+ if(improved){
+   const copy=add(doc,corrected,'button','wc-simple-copy','Copy corrected answer · उत्तर कपी गर्नुहोस्');
+   copy.type='button';
+   copy.addEventListener('click',async()=>{
+     try{
+       await doc.defaultView.navigator.clipboard.writeText(improved);
+       copy.textContent='Copied · कपी भयो';
+     }catch(_){
+       const field=add(doc,corrected,'textarea','wc-copy-fallback',improved);
+       field.value=improved;field.select();
+       try{doc.execCommand('copy');copy.textContent='Copied · कपी भयो';}
+       catch(__){copy.textContent='Select the paragraph to copy · पाठ छानेर कपी गर्नुहोस्';}
+       field.remove();
+     }
    });
  }
- const model=card('amber','👑','Model Answer','नमुना उत्तर');
- const teaching=nativeSection(result,/कसरी राम्रो उत्तर लेख्ने|Learn to write/i);
- const modelSection=nativeSection(result,/Model answer|नमुना उत्तर/i);
- // The native teaching lesson includes a dedicated illustrative model; its
- // rich paragraph is in a .ds-body inside its own detail section.
- let modelText=previewFrom(modelSection,410);
- if(!modelText&&teaching){
-   // The native teaching section has a "Model answer" label followed by
-   // an explanatory note and then the model's .ds-body; don't display lesson
-   // instructions as if they were the model answer.
-   const marker=[...teaching.querySelectorAll('div')].find(n=>
-     n.children.length===0 && /राम्रो नमुना उत्तर|^Model answer/i.test(n.textContent.trim())
-   );
-   let cursor=marker?.nextElementSibling;
-   while(cursor&&!cursor.classList.contains('ds-body'))cursor=cursor.nextElementSibling;
-   modelText=(cursor?.textContent||'').trim().slice(0,410);
+ const key=add(doc,summary,'section','wc-simple-card');
+ add(doc,key,'h3','','What to improve · के सुधार्ने?');
+ if(unique.length){
+   const ul=add(doc,key,'ul','wc-simple-fixes');
+   for(const item of unique.slice(0,4)){
+     const li=add(doc,ul,'li');
+     add(doc,li,'span','',item.wrong);
+     add(doc,li,'span','wc-simple-arrow','→');
+     add(doc,li,'strong','',item.right||'Review');
+   }
+ }else add(doc,key,'p','wc-simple-text','No specific corrections were returned.');
+ const why=add(doc,key,'p','wc-simple-tip',/\bI (?:wake|go|want|know|eat)\b/i.test(improved)&&/\bI (?:wakes|goes|wants|knows|eats)\b/i.test(originalAnswer)?'💡 After “I”, use the base verb: I wake, I go, I want. · “I” पछि क्रियाको मूल रूप प्रयोग गर्नुहोस्।':'💡 Read your improved answer and compare it with your original. · पुरानो र सुधारिएको उत्तर तुलना गर्नुहोस्।');
+ if(unique.length>4){
+   const details=add(doc,key,'details','wc-simple-details');
+   add(doc,details,'summary','','See all detected corrections ('+unique.length+') · सबै सुधार हेर्नुहोस्');
+   const ul=add(doc,details,'ul','wc-simple-fixes');
+   for(const item of unique.slice(4)){
+     const li=add(doc,ul,'li');add(doc,li,'span','',item.wrong);add(doc,li,'span','wc-simple-arrow','→');add(doc,li,'strong','',item.right||'Review');
+   }
  }
- add(doc,model,'p','wc-feedback-text',modelText||'A model answer may appear in the complete feedback below.');
- const details=add(doc,model,'button','wc-feedback-button','Read full model answer · नमुना पढ्नुहोस्');
- details.type='button';details.addEventListener('click',()=>{original.open=true;teaching?.scrollIntoView({block:'nearest',behavior:'smooth'});});
- const mistakes=card('rose','⚠️','Mistakes to Fix','सुधार गर्नुपर्ने गल्ती');
- const mistakesFound=[...result.querySelectorAll('.mistake')].filter(n=>n.querySelector('.wrong,.right'));
- const label=add(doc,mistakes,'p','wc-feedback-count',mistakesFound.length?mistakesFound.length+' feedback item(s)':'See the detailed error analysis');
- for(const n of mistakesFound.slice(0,3)){
-   const w=(n.querySelector('.wrong')?.textContent||'').trim();
-   const r=(n.querySelector('.right')?.textContent||'').trim();
-   const t=add(doc,mistakes,'div','wc-feedback-error');
-   add(doc,t,'span','',w||n.textContent.trim().slice(0,70));
-   if(r)add(doc,t,'strong','',' → '+r);
+ const model=getModelAnswer(result);
+ if(model){
+   const examples=add(doc,summary,'details','wc-simple-model');
+   add(doc,examples,'summary','','See model answer · नमुना उत्तर हेर्नुहोस्');
+   add(doc,examples,'p','wc-simple-text',model);
  }
- const mistakeButton=add(doc,mistakes,'button','wc-feedback-button','View all feedback · विस्तृत गल्ती');
- mistakeButton.type='button';mistakeButton.addEventListener('click',()=>{original.open=true;const section=nativeSection(result,/Errors found/i);(section||result).scrollIntoView({behavior:'smooth',block:'nearest'});});
- const scores=card('purple','📊','Writing Score','लेखाइको नतिजा');
- const scoreVal=(score.textContent||'').trim();
- add(doc,scores,'p','wc-feedback-score',scoreVal+' / 100');
- add(doc,scores,'p','wc-feedback-text',result.querySelector('.wc-score .label')?.textContent?.trim()||'Your score from the writing check');
- const relevance=result.querySelector('b');
- const allText=result.innerText||result.textContent||'';
- if(/Off-topic answer/i.test(allText))add(doc,scores,'p','wc-feedback-alert','⚠️ Off-topic: answer the assigned question first.');
- if(/Partly on-topic/i.test(allText))add(doc,scores,'p','wc-feedback-alert','⚠️ Answer all parts of the assigned topic.');
- const explanation=card('green','📖','Nepali Explanation','नेपालीमा व्याख्या');
- const tips=nativeSection(result,/Study tips|Next steps/i);
- const explanationText=(tips?.textContent||teaching?.textContent||'').trim();
- add(doc,explanation,'p','wc-feedback-text',explanationText?explanationText.slice(0,410):'नेपाली व्याख्या हेर्न तलको पूरा प्रतिक्रिया खोल्नुहोस्।');
- const explainButton=add(doc,explanation,'button','wc-feedback-button','Read full explanation · सबै पढ्नुहोस्');
- explainButton.type='button';explainButton.addEventListener('click',()=>{original.open=true;(teaching||result).scrollIntoView({behavior:'smooth',block:'nearest'});});
 }
+
 window.enhanceWritingCoachDashboard=function(doc){
  if(!doc?.body||!doc.head)return;
  const section=doc.getElementById('hw');
@@ -197,7 +254,7 @@ window.enhanceWritingCoachDashboard=function(doc){
   const view=doc.defaultView;
   (view.requestAnimationFrame||((f)=>view.setTimeout(f,0)))(()=>{
    scheduled=false;
-   renderRealFeedback(doc,feedback,summaries,full);
+   renderRealFeedback(doc,feedback,summaries,full,textarea);
   });
  };
  const observer=new doc.defaultView.MutationObserver(update);
