@@ -65,6 +65,26 @@ export default async function({req,res}){
   if(!valid.ok)return respond({status:"error",message:"Invalid session"},401);
   const person=await valid.json();
   if(!person?.$id||!person?.emailVerification)return respond({status:"error",message:"Verified account required"},403);
+  // This is a protected, paid/trial learning feature. Do not allow a signed-in
+  // account with an expired trial to consume the shared free AI allowance.
+  const approved=Array.isArray(person.labels)&&person.labels.includes("sikaupaid");
+  if(!approved){
+   const trialResponse=await fetch(ENDPOINT+"/functions/6acaf5fe00349b7b8d3d/executions",{
+    method:"POST",headers:{"x-appwrite-project":PROJECT,"x-appwrite-jwt":jwt,"content-type":"application/json"},
+    body:JSON.stringify({body:JSON.stringify({action:"status"}),async:false}),
+    signal:AbortSignal.timeout(8000)
+   });
+   if(!trialResponse.ok)return respond({status:"error",message:"Active membership or trial required"},403);
+   const execution=await trialResponse.json();
+   let state=null;
+   try{state=JSON.parse(execution?.responseBody||"null");}catch(_){}
+   const expiry=Date.parse(state?.expiresAt||""),now=Date.parse(state?.serverNow||"");
+   if(execution?.status!=="completed"||execution?.responseStatusCode!==200||
+      state?.used!==true||state?.active!==true||
+      !Number.isFinite(expiry)||!Number.isFinite(now)||now>=expiry)
+     return respond({status:"error",message:"Active membership or trial required"},403);
+  }
+
  }catch(_){return respond({status:"unavailable",message:"Unable to verify account"},503);}
  let input;
  try{input=requestData(req);}catch(_){return respond({status:"error",message:"Invalid JSON"},400);}
