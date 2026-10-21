@@ -761,3 +761,62 @@ html.sikau-refresh #coach .sikau-visa-main > .sikau-visa-learner{
  max-height:none!important;
  overflow:visible!important;
 }
+
+
+/* Reported reinterview themes: visibly distinguish learner-shared material
+   from Department of State sources without creating a seventh visa category. */
+.sikau-visa-reinterview-notice{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;
+ min-width:0;margin:0 0 16px;padding:15px 17px;
+ border:1px solid #bcd8e7;border-radius:15px;
+ background:linear-gradient(120deg,#f2faff,#f9f7ff);color:#274262
+}
+.sikau-visa-reinterview-copy{min-width:0}
+.sikau-visa-reinterview-copy strong{
+ display:block;font-size:14px;line-height:1.45;margin-bottom:5px;color:#245078;font-weight:900
+}
+.sikau-visa-reinterview-copy p{font-size:12px;line-height:1.6;margin:0;color:#445e7f}
+.sikau-visa-reinterview-button{
+ width:auto;max-width:280px;min-height:47px;padding:10px 14px;
+ border-radius:11px;border:1px solid #37719d;background:#fff;color:#19547c;
+ font-weight:850;font-size:12px;line-height:1.4;text-align:center;cursor:pointer
+}
+.sikau-visa-reinterview-button[aria-pressed="true"]{
+ background:#e50d65;color:#fff;border-color:#e50d65
+}
+.sikau-visa-reinterview-tag{
+ display:block;color:#a12d68;font-size:10px;font-weight:850;
+ font-style:normal;line-height:1.45;margin-top:5px;overflow-wrap:break-word
+}
+.sikau-visa-prompt>.sikau-visa-reinterview-tag{
+ color:#9b3e73;font-size:11px;margin:7px 0 0
+}
+/* The main grid already assigns fixed rows; shift them only when a
+   reinterview note is visible to prevent overlapping or empty rows. */
+@container (min-width:1000px){
+ #coach .sikau-visa-reinterview-notice{grid-column:1/-1;grid-row:3;margin:0}
+ #coach .sikau-visa-main:has(.sikau-visa-reinterview-notice:not([hidden]))
+   .sikau-visa-categories{grid-row:4}
+ #coach .sikau-visa-main:has(.sikau-visa-reinterview-notice:not([hidden]))
+   .sikau-visa-browser,
+ #coach .sikau-visa-main:has(.sikau-visa-reinterview-notice:not([hidden]))
+   .sikau-visa-learner{grid-row:5}
+ #coach .sikau-visa-main:has(.sikau-visa-reinterview-notice:not([hidden]))
+   .sikau-visa-official{grid-row:6}
+}
+@media(max-width:850px){
+ .sikau-visa-reinterview-notice{grid-template-columns:1fr;padding:12px;gap:10px}
+ .sikau-visa-reinterview-button{width:100%;max-width:none}
+}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-notice{
+ background:#233448;color:#e9f3ff;border-color:#486985
+}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-copy strong{color:#daecff}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-copy p{color:#d2e0f3}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-button{
+ background:#30475e;border-color:#789abd;color:#eef7ff
+}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-button[aria-pressed="true"]{
+ background:#d51667;border-color:#d51667;color:#fff
+}
+html[data-sikau-theme="dark"] .sikau-visa-reinterview-tag{color:#ffaccf}
