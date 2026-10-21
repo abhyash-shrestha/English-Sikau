@@ -80,9 +80,16 @@
   try{
    const mode=modes.has(s.value)?s.value:'en-ne';
    h.dataset.sikauDisplayLanguage=mode;
+   try{window.localStorage.setItem('sikau_lang_pref',mode)}catch(_){}
+   // In Roman-only mode the Roman text, not the hidden Devanagari copy,
+   // must remain accessible to assistive technology.
+   for(const node of d.querySelectorAll('.sikau-lang-roman'))
+    node.setAttribute('aria-hidden',mode==='en-roman'?'false':'true');
    s.title='Display language · '+names[mode];
    s.setAttribute('aria-label','Display language: '+names[mode]);
    decorate();
+   for(const node of d.querySelectorAll('.sikau-lang-roman'))
+    node.setAttribute('aria-hidden',mode==='en-roman'?'false':'true');
   }finally{
    busy=false;observer?.observe(d.body,{subtree:true,childList:true,characterData:true});
   }
