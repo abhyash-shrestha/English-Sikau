@@ -169,7 +169,7 @@ window.enhanceNepalJourney=function(doc,accountId){
   side.replaceChildren();
   const selected=districts.find(x=>x.id===selectedId)||cur;
   const info=place(doc,"div","ne-district-info");
-  info.append(place(doc,"span","ne-eyebrow","TODAY'S DISCOVERY · आजको खोज"),
+  info.append(place(doc,"span","ne-eyebrow","DISTRICT EXPLORER · जिल्ला खोज"),
    place(doc,"h3",null,selected.en+" · "+selected.ne),
    place(doc,"p",null,PROVINCES[selected.province]+" Province · HQ: "+selected.hq));
   if(completed(state,selected))info.append(place(doc,"span","ne-earned","✓ District map piece collected · जिल्ला पूरा भयो"));
@@ -179,10 +179,11 @@ window.enhanceNepalJourney=function(doc,accountId){
   const journey=place(doc,"div","ne-build");
   journey.append(place(doc,"strong",null,"🏡 Build your district · जिल्ला बनाऔं"));
   const tiles=place(doc,"div","ne-build-tiles");
+  const selectedProgress=Math.min(CLAIM_STAMPS,(state.days[selected.id]||[]).length);
   const steps=["🏠","🌳","🏯"];
   for(let i=0;i<3;i++){
-   const tile=place(doc,"span",i<progress?"earned":"locked",steps[i]);
-   tile.title=i<progress?"Collected":"Earn by completing English missions on a different day";
+   const tile=place(doc,"span",i<selectedProgress?"earned":"locked",steps[i]);
+   tile.title=i<selectedProgress?"Collected":"Earn by completing English missions on a different day";
    tile.setAttribute("aria-label",i<progress?"Puzzle piece collected":"Puzzle piece locked");
    tiles.append(tile);
   }
@@ -205,7 +206,7 @@ window.enhanceNepalJourney=function(doc,accountId){
      state=action.state;
      try{window.localStorage.setItem(key,JSON.stringify(state));}
      catch(_){note="Browser storage unavailable. Explorer progress might not survive refresh.";}
-     selectedId=action.district.id;
+     selectedId=action.unlocked?(currentDistrict(route,state)?.id||action.district.id):action.district.id;
      note=action.unlocked?"🎊 "+action.district.en+" unlocked! New district available tomorrow.":"✅ +"+action.points+" Explorer points! Come back on another day for the next piece.";
      show();
     });
