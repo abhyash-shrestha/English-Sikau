@@ -113,11 +113,6 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
   add(doc,h1,'span','','नेपाली चाडपर्व');
   add(doc,copy,'p','','Learn English through Nepali festivals, traditions and cultural stories.');
   var ne=add(doc,copy,'p','','नेपाली चाडपर्व र संस्कृतिमार्फत सजिलै अंग्रेजी सिकौं।');ne.lang='ne';
-  var actions=add(doc,copy,'div','sfd-actions');
-  var go=add(doc,actions,'button','sfd-btn sfd-btn-primary','▶  Start Learning · सुरु गरौं');go.type='button';
-  go.addEventListener('click',function(){tab(doc,'coach');});
-  var reading=add(doc,actions,'button','sfd-btn sfd-btn-outline','📖  Practice Reading · पढ्ने अभ्यास');reading.type='button';
-  reading.addEventListener('click',function(){tab(doc,'read');});
   decorateHero(add(doc,hero,'div','sfd-hero-art'));
 
   var heading=add(doc,root,'div','sfd-main-head');
@@ -138,14 +133,6 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
   var study=add(doc,main,'section','sfd-study');
   study.id='sfdStudy';study.setAttribute('aria-label','Festival English practice');
   var side=add(doc,layout,'aside','sfd-side');
-  var progress=add(doc,side,'section','sfd-panel');
-  var progressTitle=add(doc,progress,'div','sfd-panel-title');
-  add(doc,progressTitle,'span','sfd-panel-icon','✦');
-  add(doc,progressTitle,'span','','Your Learning Progress · प्रगति');
-  add(doc,progress,'p','','Your learning records stay in the existing secure Progress tab.');
-  var progressButton=add(doc,progress,'button','','View My Progress · मेरो प्रगति');
-  progressButton.type='button';
-  progressButton.addEventListener('click',function(){tab(doc,'progress');});
   var tip=add(doc,side,'section','sfd-panel sfd-tip');
   var tipTitle=add(doc,tip,'div','sfd-panel-title');
   add(doc,tipTitle,'span','sfd-panel-icon','💡');
