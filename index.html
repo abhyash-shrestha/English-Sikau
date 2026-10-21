@@ -1094,11 +1094,11 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-dashboard-preview.js"></script>
 <script src="./coach-dashboard.js?v=20261020-visa-label-only-r1"></script>
-<script src="./translate-studio-v4.js?v=20261020-two-directions-r1"></script>
+<script src="./translate-studio-v4.js?v=20261021-mobile-upload-r1"></script>
 <script src="./all-tabs-responsive.js"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
 <script src="./writing-coach-dashboard.js?v=20261020-clean-topic-grid-r2"></script>
-<script src="./reading-dashboard.js?v=20261021-readable-nepali-r4"></script>
+<script src="./reading-dashboard.js?v=20261021-remove-flag-tip-r5"></script>
 <script src="./game-adventure.js?v=20261020-lightning-60s-5s-r3"></script>
 <script src="./progress-dashboard.js?v=20261016-1"></script>
 <script>
@@ -2047,7 +2047,19 @@ function enhanceBeginnerClarity(doc){
   }
   const buttons=doc.querySelectorAll('button,[role="button"]');
   for(const button of buttons){
-    if(button.closest('#sikauCoachQuickStart')||button.hasAttribute('data-sikau-cue'))continue;
+    if(button.closest('#sikauCoachQuickStart'))continue;
+    // Upload is not a level-control button: the old up-arrow was misidentified
+    // as Level up on phones. Keep its native upload click handler unchanged.
+    if(button.matches('#tr .ttx-upload')){
+      button.classList.remove('sikau-beginner-action','sikau-level-action','sikau-topic-action');
+      button.removeAttribute('data-sikau-cue');
+      button.removeAttribute('data-sikau-short');
+      if(button.textContent!=='Upload')button.textContent='Upload';
+      button.title='Upload an image · फोटो अपलोड गर्नुहोस्';
+      button.setAttribute('aria-label','Upload an image · फोटो अपलोड गर्नुहोस्');
+      continue;
+    }
+    if(button.hasAttribute('data-sikau-cue'))continue;
     const visibleText=(button.textContent||'').trim();
     const meta=((button.getAttribute('aria-label')||'')+' '+(button.getAttribute('title')||'')).toLowerCase();
     const plain=visibleText.replace(/[\s\p{P}\p{S}\p{N}]/gu,'').trim();
@@ -2075,21 +2087,8 @@ function enhanceBeginnerClarity(doc){
     button.setAttribute('title',label);
     button.setAttribute('aria-label',label);
   }
-  // One readable instruction above the reading passages, not under every flag.
-  const flags=Array.from(doc.querySelectorAll('button.sikau-translate-action'));
-  if(flags.length){
-    const first=flags[0];
-    const card=first.closest('.card,.reader-card,.reading-card,[class*="lesson-card"],article');
-    const guideHost=card||first.closest('.reader-line')?.parentElement||null;
-    if(guideHost && !guideHost.querySelector('.sikau-translation-hint')){
-      const hint=doc.createElement('p');
-      hint.className='sikau-translation-hint';
-      hint.textContent='🇳🇵 Tap the flag next to a sentence to see Nepali. · नेपाली अर्थ हेर्न झण्डा थिच्नुहोस्।';
-      const heading=guideHost.querySelector('h2,h3,h4');
-      if(heading && heading.parentElement===guideHost)heading.insertAdjacentElement('afterend',hint);
-      else guideHost.insertBefore(hint,guideHost.firstChild);
-    }
-  }
+  // Remove legacy flag-only tips; descriptive Nepali buttons need no extra banner.
+  doc.querySelectorAll('#rd .sikau-translation-hint,#learn .sikau-translation-hint').forEach(hint=>hint.remove());
   const hero=doc.querySelector('.coach-top');
   if(!hero || !hero.parentElement)return;
   let hiddenCount=0;
