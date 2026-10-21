@@ -3,7 +3,7 @@
    trial, score, payment or Appwrite functionality is modified here. */
 (function(){
 'use strict';
-var stylesheetUrl = new URL('festival-dashboard-preview.css', document.baseURI).href;
+var stylesheetUrl = new URL('festival-dashboard-preview.css?v=20261021-festival-date-layout-r1', document.baseURI).href;
 function el(doc,tag,cls,value){
   var node=doc.createElement(tag);
   if(cls)node.className=cls;
@@ -154,10 +154,12 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     var card=el(doc,'article','sfd-card');
     var visual=add(doc,card,'div','sfd-visual sfd-'+d.scene);
     add(doc,visual,'span','sfd-visual-note',d.hint);
+    add(doc,visual,'span','sfd-visual-emoji',festival.icon||d.emoji);
     var date=formatDate(festival.date);
     if(festival.end)date+=' – '+formatDate(festival.end);
-    add(doc,visual,'span','sfd-date','▣  '+date);
-    add(doc,visual,'span','sfd-visual-emoji',festival.icon||d.emoji);
+    // Keep the badge anchored over the artwork on desktop; on smaller
+    // screens the card layout places it beneath the image instead.
+    add(doc,card,'span','sfd-date','▣  '+date);
     var name=add(doc,card,'div','sfd-card-title',festival.name);
     if(festival.ne)add(doc,name,'span','',' / '+festival.ne);
     add(doc,card,'p','sfd-desc',d.english+' '+(festival.bs||''));
