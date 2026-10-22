@@ -5,6 +5,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {JSDOM}=require(process.env.SIKAU_JSDOM_MODULE||'jsdom');
 const source=readFileSync(new URL('../../../writing-coach-dashboard.js',import.meta.url),'utf8');
+const pokhara=JSON.parse(readFileSync(new URL('./grammar-cases.json',import.meta.url),'utf8')).find(x=>x.id==='pokhara-advantages-user-20261022');
 const answer='I wakes up early every day.';
 const review={relevance:'on_topic',score:81,corrected:'I wake up early every day.',feedback:[{before:'I wakes up',after:'I wake up',why_en:'Use the base verb with I.',why_ne:'“I” सँग “wake” लेख्नुहोस्।'}],model_answer:'This is a fictional model answer for practice.',tip_en:'Add one example.',tip_ne:'एउटा उदाहरण थप्नुहोस्।'};
 function setup({enabled=true,respond=async()=>({status:'ok',review})}={}){
@@ -36,6 +37,14 @@ test('basic checker remains available without sending writing to Groq',async()=>
 });
 test('disabled configuration preserves native behavior and does not show AI controls',async()=>{
  const x=setup({enabled:false});x.click();await tick();assert.equal(x.native(),1);assert.equal(x.calls.length,0);assert.equal(x.consent,null);x.close();
+});
+test('PR45 basic fallback retains Pokhara corrections, eight Nepali fixes and native score',async()=>{
+ const x=setup({enabled:false});x.edit(pokhara.answer);x.click();await tick();
+ const corrected=x.summary().querySelector('.wc-simple-corrected .wc-simple-text').textContent;
+ for(const phrase of ['Have you ever visited','mountains touch','Pokhara is','beautiful cities','many tourists come','biggest advantages','make people feel','Tourism also gives','local people','Pokhara has','roads become','hotels are','tourists throw','which makes','In the rainy season','traveling becomes','mountains are','places do not','a wonderful place','it needs','everyone works','can become'])assert.ok(corrected.includes(phrase),phrase);
+ assert.match(x.summary().textContent,/60\/100/);assert.equal(x.summary().querySelectorAll('.wc-simple-fixes li').length,8);
+ for(const item of x.summary().querySelectorAll('.wc-simple-fixes li small'))assert.match(item.textContent,/[\u0900-\u097f]/u);
+ assert.equal(x.calls.length,0);assert.equal(x.native(),1);x.close();
 });
 test('provider limit message is visible with no fake score or correction',async()=>{
  const x=setup({respond:async()=>({status:'unavailable',code:'busy',message:'Wait a minute.',message_ne:'एक मिनेट पर्खनुहोस्।'})});

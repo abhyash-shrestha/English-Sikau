@@ -1,5 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {createWritingAI,parseInput,validTrial} from '../src/main.js';
 import {normalizeReview,buildCompletion} from '../src/review.js';
 import {reserveQuota,QuotaError} from '../src/quota.js';
@@ -8,7 +9,7 @@ import {createSharedHandler} from '../src/shared-handler.js';
 const NOW=Date.parse('2026-10-21T14:00:00Z');
 const input={action:'writing-review',answer:'I wakes up early every day.',topicEn:'Describe your daily routine.',topicNe:'आफ्नो दिनचर्याबारे लेख्नुहोस्।'};
 const person={$id:'student-1',status:true,emailVerification:true,labels:['sikaupaid','sikauaiapproved']};
-const env={GROQ_API_KEY:'unit-test-provider-value',WRITING_AI_ENABLED:'true',GROQ_FREE_TIER_CONFIRMED:'true',WRITING_AI_DATABASE_ID:'test-db',WRITING_AI_QUOTA_TABLE_ID:'ai-quotas'};
+const env={GROQ_API_KEY:'unit-test-provider-value',WRITING_AI_ENABLED:'true',WRITING_AI_PILOT_USER_ID:'student-1',GROQ_FREE_TIER_CONFIRMED:'true',WRITING_AI_DATABASE_ID:'test-db',WRITING_AI_QUOTA_TABLE_ID:'ai-quotas'};
 const fixture=()=>({relevance:'on_topic',ratings:{grammar:'minor_errors',completeness:'partly_complete',clarity:'mostly_clear'},corrected:'I wake up early every day.',model_answer:'Every morning, I wake up early and prepare for my day. I eat breakfast before leaving home. In the evening, I read a book and plan the following day.',feedback:[{before:'I wakes up',after:'I wake up',why_type:'agreement'}],tip_en:'Describe the rest of your day.'});
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 const context=(body=input)=>({req:{method:'POST',headers:{'x-appwrite-trigger':'http','x-appwrite-user-jwt':'unit-test-jwt','x-appwrite-user-id':'student-1','x-appwrite-key':'unit-test-server-value'},bodyJson:body,bodyText:JSON.stringify(body)},res:{json:(body,status=200,headers={})=>({body,status,headers})}});
@@ -35,7 +36,7 @@ test('verified paid account receives a schema-validated AI result and no secrets
  const sent=JSON.parse(h.calls[1].options.body);
  assert.equal(sent.model,'openai/gpt-oss-20b');assert.equal(sent.response_format.json_schema.strict,true);
  assert.equal(sent.include_reasoning,false);assert.equal(sent.max_completion_tokens,3200);
- assert.equal(sent.reasoning_effort,'medium');
+ assert.equal(sent.reasoning_effort,'low');
  assert.ok(!h.calls[1].options.body.includes('student-1'));
  assert.ok(!JSON.stringify(result).includes('unit-test-'));
  assert.match(result.headers['Cache-Control'],/no-store/);
@@ -50,6 +51,17 @@ test('one server-bound existing QA member can review with normal quota reservati
  assert.equal((await h.handler(context())).status,200);
  assert.equal(h.reservations.length,1);
  assert.ok(!h.calls.some(x=>x.url.includes('/executions')));
+});
+for(const pilotId of [undefined,'another-student'])test('paid pilot label cannot bypass '+(pilotId?'another account binding':'a missing account binding'),async()=>{
+ const h=harness({overrides:{env:{...env,WRITING_AI_PILOT_USER_ID:pilotId}}});
+ const r=await h.handler(context({...input,pilotUserId:person.$id,WRITING_AI_PILOT_USER_ID:person.$id}));
+ assert.equal(r.status,403);assert.equal(r.body.code,'eligibility');
+ assert.equal(h.reservations.length,0);assert.ok(!h.calls.some(x=>x.url.includes('api.groq.com')));
+});
+test('a matching QA exception still needs the exact pilot binding',async()=>{
+ const h=harness({user:{...person,labels:['sikautestpaid','sikauaiapproved']},overrides:{env:{...env,WRITING_AI_QA_USER_ID:person.$id,WRITING_AI_PILOT_USER_ID:'another-student'}}});
+ assert.equal((await h.handler(context())).status,403);assert.equal(h.reservations.length,0);
+ assert.ok(!h.calls.some(x=>x.url.includes('api.groq.com')));
 });
 for(const [name,labels,qaId] of [
  ['unbound test membership',['sikautestpaid','sikauaiapproved'],undefined],
@@ -155,6 +167,12 @@ test('long paragraphs and mixed English/Nepali are sent as data, not system comm
   const x=buildCompletion({...input,answer});assert.equal(x.messages.length,2);assert.equal(JSON.parse(x.messages[1].content).student_writing,answer);
  }
  assert.throws(()=>buildCompletion({...input,answer:'क्ष'.repeat(900)}));
+});
+test('actual Pokhara assignment and original paragraph fit the free request envelope unchanged',()=>{
+ const p=JSON.parse(readFileSync(new URL('./grammar-cases.json',import.meta.url),'utf8')).find(x=>x.id==='pokhara-advantages-user-20261022');
+ const completion=buildCompletion({...p,topicNe:''}),sent=JSON.parse(completion.messages[1].content);
+ assert.equal(sent.assignment_en,p.topicEn);assert.equal(sent.student_writing,p.answer);
+ assert.ok(Buffer.byteLength(JSON.stringify({messages:completion.messages,response_format:completion.response_format}))<=7500);
 });
 
 function quotaStore(){

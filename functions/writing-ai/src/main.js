@@ -70,7 +70,10 @@ export function createWritingAI({fetchImpl=fetch,clock=()=>Date.now(),env=proces
   }catch(_){return reply('verification','We could not verify access. Please try again.','पहुँच पुष्टि भएन। फेरि प्रयास गर्नुहोस्।');}
 
   // Server-controlled pilot enrollment; never trust browser age/preferences.
-  if(!Array.isArray(person.labels)||!person.labels.includes('sikauaiapproved'))
+  // This release is a single-account pilot. Even a different paid/trial user
+  // with a pilot label cannot call Groq without the exact server-side binding.
+  // Expanding enrollment requires a separately reviewed production change.
+  if(env.WRITING_AI_PILOT_USER_ID!==person.$id||!Array.isArray(person.labels)||!person.labels.includes('sikauaiapproved'))
    return reply('eligibility','AI review is not enabled for this account yet. You can use the basic checker.','यो खातामा एआई जाँच खुलाइएको छैन। सामान्य जाँच प्रयोग गर्न सक्नुहुन्छ।',403);
   // A narrow contact-data guard, not a claim of complete anonymization.
   const submitted=[input.answer,input.topicEn,input.topicNe].join('\n');
