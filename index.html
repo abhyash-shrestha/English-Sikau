@@ -1619,10 +1619,16 @@ async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['htt
 
 
 /* Optional, authenticated AI writing checks. Never include provider API secrets.
-   The function must be deployed separately and CFG.writingAI activated afterward. */
-window.sikauWritingAIConfigured=!!CFG.writingAI;
+   The function must be verified before CFG.writingAI is activated. The label
+   check controls pilot display only; the backend validates the exact account. */
+function sikauCanUseWritingAI(){
+ return !!CFG.writingAI&&!!functions&&!!openedAccess&&user?.status===true&&
+  user?.emailVerification===true&&Array.isArray(user.labels)&&
+  user.labels.includes('sikautestpaid')&&user.labels.includes('sikauaiapproved');
+}
+Object.defineProperty(window,'sikauWritingAIConfigured',{get:sikauCanUseWritingAI});
 window.sikauWritingAI=async function({answer,topicEn,topicNe}){
- if(!CFG.writingAI||!functions||!user||!openedAccess)throw Error('AI reviewer not available');
+ if(!sikauCanUseWritingAI())throw Error('AI reviewer not available');
  let timer;
  // Appwrite Web SDK 17 uses positional arguments, as does the trial client.
  const response=await Promise.race([functions.createExecution(

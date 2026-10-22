@@ -4,6 +4,8 @@ The single-account backend pilot is deployed at Appwrite deployment `6ada6e17023
 
 A temporary authenticated verification page is published by main commit `06f8b2024e07d9774067ea39792966c23e6127c7`. The new backend returned HTTP 401 with a safe bilingual message when called without a valid project-student JWT. The stored Groq key and positive strict-schema/quota path remain unverified pending enrollment and correct-account sign-in. See `VALIDATION.md`.
 
+The latest follow-up reloaded the account and found no saved AI label; the cloud browser still lacked the approved account's session. A different account was selected in secure sign-in, and automatic approval review rejected completing that authentication. The proposed frontend now hides AI controls unless the verified account has both the existing internal-test and reviewed AI labels. The exact private account binding remains server-side. Twenty focused client/dashboard/security tests passed, with one optional network test skipped; the normal Writing UI remains unactivated.
+
 ## Verified deployment constraint — 21 October 2026
 
 The signed-in Appwrite organization is on **Free** and already uses both allowed Functions:
