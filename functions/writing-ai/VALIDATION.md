@@ -1,6 +1,17 @@
 # Writing AI validation — 22 October 2026
 
-**Status: deployed backend remains disabled; PR #39 is being reconciled with PR #45; no live AI activation.** The 22 October approval names an account suffix that was not found in the project. A name search found only one Abhyash Shrestha project user, with a different suffix. No pilot label, QA/pilot ID binding, membership, trial clock or progress record has been changed. Exact-account clarification is required before enrollment.
+**Current status: restricted backend deployed; pilot enrollment and authenticated positive test remain blocked; general Writing UI not activated.** The owner approved the correct account on 22 October. Saving `sikauaiapproved` was rejected again by automatic approval review: it requires confirmation at the moment of the persistent browser access change, despite prior explicit approval. The save was not retried or bypassed. The existing `sikautestpaid` role and all student memberships, trial dates and learning progress remain unchanged.
+
+## Approved pilot staging — 22 October
+
+- Active Appwrite deployment: **`6ada6e1702354f572b1d`**, build Ready/Active in one second, 1.88 MB, existing Node.js 22 Function. Source checkpoint: **`48a3271fc59a9f2f56ec72e2285bab45157ce43f`**. Original handler/package remain unchanged; no Function, paid plan or scope was added.
+- Saved secret server bindings `WRITING_AI_PILOT_USER_ID` and `WRITING_AI_QA_USER_ID` to only the explicitly approved owner-selected account. No real account ID is committed here. Set `WRITING_AI_ENABLED=true` and deployed the mandatory exact-ID/pilot-label checks. The label is still unsaved, so this does not admit a caller without the remaining reviewed enrollment.
+- Live execution **`6ada6e60b4ddbeeacc5f`** completed with HTTP **401**, code `signin`, when called from the console without a valid student JWT. No Groq call or quota reservation was made by that request.
+- Main commit **`06f8b2024e07d9774067ea39792966c23e6127c7`** publishes only the temporary authenticated `writing-ai-verify.html` page. The normal Writing section remains basic (`writingAI:null`). The page was opened and verified; it contains no private lessons or credentials.
+- Website sign-in was required again. The secure sign-in flow selected email-code login for a different, non-pilot account; no OTP was collected and no membership/trial was changed. That pending flow was cleared. Correct-account sign-in and the owner's manual pilot-label Update remain necessary.
+- Real stored-key connectivity, positive strict-schema review, durable quota writes, live privacy/cooldown tests and responsive/dark AI results remain pending. No claim is made that the live Writing Checker uses Groq yet.
+
+The following continuation notes describe the preceding preparation; the deployment/enrollment state above supersedes earlier blockers.
 
 ## 22 October continuation
 
@@ -73,7 +84,7 @@ The five reported failures passed within full paragraphs, not isolated substitut
 
 ## Remaining launch gates
 
-1. Resolve the mismatch between the latest approved suffix and the project account actually found. Only then add `sikauaiapproved` to that explicitly approved member and bind the exact ID through both `WRITING_AI_PILOT_USER_ID` and `WRITING_AI_QA_USER_ID`. Preserve its `sikautestpaid` role. Automatic approval review rejected the attempted pilot-label save; it was not retried and no access change was saved. Alternatively use an existing verified paid/active-trial adult account with approved pilot enrollment. Do not enroll children or unknown-age users before the privacy/guardian-consent process is completed.
+1. Exact-account approval is now supplied and both server bindings are saved. The owner must complete the prepared manual Update to save `sikauaiapproved`, because automatic approval review rejected the agent Save. Preserve `sikautestpaid` and all trial dates. Preserve its `sikautestpaid` role. Automatic approval review rejected the attempted pilot-label save; it was not retried and no access change was saved. Alternatively use an existing verified paid/active-trial adult account with approved pilot enrollment. Do not enroll children or unknown-age users before the privacy/guardian-consent process is completed.
 2. The QA extension and temporary synthetic verification page are prepared and tested but not deployed/published. After approval, deploy the account-bound QA code, save only the approved binding/enrollment, enable the backend pilot and verify the actual stored key, server quota writes, strict-schema response, negative access cases and limits. The new tests reject unbound/different test accounts, missing test or pilot roles, and browser-supplied overrides. Every admitted QA call reserves the normal quota.
 3. Remove the temporary verification page after backend verification. Finish real responsive/light/dark visual checks and an authorized live website submission. Then activate `CFG.writingAI` and merge/publish the tested frontend. Until then, no claim is made that the live website uses Groq.
 
