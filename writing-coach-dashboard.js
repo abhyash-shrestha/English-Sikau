@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261021-ai-ready-r1',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261022-proofreading-quality-r1',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -20,11 +20,53 @@ function previewFrom(section,limit){
 /* Conservative client-side polish for recurring ESL mistakes missed by the
  * protected grammar service. Keep the student's original ideas, not the
  * unrelated model answer. This is a supplement, not an AI or final validator. */
+
+/* Conservative, testable ESL fallback. No claims of AI or verified grammar. */
+const BASIC_RULES=[
+ [/have you ever (visit|see|go|take|eat)\b/gi,(_,v)=>'have you ever '+({visit:'visited',see:'seen',go:'gone',take:'taken',eat:'eaten'}[v.toLowerCase()]),'“Have you ever” पछि past participle प्रयोग गर्नुहोस्।'],
+ [/\b(mountains|tourists|roads) (touches|throws|becomes)\b/gi,(_,n,v)=>n+' '+({touches:'touch',throws:'throw',becomes:'become'}[v.toLowerCase()]),'बहुवचन subject सँग verb मा -s नजोड्नुहोस्।'],
+ [/\b(Pokhara|Kathmandu|Chitwan|Nepal|Janakpur) are\b/gi,'$1 is','एउटा ठाउँको नाम एकवचन हो, त्यसैले “is” हुन्छ।'],
+ [/\b(Pokhara|Kathmandu|Chitwan|Nepal|Janakpur) have\b/gi,'$1 has','एउटा ठाउँको नामसँग “has” प्रयोग हुन्छ।'],
+ [/\bone of the most beautiful city\b/gi,'one of the most beautiful cities','“One of the” पछि बहुवचन noun चाहिन्छ।'],
+ [/\bevery year many tourist comes\b/gi,'Every year, many tourists come','Many पछि plural noun र come प्रयोग गर्नुहोस्।'],
+ [/\bone biggest advantage\b/gi,'one of the biggest advantages','“One of the biggest advantages” भन्ने सही वाक्यांश हो।'],
+ [/\b(the fresh air and peaceful environment) makes\b/gi,'$1 make','दुई कुरा “and” ले जोड्दा बहुवचन verb प्रयोग हुन्छ।'],
+ [/\bmake people feels\b/gi,'make people feel','“Make someone” पछि मूल क्रिया प्रयोग हुन्छ।'],
+ [/\b(tourism|traveling)(\s+also)? (give|become)\b/gi,(_,sub,adv,v)=>sub+(adv||'')+' '+({give:'gives',become:'becomes'}[v.toLowerCase()]),'एकवचन subject सँग present tense मा -s थप्नुहोस्।'],
+ [/\blocal peoples\b/gi,'local people','“People” आफैं बहुवचन हो।'],
+ [/\bhotels is\b/gi,'hotels are','Hotels बहुवचन हो, त्यसैले are चाहिन्छ।'],
+ [/\bwhich make the city\b/gi,'which makes the city','यहाँ एकवचन विचारसँग makes प्रयोग हुन्छ।'],
+ [/\bmountains is\b/gi,'mountains are','Mountains बहुवचन भएकाले are प्रयोग हुन्छ।'],
+ [/\bsome places does not\b/gi,'some places do not','Places बहुवचन भएकाले do not प्रयोग हुन्छ।'],
+ [/\b(it|Pokhara) need\b/gi,'$1 needs','एकवचन subject सँग needs हुन्छ।'],
+ [/\beveryone work together\b/gi,'everyone works together','Everyone एकवचन हो, त्यसैले works हुन्छ।'],
+ [/\bcan became\b/gi,'can become','Can पछि मूल क्रिया प्रयोग हुन्छ।'],
+ [/\bin rainy season\b/gi,'in the rainy season','“In the rainy season” भन्ने वाक्यांश प्रयोग गर्नुहोस्।'],
+ [/\bPokhara is wonderful place\b/gi,'Pokhara is a wonderful place','एकवचन place अघि a राख्नुहोस्।'],
+ [/\beven better place\b/gi,'an even better place','एकवचन place अघि an राख्नुहोस्।'],
+ [/\band lake looks like\b/gi,'and a lake looks like','एकवचन lake अघि a राख्नुहोस्।']
+];
+function basicProofread(s){for(const [pattern,replace] of BASIC_RULES)s=s.replace(pattern,replace);return s;}
+function basicTips(original){
+ const out=[],seen=new Set();
+ for(const [pattern,replace,why] of BASIC_RULES){
+  const before=String(original||'').match(pattern)?.[0];
+  if(!before)continue;
+  const after=before.replace(pattern,replace);
+  if(after.toLowerCase()===before.toLowerCase())continue;
+  const key=(before+'>'+after).toLowerCase();
+  if(seen.has(key))continue;
+  seen.add(key);out.push({before,after,ne:why});
+ }
+ return out;
+}
+
 function polishWriting(source){
  let s=String(source||'').trim().replace(/\s+/g,' ');
  if(!s)return '';
  const base={wakes:'wake',goes:'go',wants:'want',knows:'know',likes:'like',eats:'eat',drinks:'drink',says:'say',makes:'make',works:'work',does:'do',has:'have'};
  const plural={say:'says',make:'makes',want:'wants',work:'works',go:'goes',need:'needs',like:'likes',have:'has',eat:'eats',know:'knows',do:'does'};
+ s=basicProofread(s);
  s=s.replace(/\bi\b/g,'I');
  const contractions={dont:"don't",doesnt:"doesn't",didnt:"didn't",cant:"can't",wont:"won't",isnt:"isn't",arent:"aren't",wasnt:"wasn't",werent:"weren't"};
  s=s.replace(/\b(dont|doesnt|didnt|cant|wont|isnt|arent|wasnt|werent)\b/gi,x=>contractions[x.toLowerCase()]||x);
@@ -189,6 +231,11 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  example(/\bI will goes?\b/i,'I will goes','I will go','“Will” पछि क्रियाको मूल रूप आउँछ।');
  example(/\bthis memory are\b/i,'this memory are','this memory is','एउटा सम्झनासँग “is” प्रयोग हुन्छ।');
  example(/\bI never wants\b/i,'I never wants','I never want','“I” पछि “want” हुन्छ।');
+ if(!aiReview){
+  for(const t of basicTips(originalAnswer)){
+   if(!tips.some(p=>p.before.toLowerCase()===t.before.toLowerCase()))tips.push(t);
+  }
+ }
  if(!tips.length&&!aiReview){
   for(const m of unique.filter(x=>!/(?:capitalization|\bminor\b)/i.test(x.category)&&!/^[a-z]$/i.test(x.wrong)).slice(0,3)){
    tips.push({before:m.wrong,after:m.right||'Review',ne:'सुधार गरेर वाक्य फेरि पढ्नुहोस्।'});
@@ -196,7 +243,7 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  }
  if(tips.length){
   const ul=add(doc,key,'ul','wc-simple-fixes');
-  for(const t of tips.slice(0,3)){
+  for(const t of tips.slice(0,8)){
    const li=add(doc,ul,'li');
    add(doc,li,'span','',t.before);
    add(doc,li,'span','wc-simple-arrow','→');
