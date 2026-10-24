@@ -15,12 +15,37 @@ function addStyle(){
  if(document.getElementById(STYLE_ID))return;
  const style=document.createElement('style');
  style.id=STYLE_ID;
- style.textContent='@media(max-width:650px){#protected.'+HIDDEN+
-    ' #bar.student-topbar{display:none!important}}';
+ style.textContent=[
+  '@media(max-width:650px){',
+  '#protected #bar.student-topbar{',
+  'flex-shrink:0;position:relative;z-index:2;',
+  'margin-bottom:0!important;transform:translate3d(0,0,0);opacity:1;visibility:visible;',
+  'transition:transform 300ms cubic-bezier(.2,.75,.2,1),margin-bottom 300ms cubic-bezier(.2,.75,.2,1),opacity 230ms ease,visibility 0s linear 0s;',
+  '}',
+  '#protected.'+HIDDEN+' #bar.student-topbar{',
+  'transform:translate3d(0,-105%,0);',
+  'margin-bottom:calc(-1 * var(--sikau-mobile-header-height,190px))!important;',
+  'opacity:0;visibility:hidden;pointer-events:none;',
+  'transition:transform 300ms cubic-bezier(.2,.75,.2,1),margin-bottom 300ms cubic-bezier(.2,.75,.2,1),opacity 230ms ease,visibility 0s linear 300ms;',
+  '}',
+  '}',
+  '@media(max-width:650px) and (prefers-reduced-motion:reduce){',
+  '#protected #bar.student-topbar,#protected.'+HIDDEN+' #bar.student-topbar{transition:none!important}',
+  '}'
+ ].join('');
  document.head.appendChild(style);
 }
 function root(){return document.getElementById('protected');}
 function showHeader(){root()?.classList.remove(HIDDEN);}
+function sizeHeader(){
+ // The welcome row can wrap on narrow phones or long names. Use its actual
+ // current height, not a guessed fixed margin that leaves a blank strip.
+ const host=root();
+ const header=document.getElementById('bar');
+ if(!host||!header||!host.style?.setProperty)return;
+ const height=header.getBoundingClientRect?.().height||header.offsetHeight||0;
+ if(height>0)host.style.setProperty('--sikau-mobile-header-height',Math.ceil(height)+'px');
+}
 function isMobile(){
  return window.matchMedia?
    window.matchMedia('(max-width: 650px)').matches:
@@ -47,7 +72,7 @@ window.sikauInstallMobileHeader=function(doc){
  addStyle();
  listeners.add(doc);
  let lastTarget=null,lastY=0,down=0,up=0,lastChange=0;
- function reset(){lastTarget=null;lastY=0;down=0;up=0;showHeader();}
+ function reset(){lastTarget=null;lastY=0;down=0;up=0;showHeader();sizeHeader();}
  function onScroll(event){
    if(!isMobile()){reset();return;}
    if(!root()||root().classList.contains('hide'))return;
@@ -57,7 +82,7 @@ window.sikauInstallMobileHeader=function(doc){
    const {scrollTarget,y}=position;
    // Hiding the outer header enlarges the iframe and can adjust scrollTop.
    // Ignore these synthetic layout scroll events to prevent flickering.
-   if(Date.now()-lastChange<320){
+   if(Date.now()-lastChange<390){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
    }
    if(y<=TOP_REVEAL){reset();return;}
@@ -72,11 +97,13 @@ window.sikauInstallMobileHeader=function(doc){
      down+=delta;up=0;
      if(y>HIDE_AFTER&&down>=DISTANCE){
        const header=document.getElementById('bar');
-       if(!header?.contains(document.activeElement))
+       if(!header?.contains(document.activeElement)){
          if(!root()?.classList.contains(HIDDEN)){
+           sizeHeader();
            root()?.classList.add(HIDDEN);
            lastChange=Date.now();
          }
+       }
        down=0;
      }
    }else{
@@ -96,7 +123,8 @@ window.sikauInstallMobileHeader=function(doc){
    if(e.target?.closest?.('#mobileModes, .nav, .sikau-home-nav, .sikau-visa-nav'))
      reset();
  },{capture:true});
- window.addEventListener('resize',function(){if(!isMobile())reset();},{passive:true});
+ document.getElementById('bar')?.addEventListener('focusin',function(){showHeader();});
+ window.addEventListener('resize',function(){if(!isMobile())reset();else sizeHeader();},{passive:true});
  reset();
 };
 })();
