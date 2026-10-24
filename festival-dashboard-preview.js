@@ -3,7 +3,7 @@
    trial, score, payment or Appwrite functionality is modified here. */
 (function(){
 'use strict';
-var stylesheetUrl = new URL('festival-dashboard-preview.css?v=20261021-dark-contrast-r1', document.baseURI).href;
+var stylesheetUrl = new URL('festival-dashboard-preview.css?v=20261024-stories-r1', document.baseURI).href;
 function el(doc,tag,cls,value){
   var node=doc.createElement(tag);
   if(cls)node.className=cls;
@@ -58,10 +58,28 @@ function kindFor(name){
   if(s.includes('dashain'))return 'dashain';
   if(s.includes('tihar'))return 'tihar';
   if(s.includes('chhath'))return 'chhath';
-  if(s.includes('lhosar'))return 'lhosar';
+  if(s.includes('tamu lhosar'))return 'tamu';
+  if(s.includes('sonam lhosar'))return 'sonam';
+  if(s.includes('gyalpo lhosar'))return 'gyalpo';
+  if(s.includes('lhosar'))return 'tamu';
   if(s.includes('prithvi'))return 'prithvi';
   if(s.includes('maghe')||s.includes('maghi'))return 'maghe';
+  if(s.includes('shivaratri'))return 'shivaratri';
+  if(s.includes('fagu')||s.includes('holi'))return 'holi';
+  if(s.includes('yomari')||s.includes('udhauli')||s.includes('dhanya'))return 'yomari';
+  if(s.includes('basanta')||s.includes('saraswati'))return 'basanta';
+  if(s.includes('democracy'))return 'democracy';
+  if(s.includes('ghode'))return 'ghode';
+  if(s.includes('new year')||s.includes('baisakh 1'))return 'newyear';
   return 'other';
+}
+function visualFor(key){
+  if(details[key])return details[key];
+  if(key==='tamu'||key==='sonam'||key==='gyalpo')return details.lhosar;
+  if(key==='yomari'||key==='basanta')return details.maghe;
+  if(key==='holi'||key==='newyear')return details.dashain;
+  if(key==='democracy')return details.prithvi;
+  return details.other;
 }
 function formatDate(stamp){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(stamp||''))return '';
@@ -145,59 +163,260 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
   home.insertBefore(root,home.firstChild);
   home.classList.add('sfd-ready');
 
-  var events=Array.isArray(festivalRows)?festivalRows.filter(function(x){
-    return x && typeof x.date==='string' && (x.end||x.date)>=today;
-  }).sort(function(a,b){return a.date.localeCompare(b.date);}):[];
-  /* Only show already-published date rows supplied by the existing app. */
+
+  /* Dated source rows are fixed, but the visible selection is recomputed
+     each Nepal day. Expired rows are excluded without mutating source records. */
+  var catalog=Array.isArray(festivalRows)?festivalRows.filter(function(f){
+    return f&&typeof f.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(f.date);
+  }).slice().sort(function(a,b){return a.date.localeCompare(b.date);}):[];
+  var shownAll=false,activeFestival=null,returnFocus=null,lastRenderedDay='';
+  var stories=window.EnglishSikauFestivalStories||{};
+  var win=doc.defaultView;
+  function todayInNepal(){
+    try{
+      var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kathmandu',
+        year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      var get=function(k){return parts.find(function(p){return p.type===k;}).value;};
+      return get('year')+'-'+get('month')+'-'+get('day');
+    }catch(_){return today||'';}
+  }
+  function futureEvents(){
+    var now=todayInNepal();
+    return catalog.filter(function(f){return (f.end||f.date)>=now;});
+  }
+  function fallbackLesson(f){
+    return {
+      summary:'Learn about this Nepali celebration through easy English.',
+      story:'People celebrate '+f.name+' in different ways. Families and communities share traditions and learn from one another. Ask a family member what this occasion means to them.',
+      ne:'यस अवसरसँग जोडिएका परम्पराबारे परिवार वा समुदायका सदस्यसँग बुझ्नुहोस्। सबै समुदायको मनाउने तरिका एउटै हुँदैन।',
+      moments:[['🎊','Celebration','उत्सव'],['🤝','Community','समुदाय'],['📖','Learn together','सँगै सिकौं']],
+      words:[['🎉','Festival','चाड'],['🤝','Community','समुदाय'],['📚','Tradition','परम्परा'],['😊','Celebrate','मनाउनु'],['🌟','Learn','सिक्नु']],
+      example:'We learn about Nepali traditions during festivals.',
+      fact:'Different families may celebrate the same festival differently.',
+      quiz:[['Which word means परम्परा?',['Tradition','Mountain','Calendar'],0,'Tradition means परम्परा।'],
+        ['Choose the correct sentence.',['We learn together.','We learns together.','We learning together yesterday.'],0,'Use learn after we.']]
+    };
+  }
+  function speakEnglish(text){
+    if(!win?.speechSynthesis||!win?.SpeechSynthesisUtterance)return false;
+    try{
+      win.speechSynthesis.cancel();
+      var utterance=new win.SpeechSynthesisUtterance(text);
+      utterance.lang='en-US';utterance.rate=.87;utterance.pitch=1;
+      win.speechSynthesis.speak(utterance);
+      return true;
+    }catch(_){return false;}
+  }
+  function openLesson(f,trigger){
+    activeFestival=f;
+    returnFocus=trigger;
+    cards.hidden=true;
+    shownAll=false;
+    root.classList.add('sfd-lesson-open');
+    study.replaceChildren();
+    study.dataset.open='true';
+    study.setAttribute('tabindex','-1');
+    var d=visualFor(kindFor(f.name));
+    var lesson=stories[kindFor(f.name)]||fallbackLesson(f);
+
+    var back=add(doc,study,'button','sfd-story-back','← Back to festivals · चाडपर्वमा फर्कनुहोस्');
+    back.type='button';back.addEventListener('click',closeLesson);
+    var banner=add(doc,study,'div','sfd-story-banner sfd-'+d.scene);
+    var bannerCopy=add(doc,banner,'div','sfd-story-banner-text');
+    add(doc,bannerCopy,'span','sfd-story-kicker','📖 FESTIVAL STORY · चाडपर्वको कथा');
+    add(doc,bannerCopy,'h2','',f.name);
+    if(f.ne)add(doc,bannerCopy,'p','sfd-story-ne',f.ne);
+    add(doc,bannerCopy,'p','sfd-story-summary',lesson.summary);
+    var emblem=add(doc,banner,'span','sfd-story-emblem',f.icon||d.emoji);
+    emblem.setAttribute('aria-hidden','true');
+    var storyGrid=add(doc,study,'div','sfd-story-grid');
+    var mainStory=add(doc,storyGrid,'section','sfd-story-card sfd-story-reading');
+    add(doc,mainStory,'span','sfd-story-section-label','01 · BEHIND THE STORY');
+    add(doc,mainStory,'h3','','Why do people celebrate? · किन मनाइन्छ?');
+    add(doc,mainStory,'p','sfd-story-body',lesson.story);
+    var controls=add(doc,mainStory,'div','sfd-story-controls');
+    if(win?.speechSynthesis&&win?.SpeechSynthesisUtterance){
+      var listen=add(doc,controls,'button','sfd-story-voice','🔊 Listen in English · सुन्नुहोस्');
+      listen.type='button';
+      listen.addEventListener('click',function(){
+        if(!speakEnglish(lesson.story))listen.textContent='Audio unavailable · अडियो उपलब्ध छैन';
+      });
+    }
+    var meaning=add(doc,controls,'button','sfd-story-translate','🇳🇵 Show Nepali meaning · नेपाली अर्थ');
+    meaning.type='button';meaning.setAttribute('aria-expanded','false');
+    var translated=add(doc,mainStory,'p','sfd-story-meaning',lesson.ne);
+    translated.lang='ne';translated.hidden=true;
+    meaning.addEventListener('click',function(){
+      translated.hidden=!translated.hidden;
+      meaning.setAttribute('aria-expanded',String(!translated.hidden));
+      meaning.textContent=translated.hidden?'🇳🇵 Show Nepali meaning · नेपाली अर्थ':'🇳🇵 Hide Nepali meaning · अर्थ लुकाउनुहोस्';
+    });
+
+    var moments=add(doc,storyGrid,'section','sfd-story-card');
+    add(doc,moments,'span','sfd-story-section-label','02 · CULTURAL MOMENTS');
+    add(doc,moments,'h3','','See the traditions · परम्परा हेर्नुहोस्');
+    var momentGrid=add(doc,moments,'div','sfd-story-moments');
+    lesson.moments.slice(0,3).forEach(function(m){
+      var tile=add(doc,momentGrid,'div','sfd-story-moment');
+      var icon=add(doc,tile,'span','',m[0]);icon.setAttribute('aria-hidden','true');
+      add(doc,tile,'strong','',m[1]);
+      add(doc,tile,'small','',m[2]);
+    });
+    var fact=add(doc,moments,'p','sfd-story-fact','💡 Did you know? '+lesson.fact);
+    fact.setAttribute('role','note');
+
+    var vocab=add(doc,study,'section','sfd-story-vocab');
+    add(doc,vocab,'span','sfd-story-section-label','03 · ENGLISH WORDS');
+    add(doc,vocab,'h3','','Learn 5 words · पाँच नयाँ शब्द');
+    var vocabList=add(doc,vocab,'div','sfd-story-wordgrid');
+    lesson.words.slice(0,5).forEach(function(pair){
+      var word=add(doc,vocabList,'div','sfd-story-word');
+      add(doc,word,'span','sfd-story-wordicon',pair[0]);
+      var block=add(doc,word,'div','');
+      add(doc,block,'strong','',pair[1]);
+      var nepali=add(doc,block,'small','',pair[2]);nepali.lang='ne';
+    });
+    var sample=add(doc,study,'div','sfd-story-sentence');
+    add(doc,sample,'span','','💬 SAY IT IN ENGLISH');
+    add(doc,sample,'p','',lesson.example);
+    if(win?.speechSynthesis&&win?.SpeechSynthesisUtterance){
+      var play=add(doc,sample,'button','','🔊 Listen');
+      play.type='button';play.addEventListener('click',function(){speakEnglish(lesson.example);});
+    }
+
+    var quiz=add(doc,study,'section','sfd-story-quiz');
+    add(doc,quiz,'span','sfd-story-section-label','04 · QUICK PRACTICE');
+    add(doc,quiz,'h3','','Check your English · सानो अभ्यास');
+    add(doc,quiz,'p','sfd-story-quiz-note','Just for practice — no XP or account changes. · यो अभ्यास मात्र हो।');
+    var quizArea=add(doc,quiz,'div','sfd-story-quiz-area');
+    var questionIndex=0,correctTotal=0;
+    function drawQuestion(){
+      quizArea.replaceChildren();
+      if(questionIndex>=lesson.quiz.length){
+        var trophy=add(doc,quizArea,'div','sfd-quiz-finished');
+        add(doc,trophy,'span','','🎉');
+        add(doc,trophy,'strong','','Well done! · राम्रो गर्नुभयो!');
+        add(doc,trophy,'p','','You answered '+correctTotal+' of '+lesson.quiz.length+' questions correctly.');
+        var again=add(doc,trophy,'button','sfd-story-quiz-next','↻ Practice again · फेरि अभ्यास');
+        again.type='button';again.addEventListener('click',function(){questionIndex=0;correctTotal=0;drawQuestion();});
+        return;
+      }
+      var q=lesson.quiz[questionIndex];
+      add(doc,quizArea,'p','sfd-quiz-count','Question '+(questionIndex+1)+' of '+lesson.quiz.length);
+      add(doc,quizArea,'h4','',q[0]);
+      var answers=add(doc,quizArea,'div','sfd-quiz-answers');
+      // Rotate the correct button position; do not teach a fixed A pattern.
+      var spin=(f.name.length+questionIndex)%q[1].length;
+      var options=q[1].map(function(label,i){return {label:label,index:i};});
+      options=options.slice(spin).concat(options.slice(0,spin));
+      var feedback=add(doc,quizArea,'div','sfd-quiz-feedback');
+      feedback.setAttribute('role','status');
+      feedback.setAttribute('aria-live','polite');
+      feedback.hidden=true;
+      options.forEach(function(opt){
+        var button=add(doc,answers,'button','sfd-quiz-choice',opt.label);
+        button.type='button';
+        button.addEventListener('click',function(){
+          if(answers.dataset.answered)return;
+          answers.dataset.answered='true';
+          var right=opt.index===q[2];
+          if(right)correctTotal++;
+          answers.querySelectorAll('button').forEach(function(x){x.disabled=true;});
+          button.classList.add(right?'sfd-quiz-correct':'sfd-quiz-wrong');
+          if(!right){
+            var correctButton=options.findIndex(function(o){return o.index===q[2];});
+            answers.children[correctButton]?.classList.add('sfd-quiz-correct');
+          }
+          feedback.hidden=false;
+          feedback.textContent=(right?'✅ Correct! · सही उत्तर! ':'❌ Not quite · फेरि सिकौं। ')+q[3];
+          feedback.className='sfd-quiz-feedback '+(right?'sfd-feedback-good':'sfd-feedback-review');
+          var next=add(doc,quizArea,'button','sfd-story-quiz-next',questionIndex===lesson.quiz.length-1?
+            'See results · नतिजा हेर्नुहोस् →':'Next question · अर्को प्रश्न →');
+          next.type='button';next.addEventListener('click',function(){questionIndex++;drawQuestion();});
+          next.focus();
+        });
+      });
+    }
+    drawQuestion();
+    var close=add(doc,study,'button','sfd-story-bottom-back','← All upcoming festivals · सबै आगामी चाडपर्व');
+    close.type='button';close.addEventListener('click',closeLesson);
+    study.scrollIntoView?.({block:'start',behavior:win?.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    back.focus({preventScroll:true});
+  }
+  function closeLesson(){
+    win?.speechSynthesis?.cancel?.();
+    activeFestival=null;
+    study.removeAttribute('data-open');
+    study.replaceChildren();
+    cards.hidden=false;
+    root.classList.remove('sfd-lesson-open');
+    render();
+    if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});
+    else input.focus({preventScroll:true});
+    returnFocus=null;
+  }
   function makeCard(festival){
-    var key=kindFor(festival.name), d=details[key];
+    var key=kindFor(festival.name),d=visualFor(key);
     var card=el(doc,'article','sfd-card');
     var visual=add(doc,card,'div','sfd-visual sfd-'+d.scene);
     add(doc,visual,'span','sfd-visual-note',d.hint);
     add(doc,visual,'span','sfd-visual-emoji',festival.icon||d.emoji);
     var date=formatDate(festival.date);
     if(festival.end)date+=' – '+formatDate(festival.end);
-    // Keep the badge anchored over the artwork on desktop; on smaller
-    // screens the card layout places it beneath the image instead.
     add(doc,card,'span','sfd-date','▣  '+date);
     var name=add(doc,card,'div','sfd-card-title',festival.name);
     if(festival.ne)add(doc,name,'span','',' / '+festival.ne);
-    add(doc,card,'p','sfd-desc',d.english+' '+(festival.bs||''));
-    var btn=add(doc,card,'button','sfd-learn','Learn Festival English · अंग्रेजी सिक्नुहोस्  →');
-    btn.type='button';
-    btn.setAttribute('aria-label','Learn English about '+festival.name);
-    btn.addEventListener('click',function(){
-      study.replaceChildren();
-      add(doc,study,'h4','','English through '+festival.name+' · '+(festival.ne||''));
-      add(doc,study,'p','',d.english);
-      add(doc,study,'p','',d.nepali);
-      var chips=add(doc,study,'div','sfd-chips');
-      (festival.words||[]).slice(0,6).forEach(function(w){
-        if(Array.isArray(w)&&w.length>=2)add(doc,chips,'span','',w[0]+' — '+w[1]);
-      });
-      add(doc,study,'p','','Example · उदाहरण: '+d.sentence);
-      var close=add(doc,study,'button','sfd-learn','Close lesson · बन्द गर्नुहोस्');
-      close.type='button';
-      close.addEventListener('click',function(){study.removeAttribute('data-open');btn.focus();});
-      study.dataset.open='true';study.scrollIntoView({block:'nearest',behavior:'smooth'});
-    });
+    var copy=stories[key];
+    add(doc,card,'p','sfd-desc',(copy?.summary||d.english)+' '+(festival.bs||''));
+    var btn=add(doc,card,'button','sfd-learn','📖 Learn Festival English · अंग्रेजी सिक्नुहोस् →');
+    btn.type='button';btn.setAttribute('aria-label','Learn English about '+festival.name);
+    btn.addEventListener('click',function(){openLesson(festival,btn);});
     return card;
   }
+  var controls=add(doc,main,'div','sfd-more-controls');
+  var more=add(doc,controls,'button','sfd-more-btn');
+  more.type='button';
+  more.addEventListener('click',function(){shownAll=!shownAll;render();});
   function render(){
+    var now=todayInNepal();
+    lastRenderedDay=now;
+    var upcoming=futureEvents();
     var query=input.value.toLocaleLowerCase().trim();
-    var filtered=events.filter(function(f){
-      return !query || [f.name,f.ne,f.bs].join(' ').toLocaleLowerCase().includes(query);
+    var filtered=upcoming.filter(function(f){
+      return !query||[f.name,f.ne,f.bs].join(' ').toLocaleLowerCase().includes(query);
     });
     cards.replaceChildren();
-    if(filtered.length){
-      filtered.slice(0,12).forEach(function(f){cards.appendChild(makeCard(f));});
-    }else{
-      add(doc,cards,'div','sfd-empty',query?
-        'No matching upcoming festival · मिल्ने चाडपर्व भेटिएन':
-        'No upcoming published dates yet · आगामी चाडपर्वको मिति प्रकाशन भएपछि देखिनेछ।');
-    }
+    var limit=shownAll?filtered.length:12;
+    if(filtered.length)filtered.slice(0,limit).forEach(function(f){cards.appendChild(makeCard(f));});
+    else add(doc,cards,'div','sfd-empty',query?
+      'No matching upcoming festival · मिल्ने आगामी चाडपर्व भेटिएन':
+      'No more published festival dates in this calendar. New dates will appear after the schedule is updated. · नयाँ पात्रो प्रकाशित भएपछि मिति थपिनेछ।');
+    more.hidden=filtered.length<=12;
+    more.textContent=shownAll?'Show first 12 · पहिलो १२ हेर्नुहोस्':
+      'Show '+(filtered.length-12)+' more upcoming · थप चाडपर्व हेर्नुहोस् ↓';
+    var countText=upcoming.length+' published upcoming celebrations · नेपाल समय अनुसार';
+    var label=labels.querySelector('.sfd-muted');
+    if(label)label.textContent=countText;
   }
-  input.addEventListener('input',render);
+  input.addEventListener('input',function(){shownAll=false;if(!activeFestival)render();});
   render();
+  // Refresh on Nepal calendar day rollover, returning to tab, or refocus.
+  // No API requests, service workers, or client-written festival dates.
+  win?.setInterval?.(function(){
+    if(doc.hidden)return;
+    if(lastRenderedDay!==todayInNepal()){
+      if(activeFestival&&(activeFestival.end||activeFestival.date)<todayInNepal())closeLesson();
+      else if(!activeFestival)render();
+    }
+  },60000);
+  doc.addEventListener('visibilitychange',function(){
+    if(!doc.hidden&&lastRenderedDay!==todayInNepal()){
+      if(activeFestival&&(activeFestival.end||activeFestival.date)<todayInNepal())closeLesson();
+      else if(!activeFestival)render();
+    }
+  });
+  if(win?.addEventListener)win.addEventListener('focus',function(){
+    if(!activeFestival&&lastRenderedDay!==todayInNepal())render();
+  });
 };
 })();
