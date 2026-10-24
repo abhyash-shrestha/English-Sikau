@@ -46,7 +46,7 @@ window.sikauInstallMobileHeader=function(doc){
  if(!doc?.defaultView||!doc.documentElement||listeners.has(doc)||!root())return;
  addStyle();
  listeners.add(doc);
- let lastTarget=null,lastY=0,down=0,up=0;
+ let lastTarget=null,lastY=0,down=0,up=0,lastChange=0;
  function reset(){lastTarget=null;lastY=0;down=0;up=0;showHeader();}
  function onScroll(event){
    if(!isMobile()){reset();return;}
@@ -55,6 +55,11 @@ window.sikauInstallMobileHeader=function(doc){
    const position=readPosition(event,doc);
    if(!position)return;
    const {scrollTarget,y}=position;
+   // Hiding the outer header enlarges the iframe and can adjust scrollTop.
+   // Ignore these synthetic layout scroll events to prevent flickering.
+   if(Date.now()-lastChange<320){
+     lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
+   }
    if(y<=TOP_REVEAL){reset();return;}
    if(lastTarget!==scrollTarget){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
@@ -68,12 +73,20 @@ window.sikauInstallMobileHeader=function(doc){
      if(y>HIDE_AFTER&&down>=DISTANCE){
        const header=document.getElementById('bar');
        if(!header?.contains(document.activeElement))
-         root()?.classList.add(HIDDEN);
+         if(!root()?.classList.contains(HIDDEN)){
+           root()?.classList.add(HIDDEN);
+           lastChange=Date.now();
+         }
        down=0;
      }
    }else{
      up-=delta;down=0;
-     if(up>=DISTANCE){showHeader();up=0;}
+     if(up>=DISTANCE){
+       if(root()?.classList.contains(HIDDEN)){
+         showHeader();lastChange=Date.now();
+       }
+       up=0;
+     }
    }
  }
  // Captured scroll events work for document scrolling AND nested containers.
