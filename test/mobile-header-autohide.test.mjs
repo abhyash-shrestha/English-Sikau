@@ -73,7 +73,7 @@ test('scroll down slides away, up restores, and rapid layout adjustments do not 
  assert.equal(b.scroll(180),true);
  assert.equal(b.scroll(94,10),true,'ignore synthetic iframe resize');
  assert.equal(b.scroll(66),false);
- assert.equal(b.scroll(210),true);
+ assert.equal(b.scroll(192),true);
  b.reset();
  assert.equal(b.hidden(),false);
 });
