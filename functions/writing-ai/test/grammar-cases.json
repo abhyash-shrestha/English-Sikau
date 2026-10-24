@@ -1,0 +1,110 @@
+[
+ {
+  "id": "pokhara-advantages-user-20261022",
+  "topicEn": "Write about Pokhara. Discuss its advantages and disadvantages, with a strong introduction and conclusion.",
+  "answer": "Have you ever visit a city where mountains touches the sky and lake looks like a mirror? Pokhara are one of the most beautiful city in Nepal. Every year many tourist comes to enjoy its natural beauty. One biggest advantage of Pokhara is Phewa Lake and the beautiful mountains. The fresh air and peaceful environment makes people feels happy. Tourism also give jobs to many local peoples. However, Pokhara have some disadvantages too. During holidays, the roads becomes very crowded and hotels is expensive. Some tourists throws plastic near the lake, which make the city dirty. In rainy season, traveling become difficult and mountains is not clearly visible. Another problem is that some places does not have good transportation. In my opinion, Pokhara is wonderful place but it need some improvements. If everyone work together to keep the city clean and reduce traffic, Pokhara can became even better place for tourists and local people.",
+  "check": "Preserve the introduction question, Pokhara/Phewa Lake, mountains, peace, jobs, holiday congestion, expensive hotels, lake litter, rain/visibility, transport problems and collaborative conclusion. Correct visited/touch/is/cities/tourists come/advantages/make people feel/gives/people/has/become/are/throw/makes/becomes/do not/a/needs/works/can become. Do not invent a personal trip or new advantages/disadvantages. Assess all assignment requirements; grammatical errors remain frequent even though the argument is complete. Pending real authenticated Appwrite/Groq execution; a basic fallback regression is not an AI pass."
+ },
+ {
+  "id": "family-dashain",
+  "topicEn": "Write about your family. Describe a special memory and explain why it mattered. Give a real example.",
+  "answer": "We has five member in my family. Last Dashain my father taked us to my grandparents house. Before that visit I didn't saw my grandparents for two years. We cooked together and everybody were happy. That memory are important because we spent time together.",
+  "check": "Preserve five members and two years; correct have/members/took/were/agreement; use hadn't seen for the period preceding that visit. Do not invent activities."
+ },
+ {
+  "id": "routine",
+  "topicEn": "Describe your daily routine.",
+  "answer": "I wakes up at six every day. I brush my teeth and eats breakfast. After that I goes to work. In the evening I read a book and sleep at ten.",
+  "check": "I wake up; eat; go. Present routine, no unnecessary past tense."
+ },
+ {
+  "id": "past",
+  "topicEn": "What did you do yesterday?",
+  "answer": "Yesterday I go to the market and buy rice. Then I meet my friend. We talk for an hour and I return home before dark.",
+  "check": "went, bought, met, talked, returned; preserve rice, one hour, before dark."
+ },
+ {
+  "id": "present",
+  "topicEn": "Describe what your teacher usually does.",
+  "answer": "My teacher explain clearly and always help us. She have patience. The lessons is useful because she give real examples.",
+  "check": "explains, helps, has, lessons are, gives; no changed relationships."
+ },
+ {
+  "id": "future",
+  "topicEn": "Describe your plans for next Saturday.",
+  "answer": "Next Saturday I will goes to my cousin house. We will cooking dinner and watch a movie. I am going buy vegetables before I leave.",
+  "check": "will go, cousin's house, will cook, going to buy; preserve future."
+ },
+ {
+  "id": "pokhara-phewa",
+  "topicEn": "Describe your favorite place and why you like it.",
+  "answer": "My favorite place is Pokhara. I likes Phewa Lake because the water look peaceful. Last year I enjoy boating there with my brother. I want to visit again.",
+  "check": "Preserve Pokhara, Phewa Lake, brother; like, looks, enjoyed; retain valid present/past shift."
+ },
+ {
+  "id": "school",
+  "topicEn": "Describe an activity you enjoyed at school and explain what you learned.",
+  "answer": "Our class build a small garden last month. Every student bring seeds and we planted them near the library. I learn that plants needs sunlight and water. Working together were the best part.",
+  "check": "built, brought, learned, plants need, working together was; no invented crops."
+ },
+ {
+  "id": "work",
+  "topicEn": "Describe a problem at work and how you solved it.",
+  "answer": "At work the scanner stop working yesterday. I checked the cable and restart it. After that we was able to finish counting the boxes. I feel proud because I solve the problem without delaying the delivery.",
+  "check": "stopped, restarted, were, felt, solved; keep scanner, cable, boxes, delivery."
+ },
+ {
+  "id": "short-perfect",
+  "topicEn": "Introduce yourself and mention one hobby.",
+  "answer": "My name is Rina, and I enjoy reading books.",
+  "check": "High score; keep valid English unchanged; do not invent three grammar errors or impose an unrequested length."
+ },
+ {
+  "id": "perfect",
+  "topicEn": "Describe a family memory and explain why it matters to you.",
+  "answer": "Last Dashain, my family gathered at my grandparents' house. We cooked together and shared stories over dinner. My favorite moment was helping my grandmother prepare the vegetables while she told me about her childhood. That memory matters to me because it reminds me how much we can learn when we spend time together.",
+  "check": "95–100; no fabricated errors; no invented personal facts in the correction."
+ },
+ {
+  "id": "off-topic",
+  "topicEn": "Describe your best friend and a time they helped you.",
+  "answer": "Momo is a popular food in Nepal. I like steamed momo with spicy sauce. I usually eat it at a small restaurant on Saturdays.",
+  "check": "Off-topic, 0–10; correct the momo paragraph without replacing it with an invented friend story. Model answers must remain separate."
+ },
+ {
+  "id": "partial",
+  "topicEn": "Describe a special family memory and explain why it mattered, with one real example.",
+  "answer": "My family is kind. I work in a shop where I count boxes and organize shelves. The shop has many customers, and ordering products is a busy part of my job.",
+  "check": "Partial relevance, at most 65; explain missing family memory rather than inventing one."
+ },
+ {
+  "id": "spelling-unnatural",
+  "topicEn": "Describe a walk with a friend.",
+  "answer": "Me and my freind maked a walk in a beutiful park. We was very enjoy the fresh air. I am very much happy when we spending time togather.",
+  "check": "My friend and I went for/took a walk, beautiful, enjoyed, happy, together; preserve meaning and natural tense."
+ },
+ {
+  "id": "mixed-nepali",
+  "topicEn": "Describe your favorite activity with your family.",
+  "answer": "I like cooking with my mother. हामी सँगै मोमो बनाउँछौं। She teach me to fold the dough and I feels happy when we share the food.",
+  "check": "Translate the clear Nepali momo sentence; teaches, feel; preserve mother, momo and sharing food."
+ },
+ {
+  "id": "didnt-simple-past",
+  "topicEn": "Explain what happened when you tried to meet your friend yesterday.",
+  "answer": "Yesterday I didn't saw my friend at the park. I waited for ten minutes, but she did not arrive. I went home and called her.",
+  "check": "didn't see, rather than automatic hadn't seen; preserve ten minutes and later phone call."
+ },
+ {
+  "id": "unseen-topic",
+  "topicEn": "Describe a small change that helped your neighborhood during a power cut.",
+  "answer": "When the lights goes out last week, our neighbor put a lamp near the stair. This help everyone walk safe. We decided keeping a rechargeable light there because the stairs becomes dark in the evening.",
+  "check": "went out, stairs, helped, safely, to keep, become; preserve lamp location and rechargeable light. Do not add rescues, injuries, purchases or names."
+ },
+ {
+  "id": "long-library",
+  "topicEn": "Describe a group activity you helped organize. Explain what happened, one difficulty, how your group solved it, and what you learned.",
+  "answer": "Last Saturday our reading club organize a small book exchange at the community library. Six students bring twelve books, and we put them on three shelves near the door. We started at ten o'clock and stayed for two hours. I was responsible for making a list, but I forget to write the names of two books. At first I feel worried because I did not wanted anyone to lose a book. My friend suggested that we check each shelf together. We compare the books with the list and found the missing titles. Nobody lose anything. After we finished, we cleaned the tables and returned the chairs to their places. The librarian thank us for keeping the room tidy. I learned that asking for help are better than hiding a mistake. I also learned to check my work before people arrives. Next month we will holds another exchange, and I am going to prepare a clearer list. I want every student to feel welcome, even if they can only brings one book. This activity mattered to me because we solved a small problem together without blaming anyone. We has different ideas, but we listened carefully and agreed on a simple plan. I felt proud when everyone left with the correct books.",
+  "check": "Preserve six students, twelve books, three shelves, ten o’clock, two hours, two missing titles, no losses, the librarian, and next-month plans. Correct tense/agreement/verb forms throughout; preserve facts and learning. Do not add money, purchases, prizes or personal names."
+ }
+]

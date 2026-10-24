@@ -393,3 +393,17 @@ html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-simple-details,.wc-si
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-ai-privacy{color:#e5e9f4;background:#303a50;border-color:#5c6a84}
 #hw.sikau-writing-v1 .wc-simple-fixes li small{flex-basis:100%;color:#647086;font-size:12px;line-height:1.5}
 html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li small{color:#d6ddec}
+
+#hw.sikau-writing-v1 .wc-ai-privacy{display:flex;align-items:flex-start;gap:10px;font-size:13px;cursor:pointer}
+#hw.sikau-writing-v1 .wc-ai-privacy input{flex:0 0 18px;width:18px;height:18px;margin:3px 0;accent-color:#3b58a8}
+#hw.sikau-writing-v1 .wc-basic-check{display:block;width:auto;max-width:100%;background:transparent;border:0;color:#315aa0;padding:8px 0;font-size:13px;text-decoration:underline;cursor:pointer}
+#hw.sikau-writing-v1 .wc-ai-message{padding:18px 0;line-height:1.8;color:#36445b;overflow-wrap:anywhere}
+#hw.sikau-writing-v1 .wc-simple-text{white-space:pre-wrap;overflow-wrap:anywhere}
+#hw.sikau-writing-v1 .wc-simple-fixes li :is(span,strong,small){min-width:0;overflow-wrap:anywhere}
+#hw.sikau-writing-v1 button:focus-visible,#hw.sikau-writing-v1 input:focus-visible{outline:3px solid #5479cf;outline-offset:3px}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 :is(.wc-basic-check,.wc-ai-message){color:#c8ddff}
+#hw.sikau-writing-v1 .wc-real-feedback>h2{font-size:23px;line-height:1.4;color:#243554}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-real-feedback>h2{color:#f4f1fc}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-fixes li>span:first-child{color:#ffb4ca}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-arrow{color:#cdd7e6}
+html[data-sikau-theme="dark"] #hw.sikau-writing-v1 .wc-simple-status p{color:#ffc5d5}

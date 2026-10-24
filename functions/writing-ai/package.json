@@ -1,9 +1,11 @@
 {
   "name": "english-sikau-writing-ai",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "main": "src/main.js",
+  "scripts": {"test": "node --test test/*.test.mjs"},
+  "devDependencies": {"jsdom": "26.1.0", "appwrite": "17.0.0"},
   "engines": {
     "node": ">=20"
   }
