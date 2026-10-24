@@ -73,6 +73,14 @@ function kindFor(name){
   if(s.includes('new year')||s.includes('baisakh 1'))return 'newyear';
   return 'other';
 }
+function visualFor(key){
+  if(details[key])return details[key];
+  if(key==='tamu'||key==='sonam'||key==='gyalpo')return details.lhosar;
+  if(key==='yomari'||key==='basanta')return details.maghe;
+  if(key==='holi'||key==='newyear')return details.dashain;
+  if(key==='democracy')return details.prithvi;
+  return details.other;
+}
 function formatDate(stamp){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(stamp||''))return '';
   var date=new Date(stamp+'T12:00:00Z');
@@ -208,7 +216,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     study.replaceChildren();
     study.dataset.open='true';
     study.setAttribute('tabindex','-1');
-    var d=details[kindFor(f.name)]||details.other;
+    var d=visualFor(kindFor(f.name));
     var lesson=stories[kindFor(f.name)]||fallbackLesson(f);
 
     var back=add(doc,study,'button','sfd-story-back','← Back to festivals · चाडपर्वमा फर्कनुहोस्');
@@ -302,6 +310,8 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
       var options=q[1].map(function(label,i){return {label:label,index:i};});
       options=options.slice(spin).concat(options.slice(0,spin));
       var feedback=add(doc,quizArea,'div','sfd-quiz-feedback');
+      feedback.setAttribute('role','status');
+      feedback.setAttribute('aria-live','polite');
       feedback.hidden=true;
       options.forEach(function(opt){
         var button=add(doc,answers,'button','sfd-quiz-choice',opt.label);
@@ -346,7 +356,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     returnFocus=null;
   }
   function makeCard(festival){
-    var key=kindFor(festival.name),d=details[key]||details.other;
+    var key=kindFor(festival.name),d=visualFor(key);
     var card=el(doc,'article','sfd-card');
     var visual=add(doc,card,'div','sfd-visual sfd-'+d.scene);
     add(doc,visual,'span','sfd-visual-note',d.hint);
@@ -392,7 +402,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
   render();
   // Refresh on Nepal calendar day rollover, returning to tab, or refocus.
   // No API requests, service workers, or client-written festival dates.
-  var timer=win?.setInterval?.(function(){
+  win?.setInterval?.(function(){
     if(doc.hidden)return;
     if(lastRenderedDay!==todayInNepal()){
       if(activeFestival&&(activeFestival.end||activeFestival.date)<todayInNepal())closeLesson();
