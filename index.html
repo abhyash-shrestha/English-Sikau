@@ -1128,7 +1128,8 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
 <section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
-<script src="./festival-dashboard-preview.js?v=20261021-dark-contrast-r1"></script>
+<script src="./festival-stories.js?v=20261024-r1"></script>
+<script src="./festival-dashboard-preview.js?v=20261024-stories-r1"></script>
 <script src="./coach-dashboard.js?v=20261021-visa-panels-gone-r3"></script>
 <script src="./translate-studio-v4.js?v=20261021-remove-examples-r1"></script>
 <script src="./sidebar-unified.js?v=20261021-sidebar-parity-r1"></script>
@@ -1668,12 +1669,20 @@ const SIKAU_NEXT_FESTIVALS=[
    words:[['Harvest','बाली भित्र्याउने समय'],['Celebration','उत्सव'],['Family','परिवार']]},
   {name:'Sonam Lhosar',ne:'सोनाम ल्होछार · तामाङ समुदाय',date:'2027-02-07',bs:'२०८३ माघ २४',icon:'🎊',
    words:[['New Year','नयाँ वर्ष'],['Tradition','परम्परा'],['Community','समुदाय']]},
+  {name:'Basanta Panchami / Saraswati Puja',ne:'वसन्त पञ्चमी / सरस्वती पूजा',date:'2027-02-11',bs:'२०८३ माघ २८',icon:'📚',
+   words:[['Knowledge','ज्ञान'],['Study','अध्ययन'],['Art','कला']]},
+  {name:'National Democracy Day',ne:'राष्ट्रिय प्रजातन्त्र दिवस',date:'2027-02-19',bs:'२०८३ फागुन ७',icon:'🕊️',
+   words:[['Democracy','प्रजातन्त्र'],['Freedom','स्वतन्त्रता'],['Citizen','नागरिक']]},
   {name:'Maha Shivaratri',ne:'महाशिवरात्रि',date:'2027-03-06',bs:'२०८३ फागुन २२',icon:'🕉️',
    words:[['Prayer','प्रार्थना'],['Temple','मन्दिर'],['Devotion','भक्ति']]},
   {name:'Gyalpo Lhosar',ne:'ग्याल्पो ल्होछार',date:'2027-03-09',bs:'२०८३ फागुन २५',icon:'🏔️',
    words:[['New Year','नयाँ वर्ष'],['Greetings','शुभकामना'],['Culture','संस्कृति']]},
-  {name:'Fagu Purnima / Holi',ne:'फागु पूर्णिमा / होली · पहाड २१, तराई २२ मार्च',date:'2027-03-22',bs:'२०८३ चैत ७–८',icon:'🎨',
+  {name:'Fagu Purnima / Holi',ne:'फागु पूर्णिमा / होली · पहाड २१, तराई २२ मार्च',date:'2027-03-21',end:'2027-03-22',bs:'२०८३ चैत ७–८',icon:'🎨',
    words:[['Colours','रङहरू'],['Friendship','मित्रता'],['Festival','चाडपर्व']]},
+  {name:'Ghode Jatra',ne:'घोडेजात्रा · काठमाडौँ उपत्यका',date:'2027-04-06',bs:'२०८३ चैत २३',icon:'🐎',
+   words:[['Horse','घोडा'],['Tradition','परम्परा'],['Parade','परेड']]},
+  {name:'Nepali New Year 2084',ne:'नेपाली नयाँ वर्ष २०८४',date:'2027-04-14',bs:'२०८४ वैशाख १',icon:'🎊',
+   words:[['New Year','नयाँ वर्ष'],['Beginning','सुरुवात'],['Goals','लक्ष्य']]},
 ];
 const SIKAU_FESTIVAL_MONTHS={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
 function sikauNepalDate(){
@@ -1805,7 +1814,8 @@ function enhanceFestivalCalendar(doc){
   // The source's existing published entries retain their own interactive buttons.
   // Supplement with the NEXT published festivals after the native source horizon.
   const newEntries=SIKAU_NEXT_FESTIVALS
-    .filter(x=>x.date>=today&&x.date>latestNative)
+    .filter(x=>(x.end||x.date)>=today&&x.date>latestNative)
+    .sort((a,b)=>a.date.localeCompare(b.date))
     .slice(0,Math.max(0,SIKAU_FESTIVAL_TARGET_COUNT-live.length));
   const signature=today+'|'+latestNative+'|'+live.length+'|'+newEntries.map(x=>x.date).join(',');
   if(slot.dataset.sikauSignature===signature)return;
@@ -1833,7 +1843,9 @@ const SIKAU_FESTIVAL_PREVIEW=[
   {name:'Chhath',ne:'छठ',date:'2026-11-15',
    bs:'२०८३ कार्तिक २९',icon:'🌅',words:[['Sun','सूर्य'],['Prayer','प्रार्थना'],['River','नदी']]},
   {name:'Tamu Lhosar',ne:'तमु ल्होसार',date:'2026-12-30',
-   bs:'२०८३ पुस १५',icon:'🏔️',words:[['New Year','नयाँ वर्ष'],['Tradition','परम्परा'],['Community','समुदाय']]}
+   bs:'२०८३ पुस १५',icon:'🏔️',words:[['New Year','नयाँ वर्ष'],['Tradition','परम्परा'],['Community','समुदाय']]},
+  {name:'Yomari Punhi / Udhauli / Dhanya Purnima',ne:'यःमरि पुन्हि / उधौली / धान्य पूर्णिमा',date:'2026-12-24',
+   bs:'२०८३ पुस ९',icon:'🥟',words:[['Harvest','अन्नबाली'],['Tradition','परम्परा'],['Yomari','यःमरि']]}
 ];
 function sikauFestivalPreview(doc,mount){
   let today;try{today=sikauNepalDate();}catch{return;}
