@@ -5,9 +5,10 @@
 'use strict';
 const STYLE_ID='sikau-mobile-header-autohide-style';
 const HIDDEN='sikau-mobile-header-hidden';
+const COMPACT='sikau-mobile-header-compact';
 const MOBILE_MAX=650;
 const HIDE_AFTER=140;
-const TOP_REVEAL=35;
+const TOP_REVEAL=8;
 const DISTANCE=24;
 const listeners=new WeakSet();
 
@@ -22,9 +23,14 @@ function addStyle(){
   'margin-bottom:0!important;transform:translate3d(0,0,0);opacity:1;visibility:visible;',
   'transition:transform 300ms cubic-bezier(.2,.75,.2,1),margin-bottom 300ms cubic-bezier(.2,.75,.2,1),opacity 230ms ease,visibility 0s linear 0s;',
   '}',
+  // Collapse the iframe space once, then KEEP it collapsed while the header
+  // slides back over the lesson on upward scroll. This avoids resizing the
+  // Safari iframe each time the scroll direction changes.
+  '#protected.'+COMPACT+' #bar.student-topbar{',
+  'margin-bottom:calc(-1 * var(--sikau-mobile-header-height,190px))!important;',
+  '}',
   '#protected.'+HIDDEN+' #bar.student-topbar{',
   'transform:translate3d(0,-105%,0);',
-  'margin-bottom:calc(-1 * var(--sikau-mobile-header-height,190px))!important;',
   'opacity:0;visibility:hidden;pointer-events:none;',
   'transition:transform 300ms cubic-bezier(.2,.75,.2,1),margin-bottom 300ms cubic-bezier(.2,.75,.2,1),opacity 230ms ease,visibility 0s linear 300ms;',
   '}',
@@ -37,6 +43,12 @@ function addStyle(){
 }
 function root(){return document.getElementById('protected');}
 function showHeader(){root()?.classList.remove(HIDDEN);}
+function restoreLayout(){
+ const host=root();
+ if(!host)return;
+ host.classList.remove(HIDDEN);
+ host.classList.remove(COMPACT);
+}
 function sizeHeader(){
  // The welcome row can wrap on narrow phones or long names. Use its actual
  // current height, not a guessed fixed margin that leaves a blank strip.
@@ -66,26 +78,27 @@ function readPosition(event,doc){
  return {scrollTarget:scrollEl||doc,y:Math.max(0,
    scrollEl?.scrollTop||win?.scrollY||doc.body?.scrollTop||0)};
 }
-window.sikauResetMobileHeader=function(){showHeader();};
+window.sikauResetMobileHeader=function(){restoreLayout();};
 window.sikauInstallMobileHeader=function(doc){
  if(!doc?.defaultView||!doc.documentElement||listeners.has(doc)||!root())return;
  addStyle();
  listeners.add(doc);
  let lastTarget=null,lastY=0,down=0,up=0,lastChange=0;
- function reset(){lastTarget=null;lastY=0;down=0;up=0;showHeader();sizeHeader();}
+ function reset(){lastTarget=null;lastY=0;down=0;up=0;restoreLayout();sizeHeader();}
  function onScroll(event){
    if(!isMobile()){reset();return;}
    if(!root()||root().classList.contains('hide'))return;
-   if(expanded()){showHeader();return;}
+   if(expanded()){restoreLayout();return;}
    const position=readPosition(event,doc);
    if(!position)return;
    const {scrollTarget,y}=position;
-   // Hiding the outer header enlarges the iframe and can adjust scrollTop.
-   // Ignore these synthetic layout scroll events to prevent flickering.
-   if(Date.now()-lastChange<390){
+   // At the actual top always restore the normal page layout, even
+   // during iOS bounce/rapid scroll. Ignore synthetic resize events only
+   // away from top; these should never trap the header off-screen.
+   if(y<=TOP_REVEAL){reset();return;}
+   if(Date.now()-lastChange<260){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
    }
-   if(y<=TOP_REVEAL){reset();return;}
    if(lastTarget!==scrollTarget){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
    }
@@ -99,7 +112,8 @@ window.sikauInstallMobileHeader=function(doc){
        const header=document.getElementById('bar');
        if(!header?.contains(document.activeElement)){
          if(!root()?.classList.contains(HIDDEN)){
-           sizeHeader();
+           if(!root()?.classList.contains(COMPACT))sizeHeader();
+           root()?.classList.add(COMPACT);
            root()?.classList.add(HIDDEN);
            lastChange=Date.now();
          }
@@ -110,7 +124,9 @@ window.sikauInstallMobileHeader=function(doc){
      up-=delta;down=0;
      if(up>=DISTANCE){
        if(root()?.classList.contains(HIDDEN)){
-         showHeader();lastChange=Date.now();
+         // Only reveal the overlay; leave iframe height untouched.
+         showHeader();
+         lastChange=0;
        }
        up=0;
      }

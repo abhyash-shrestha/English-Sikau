@@ -50,7 +50,8 @@ function makeBrowser(){
   window,root,header,toggle,styles,scroll,
   reset:()=>window.sikauResetMobileHeader(),
   resize:()=>windowListeners.resize(),
-  hidden:()=>rootClasses.has('sikau-mobile-header-hidden')
+  hidden:()=>rootClasses.has('sikau-mobile-header-hidden'),
+  compact:()=>rootClasses.has('sikau-mobile-header-compact')
  };
 }
 
@@ -58,12 +59,14 @@ test('smooth header retains layout and transitions instead of abrupt display non
  const {styles,root}=makeBrowser();
  const css=styles[0].textContent;
  assert.match(css,/translate3d\(0,-105%,0\)/);
+ assert.match(css,/sikau-mobile-header-compact/);
+ assert.match(css,/margin-bottom:calc\(-1 \* var\(--sikau-mobile-header-height/);
  assert.match(css,/margin-bottom 300ms/);
  assert.match(css,/opacity 230ms/);
  assert.match(css,/prefers-reduced-motion:reduce/);
  assert.doesNotMatch(css,/display:none/);
  assert.equal(root.style.properties['--sikau-mobile-header-height'],'228px');
- assert.match(website,/mobile-header-autohide\.js\?v=20261024-smooth-r2/);
+ assert.match(website,/mobile-header-autohide\.js\?v=20261024-overlay-r3/);
 });
 
 test('scroll down slides away, up restores, and rapid layout adjustments do not flicker',()=>{
@@ -71,9 +74,14 @@ test('scroll down slides away, up restores, and rapid layout adjustments do not 
  assert.equal(b.hidden(),false);
  assert.equal(b.scroll(56),false);
  assert.equal(b.scroll(180),true);
+ assert.equal(b.compact(),true,'initial hide collapses layout');
  assert.equal(b.scroll(94,10),true,'ignore synthetic iframe resize');
  assert.equal(b.scroll(66),false);
+ assert.equal(b.compact(),true,'scrolling UP reveals over the lesson, without resizing iframe');
  assert.equal(b.scroll(192),true);
+ assert.equal(b.compact(),true,'scrolling DOWN hides while preserving the same lesson viewport');
+ assert.equal(b.scroll(0,20),false,'at top always reveals even during debounce');
+ assert.equal(b.compact(),false,'normal header layout is restored only at the very top');
  b.reset();
  assert.equal(b.hidden(),false);
 });
