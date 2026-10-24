@@ -126,3 +126,135 @@ html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-main-head h3 span,
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-card-title span{color:#ff9dc9!important}
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-panel b,
 html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-study h4{color:#ffc0d9!important}
+
+
+/* Festival stories v2 — focused bilingual storybook, no XP or access changes. */
+#sikauHomeScreen .sfd .sfd-cards[hidden],
+#sikauHomeScreen .sfd .sfd-more-btn[hidden],
+#sikauHomeScreen .sfd .sfd-story-meaning[hidden],
+#sikauHomeScreen .sfd .sfd-quiz-feedback[hidden]{display:none!important}
+#sikauHomeScreen .sfd .sfd-more-controls{display:flex;justify-content:center;margin:16px 0 0}
+#sikauHomeScreen .sfd .sfd-more-btn{border:1.5px solid #ecb1c9;background:#fff6fa;color:#a8124f;border-radius:12px;font-size:13px;font-weight:850;padding:10px 18px;min-height:44px}
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-hero,
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-main-head,
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-more-controls,
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-side{display:none!important}
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-main-grid{display:block!important;margin:0}
+#sikauHomeScreen .sfd.sfd-lesson-open .sfd-study{margin-top:0}
+#sikauHomeScreen .sfd .sfd-study[data-open="true"]{
+ display:block!important;background:#fff!important;padding:clamp(12px,2.2vw,23px)!important;
+ border:1px solid #e7d9e5!important;box-shadow:0 9px 26px #311e4210!important;
+ color:#233353!important;outline:none;
+}
+#sikauHomeScreen .sfd .sfd-story-back,
+#sikauHomeScreen .sfd .sfd-story-bottom-back{
+ display:inline-flex;align-items:center;background:#fff4f9;color:#9b1d52;
+ border:1px solid #f3c7d8;border-radius:11px;padding:10px 14px;
+ font-weight:850;font-size:12px;min-height:42px;margin:0 0 15px;
+}
+#sikauHomeScreen .sfd .sfd-story-bottom-back{margin:18px 0 0}
+#sikauHomeScreen .sfd .sfd-story-banner{
+ position:relative;isolation:isolate;overflow:hidden;border-radius:19px;min-height:190px;
+ background:linear-gradient(120deg,#292e66,#705aa1,#eea2b9);color:#fff;
+ padding:clamp(19px,3vw,35px);display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+#sikauHomeScreen .sfd .sfd-story-banner:before{content:"";position:absolute;inset:auto -15% -115px -10%;height:200px;border-radius:48%;background:#ffffff1b;transform:rotate(-10deg);z-index:-1}
+#sikauHomeScreen .sfd .sfd-story-banner:after{content:"";position:absolute;inset:auto -20% -140px 22%;height:205px;border-radius:48%;background:#00000017;transform:rotate(10deg);z-index:-1}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-tihar{background:linear-gradient(112deg,#4c295f,#ab5165,#eb9e66)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-chhath{background:linear-gradient(110deg,#9d3b57,#e77d5a,#f4bf77)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-lhosar{background:linear-gradient(115deg,#345185,#6764a9,#a58cc9)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-maghe{background:linear-gradient(110deg,#6a465a,#d38b63,#e8bc75)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-prithvi{background:linear-gradient(115deg,#394969,#6379a4,#bb829b)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-dashain{background:linear-gradient(115deg,#7f325b,#c75865,#efad79)}
+#sikauHomeScreen .sfd .sfd-story-banner.sfd-other{background:linear-gradient(110deg,#384e85,#805d9d,#bc82a5)}
+#sikauHomeScreen .sfd .sfd-story-banner-text{position:relative;z-index:1;max-width:75%}
+#sikauHomeScreen .sfd .sfd-story-kicker{display:block;font-size:11px;font-weight:950;letter-spacing:.12em;color:#ffe4c8;margin-bottom:9px}
+#sikauHomeScreen .sfd .sfd-story-banner h2{font-size:clamp(25px,3vw,37px)!important;color:white!important;line-height:1.2;margin:0 0 7px!important;letter-spacing:-.04em}
+#sikauHomeScreen .sfd .sfd-story-ne{font-size:16px;font-weight:850;color:#fff4fa;margin:0 0 8px!important}
+#sikauHomeScreen .sfd .sfd-story-summary{font-size:13px;font-weight:650;color:#fff4ee;line-height:1.55;margin:0!important;max-width:590px}
+#sikauHomeScreen .sfd .sfd-story-emblem{display:grid;place-items:center;flex:0 0 130px;width:130px;height:130px;border-radius:31px;background:#ffffff30;box-shadow:inset 0 0 0 1px #fff5;transform:rotate(-6deg);font-size:76px;filter:drop-shadow(0 10px 16px #130b2625)}
+#sikauHomeScreen .sfd .sfd-story-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:13px;margin:16px 0}
+#sikauHomeScreen .sfd .sfd-story-card{background:#f9faff!important;border:1px solid #e5e8f3!important;border-radius:16px;padding:clamp(15px,2vw,21px);min-width:0}
+#sikauHomeScreen .sfd .sfd-story-reading{background:linear-gradient(145deg,#fff8f8,#faf6fe)!important;border-color:#f0e2ef!important}
+#sikauHomeScreen .sfd .sfd-story-section-label{display:block;color:#ad275c;font-weight:950;font-size:11px;letter-spacing:.10em;margin-bottom:9px}
+#sikauHomeScreen .sfd .sfd-story-card h3,
+#sikauHomeScreen .sfd .sfd-story-vocab h3,
+#sikauHomeScreen .sfd .sfd-story-quiz h3{font-size:clamp(17px,1.8vw,21px)!important;color:#273253!important;margin:0 0 12px!important;letter-spacing:-.025em}
+#sikauHomeScreen .sfd .sfd-story-body{font-size:14px;line-height:1.85;color:#343a59;margin:0 0 15px;max-width:70ch}
+#sikauHomeScreen .sfd .sfd-story-controls{display:flex;flex-wrap:wrap;gap:8px}
+#sikauHomeScreen .sfd :is(.sfd-story-voice,.sfd-story-translate){
+ border:1px solid #e6bcd0;background:#fff;color:#a22157;
+ border-radius:10px;padding:9px 12px;font-size:11px;font-weight:900;min-height:40px;
+}
+#sikauHomeScreen .sfd .sfd-story-meaning{background:#f0ebfc;border-left:3px solid #986ac9;color:#44345f;font-size:13px;line-height:1.75;margin:11px 0 0;padding:11px 12px;border-radius:7px}
+#sikauHomeScreen .sfd .sfd-story-moments{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#sikauHomeScreen .sfd .sfd-story-moment{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;padding:12px 7px;background:#fff;border:1px solid #e4deeb;border-radius:13px;gap:6px}
+#sikauHomeScreen .sfd .sfd-story-moment span{font-size:31px;line-height:1.25}
+#sikauHomeScreen .sfd .sfd-story-moment strong{font-size:11px;color:#333b60;line-height:1.3;overflow-wrap:anywhere}
+#sikauHomeScreen .sfd .sfd-story-moment small{font-size:10px;color:#746782;overflow-wrap:anywhere}
+#sikauHomeScreen .sfd .sfd-story-fact{background:#fff0d8;color:#734f25;border-radius:10px;padding:11px 12px;margin:13px 0 0;font-size:12px;line-height:1.6;font-weight:650}
+#sikauHomeScreen .sfd .sfd-story-vocab{border-radius:16px;background:#f4f8fe;padding:18px;border:1px solid #e2eaf6}
+#sikauHomeScreen .sfd .sfd-story-wordgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+#sikauHomeScreen .sfd .sfd-story-word{background:#fff;border:1px solid #e3e8f4;border-radius:13px;padding:13px 9px;display:flex;align-items:center;gap:7px;min-width:0}
+#sikauHomeScreen .sfd .sfd-story-wordicon{font-size:26px;flex-shrink:0}
+#sikauHomeScreen .sfd .sfd-story-word strong{display:block;color:#293253;font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+#sikauHomeScreen .sfd .sfd-story-word small{display:block;color:#716c80;font-size:11px;line-height:1.35;margin-top:3px}
+#sikauHomeScreen .sfd .sfd-story-sentence{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px 18px;border-radius:14px;background:#fff7e9;border:1px solid #f1dfb9;margin:13px 0}
+#sikauHomeScreen .sfd .sfd-story-sentence span{font-size:10px;color:#ab7042;letter-spacing:.1em;font-weight:900;flex:1 1 100%}
+#sikauHomeScreen .sfd .sfd-story-sentence p{margin:0;flex:1;font-size:14px;color:#58402e;font-weight:800;line-height:1.5}
+#sikauHomeScreen .sfd .sfd-story-sentence button{border:1px solid #c99e6e;border-radius:9px;background:#fff;color:#8b4a27;font-size:12px;font-weight:850;padding:9px;min-height:39px}
+#sikauHomeScreen .sfd .sfd-story-quiz{padding:18px;border-radius:16px;background:#fff;border:1px solid #e8d9e9}
+#sikauHomeScreen .sfd .sfd-story-quiz-note{font-size:11px;color:#797082;margin:-6px 0 11px}
+#sikauHomeScreen .sfd .sfd-story-quiz-area{max-width:760px}
+#sikauHomeScreen .sfd .sfd-quiz-count{margin:0 0 7px;font-weight:900;color:#a21e57;font-size:11px}
+#sikauHomeScreen .sfd .sfd-story-quiz h4{font-size:17px!important;color:#293452!important;line-height:1.4;margin:0 0 12px!important}
+#sikauHomeScreen .sfd .sfd-quiz-answers{display:grid;gap:8px}
+#sikauHomeScreen .sfd .sfd-quiz-choice{display:block;text-align:left;padding:11px 14px;min-height:44px;border-radius:10px;border:1px solid #e6dce9;background:#f8f8fd;color:#33405b;font-size:13px;font-weight:700}
+#sikauHomeScreen .sfd .sfd-quiz-choice:not(:disabled):hover{background:#fae8f0;border-color:#e5acc6}
+#sikauHomeScreen .sfd .sfd-quiz-choice:disabled{cursor:default;opacity:1!important}
+#sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-correct{border-color:#43ab7d!important;background:#e3f7ea!important;color:#14603a!important}
+#sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-wrong{border-color:#e87d89!important;background:#ffeaed!important;color:#a3294d!important}
+#sikauHomeScreen .sfd .sfd-quiz-feedback{margin:12px 0 0;padding:12px;border-radius:11px;font-size:12px;font-weight:800;line-height:1.5}
+#sikauHomeScreen .sfd .sfd-feedback-good{background:#e5f8ef;color:#176647}
+#sikauHomeScreen .sfd .sfd-feedback-review{background:#fff0f2;color:#a53052}
+#sikauHomeScreen .sfd .sfd-story-quiz-next{margin-top:12px;padding:11px 17px;border-radius:11px;min-height:43px;background:#c61460;color:white;border:1px solid #c61460;font-size:12px;font-weight:900}
+#sikauHomeScreen .sfd .sfd-quiz-finished{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:18px;border-radius:14px;background:#f5f1ff}
+#sikauHomeScreen .sfd .sfd-quiz-finished span{font-size:38px}
+#sikauHomeScreen .sfd .sfd-quiz-finished strong{font-size:20px;color:#42326f}
+#sikauHomeScreen .sfd .sfd-quiz-finished p{margin:0;color:#58516c;font-size:13px}
+@media(max-width:1150px){#sikauHomeScreen .sfd .sfd-story-wordgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:790px){#sikauHomeScreen .sfd .sfd-story-grid{grid-template-columns:1fr}#sikauHomeScreen .sfd .sfd-story-wordgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:570px){
+ #sikauHomeScreen .sfd .sfd-study[data-open="true"]{padding:11px!important}
+ #sikauHomeScreen .sfd .sfd-story-banner{padding:19px;min-height:170px}
+ #sikauHomeScreen .sfd .sfd-story-banner-text{max-width:83%}
+ #sikauHomeScreen .sfd .sfd-story-emblem{flex:0 0 57px;width:57px;height:65px;border-radius:16px;font-size:39px}
+ #sikauHomeScreen .sfd .sfd-story-banner h2{font-size:24px!important}
+ #sikauHomeScreen .sfd .sfd-story-ne{font-size:13px}
+ #sikauHomeScreen .sfd .sfd-story-summary{font-size:11px}
+ #sikauHomeScreen .sfd .sfd-story-kicker{font-size:9px}
+ #sikauHomeScreen .sfd .sfd-story-wordgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ #sikauHomeScreen .sfd .sfd-story-word{padding:10px 7px}
+ #sikauHomeScreen .sfd .sfd-story-moments{gap:5px}
+ #sikauHomeScreen .sfd .sfd-story-moment{padding:9px 4px}
+ #sikauHomeScreen .sfd .sfd-story-moment span{font-size:24px}
+}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-study[data-open="true"]{background:#1e2840!important;border-color:#50607a!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-card,.sfd-story-vocab,.sfd-story-quiz){background:#273149!important;border-color:#526078!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-story-reading{background:#302e49!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-card h3,.sfd-story-vocab h3,.sfd-story-quiz h3,.sfd-story-quiz h4,.sfd-story-body){color:#f3f1fc!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-section-label,.sfd-quiz-count){color:#ffc1d7!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-moment,.sfd-story-word,.sfd-quiz-choice){background:#33405a!important;border-color:#66728a!important;color:#f7f1ff!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-moment strong,.sfd-story-word strong){color:#f8f2ff!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-moment small,.sfd-story-word small,.sfd-story-quiz-note){color:#d6d7e7!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-story-fact{background:#483c3e!important;color:#ffe5be!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-story-meaning{background:#463755!important;color:#f2dbff!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-story-sentence{background:#443b39!important;border-color:#806c54!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-story-sentence p{color:#ffe8ca!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd :is(.sfd-story-voice,.sfd-story-translate,.sfd-story-sentence button,.sfd-story-back,.sfd-story-bottom-back,.sfd-more-btn){background:#473449!important;color:#ffdeeb!important;border-color:#86627f!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-correct{background:#244937!important;color:#ccf9e1!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-wrong{background:#592c3a!important;color:#ffe1eb!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-feedback-good{background:#244937!important;color:#ccf9e1!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-feedback-review{background:#592c3a!important;color:#ffe1eb!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-quiz-finished{background:#353454!important}
+html[data-sikau-theme="dark"] #sikauHomeScreen .sfd .sfd-quiz-finished :is(strong,p){color:#f2eaff!important}
