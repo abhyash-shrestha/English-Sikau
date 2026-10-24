@@ -8,7 +8,7 @@ const HIDDEN='sikau-mobile-header-hidden';
 const COMPACT='sikau-mobile-header-compact';
 const MOBILE_MAX=650;
 const HIDE_AFTER=140;
-const TOP_REVEAL=35;
+const TOP_REVEAL=8;
 const DISTANCE=24;
 const listeners=new WeakSet();
 
@@ -92,12 +92,13 @@ window.sikauInstallMobileHeader=function(doc){
    const position=readPosition(event,doc);
    if(!position)return;
    const {scrollTarget,y}=position;
-   // Hiding the outer header enlarges the iframe and can adjust scrollTop.
-   // Ignore these synthetic layout scroll events to prevent flickering.
+   // At the actual top always restore the normal page layout, even
+   // during iOS bounce/rapid scroll. Ignore synthetic resize events only
+   // away from top; these should never trap the header off-screen.
+   if(y<=TOP_REVEAL){reset();return;}
    if(Date.now()-lastChange<260){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
    }
-   if(y<=TOP_REVEAL){reset();return;}
    if(lastTarget!==scrollTarget){
      lastTarget=scrollTarget;lastY=y;down=0;up=0;return;
    }
