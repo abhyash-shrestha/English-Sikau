@@ -1135,7 +1135,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./sidebar-unified.js?v=20261021-sidebar-parity-r1"></script>
 <script src="./all-tabs-responsive.js?v=20261021-dark-contrast-r1"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
-<script src="./writing-coach-dashboard.js?v=20261022-proofreading-quality-r1"></script>
+<script src="./writing-coach-dashboard.js?v=20261022-ai-pilot-proofreading-r3"></script>
 <script src="./reading-dashboard.js?v=20261021-dark-contrast-r1"></script>
 <script src="./game-adventure.js?v=20261021-big-answer-verdict-hotfix-r2"></script>
 <script src="./nepal-explorer.js?v=20261021-r1"></script>
@@ -1621,20 +1621,31 @@ async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['htt
 
 
 /* Optional, authenticated AI writing checks. Never include provider API secrets.
-   The function must be deployed separately and CFG.writingAI activated afterward. */
-window.sikauWritingAIConfigured=!!CFG.writingAI;
+   The function must be verified before CFG.writingAI is activated. The label
+   check controls pilot display only; the backend validates the exact account. */
+function sikauCanUseWritingAI(){
+ return !!CFG.writingAI&&!!functions&&!!openedAccess&&user?.status===true&&
+  user?.emailVerification===true&&Array.isArray(user.labels)&&
+  user.labels.includes('sikautestpaid')&&user.labels.includes('sikauaiapproved');
+}
+Object.defineProperty(window,'sikauWritingAIConfigured',{get:sikauCanUseWritingAI});
 window.sikauWritingAI=async function({answer,topicEn,topicNe}){
- if(!CFG.writingAI||!functions||!user||!openedAccess)throw Error('AI reviewer not available');
- const response=await functions.createExecution({
-  functionId:CFG.writingAI,
-  body:JSON.stringify({answer,topicEn,topicNe}),
-  async:false,method:'POST',
-  headers:{"content-type":"application/json"}
- });
+ if(!sikauCanUseWritingAI())throw Error('AI reviewer not available');
+ let timer;
+ // Appwrite Web SDK 17 uses positional arguments, as does the trial client.
+ const response=await Promise.race([functions.createExecution(
+  CFG.writingAI,JSON.stringify({action:'writing-review',answer,topicEn,topicNe}),
+  false,'/','POST',{'content-type':'application/json'}
+ ),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('AI review timed out')),35000);})]).finally(()=>clearTimeout(timer));
  const body=JSON.parse(response.responseBody||'{}');
- if(response.responseStatusCode!==200||body.status!=='ok'||!body.review)throw Error('AI review unavailable');
+ if(response.status!=='completed')throw Error('AI review did not complete');
+ if(response.responseStatusCode!==200||body.status!=='ok'||!body.review)return {
+  status:'unavailable',code:String(body.code||'unavailable').slice(0,40),
+  message:typeof body.message==='string'?body.message.slice(0,300):'AI review is unavailable. Try again later.',
+  message_ne:typeof body.message_ne==='string'?body.message_ne.slice(0,400):'एआई जाँच उपलब्ध छैन। पछि प्रयास गर्नुहोस्।'
+ };
  const review=body.review;
- if(typeof review.corrected!=='string'||review.corrected.length<12||!Number.isFinite(Number(review.score)))throw Error('AI result invalid');
+ if(typeof review.corrected!=='string'||!review.corrected.trim()||review.corrected.length>6000||!Number.isInteger(review.score)||review.score<0||review.score>100||!['on_topic','partial','off_topic'].includes(review.relevance)||!Array.isArray(review.feedback)||review.feedback.length>3)throw Error('AI result invalid');
  return {status:'ok',review};
 };
 

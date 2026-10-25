@@ -1,11 +1,9 @@
-/* English Sikau Writing Coach visual dashboard.
- * The existing, protected Writing Coach remains the only source of grades,
- * corrections, model answers, topics, camera OCR and stored learning progress.
- * We move its native controls, then summarize REAL returned feedback only.
+/* AI-first Writing Coach. Protected native topics/photo controls are preserved.
+ * AI results are advisory; this dashboard never writes learning progress or XP.
  */
 (function(){
 'use strict';
-const stylesheet=new URL('./writing-coach-dashboard.css?v=20261022-proofreading-quality-r1',document.baseURI).href;
+const stylesheet=new URL('./writing-coach-dashboard.css?v=20261022-ai-pilot-proofreading-r3',document.baseURI).href;
 const create=(d,t,c,s)=>{const n=d.createElement(t);if(c)n.className=c;if(s!==undefined)n.textContent=String(s);return n};
 const add=(d,p,t,c,s)=>{const n=create(d,t,c,s);p.appendChild(n);return n};
 function nativeSection(result,re){
@@ -142,10 +140,18 @@ function getModelAnswer(result){
  }
  return model;
 }
-function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,aiPending=false,aiUnavailable=false){
+function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,aiPending=false,aiUnavailable=null){
  const score=result.querySelector('.wc-score .num');
  const error=result.querySelector('.card.bad');
- if(!score){
+ if(aiPending||aiUnavailable){
+   original.hidden=true;original.open=false;summary.hidden=false;summary.replaceChildren();
+   add(doc,summary,'h2','','Writing Result · लेखाइको नतिजा');
+   add(doc,summary,'p','wc-ai-message',aiPending?'Checking your paragraph… · तपाईंको लेख जाँच हुँदैछ…':
+     (aiUnavailable.message||'AI review is unavailable. You can use the basic checker.')+' · '+
+     (aiUnavailable.message_ne||'एआई जाँच उपलब्ध छैन। सामान्य जाँच प्रयोग गर्न सक्नुहुन्छ।'));
+   return;
+ }
+ if(!score&&!aiReview){
    summary.hidden=true;
    original.hidden=!error;
    original.open=!!error;
@@ -181,19 +187,18 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  });
  const heading=add(doc,summary,'div','wc-simple-head');
  const main=add(doc,heading,'div');
- add(doc,main,'h2','','Your writing results · लेखाइको नतिजा');
- add(doc,main,'p','','Short, clear feedback to help you improve.');
+ add(doc,main,'h2','','Writing Result · लेखाइको नतिजा');
  const stats=add(doc,summary,'div','wc-simple-stats');
  const scoreBox=add(doc,stats,'div','wc-simple-score');
  add(doc,scoreBox,'strong','',scoreLabel+'/100');
- add(doc,scoreBox,'span','',aiReview?'AI estimated score · एआई अनुमानित अंक':'Writing score · लेखाइको अंक');
+ add(doc,scoreBox,'span','',aiReview?'Writing score · लेखाइको अंक':'Basic estimate · सामान्य अनुमान');
  const info=add(doc,stats,'div','wc-simple-status');
  const topicStatus=offTopic?'⚠️ Off-topic · विषय मिलेन':partly?'⚠️ Partly on topic · आंशिक मिल्यो':'✓ Topic checked · विषय जाँचियो';
  add(doc,info,'strong','',topicStatus);
  add(doc,info,'small','',aiReview?'AI-powered review · एआई लेखन जाँच':aiPending?'AI reviewing… · एआई जाँच हुँदैछ':aiUnavailable?'Basic checker used · सामान्य जाँच':'Basic grammar review · सामान्य जाँच');
  if(offTopic)add(doc,info,'p','','Answer the assigned question before fixing grammar. · पहिले सोधिएको विषयमा लेख्नुहोस्।');
  const corrected=add(doc,summary,'section','wc-simple-card wc-simple-corrected');
- add(doc,corrected,'h3','',aiReview?'✓ AI corrected version · एआईले सुधारेको उत्तर':'✓ Improved version · सुधारिएको उत्तर');
+ add(doc,corrected,'h3','',aiReview?'✓ Corrected & polished · सुधारिएको लेख':'✓ Basic correction · सामान्य सुधार');
  add(doc,corrected,'p','wc-simple-text',improved||'Your corrected paragraph was not available.');
  add(doc,corrected,'p','wc-simple-note',aiReview?'AI suggestions can still be inaccurate; compare with your own meaning. · एआईको सुझाव पनि जाँच्नुहोस्।':aiPending?'AI is checking the full paragraph. This is the basic result. · एआई जाँच हुँदैछ।':'Rule-based corrections can miss context-dependent errors. · स्वचालित सुधारमा गल्ती छुट्न सक्छ।');
  if(improved){
@@ -217,13 +222,13 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  const tips=[];
  if(aiReview && Array.isArray(aiReview.feedback)){
   for(const item of aiReview.feedback.slice(0,3)){
-   if(item?.before&&item?.after)tips.push({before:String(item.before).slice(0,180),after:String(item.after).slice(0,180),ne:String(item.why_ne||'').slice(0,300)});
+   if(item?.before&&item?.after)tips.push({before:String(item.before).slice(0,500),after:String(item.after).slice(0,600),en:String(item.why_en||'').slice(0,350),ne:String(item.why_ne||'').slice(0,450)});
   }
  }
  const example=(re,before,after,ne)=>{if(!aiReview&&re.test(originalAnswer))tips.push({before,after,ne});};
  example(/\bwe has\b/i,'we has','we have','“We” पछि “have” प्रयोग हुन्छ।');
  example(/\blast dashain[^.!?]*we goes\b/i,'we goes','we went','बितेको Dashain बारे past tense मा “went” लेख्नुहोस्।');
- example(/\bI (?:didnt|didn't) saw my grandparents\b/i,"didn't saw","hadn't seen",'नभेटेको अवधि बताउँदा “hadn’t seen” प्रयोग गर्नुहोस्।');
+ example(/\bI (?:didnt|didn't) saw\b/i,"didn't saw","didn't see",'“Didn’t” पछि क्रियाको मूल रूप “see” लेख्नुहोस्।');
  example(/\btaked\b/i,'taked','took','“Take” को past tense “took” हो।');
  example(/\bI wakes\b/i,'I wakes','I wake','“I” पछि “wake” लेख्नुहोस्।');
  example(/\bI eating\b/i,'I eating','I eat','दिनचर्यामा “I eat” प्रयोग हुन्छ।');
@@ -243,19 +248,21 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  }
  if(tips.length){
   const ul=add(doc,key,'ul','wc-simple-fixes');
-  for(const t of tips.slice(0,8)){
+  for(const t of tips.slice(0,aiReview?3:8)){
    const li=add(doc,ul,'li');
    add(doc,li,'span','',t.before);
    add(doc,li,'span','wc-simple-arrow','→');
    add(doc,li,'strong','',t.after);
+   if(t.en)add(doc,li,'small','',t.en);
    add(doc,li,'small','',t.ne);
   }
- }else add(doc,key,'p','wc-simple-text','No specific grammar suggestions were returned.');
- add(doc,key,'p','wc-simple-tip',aiReview?.tip_ne?'💡 '+String(aiReview.tip_ne).slice(0,450):'💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
+ }else add(doc,key,'p','wc-simple-text','No major grammar fixes needed. · ठूलो व्याकरण सुधार आवश्यक छैन।');
+ add(doc,key,'p','wc-simple-tip',aiReview?.tip_ne?'💡 '+(aiReview.tip_en?String(aiReview.tip_en)+' · ':'')+String(aiReview.tip_ne):'💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
  const model=aiReview?.model_answer||getModelAnswer(result);
  if(model){
    const examples=add(doc,summary,'details','wc-simple-model');
    add(doc,examples,'summary','','See model answer · नमुना उत्तर हेर्नुहोस्');
+   if(aiReview)add(doc,examples,'p','wc-simple-note','Fictional example for practice · अभ्यासका लागि काल्पनिक उदाहरण');
    add(doc,examples,'p','wc-simple-text',model);
  }
 }
@@ -342,46 +349,58 @@ window.enhanceWritingCoachDashboard=function(doc){
  root.appendChild(full);
  content.insertBefore(root,content.firstChild);
  section.classList.add('sikau-writing-v1');
- let scheduled=false;
- const update=()=>{
-  if(scheduled)return;scheduled=true;
-  const view=doc.defaultView;
-  (view.requestAnimationFrame||((f)=>view.setTimeout(f,0)))(()=>{
-   scheduled=false;
-   const grade=feedback.querySelector('.wc-score .num');
-   const answer=textarea.value.trim();
-   const topicEn=(doc.getElementById('topicEn')?.textContent||'').trim();
-   const topicNe=(doc.getElementById('topicNe')?.textContent||'').trim();
-   const key=JSON.stringify([answer,topicEn,topicNe]);
-   if(onlineAI&&grade&&answer.length>=15&&topicEn&&key!==lastAIKey){
-      lastAIKey=key;aiPending=true;aiReview=null;aiUnavailable=false;
-      window.sikauWritingAI({answer,topicEn,topicNe})
-        .then(data=>{
-          if(lastAIKey!==key)return;
-          aiReview=data?.status==='ok'&&data?.review?data.review:null;
-          aiUnavailable=!aiReview;
-          aiPending=false;
-          renderRealFeedback(doc,feedback,summaries,full,textarea,aiReview,aiPending,aiUnavailable);
-        }).catch(()=>{
-          if(lastAIKey!==key)return;
-          aiPending=false;aiUnavailable=true;
-          renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,true);
-        });
-   }
-   renderRealFeedback(doc,feedback,summaries,full,textarea,aiReview,aiPending,aiUnavailable);
-  });
- };
- // AI is optional and disabled until the separate authenticated Appwrite
- // Function has been deployed with a private provider key.
- let lastAIKey='',aiReview=null,aiPending=false,aiUnavailable=false;
  const onlineAI=typeof window.sikauWritingAI==='function' && window.sikauWritingAIConfigured===true;
+ let sequence=0,busy=false,runNative=false,showBasic=!onlineAI;
+ const snapshot=()=>({answer:textarea.value.trim(),topicEn:(doc.getElementById('topicEn')?.textContent||'').trim(),topicNe:(doc.getElementById('topicNe')?.textContent||'').trim()});
+ const cached=new Map(); // Memory only; never store paragraphs in localStorage.
+ summaries.setAttribute('aria-live','polite');
+ let consent;
  if(onlineAI){
-  add(doc,editorPanel,'p','wc-ai-privacy','🤖 AI review sends your assignment and writing to Groq when you press Check my writing. Do not include private personal information. · एआई जाँचमा आफ्नो लेख र प्रश्न पठाइन्छ। व्यक्तिगत गोप्य जानकारी नलेख्नुहोस्।');
+  const notice=add(doc,editorPanel,'label','wc-ai-privacy');
+  consent=add(doc,notice,'input');consent.type='checkbox';
+  add(doc,notice,'span','','Use AI: send this topic and writing to Groq. Avoid real names, contact details or private information. · एआई प्रयोग: प्रश्न र लेख Groq मा पठाइन्छ। वास्तविक नाम, सम्पर्क वा गोप्य विवरण नलेख्नुहोस्।');
+  const basic=add(doc,editorPanel,'button','wc-basic-check','Use basic checker · सामान्य जाँच');
+  basic.type='button';
+  basic.addEventListener('click',()=>{
+   if(busy)return;
+   sequence++;showBasic=true;runNative=true;
+   summaries.hidden=true;full.hidden=true;
+   try{check.click();}finally{runNative=false;}
+  });
  }
- check.addEventListener('click',()=>{
-   // A new user-initiated check invalidates previous AI results, even for the same text.
-   lastAIKey='';aiReview=null;aiPending=false;aiUnavailable=false;
+ check.addEventListener('click',async event=>{
+  if(!onlineAI||runNative)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  if(busy)return;
+  showBasic=false;
+  const input=snapshot(),key=JSON.stringify(input),job=++sequence;
+  if(!consent.checked){
+   renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,{message:'Choose AI above to send your writing, or use the basic checker.',message_ne:'एआईका लागि माथि सहमति दिनुहोस् वा सामान्य जाँच प्रयोग गर्नुहोस्।'});return;
+  }
+  if(input.answer.length<15||input.answer.length>2800||!input.topicEn){
+   renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,{message:'Select a topic and write 15–2,800 characters.',message_ne:'विषय छानेर १५–२,८०० अक्षर लेख्नुहोस्।'});return;
+  }
+  if(cached.has(key)){
+   renderRealFeedback(doc,feedback,summaries,full,textarea,cached.get(key));return;
+  }
+  busy=true;check.disabled=true;check.setAttribute('aria-busy','true');
+  renderRealFeedback(doc,feedback,summaries,full,textarea,null,true);
+  try{
+   const data=await window.sikauWritingAI(input);
+   if(sequence!==job||JSON.stringify(snapshot())!==key)return;
+   if(data?.status==='ok'&&data.review){
+    cached.set(key,data.review);if(cached.size>3)cached.delete(cached.keys().next().value);
+    renderRealFeedback(doc,feedback,summaries,full,textarea,data.review);
+   }else renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,data||{});
+  }catch(_){
+   if(sequence===job&&JSON.stringify(snapshot())===key)
+    renderRealFeedback(doc,feedback,summaries,full,textarea,null,false,{message:'AI could not finish. Please retry later or use the basic checker.',message_ne:'एआई जाँच पूरा भएन। पछि प्रयास गर्नुहोस् वा सामान्य जाँच प्रयोग गर्नुहोस्।'});
+  }finally{busy=false;check.disabled=false;check.removeAttribute('aria-busy');}
  },{capture:true});
+ const invalidate=()=>{sequence++;showBasic=!onlineAI;summaries.hidden=true;full.hidden=true;};
+ textarea.addEventListener('input',invalidate);
+ new doc.defaultView.MutationObserver(invalidate).observe(topic,{childList:true,subtree:true,characterData:true});
+ const update=()=>{if(showBasic)renderRealFeedback(doc,feedback,summaries,full,textarea);};
  const observer=new doc.defaultView.MutationObserver(update);
  observer.observe(feedback,{childList:true,subtree:true,characterData:true});
  update();

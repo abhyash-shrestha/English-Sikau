@@ -1,0 +1,588 @@
+{
+  "date": "2026-10-21",
+  "provider": "Groq",
+  "model": "openai/gpt-oss-20b",
+  "source": "Signed-in Groq Playground UI; synthetic data only",
+  "format": "json_object; production strict json_schema still requires an authorized end-to-end test",
+  "temperature": 0.1,
+  "reasoning_effort": "medium",
+  "output_budget": "2400 initially; raised to 3200 for mixed input and final long/context/unseen tests",
+  "successful_cases": 17,
+  "failed_attempts": 3,
+  "retries": "One manual Playground retest for each failed case. Production has no automatic retry.",
+  "attempts": [
+    {
+      "id": "family-dashain",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "We have five members in my family. Last Dashain, my father took us to my grandparents' house. Before that visit, I hadn't seen my grandparents for two years. We cooked together and everyone was happy. That memory is important because we spent time together.",
+        "model_answer": "My family consists of my parents, my older sister, my younger brother, and me. One summer, we all gathered at my grandmother’s house for a picnic. We played games, shared stories, and cooked a big meal together. It mattered because it reminded us of our close bond and the joy of being together after a long time apart. The laughter and warmth made that day unforgettable.",
+        "feedback": [
+          {
+            "before": "We has five member in my family.",
+            "after": "We have five members in my family.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "Last Dashain my father taked us to my grandparents house.",
+            "after": "Last Dashain, my father took us to my grandparents' house.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "That memory are important because we spent time together.",
+            "after": "That memory is important because we spent time together.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Try adding more sensory details to make the memory vivid.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "routine",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "I wake up at six every day. I brush my teeth and eat breakfast. After that I go to work. In the evening I read a book and sleep at ten.",
+        "model_answer": "I wake up at 6 a.m. and start my day with a quick stretch. I brush my teeth, have a bowl of oatmeal, and then head to work. After finishing my tasks, I return home, cook dinner, and spend some time reading. Finally, I go to bed around 10 p.m., feeling relaxed and ready for the next day.",
+        "feedback": [
+          {
+            "before": "I wakes up at six every day.",
+            "after": "I wake up at six every day.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I brush my teeth and eats breakfast.",
+            "after": "I brush my teeth and eat breakfast.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "After that I goes to work.",
+            "after": "After that I go to work.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Try adding more details about what you do at work or how you relax in the evening to make your routine more vivid.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "past",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "Yesterday I went to the market and bought rice. Then I met my friend. We talked for an hour and I returned home before dark.",
+        "model_answer": "Yesterday, I went to the market to buy rice. After that, I met a friend and we chatted for about an hour. I then returned home before it got dark. It was a pleasant day, and I felt relaxed after spending time with my friend.",
+        "feedback": [
+          {
+            "before": "Yesterday I go to the market and buy rice.",
+            "after": "Yesterday I went to the market and bought rice.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "Then I meet my friend.",
+            "after": "Then I met my friend.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "We talk for an hour",
+            "after": "We talked for an hour",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Make sure to use past tense consistently when describing yesterday’s events.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "present",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 86,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 16
+        },
+        "corrected": "My teacher explains clearly and always helps us. She has patience. The lessons are useful because she gives real examples.",
+        "model_answer": "My teacher usually starts each class by reviewing the previous lesson, then introduces new material with clear explanations and engaging activities. She often uses real-life examples, like discussing current events or everyday situations, to make the concepts relatable. After the lesson, she checks our understanding with quick quizzes or group discussions, and she always offers extra help during office hours.",
+        "feedback": [
+          {
+            "before": "My teacher explain clearly and always help us.",
+            "after": "My teacher explains clearly and always helps us.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "She have patience.",
+            "after": "She has patience.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "The lessons is useful because she give real examples.",
+            "after": "The lessons are useful because she gives real examples.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Try to describe more details about what your teacher does, such as how she starts the lesson, what activities she uses, and how she supports students.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "future",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "Next Saturday, I will go to my cousin's house. We will cook dinner and watch a movie. I am going to buy vegetables before I leave.",
+        "model_answer": "On Saturday, I plan to visit my cousin in Pokhara. I’ll start by buying fresh vegetables at the local market, then head to my cousin’s house. We’ll cook a traditional Nepali meal together, followed by watching a movie. After the film, we’ll take a walk around Phewa Lake before heading home. It will be a relaxing and fun day.",
+        "feedback": [
+          {
+            "before": "Next Saturday I will goes to my cousin house.",
+            "after": "Next Saturday, I will go to my cousin's house.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "We will cooking dinner and watch a movie.",
+            "after": "We will cook dinner and watch a movie.",
+            "why_en": "Put the words together this way for a clear, correct sentence.",
+            "why_ne": "यसरी शब्दहरू मिलाउँदा वाक्य सही र स्पष्ट हुन्छ।"
+          },
+          {
+            "before": "I am going buy vegetables before I leave.",
+            "after": "I am going to buy vegetables before I leave.",
+            "why_en": "Add the missing word to complete the sentence.",
+            "why_ne": "वाक्य पूरा गर्न छुटेको शब्द थप्नुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job describing your plans! Consider adding more details about what you’ll do after the movie or how you’ll get to your cousin’s house.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "pokhara-phewa",
+      "status": "failed",
+      "reason": "Playground showed an empty assistant response; no review or latency appeared."
+    },
+    {
+      "id": "pokhara-phewa",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 96,
+        "scores": {
+          "relevance": 30,
+          "grammar": 26,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "My favorite place is Pokhara. I like Phewa Lake because the water looks peaceful. Last year I enjoyed boating there with my brother. I want to visit again.",
+        "model_answer": "My favorite place is Pokhara, a beautiful city in western Nepal. I love Phewa Lake because its calm turquoise waters reflect the surrounding mountains, creating a peaceful atmosphere. I spent a sunny afternoon boating with my brother last year, and we watched the sunset over the lake. I hope to return soon to enjoy the scenery and the friendly locals.",
+        "feedback": [
+          {
+            "before": "I likes",
+            "after": "I like",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "the water look peaceful",
+            "after": "the water looks peaceful",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "Last year I enjoy boating",
+            "after": "Last year I enjoyed boating",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job! Try adding more details about what makes the place special, like activities or sights you enjoy.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "school",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "Our class built a small garden last month. Every student brought seeds and we planted them near the library. I learned that plants need sunlight and water. Working together was the best part.",
+        "model_answer": "Last year, our class planted a small garden in the school courtyard. We each brought seeds, tools, and a lot of enthusiasm. While we were working, I learned how plants grow, the importance of sunlight, water, and soil quality, and how teamwork makes tasks easier. The experience taught me responsibility and patience, and I enjoyed seeing the seedlings sprout and thrive.",
+        "feedback": [
+          {
+            "before": "Our class build a small garden last month.",
+            "after": "Our class built a small garden last month.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "Every student bring seeds and we planted them near the library.",
+            "after": "Every student brought seeds and we planted them near the library.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I learn that plants needs sunlight and water.",
+            "after": "I learned that plants need sunlight and water.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job describing the garden activity! To strengthen your writing, try adding more details about how you felt during the project and what specific skills you gained.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "work",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "At work, the scanner stopped working yesterday. I checked the cable and restarted it. After that, we were able to finish counting the boxes. I feel proud because I solved the problem without delaying the delivery.",
+        "model_answer": "Last week, our office printer jammed and caused a backlog of documents. I identified the jam, cleared the paper, and replaced the ink cartridge. After reloading the printer, the print queue resumed smoothly. I was pleased that the issue was resolved quickly, preventing any delay in the project deadline. I also notified the team so they could adjust their schedules accordingly.",
+        "feedback": [
+          {
+            "before": "At work the scanner stop working yesterday.",
+            "after": "At work, the scanner stopped working yesterday.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I checked the cable and restart it.",
+            "after": "I checked the cable and restarted it.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "we was able to finish counting the boxes.",
+            "after": "we were able to finish counting the boxes.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job! Try to add more details about the steps you took and how you felt during the process.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "short-perfect",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 100,
+        "scores": {
+          "relevance": 30,
+          "grammar": 30,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "My name is Rina, and I enjoy reading books.",
+        "model_answer": "Hello, my name is Rina. I am a student from Kathmandu and I love reading books. I enjoy exploring different genres, especially mystery and fantasy. Reading helps me relax and learn new ideas. In my free time, I also like to write short stories and share them with friends. I hope to become a writer one day.",
+        "feedback": [],
+        "tip_en": "Great job! You could add more details about your hobby or background to make your introduction richer.",
+        "tip_ne": "राम्रो लेखाइ छ। यही अभ्यास जारी राख्नुहोस्।"
+      }
+    },
+    {
+      "id": "perfect",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 100,
+        "scores": {
+          "relevance": 30,
+          "grammar": 30,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "Last Dashain, my family gathered at my grandparents' house. We cooked together and shared stories over dinner. My favorite moment was helping my grandmother prepare the vegetables while she told me about her childhood. That memory matters to me because it reminds me how much we can learn when we spend time together.",
+        "model_answer": "During the New Year celebrations in my hometown, my parents and I gathered around the kitchen table to cook traditional dumplings. I remember the aroma of ginger and garlic, the laughter as my brother accidentally dropped a pot, and my father's gentle guidance. This memory matters because it reminds me of the warmth of family bonds and the importance of sharing simple moments together.",
+        "feedback": [],
+        "tip_en": "Great job! You could add more sensory details to make the memory even more vivid.",
+        "tip_ne": "राम्रो लेखाइ छ। यही अभ्यास जारी राख्नुहोस्।"
+      }
+    },
+    {
+      "id": "off-topic",
+      "status": "passed",
+      "review": {
+        "relevance": "off_topic",
+        "score": 10,
+        "scores": {
+          "relevance": 0,
+          "grammar": 30,
+          "completeness": 0,
+          "clarity": 20
+        },
+        "corrected": "Momo is a popular food in Nepal. I like steamed momo with spicy sauce. I usually eat it at a small restaurant on Saturdays.",
+        "model_answer": "My best friend is Maya, a cheerful and supportive person who has been by my side since childhood. One rainy afternoon, I slipped on a wet sidewalk and fell. Maya immediately ran to help, lifted me up, and called a taxi for me. Her quick thinking and kindness made me feel safe and grateful, and I know I can always count on her.",
+        "feedback": [],
+        "tip_en": "Please describe your best friend and a time they helped you.",
+        "tip_ne": "तपाईंको लेखाइ प्रश्नसँग मेल खाँदैन। प्रश्नले मागेको विषयमा आफ्नै कुरा लेख्नुहोस्।"
+      }
+    },
+    {
+      "id": "partial",
+      "status": "passed",
+      "review": {
+        "relevance": "partial",
+        "score": 65,
+        "scores": {
+          "relevance": 15,
+          "grammar": 30,
+          "completeness": 0,
+          "clarity": 20
+        },
+        "corrected": "My family is kind. I work in a shop where I count boxes and organize shelves. The shop has many customers, and ordering products is a busy part of my job.",
+        "model_answer": "One special memory is the summer trip to Pokhara with my parents and siblings. We hiked to the Phewa Lake viewpoint, shared homemade momo, and watched the sunset over the mountains. That day taught me the value of family support and adventure. It mattered because it strengthened our bond and created lasting joy that we still cherish and it remains a treasured story in our family.",
+        "feedback": [],
+        "tip_en": "Please include a specific family memory and explain why it mattered.",
+        "tip_ne": "लेखाइको केही भाग प्रश्नसँग मिल्छ। प्रश्नले मागेका छुटेका कुरा पनि समेट्नुहोस्।"
+      }
+    },
+    {
+      "id": "spelling-unnatural",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 78,
+        "scores": {
+          "relevance": 30,
+          "grammar": 12,
+          "completeness": 20,
+          "clarity": 16
+        },
+        "corrected": "My friend and I took a walk in a beautiful park. We enjoyed the fresh air very much. I was very happy when we spent time together.",
+        "model_answer": "Last Saturday, I went for a walk with my best friend, Maya. We strolled through the lush green paths of the city park, chatting about our plans for the upcoming semester. The cool breeze and the chirping of birds made the experience refreshing. We stopped by a small pond to take photos, and we laughed a lot. It was a memorable and relaxing afternoon that strengthened our friendship.",
+        "feedback": [
+          {
+            "before": "Me and my freind maked a walk in a beutiful park.",
+            "after": "My friend and I took a walk in a beautiful park.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "We was very enjoy the fresh air.",
+            "after": "We enjoyed the fresh air very much.",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I am very much happy when we spending time togather.",
+            "after": "I was very happy when we spent time together.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Try adding more details about what you did during the walk and how it made you feel.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "mixed-nepali",
+      "status": "failed",
+      "reason": "Playground showed an empty assistant response; no review or latency appeared."
+    },
+    {
+      "id": "mixed-nepali",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 96,
+        "scores": {
+          "relevance": 30,
+          "grammar": 26,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "I like cooking with my mother. We make momos together. She teaches me to fold the dough, and I feel happy when we share the food.",
+        "model_answer": "My favorite activity with my family is cooking together. Every Sunday, my mother and I prepare momos and other dishes. She shows me how to roll the dough and fold the pockets, and I learn to season the filling. After cooking, we sit around the table and share the food, laughing and chatting. The whole process brings us closer and makes me feel happy and grateful.",
+        "feedback": [
+          {
+            "before": "She teach me",
+            "after": "She teaches me",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I feels",
+            "after": "I feel",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "हामी सँगै मोमो बनाउँछौं।",
+            "after": "We make momos together.",
+            "why_en": "Express the Nepali sentence’s meaning in natural English.",
+            "why_ne": "नेपालीमा लेखिएको अर्थलाई स्वाभाविक अंग्रेजीमा लेखिएको छ।"
+          }
+        ],
+        "tip_en": "Try to include more details about why you enjoy this activity or how it brings your family together.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "didnt-simple-past",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 96,
+        "scores": {
+          "relevance": 30,
+          "grammar": 26,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "Yesterday I didn't see my friend at the park. I waited for ten minutes, but she did not arrive. I went home and called her.",
+        "model_answer": "Yesterday I planned to meet my friend at the park, but she didn't show up. I waited for about ten minutes, hoping she would arrive, but she never came. I decided to go home and called her to find out what happened. She said she had an unexpected meeting and would meet me later.",
+        "feedback": [
+          {
+            "before": "Yesterday I didn't saw my friend at the park.",
+            "after": "Yesterday I didn't see my friend at the park.",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job! Try adding more details about how you felt or what you did after calling her.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "unseen-topic",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 90,
+        "scores": {
+          "relevance": 30,
+          "grammar": 20,
+          "completeness": 20,
+          "clarity": 20
+        },
+        "corrected": "When the lights went out last week, our neighbor put a lamp near the stairs. This helped everyone walk safely. We decided to keep a rechargeable light there because the stairs become dark in the evening.",
+        "model_answer": "During a recent power cut, a neighbor placed a small lantern beside the staircase. The light made it easier for everyone to move around safely at night. We all agreed to keep a rechargeable lamp there, so the stairs stay illuminated even when the main power fails.",
+        "feedback": [
+          {
+            "before": "When the lights goes out last week",
+            "after": "When the lights went out last week",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "This help everyone walk safe",
+            "after": "This helped everyone walk safely",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "We decided keeping a rechargeable light there",
+            "after": "We decided to keep a rechargeable light there",
+            "why_en": "Add the missing word to complete the sentence.",
+            "why_ne": "वाक्य पूरा गर्न छुटेको शब्द थप्नुपर्छ।"
+          }
+        ],
+        "tip_en": "Great job describing the change! Remember to use correct verb tenses and include all necessary words for clarity.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    },
+    {
+      "id": "long-library",
+      "status": "failed",
+      "reason": "Playground JSON mode returned only relevance and ratings, omitting required review fields."
+    },
+    {
+      "id": "long-library",
+      "status": "passed",
+      "review": {
+        "relevance": "on_topic",
+        "score": 78,
+        "scores": {
+          "relevance": 30,
+          "grammar": 12,
+          "completeness": 20,
+          "clarity": 16
+        },
+        "corrected": "Last Saturday our reading club organized a small book exchange at the community library. Six students brought twelve books, and we placed them on three shelves near the door. We started at ten o’clock and stayed for two hours. I was responsible for making a list, but I forgot to write the names of two books. At first I felt worried because I did not want anyone to lose a book. My friend suggested that we check each shelf together. We compared the books with the list and found the missing titles. Nobody lost anything. After we finished, we cleaned the tables and returned the chairs to their places. The librarian thanked us for keeping the room tidy. I learned that asking for help is better than hiding a mistake. I also learned to check my work before people arrive. Next month we will hold another exchange, and I am going to prepare a clearer list. I want every student to feel welcome, even if they can only bring one book. This activity mattered to me because we solved a small problem together without blaming anyone. We had different ideas, but we listened carefully and agreed on a simple plan. I felt proud when everyone left with the correct books.",
+        "model_answer": "Last week, my class organized a community clean‑up. We faced a problem when the rain delayed the start, but we split into teams and finished on time. I learned that clear communication and flexibility are key to teamwork.",
+        "feedback": [
+          {
+            "before": "our reading club organize a small book exchange",
+            "after": "our reading club organized a small book exchange",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I was responsible for making a list, but I forget to write the names of two books",
+            "after": "I was responsible for making a list, but I forgot to write the names of two books",
+            "why_en": "Use the verb form that fits when the event happened.",
+            "why_ne": "काम भएको समयअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          },
+          {
+            "before": "I learned that asking for help are better than hiding a mistake",
+            "after": "I learned that asking for help is better than hiding a mistake",
+            "why_en": "Match the verb form to who or what is doing the action.",
+            "why_ne": "कसले काम गर्छ भन्नेअनुसार क्रियाको रूप मिलाउनुपर्छ।"
+          }
+        ],
+        "tip_en": "Try to keep verb tenses consistent throughout the story to make it easier to follow.",
+        "tip_ne": "देखाइएका सुधारहरू अभ्यास गर्नुहोस्। आफ्नो अर्थ नबदली स्पष्ट लेख्ने प्रयास गर्नुहोस्।"
+      }
+    }
+  ]
+}
