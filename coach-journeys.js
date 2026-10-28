@@ -263,6 +263,40 @@ const alternateService={
    "समस्या बताउनुभएकोमा धन्यवाद। अर्को कदम वास्तविक सेवा प्रदायकसँग पुष्टि गर्नुहोस्। शुभ यात्रा!"]
  }
 };
+const reservationHelp={
+ intro:["Of course. Are you hoping to reserve a table or just find out what's available?",
+  "अवश्य। टेबल बुक गर्न चाहनुहुन्छ कि उपलब्धता मात्र सोध्ने?"],
+ priorities:[["Could you check a table for my group?","मेरो समूहका लागि टेबल जाँच्नुहुन्छ?","requirements"],
+  ["Could we look at another time?","अर्को समय हेर्ने?","time"],
+  ["I'd like to know the reservation policy.","बुकिङको नियम बुझ्न चाहन्छु।","quality"]],
+ proposal:["We'll need the party size, date and preferred time before the host can check the restaurant's actual availability. A table has not been reserved.",
+  "रेस्टुरेन्टमा उपलब्धता जाँच्न मानिसको संख्या, मिति र समय चाहिन्छ। टेबल बुक भएको छैन।"],
+ alternative:["We can ask about another time or seating arrangement, but the host must verify availability first.",
+  "अर्को समय वा बस्ने ठाउँ सोध्न सक्छौँ, तर कर्मचारीले उपलब्धता पुष्टि गर्नुपर्छ।"],
+ requirement:["Confirm the number of guests, local date, preferred time, seating and any cancellation rules with the restaurant.",
+  "रेस्टुरेन्टसँग मानिसको संख्या, मिति, समय, बस्ने ठाउँ र रद्द गर्ने नियम पुष्टि गर्नुहोस्।"],
+ ready:["Let's practice asking the host for a table. We can't promise a real booking here.",
+  "होस्टसँग टेबल माग्ने अभ्यास गरौँ। यहाँ वास्तविक बुकिङको वाचा गर्न सकिँदैन।"],
+ done:["Thank you for asking. The restaurant must confirm a table before you rely on a reservation. Have a lovely meal!",
+  "सोध्नुभएकोमा धन्यवाद। रेस्टुरेन्टले पुष्टि नगरेसम्म बुकिङ पक्का मान्नु हुँदैन। शुभ भोजन!"]
+};
+const interviewHelp={
+ intro:["Thanks for sharing your background. What would help you prepare for the interview?",
+  "अनुभव बताउनुभएकोमा धन्यवाद। अन्तर्वार्ताका लागि कुन मद्दत चाहिन्छ?"],
+ priorities:[["I'd like to practice answering honestly.","साँचो उत्तर दिने अभ्यास चाहिन्छ।","quality"],
+  ["Could you explain the role or training?","काम वा तालिमबारे बुझाउनुहुन्छ?","requirements"],
+  ["What happens after the interview?","अन्तर्वार्तापछि के हुन्छ?","time"]],
+ proposal:["We can discuss relevant experience and prepare clear examples. Any job offer or hiring decision belongs to the employer.",
+  "सम्बन्धित अनुभव र स्पष्ट उदाहरण तयार गरौँ। जागिर दिने निर्णय रोजगारदाताको हुन्छ।"],
+ alternative:["Let's try a different interview question, or ask the recruiter about the role and next steps.",
+  "अर्को अन्तर्वार्ता प्रश्न अभ्यास गरौँ वा भर्तीकर्तासँग कामबारे सोधौँ।"],
+ requirement:["Review the job description, interview instructions and your real experience before answering.",
+  "उत्तरअघि जागिरको विवरण, अन्तर्वार्ता निर्देशन र आफ्नो वास्तविक अनुभव जाँच्नुहोस्।"],
+ ready:["Let's rehearse a concise, truthful answer. No job offer or interview outcome is guaranteed.",
+  "छोटो र साँचो उत्तरको अभ्यास गरौँ। जागिरको नतिजाको ग्यारेन्टी छैन।"],
+ done:["Thank you for the interview practice. We will explain any real next steps through the employer. Have a good day!",
+  "अन्तर्वार्ता अभ्यासका लागि धन्यवाद। वास्तविक अर्को चरण रोजगारदाताले बताउँछन्। शुभ दिन!"]
+};
 const buyable=new Set(Object.keys(purchase));
 const categoryOf=(scene)=>window.sikauMoreTopics?.find(t=>t.id===scene)?.category||
   window.sikauCoachGuidance?.old?.[scene]||"Everyday";
@@ -357,12 +391,16 @@ function build(node,state,config){
  const scene=state.scene,path=config[1][state.path]||config[1][0],detail=path[4][state.detail??0]||path[4][0];
  const specialized=scene==="buy-phone"?phone(node,state,config):null;
  if(specialized)return specialized;
- const cat=categoryOf(scene),set=
-  shoppingHelp.has(scene)?alternateService.shopping:
+ const cat=categoryOf(scene);
+ const isTable=(scene==="restaurant"&&state.path===0)||scene==="reserve-restaurant";
+ const isTechHelp=scene==="buy-phone"&&state.path===2;
+ const set=isTable?reservationHelp:scene==="interview"?interviewHelp:
+  shoppingHelp.has(scene)||isTechHelp?alternateService.shopping:
   foodHelp.has(scene)?alternateService.food:
   travelHelp.has(scene)?alternateService.travel:
   categories[cat]||categories.Everyday;
- const isIssue=shoppingHelp.has(scene)||foodHelp.has(scene)||travelHelp.has(scene);
+ const isIssue=shoppingHelp.has(scene)||foodHelp.has(scene)||
+  travelHelp.has(scene)||isTable||isTechHelp||scene==="interview";
  const record=window.sikauNewTopicRows?.find(row=>row[0]===scene);
  const focus=record?.[7]?.split(';')?.[state.path]||detail[0].replace(/[.!?]+$/,'');
  const descriptor=focus.replace(/[.!?]+$/,'').toLowerCase();
