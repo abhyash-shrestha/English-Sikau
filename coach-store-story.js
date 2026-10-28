@@ -116,7 +116,7 @@ function step(id,state){
   if(options.length<2)throw Error("Each Coach story step needs responses");
   if(!['opening','item','intent','close'].includes(id)){
    options=[...options,opt("Thanks, I have enough information. I'll decide later.",
-     "धन्यवाद, मलाई अहिलेको लागि जानकारी पुग्यो। पछि निर्णय गर्छु।","end",{outcome:"later"})];
+     "धन्यवाद, मलाई अहिलेको लागि जानकारी पुग्यो। पछि निर्णय गर्छु।","close",{outcome:"decide-later"})];
   }
   const shown=options.map(o=>({...o,value:itemText(o.value,state),ne:itemText(o.ne,state,true)}));
   return {nodeId:id,npc:itemText(npc,state),npcNe:itemText(npcNe,state,true),speaker,speakerEmoji:emoji,storeOptions:shown,
@@ -293,8 +293,8 @@ function step(id,state){
    ],"Store manager","👩‍💼");
   return row("I haven't been able to verify a purchase from this store. I can check an internal store-specific product label, if there is one, but a matching style alone does not prove a purchase. Can I examine the label?",
    "यो पसलबाट किनेको प्रमाण भेटिएन। पसलको विशेष उत्पादन लेबल भए जाँच्न सक्छु। मिल्दोजुल्दो सामान मात्र देखेर खरिद पुष्टि हुँदैन। लेबल हेर्न सक्छु?",[
-   opt("Yes, here is the inside store label. Please scan it.","हुन्छ, भित्रको पसलको लेबल छ। स्क्यान गर्नुहोस्।","decision",{verification:"label-match"}),
-   opt("There is no readable store label on this item.","यो सामानमा पढ्न मिल्ने पसलको लेबल छैन।","decision",{verification:"no-match"}),
+   opt("Yes, this has your store's identifying barcode. Please check it.","हुन्छ, तपाईंको पसलको विशेष बारकोड छ। जाँच्नुहोस्।","decision",{verification:"label-match"}),
+   opt("It has a label from another store, not yours.","यसमा तपाईंको होइन, अर्को पसलको लेबल छ।","decision",{verification:"no-match"}),
    opt("I can't provide a receipt or a store-identifying label.","रसिद वा पसल चिनिने लेबल केही पनि दिन सक्दिनँ।","decision",{verification:"no-proof"}),
    opt("I'd rather look for purchase information and come back.","खरिद विवरण खोजेर पछि आउँछु।","close",{outcome:"return-with-proof"})
   ],"Store manager","👩‍💼");
@@ -399,11 +399,17 @@ function choose(active,item,index){
  return {finished:active.storeCompleted,turns:active.steps.length};
 }
 function reconcile(active,index,pendingChoice){
- if(!active?.isBranchingStore||!Array.isArray(active.steps)||pendingChoice)return false;
+ if(!active?.isBranchingStore||!Array.isArray(active.steps))return false;
  const old=active.steps[index];
  if(!old?.nodeId)return false;
- try{active.steps[index]={...old,...step(old.nodeId,active.storeState||{})};return true;}
- catch(_){return false}
+ try{
+   const updated=step(old.nodeId,active.storeState||{});
+   // For an already selected reply, fix the manager's wording without
+   // replacing the options tied to the student's saved selection.
+   active.steps[index]=pendingChoice?{...old,npc:updated.npc,npcNe:updated.npcNe,
+    speaker:updated.speaker,speakerEmoji:updated.speakerEmoji}:{...old,...updated};
+   return true;
+ }catch(_){return false}
 }
 function options(stepObj){
  if(!stepObj?.storeOptions)return null;
