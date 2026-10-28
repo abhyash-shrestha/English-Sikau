@@ -209,7 +209,7 @@ function phone(node,state,config){
  if(!buying)return null; // pre-owned phone help uses the service-specific engine.
  if(node==='review'){
   return r(node,
-   "A "+detail[0].replace(/[.?!]+$/,'').toLowerCase()+" is important to you. How about battery life and your budget? Should I show you a higher-end phone or a more affordable one?",
+   "I see: "+detail[0].replace(/[.?!]+$/,'').toLowerCase()+". How about battery life and your budget? Should I show you a higher-end phone or a more affordable one?",
    "तपाईंलाई "+detail[1]+" महत्त्वपूर्ण रहेछ। ब्याट्री र बजेट कस्तो छ? महँगो वा सस्तो फोन देखाऊँ?",[
     option("A strong camera and long battery life matter. Show me your recommendation.","राम्रो क्यामेरा र लामो ब्याट्री चाहिन्छ। फोन सिफारिस गर्नुहोस्।","phone-pitch",{offer:"premium",priority:"camera-battery"}),
     option("My budget is around NPR 50,000.","मेरो बजेट करिब रु. ५०,००० छ।","phone-pitch",{offer:"budget",priority:"budget"}),
@@ -225,7 +225,9 @@ function phone(node,state,config){
   return r(node,
    "For this fictional shop conversation, I can show you "+model+" at a SAMPLE price of "+money+". These are invented practice prices, not current Nepal retail quotes. Would you like to compare it, ask about the features, or choose it?",
    "यो काल्पनिक पसलको अभ्यासमा "+model+" को नमुना मूल्य रु. "+price.toLocaleString("en-US")+" हो। यो वास्तविक नेपाली बजारको मूल्य होइन। तुलना गर्ने, विशेषता सोध्ने कि छान्ने?",[
-    option("That's too expensive. Do you have a cheaper phone?","त्यो धेरै महँगो छ। सस्तो फोन छ?","phone-pitch",{offer:premium?"budget":"basic",priority:"budget"}),
+    option(state.offer==="basic"?"This is still above my budget. I'd rather wait.":"That's too expensive. Do you have a cheaper phone?",
+    state.offer==="basic"?"यो अझै बजेटभन्दा महँगो छ। पछि आउँछु।":"त्यो धेरै महँगो छ। सस्तो फोन छ?",
+    state.offer==="basic"?"closing":"phone-pitch",{offer:premium?"budget":"basic",priority:"budget"}),
     option("Could I compare the camera and battery first?","पहिले क्यामेरा र ब्याट्री तुलना गर्न सक्छु?","phone-demo",{}),
     option("That price works for me. Can we discuss the color and storage?","मूल्य ठीक लाग्यो। रङ र स्टोरेजबारे कुरा गरौँ?","phone-options",{}),
     option("I'm not ready to buy. Thanks.","अहिले किन्न तयार छैन। धन्यवाद।","closing",{})
@@ -296,19 +298,19 @@ function build(node,state,config){
  const commercial=cashCats.has(cat),participatory=["Everyday","Family"].includes(cat);
  const quote=()=>{
   if(!commerce)return "";
-  const high=state.offer!=="budget";
-  const value=prices[high?1:2];
+  const high=state.offer!=="budget"&&state.offer!=="basic";
+  const value=state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[high?1:2];
   return " A FICTIONAL example for "+prices[0]+" is NPR "+value.toLocaleString("en-US")+
    ". This is a made-up lesson price, not current stock or a real retail quote.";
  };
  const quoteNe=()=>!commerce?"":" यो अभ्यासमा "+prices[0]+" को काल्पनिक मूल्य रु. "+
-  prices[state.offer!=="budget"?1:2].toLocaleString("en-US")+" हो, वास्तविक बजार मूल्य होइन।";
+  (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो, वास्तविक बजार मूल्य होइन।";
  if(node==='review'){
   return r(node,
    "I understand you're interested in "+descriptor+". "+set.intro[0],
    "तपाईंलाई "+detail[1]+" भन्ने बुझेँ। "+set.intro[1],[
     ...set.priorities.map(p=>option(p[0],p[1],"proposal",{priority:p[2],offer:p[2]==="budget"?"budget":"premium"})),
-    option("I'd rather explore a different option.","बरु अर्को विकल्प हेर्न चाहन्छु।","alternative",{offer:"budget"}),
+    option("I'd rather explore a different option.","बरु अर्को विकल्प हेर्न चाहन्छु।","alternative",{offer:state.offer==="budget"?"basic":"budget"}),
     option("I only needed information. Thank you!","जानकारी मात्र चाहिएको थियो। धन्यवाद।","closing",{})
    ]);
  }
@@ -329,7 +331,7 @@ function build(node,state,config){
  if(node==='alternative')return r(node,
   set.alternative[0]+(commerce?" Here's a lower-cost practice example."+quote():""),
   set.alternative[1]+(commerce?quoteNe():""),[
-   option("That alternative sounds better. Let's continue.","त्यो विकल्प राम्रो लाग्यो। अघि बढौँ।","verify",{offer:"budget"}),
+   option("That alternative sounds better. Let's continue.","त्यो विकल्प राम्रो लाग्यो। अघि बढौँ।","verify",{}),
    option("Could I compare it with the first choice?","पहिलो विकल्पसँग तुलना गर्न सक्छु?","proposal",{offer:"premium"}),
    option("I'd prefer to stop here. Thank you.","अहिलेलाई यति नै। धन्यवाद।","closing",{})
   ]);
