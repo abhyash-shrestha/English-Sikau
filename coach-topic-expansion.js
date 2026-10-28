@@ -120,6 +120,30 @@ function buildRow(row){
  if(focus.length!==3||neFocus.length!==3||!patterns[category]||!openings[category]||
    !/^[a-z][a-z0-9-]+$/.test(id)||!title||!ne)throw Error('Invalid Coach topic '+id);
  const pattern=patterns[category];
+ // Buying clothes deserves its own size, style and price paths, distinct
+ // from the dedicated clothing-return/refund scenario.
+ if(id==="buy-clothes"){
+  const custom=[
+   ["I'm looking for a jacket for winter.","म जाडोको ज्याकेट खोज्दै छु।",
+    "Of course. What kind of jacket are you looking for?","अवश्य। कस्तो ज्याकेट खोज्दै हुनुहुन्छ?",
+    [["Something warm but lightweight.","न्यानो तर हलुका।"],["A waterproof jacket.","पानी नछिर्ने ज्याकेट।"],["I'd like to compare casual styles.","सामान्य शैली तुलना गर्छु।"]],
+    "I can show you the available styles and sizes. You're welcome to check the fit before you decide.",
+    "उपलब्ध शैली र साइज देखाउन सक्छु। निर्णयअघि लगाएर मिल्छ कि हेर्न सक्नुहुन्छ।"],
+   ["Could I try on a few different sizes?","म फरक साइज लगाएर हेर्न सक्छु?",
+    "Certainly. What would you like to try first?","पक्कै। पहिले के लगाएर हेर्न चाहनुहुन्छ?",
+    [["A jacket in a larger size.","अलि ठूलो ज्याकेट।"],["Jeans in two sizes.","दुई साइजको जिन्स।"],["I'd like to use the fitting room.","मलाई ट्रायल रुम प्रयोग गर्नु छ।"]],
+    "Let's find the available sizes and the fitting room. You can compare the fit without having to buy anything.",
+    "उपलब्ध साइज र ट्रायल रुम हेरौँ। नकिनी पनि साइज तुलना गर्न सक्नुहुन्छ।"],
+   ["Could you explain the prices and offers?","मूल्य र छुटबारे बुझाउनुहुन्छ?",
+    "Sure. What would you like to check?","अवश्य। के जाँच्न चाहनुहुन्छ?",
+    [["Is there a discount on these clothes?","यी लुगामा छुट छ?"],["Is the price on the tag the final price?","ट्यागको मूल्य नै अन्तिम हो?"],["Can you explain the exchange policy?","साट्ने नियम बुझाउनुहुन्छ?"]],
+    "We can check the tag prices, current offers and exchange terms before you pay. Nothing is purchased until you choose to check out.",
+    "तिर्नुअघि मूल्य, अहिलेका छुट र साट्ने नियम बुझौँ। तपाईंले बिल नतिरुन्जेल कुनै सामान किनिएको हुँदैन।"]
+  ];
+  return Object.freeze({id,emoji,title,ne,category,place,partner,level:'Easy',
+   config:[["Hello! Welcome to the clothing store. What can I help you find today?",
+    "नमस्ते! कपडा पसलमा स्वागत छ। आज के खोज्न मद्दत गरूँ?"],custom]});
+ }
  const firstEN=[
   item=>"I'd like help with "+item+".",
   item=>"Could we talk about "+item+"?",
@@ -132,8 +156,8 @@ function buildRow(row){
  ];
  const routes=focus.map((item,i)=>{
   const first=[firstEN[i](item),firstNE[i](neFocus[i])];
-  const q=pattern.q.replace(/\?$/, '')+" Specifically, you mentioned "+item+".";
-  const qNe=pattern.ne.replace(/\?$/, '')+" तपाईंले "+neFocus[i]+" भन्नुभयो।";
+  const q="You mentioned "+item+". "+pattern.q;
+  const qNe="तपाईंले "+neFocus[i]+" भन्नुभयो। "+pattern.ne;
   const response="Thanks for explaining your interest in "+item+". "+pattern.result;
   const responseNe=neFocus[i]+" बारे बताउनुभएकोमा धन्यवाद। "+pattern.resultNe;
   return [first[0],first[1],q,qNe,pattern.a,response,responseNe];
