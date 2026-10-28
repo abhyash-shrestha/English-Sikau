@@ -648,6 +648,7 @@ function coachEquivalentReply(sentence){
 }
 
 function coachReplyOptions(step,scene){
+ if(scene?.isBranchingStore&&window.sikauStoreStory)return window.sikauStoreStory.options(step);
  const line=normalize(step.npc),sceneId=scene?.id;
  const choice=(value,ne,branch=null,followup=null)=>({
   value,ne,correct:true,branch,followup
@@ -1018,6 +1019,11 @@ window.enhanceCoachDashboard=function(doc){
   const round=practiceNumber%rounds.length;
   coachRoundMemory[original.id]=practiceNumber;
   try{doc.defaultView.localStorage.setItem(coachRoundStorage,JSON.stringify(coachRoundMemory))}catch(_){}
+  if(original.id==='return-shirt'&&window.sikauStoreStory){
+   const story=window.sikauStoreStory.start(original);
+   story.coachPracticeNumber=practiceNumber+1;
+   return story;
+  }
   const styles=['Everyday speaking','Ask more questions','Solve it politely'];
   return {...original,coachOriginal:original,coachRound:round,
    coachPracticeNumber:practiceNumber+1,coachStyle:styles[round],coachTotalRounds:rounds.length,
@@ -1099,7 +1105,7 @@ window.enhanceCoachDashboard=function(doc){
  function goNext(){
   if(!active)return;
   if(!dialogueHistory[index])dialogueHistory[index]={reply:active.steps[index].answer,kind:'example'};
-  if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
+  if(active.isBranchingStore&&active.storeCompleted){finished=true;}else if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
   renderStage();
  }
  function renderStage(){
@@ -1110,23 +1116,25 @@ window.enhanceCoachDashboard=function(doc){
   const meta=add(doc,head,'div','sikau-convo-stage-meta');
   add(doc,meta,'strong','',active.emoji+' '+active.title);
   if(showNepali)add(doc,meta,'small','',active.ne+' · '+active.place);
-  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+' · '+active.steps.length+' turns');
+  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+(active.isBranchingStore?' · Choices shape the story':' · '+active.steps.length+' turns'));
   if(finished){
    const done=add(doc,stage,'div','sikau-convo-complete');
    add(doc,done,'div','sikau-convo-complete-icon','🏆');
    add(doc,done,'h3','','You finished the conversation!');
    add(doc,done,'p','','तपाईंले वास्तविक जीवनको कुराकानी अभ्यास पूरा गर्नुभयो।');
    add(doc,done,'p','',active.steps.length+' turns practiced · '+successful+' guided responses completed');
+   if(active.isBranchingStore)add(doc,done,'p','','Your choices shaped this conversation. · तपाईंको उत्तरले यो कथा परिवर्तन गर्‍यो।');
    add(doc,done,'small','','This is practice-only feedback; official learning XP and progress are unchanged.');
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
    const readAll=add(doc,buttons,'button','sikau-convo-secondary','📖 Read full conversation · पूरा संवाद');readAll.type='button';
-   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',active.partner+': '+line.npc);add(doc,pair,'p','','You: '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
+   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',(line.speaker||active.partner)+': '+line.npc);add(doc,pair,'p','','You: '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
    const another=add(doc,buttons,'button','sikau-convo-secondary','Explore more situations · थप विषय');another.type='button';another.addEventListener('click',back);
    return;
   }
   const step=active.steps[index];
   const fullPreview=add(doc,stage,'details','sikau-convo-dialogue-preview');
+  if(active.isBranchingStore)fullPreview.hidden=true;
   add(doc,fullPreview,'summary','','📖 Read the full example conversation · पूरा संवाद पढ्नुहोस्');
   const previewBody=add(doc,fullPreview,'div','sikau-convo-preview-body');
   for(const line of active.steps){
@@ -1137,9 +1145,9 @@ window.enhanceCoachDashboard=function(doc){
    if(showNepali)add(doc,sample,'small','',line.answerNe);
   }
   const progress=add(doc,stage,'div','sikau-convo-progress');
-  add(doc,progress,'span','','Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
+  add(doc,progress,'span','',active.isBranchingStore?'Turn '+(index+1)+' · Your choices shape the story':'Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
   const track=add(doc,progress,'div','sikau-convo-track');
-  const fill=add(doc,track,'div','sikau-convo-track-fill');fill.style.width=((index+1)/active.steps.length*100)+'%';
+  const fill=add(doc,track,'div','sikau-convo-track-fill');fill.style.width=(active.isBranchingStore?Math.min(94,(index+1)*9):((index+1)/active.steps.length*100))+'%';
 
   // One chat window, with scrollable prior turns and the current message.
   // This is practice-only; the transcript stays local to this lesson session.
@@ -1150,9 +1158,9 @@ window.enhanceCoachDashboard=function(doc){
   const chatHead=add(doc,transcript,'div','sikau-chat-top');
   add(doc,chatHead,'div','sikau-chat-top-scene',active.emoji+' '+active.place);
   add(doc,chatHead,'span','sikau-chat-top-pill','● Practice conversation · कुराकानी अभ्यास');
-  function bubble(who,english,ne,speaker){
+  function bubble(who,english,ne,speaker,emoji){
    const wrapper=add(doc,transcript,'div','sikau-chat-message '+who);
-   const avatar=add(doc,wrapper,'span','sikau-chat-avatar',who==='other'?active.emoji:'🙋');
+   const avatar=add(doc,wrapper,'span','sikau-chat-avatar',who.startsWith('other')?(emoji||active.emoji):'🙋');
    avatar.setAttribute('aria-hidden','true');
    const body=add(doc,wrapper,'div','sikau-chat-message-body');
    add(doc,body,'strong','',speaker);
@@ -1163,11 +1171,11 @@ window.enhanceCoachDashboard=function(doc){
   if(index===0)add(doc,transcript,'p','sikau-chat-start','🌟 Your story begins here. Pick a reply to keep the chat going!');
   for(let i=0;i<index;i++){
    const prior=active.steps[i],history=dialogueHistory[i]||{};
-   bubble('other',prior.npc,prior.npcNe,active.partner);
+   bubble('other',prior.npc,prior.npcNe,prior.speaker||active.partner,prior.speakerEmoji);
    const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?history.answerNe||prior.answerNe:'');
    bubble('learner',history.reply||prior.answer,translated,'You · तपाईं');
   }
-  const latest=bubble('other current',step.npc,step.npcNe,active.partner+' · Now');
+  const latest=bubble('other current',step.npc,step.npcNe,(step.speaker||active.partner)+' · Now',step.speakerEmoji);
   const hear=add(doc,latest,'button','sikau-convo-hear','🔊 Listen · सुन्नुहोस्');
   hear.type='button';hear.addEventListener('click',()=>speak(doc,step.npc));
   const feedback=add(doc,chatLayout,'section','sikau-convo-reply sikau-convo-chat-choices');
@@ -1189,7 +1197,7 @@ window.enhanceCoachDashboard=function(doc){
    if(showNepali)add(doc,result,'small','',item.ne);
    if(item.branch||item.followup)add(doc,result,'small','','Your next chat message will reflect this choice. · अबको कुराकानी यसैअनुसार अघि बढ्नेछ।');
    const next=add(doc,result,'button','sikau-convo-primary',
-    index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
+    (active.isBranchingStore?active.storeCompleted:index===active.steps.length-1)?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
    next.type='button';next.addEventListener('click',goNext);
   }
   const options=add(doc,feedback,'div','sikau-convo-options');
@@ -1209,7 +1217,9 @@ window.enhanceCoachDashboard=function(doc){
     b.classList.add('is-selected');
     b.querySelector('.sikau-chat-option-radio').textContent='✓';
     options.querySelectorAll('button').forEach(x=>x.disabled=true);
-    if(item.branch){
+    if(active.isBranchingStore&&window.sikauStoreStory){
+     window.sikauStoreStory.choose(active,item,index);
+    }else if(item.branch){
      const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
      if(alternate.length){
       active.steps.splice(index+1,active.steps.length-index-1,...alternate);
@@ -1230,10 +1240,10 @@ window.enhanceCoachDashboard=function(doc){
   }
   feedback.appendChild(result);
   const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
-  skip.type='button';skip.addEventListener('click',goNext);
+  skip.type='button';if(active.isBranchingStore)skip.hidden=true;else skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
-  add(doc,note,'p','','Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
+  add(doc,note,'p','',active.isBranchingStore?'Your choices change the next question. A manager may review an exception, but approval is never guaranteed. · तपाईंको रोजाइले अर्को प्रश्न बदल्छ।':'Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
   // Show the newest question without requiring learners to scroll through all
   // earlier chat messages. Keep every previous bubble available above.
   stage.appendChild(fullPreview);
