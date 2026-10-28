@@ -494,7 +494,8 @@ function coachOfflineReview(reply,step,scene){
  // Do not reject a meaningful self-written answer merely because it
  // disagrees with the authored sample; continue as unverified practice.
  return {accepted:true,corrected,why_ne:tip,
-  mode:'offline',receiptNo:receiptQuestion&&negative};
+  learner_ne:receiptQuestion&&negative?'होइन, मसँग रसिद छैन।':'',
+  mode:'offline',receiptNo:receiptQuestion&&(negative||/\b(?:dont|do not|no|havent|have not)\s+(?:have\s+)?(?:the\s+)?receipt\b/.test(lower))};
 }
 function coachSafeAIReply(raw){
  if(!raw||typeof raw!=='object')throw Error('AI response is missing');
@@ -951,7 +952,8 @@ window.enhanceCoachDashboard=function(doc){
    const learnerLine=add(doc,transcript,'div','sikau-convo-bubble learner');
    add(doc,learnerLine,'strong','','You · तपाईं');
    add(doc,learnerLine,'p','',history.reply||prior.answer);
-   if(showNepali)add(doc,learnerLine,'small','',history.learnerNe||prior.answerNe);
+   const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?prior.answerNe:'');
+   if(showNepali&&translated)add(doc,learnerLine,'small','',translated);
   }
   const cols=add(doc,stage,'div','sikau-convo-session');
   const situ=add(doc,cols,'div','sikau-convo-dialogue');
@@ -1037,7 +1039,7 @@ window.enhanceCoachDashboard=function(doc){
     if(!review)review=coachOfflineReview(value,step,active);
     result.replaceChildren();
     result.className='sikau-convo-feedback '+(review.accepted?'success':'warning');
-    add(doc,result,'strong','',review.accepted?'✅ Your answer is understood · उत्तर बुझियो':'💡 Improve this answer · उत्तर सुधारौँ');
+    add(doc,result,'strong','',review.accepted?(review.mode==='ai'?'✅ Answer understood · उत्तर बुझियो':'✅ Reply recorded for practice · अभ्यासका लागि उत्तर राखियो'):'💡 Improve this answer · उत्तर सुधारौँ');
     if(review.corrected){
      add(doc,result,'small','',review.mode==='ai'?'Corrected English · सच्याइएको अंग्रेजी':'Suggested wording · सम्भावित राम्रो वाक्य');
      add(doc,result,'p','',review.corrected);
