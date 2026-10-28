@@ -6,7 +6,7 @@
  'use strict';
  const STORAGE='english-sikau-unified-tab-order-v1';
  const OLD_VISA='english-sikau-visa-placement-v2';
- const STYLE=new URL('./sidebar-unified.css?v=20261021-sidebar-parity-r1',document.baseURI).href;
+ const STYLE=new URL('./sidebar-unified.css?v=20261028-iphone-compact-r1',document.baseURI).href;
  const SELECTOR='button[data-t],button.sikau-home-nav,button.sikau-visa-nav';
  const id=button=>button?.classList.contains('sikau-home-nav')?'nepali-festivals':
    button?.classList.contains('sikau-visa-nav')?'us-visa-interview':
