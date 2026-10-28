@@ -30,23 +30,39 @@ function build(node,state){
   opts.push(option("Thanks, I'm just gathering information.","धन्यवाद, अहिले जानकारी मात्र लिँदै छु।","closing",{}));
  }else if(node==='review'){
   [npc,npcNe]=[guide.message,guide.messageNe];
+  const social=['Everyday','Family'].includes(guide.category);
   opts=[
    option(guide.question[0],guide.question[1],'answer',{}),
-   option("Could we compare that with another option?","यो अर्को विकल्पसँग तुलना गर्न सक्छौँ?","compare",{}),
-   option("What would we need to check before going ahead?","अघि बढ्नुअघि के जाँच्नुपर्छ?","nextSteps",{}),
-   option("Thanks, that helps. I'll decide later.","धन्यवाद, उपयोगी भयो। पछि निर्णय गर्छु।","closing",{})
+   option(social?"Could we talk about a different part of this?":"Could we compare that with another option?",
+     social?"यसबारे अर्को कुरा गरौँ?":"यो अर्को विकल्पसँग तुलना गर्न सक्छौँ?","compare",{}),
+   option(social?"What's a natural question I could ask next?":
+     guide.category==='Education'?"Could we continue with a useful practice step?":
+     "What would we need to check before going ahead?",
+     social?"अर्को स्वाभाविक प्रश्न के सोध्ने?":
+     guide.category==='Education'?"अर्को उपयोगी अभ्यास गरौँ?":
+     "अघि बढ्नुअघि के जाँच्नुपर्छ?","nextSteps",{}),
+   option(social?"Thanks, I enjoyed our conversation.":"Thanks, that helps. I'll decide later.",
+     social?"धन्यवाद, कुरा गर्न रमाइलो लाग्यो।":"धन्यवाद, उपयोगी भयो। पछि निर्णय गर्छु।","closing",{})
   ];
  }else if(node==='answer'){
   [npc,npcNe]=[guide.question[2],guide.question[3]];
+  const social=['Everyday','Family'].includes(guide.category);
   opts=[
-   option("Could we compare another option too?","अर्को विकल्प पनि तुलना गरौँ?","compare",{}),
-   option("What are the next practical steps?","अबको व्यवहारिक कदम के हो?","nextSteps",{}),
+   option(social?"Could we discuss another idea?":"Could we compare another option too?",
+    social?"अर्को विचारबारे कुरा गरौँ?":"अर्को विकल्प पनि तुलना गरौँ?","compare",{}),
+   option(social?"How could I keep the conversation going?":"What are the next practical steps?",
+    social?"कुराकानी कसरी अघि बढाउने?":"अबको व्यवहारिक कदम के हो?","nextSteps",{}),
    option("That's clear. Thanks for your help.","स्पष्ट भयो। मद्दतका लागि धन्यवाद।","closing",{})
   ];
  }else if(node==='compare'){
   const next=guide.alternate;
-  npc="You mentioned “"+chosen[0]+"” and could also consider “"+next[0]+"”. We can compare those priorities rather than assume one is better. Which would you like to explore?";
-  npcNe="तपाईंले “"+chosen[1]+"” भन्नुभयो र “"+next[1]+"” पनि हेर्न सकिन्छ। कुन विकल्पबारे थप बुझ्ने?";
+  const social=['Everyday','Family'].includes(guide.category);
+  npc=social?
+   "We could also talk about “"+next[0]+"” if you like. Which part interests you?":
+   "You mentioned “"+chosen[0]+"” and could also consider “"+next[0]+"”. We can compare these without assuming one is better. Which matters more?";
+  npcNe=social?
+   "चाहनुहुन्छ भने “"+next[1]+"” बारे पनि कुरा गरौँ। कुन कुरामा रुचि छ?":
+   "तपाईंले “"+chosen[1]+"” भन्नुभयो र “"+next[1]+"” पनि हेर्न सकिन्छ। कुन महत्त्वपूर्ण छ?";
   opts=[
    option(next[0],next[1],'review',{detail:next[2]}),
    option("I'd rather focus on my original choice.","पहिलो रोजाइमा ध्यान दिन चाहन्छु।","review",{}),
@@ -54,8 +70,13 @@ function build(node,state){
    option("I think I have enough to decide later.","पछि निर्णय गर्न पुग्ने जानकारी भयो।","closing",{})
   ];
  }else if(node==='nextSteps'||node==='followup'){
-  npc="Before taking action on “"+guide.subject[0]+"”, "+guide.proceed[0];
-  npcNe="“"+guide.subject[1]+"” बारे अघि बढ्नुअघि, "+guide.proceed[1];
+  if(['Everyday','Family'].includes(guide.category)){
+   npc="A good way to keep talking about “"+guide.subject[0]+"” is to ask a relevant question, listen to the reply, and follow the other person's interests.";
+   npcNe="“"+guide.subject[1]+"” बारे थप कुरा गर्दा सम्बन्धित प्रश्न सोध्नुहोस्, उत्तर सुन्नुहोस् र अर्काको रुचिअनुसार कुरा बढाउनुहोस्।";
+  }else{
+   npc="Before taking the next step with “"+guide.subject[0]+"”, "+guide.proceed[0];
+   npcNe="“"+guide.subject[1]+"” बारे अर्को कदमअघि, "+guide.proceed[1];
+  }
   opts=[
    option("What requirements or costs should I check first?","पहिले कुन सर्त वा खर्च जाँच्ने?","requirements",{}),
    option("I'd like to move forward if everything is suitable.","सबै कुरा मिल्यो भने अघि बढ्न चाहन्छु।","proceed",{}),
