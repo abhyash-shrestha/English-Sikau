@@ -47,7 +47,7 @@ test('verified gift receipts, verified sales, wear and age produce distinct outc
  testDecision(api,src({verification:'label-match',condition:'worn',reason:'size'}),/can't accept this worn/);
  testDecision(api,src({verification:'label-match',condition:'worn',reason:'defect'}),/quality or warranty review/);
  testDecision(api,{item:'shoes',source:'store',receipt:'paper',verification:'receipt-check',
-  intent:'refund',condition:'tried',timing:'older'},/outside our practice-store return window/);
+  intent:'refund',condition:'tried',timing:'older'},/outside our return period/);
 });
 test('realistic branch order and manager verification lead to case-specific farewell',()=>{
  const api=load('coach-store-story.js').sikauStoreStory;
