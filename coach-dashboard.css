@@ -1064,3 +1064,32 @@ html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option
  .sikau-convo .sikau-chat-option{transition:none!important;transform:none!important}
  #coach .sikau-convo-transcript.sikau-convo-chat-thread,.sikau-convo-transcript.sikau-convo-chat-thread{scroll-behavior:auto}
 }
+
+/* Coach response-choice v3: no incorrect answer cards. All three options are
+   grammatically meaningful; selection is a personal conversation choice. */
+.sikau-convo .sikau-convo-option.sikau-chat-option.is-selected,
+.sikau-convo .sikau-convo-option.sikau-chat-option.is-selected:disabled{
+ background:linear-gradient(110deg,#fff0f8,#f2eafa)!important;
+ border:2px solid #d92c7c!important;
+ color:#6c2258!important;
+ opacity:1!important;
+ box-shadow:0 0 0 2px #fce2ef!important;
+}
+.sikau-convo .sikau-convo-option.sikau-chat-option.is-selected .sikau-chat-option-radio{
+ background:#d92177!important;color:#fff!important;
+ border-radius:50%;font-size:13px;
+}
+.sikau-convo .sikau-convo-option.sikau-chat-option:disabled:not(.is-selected){
+ opacity:.8!important;
+}
+.sikau-convo .sikau-convo-option.sikau-chat-option.is-selected .sikau-chat-option-copy small{
+ color:#7b4371!important;
+}
+html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option.is-selected,
+html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option.is-selected:disabled{
+ background:#52314e!important;color:#fff1fb!important;
+ border:2px solid #f46eae!important;box-shadow:0 0 0 2px #6e3d62!important;
+}
+html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option.is-selected .sikau-chat-option-copy small{
+ color:#ffdaed!important;
+}
