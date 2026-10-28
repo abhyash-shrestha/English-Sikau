@@ -18,6 +18,12 @@
   link.id='sikauMobileBarHandleStyle';link.rel='stylesheet';link.href=SHEET_URL;
   doc.head.appendChild(link);
  }
+ function syncLessonTop(hidden,doc){
+  try{
+   const frameDoc=doc||document.getElementById('lessonFrame')?.contentDocument;
+   frameDoc?.documentElement?.classList.toggle('sikau-mobile-top-hidden',hidden);
+  }catch(_){}
+ }
  function installTop(){
   const protectedArea=document.getElementById('protected');
   const bar=document.getElementById('bar');
@@ -37,9 +43,10 @@
    button.title=hidden?'Show top bar':'Hide top bar';
   };
   protectedArea.classList.toggle('sikau-mobile-top-hidden',saved(TOP_KEY));
+  syncLessonTop(protectedArea.classList.contains('sikau-mobile-top-hidden'));
   button.addEventListener('click',()=>{
    const hidden=protectedArea.classList.toggle('sikau-mobile-top-hidden');
-   persist(TOP_KEY,hidden);render();
+   persist(TOP_KEY,hidden);syncLessonTop(hidden);render();
   });
   render();
  }
@@ -49,6 +56,7 @@
   const win=doc?.defaultView;
   if(!nav||!html||!win||!doc.body)return;
   stylesheet(doc);
+  syncLessonTop(document.getElementById('protected')?.classList.contains('sikau-mobile-top-hidden'),doc);
   let button=doc.getElementById('sikauMobileBottomHandle');
   if(button&&button.__nav!==nav){button.remove();button=null;}
   if(button)return;
@@ -84,6 +92,7 @@
    const observer=new win.ResizeObserver(updatePosition);
    observer.observe(nav);
   }
+  doc.getElementById('sikauMobileBarHandleStyle')?.addEventListener('load',updatePosition,{once:true});
   render();
  }
  window.sikauMobileBarHandles=Object.freeze({install(doc){installTop();installBottom(doc);}});
