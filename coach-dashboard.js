@@ -961,7 +961,7 @@ function hideRedundantCoachAdventurePanel(doc){
  }
  return hidden;
 }
-window.enhanceCoachDashboard=function(doc){
+window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  if(!doc?.body||!doc.head)return;
  hideRedundantCoachCultureLab(doc);
  hideRedundantCoachAdventurePanel(doc);
@@ -994,7 +994,61 @@ window.enhanceCoachDashboard=function(doc){
  const shell=el(doc,'section','sikau-convo');shell.id='sikauCoachConversations';
  oldHero.parentElement.insertBefore(shell,oldHero);
  let dialogueHistory=[];
+ let pendingChoice=null;
  let active=null,index=0,category='All',search='',mode='choose',showNepali=true,attempts=0,successful=0,finished=false,choices=[],choiceError='',typedError='',reveal=false;
+
+ // Saved locally in THIS browser and scoped to the parent-verified Appwrite
+ // account. Never store account credentials, paid labels, trial times or XP.
+ const coachDrafts=window.sikauCoachDrafts?.make(verifiedStudentId,scenarios)||null;
+ function saveDraft(){
+  if(!active||finished)return;
+  coachDrafts?.save({active,index,history:dialogueHistory,attempts,successful,pendingChoice});
+ }
+ function restoreDraft(saved){
+  const scene=scenarios.find(x=>x.id===saved.sceneId);
+  if(!scene)return;
+  const state=Object.assign(Object.create(null),saved.storeState||{});
+  active={...scene,coachOriginal:scene,steps:saved.steps,
+   coachPracticeNumber:Number.isSafeInteger(saved.practiceNumber)?saved.practiceNumber:1,
+   coachRound:Number.isSafeInteger(saved.coachRound)?saved.coachRound:0,
+   coachStyle:typeof saved.coachStyle==='string'?saved.coachStyle.slice(0,100):'Conversation',
+   isBranchingStore:!!saved.isBranchingStore,storeState:state,
+   storeCompleted:!!saved.storeCompleted};
+  index=saved.index;dialogueHistory=saved.history.slice();
+  attempts=Number.isSafeInteger(saved.attempts)?saved.attempts:0;
+  successful=Number.isSafeInteger(saved.successful)?saved.successful:0;
+  pendingChoice=saved.pendingChoice&&typeof saved.pendingChoice.value==='string'?
+   {value:saved.pendingChoice.value,ne:String(saved.pendingChoice.ne||'')}:null;
+  finished=false;choices=[];reveal=false;choiceError='';typedError='';
+  browser.hidden=true;stage.hidden=false;
+  shell.classList.add('sikau-convo-learning');
+  renderStage();
+  stage.scrollIntoView?.({behavior:'smooth',block:'start'});
+ }
+ function showSavedConversation(){
+  resumeHost.replaceChildren();
+  const saved=coachDrafts?.read();
+  if(!saved){resumeHost.hidden=true;return}
+  resumeHost.hidden=false;
+  const scene=scenarios.find(x=>x.id===saved.sceneId);
+  const row=add(doc,resumeHost,'div','sikau-convo-resume-card');
+  const copy=add(doc,row,'div','sikau-convo-resume-copy');
+  add(doc,copy,'strong','','💾 Saved conversation · अघिल्लो कुराकानी');
+  add(doc,copy,'p','',scene.emoji+' '+scene.title+' · Turn '+(saved.index+1)+
+   ' · Your conversation and choices are saved in this browser.');
+  add(doc,copy,'small','','पहिलेको संवाद जारी राख्नुहोस् वा सुरुदेखि नयाँ सुरु गर्नुहोस्।');
+  const actions=add(doc,row,'div','sikau-convo-resume-actions');
+  const resume=add(doc,actions,'button','sikau-convo-primary','▶ Resume · जारी राख्नुहोस्');
+  resume.type='button';resume.addEventListener('click',()=>{
+   const latest=coachDrafts?.read();
+   if(latest)restoreDraft(latest);else showSavedConversation();
+  });
+  const restart=add(doc,actions,'button','sikau-convo-secondary','↻ Start over · फेरि सुरु');
+  restart.type='button';restart.addEventListener('click',()=>{
+   coachDrafts?.remove();start(scene);
+  });
+ }
+
 
  let lastId=null;
 
@@ -1053,6 +1107,7 @@ window.enhanceCoachDashboard=function(doc){
  const searchInput=add(doc,searchBox,'input','','');searchInput.type='search';searchInput.placeholder='Search: hospital, restaurant, directions…';
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
+ const resumeHost=add(doc,browser,'div','sikau-convo-resume-host');resumeHost.hidden=true;
  const cards=add(doc,browser,'div','sikau-convo-cards');
  const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
@@ -1087,7 +1142,7 @@ window.enhanceCoachDashboard=function(doc){
  }
  function resetStage(){
   dialogueHistory=[];
-  index=0;attempts=0;successful=0;finished=false;choices=[];choiceError='';typedError='';reveal=false;
+  index=0;attempts=0;successful=0;finished=false;pendingChoice=null;choices=[];choiceError='';typedError='';reveal=false;
  }
  function start(scene){
   lastId=scene.id;
@@ -1096,16 +1151,18 @@ window.enhanceCoachDashboard=function(doc){
   active=coachNextConversation(scene);resetStage();
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
-  renderStage();stage.scrollIntoView?.({behavior:'smooth',block:'start'});
+  saveDraft();renderStage();stage.scrollIntoView?.({behavior:'smooth',block:'start'});
  }
  function back(){
   active=null;stage.hidden=true;browser.hidden=false;shell.classList.remove('sikau-convo-learning');
-  drawCards();
+  drawCards();showSavedConversation();
  }
  function goNext(){
   if(!active)return;
   if(!dialogueHistory[index])dialogueHistory[index]={reply:active.steps[index].answer,kind:'example'};
   if(active.isBranchingStore&&active.storeCompleted){finished=true;}else if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
+  pendingChoice=null;
+  if(finished)coachDrafts?.remove();else saveDraft();
   renderStage();
  }
  function renderStage(){
@@ -1113,6 +1170,12 @@ window.enhanceCoachDashboard=function(doc){
   if(!active)return;
   const head=add(doc,stage,'div','sikau-convo-stage-head');
   const backBtn=add(doc,head,'button','sikau-convo-back','← All situations · सबै विषय');backBtn.type='button';backBtn.addEventListener('click',back);
+  const restartButton=add(doc,head,'button','sikau-convo-secondary sikau-convo-restart','↻ Restart · सुरुदेखि');
+  restartButton.type='button';restartButton.addEventListener('click',()=>{
+   if(doc.defaultView?.confirm?.('Start this conversation over? Your previous messages in this story will be replaced.')){
+    const scene=active.coachOriginal||active;coachDrafts?.remove();start(scene);
+   }
+  });
   const meta=add(doc,head,'div','sikau-convo-stage-meta');
   add(doc,meta,'strong','',active.emoji+' '+active.title);
   if(showNepali)add(doc,meta,'small','',active.ne+' · '+active.place);
@@ -1236,6 +1299,7 @@ window.enhanceCoachDashboard=function(doc){
     successful++;
     dialogueHistory[index]={reply:item.value,answerNe:item.ne,
       learnerNe:item.ne,kind:'guided'};
+    pendingChoice={value:item.value,ne:item.ne};
     b.classList.add('is-selected');
     b.querySelector('.sikau-chat-option-radio').textContent='✓';
     options.querySelectorAll('button').forEach(x=>x.disabled=true);
@@ -1257,10 +1321,22 @@ window.enhanceCoachDashboard=function(doc){
       extra.after=active.steps[index+2]?.npc||'Thank you for sharing that.';
      }
     }
-    showResult(item);
+    saveDraft();showResult(item);
    });
   }
   feedback.appendChild(result);
+  // Restore a selected response without choosing again or changing branches.
+  if(pendingChoice){
+   const buttons=Array.from(options.querySelectorAll('button'));
+   buttons.forEach(b=>b.disabled=true);
+   const selected=buttons.find(b=>b.querySelector('.sikau-chat-option-copy span')?.textContent===pendingChoice.value);
+   if(selected){
+    selected.classList.add('is-selected');
+    const indicator=selected.querySelector('.sikau-chat-option-radio');
+    if(indicator)indicator.textContent='✓';
+   }
+   showResult(pendingChoice);
+  }
   const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
   skip.type='button';if(active.isBranchingStore)skip.hidden=true;else skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
@@ -1285,7 +1361,7 @@ window.enhanceCoachDashboard=function(doc){
   host.classList.toggle('sikau-convo-ai-open');
   if(host.classList.contains('sikau-convo-ai-open'))ask.scrollIntoView?.({behavior:'smooth',block:'center'});
  });
- drawTopics();drawCards();
+ drawTopics();drawCards();showSavedConversation();
  // Dedicated, independently hideable section for daily-life conversations.
  // Do not hide/recreate the original native Coach backend.
  const everydayContainer=add(doc,shell,'div','sikau-convo-everyday');
