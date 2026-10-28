@@ -33,13 +33,13 @@ const categories={
   priorities:[["A lower price is important to me.","कम मूल्य महत्त्वपूर्ण छ।","budget"],
    ["Quality and durability matter more.","गुणस्तर र टिकाउपन महत्त्वपूर्ण छ।","quality"],
    ["I want something suitable for my needs.","मलाई आवश्यकताअनुसार मिल्ने चाहिन्छ।","fit"]],
-  proposal:["Based on that, I'd show you the relevant options and compare their details. This is a practice store, so we'll check any actual price and availability before buying.",
-   "त्यसअनुसार मिल्ने सामान र विशेषता तुलना गरौँ। यो अभ्यास पसल हो; किन्नुअघि वास्तविक मूल्य र उपलब्धता पुष्टि गर्नुपर्छ।"],
+  proposal:["I'd recommend comparing these options side by side. Would you like to see the prices and available sizes?",
+   "तपाईंलाई मिल्ने सामानहरू तुलना गरौँ। मूल्य र उपलब्ध साइज देखाऊँ?"],
   alternative:["Let's consider another option that better fits your needs. Would you like to compare it?","तपाईंको आवश्यकतामा मिल्ने अर्को विकल्प हेरौँ। तुलना गर्ने?"],
   requirement:["Check the actual price, stock, size or model, and return policy before paying.","तिर्नुअघि वास्तविक मूल्य, स्टक, साइज वा मोडेल र फिर्ता नियम जाँच्नुहोस्।"],
-  ready:["The item looks suitable in this practice story. Would you like to discuss payment?","यो अभ्यासमा सामान मिल्ने देखियो। भुक्तानीबारे कुरा गरौँ?"],
-  done:["This is the end of the sample checkout. No real item was purchased or charged. Thank you for shopping with us!",
-   "यो अभ्यास खरिदको अन्त्य हो। वास्तविक सामान किनिएको वा पैसा काटिएको छैन। आउनुभएकोमा धन्यवाद!"]
+  ready:["That looks like a good choice. Would you like to pay now?","यो तपाईंलाई मिल्ने देखियो। अब पैसा तिर्न चाहनुहुन्छ?"],
+  done:["All set! Here's your receipt. Thank you for shopping with us, and have a lovely day!",
+   "सबै भयो! यो तपाईंको रसिद। किनमेल गर्नुभएकोमा धन्यवाद। शुभ दिन!"]
  },
  "Food & Drink":{
   intro:["Thanks! What matters most when you order?","धन्यवाद! खाना अर्डर गर्दा के महत्त्वपूर्ण छ?"],
@@ -50,9 +50,9 @@ const categories={
    "सोध्नुभएको खाना हेरौँ। अर्डरअघि सामग्री, तयार हुने समय र कुल मूल्य पुष्टि गर्नुपर्छ।"],
   alternative:["We could choose a different dish or portion that better matches your needs.","तपाईंलाई मिल्ने अर्को खाना वा परिमाण छान्न सक्छौँ।"],
   requirement:["Confirm the ingredients, any food allergies with staff, the price and expected preparation time.","कर्मचारीसँग सामग्री, एलर्जी, मूल्य र तयार हुने समय पुष्टि गर्नुहोस्।"],
-  ready:["Let's review the order and discuss how you'd pay at the counter in this fictional scene.","यो काल्पनिक अभ्यासमा अर्डर र काउन्टरमा भुक्तानीबारे कुरा गरौँ।"],
-  done:["Your practice order is complete; no food was actually prepared or paid for. Enjoy your meal!",
-   "अभ्यास अर्डर पूरा भयो; वास्तविक खाना तयार भएको वा पैसा तिरिएको छैन। शुभ भोजन!"]
+  ready:["Let's confirm your order. Would you like to pay at the counter?","अर्डर पुष्टि गरौँ। काउन्टरमा पैसा तिर्न चाहनुहुन्छ?"],
+  done:["Thank you! Your order is confirmed. Enjoy your meal!",
+   "धन्यवाद! तपाईंको अर्डर पुष्टि भयो। शुभ भोजन!"]
  },
  Travel:{
   intro:["Let's plan around the journey you described. What is most important?","तपाईंले बताएको यात्राअनुसार योजना गरौँ। के महत्त्वपूर्ण छ?"],
@@ -63,9 +63,9 @@ const categories={
    "गन्तव्यका बाटो, समय र भाडा तुलना गरौँ। वास्तविक उपलब्धता सेवा प्रदायकसँग जाँच्नुपर्छ।"],
   alternative:["Another route or departure could be more suitable. Let's compare instead of assuming it's available.","अर्को बाटो वा प्रस्थान समय उपयुक्त हुन सक्छ। उपलब्धता अनुमान नगरी तुलना गरौँ।"],
   requirement:["Confirm the route, date, actual fare, required documents and cancellation rules with the operator.","बाटो, मिति, वास्तविक भाडा, कागजात र रद्द गर्ने नियम सेवा प्रदायकसँग पुष्टि गर्नुहोस्।"],
-  ready:["We can explain the booking steps, but we can't confirm a real reservation in this practice chat.","बुकिङको प्रक्रिया बुझाउन सक्छौँ, तर यो अभ्यासमा वास्तविक बुकिङ पुष्टि हुँदैन।"],
-  done:["You've practiced how to request and review travel arrangements. No ticket or reservation was issued. Safe travels!",
-   "यात्रा सोध्ने र योजना बुझ्ने अभ्यास भयो। वास्तविक टिकट वा बुकिङ भएको छैन। शुभ यात्रा!"]
+  ready:["I'd be happy to help you with the booking details. Which date and time would you prefer?","बुकिङको विवरणमा मद्दत गर्छु। कुन मिति र समय चाहनुहुन्छ?"],
+  done:["Thanks for checking the travel details with me. Have a safe journey!",
+   "यात्राको विवरण बुझ्नुभएकोमा धन्यवाद। शुभ यात्रा!"]
  },
  Healthcare:{
   intro:["I understand. What would help you most at the clinic?","बुझेँ। क्लिनिकमा कुन मद्दत उपयोगी हुन्छ?"],
@@ -77,19 +77,19 @@ const categories={
   alternative:["We can ask whether another appointment type or department is appropriate; the clinic needs to confirm it.","अर्को अपोइन्टमेन्ट वा विभाग मिल्छ कि सोध्न सक्छौँ; क्लिनिकले पुष्टि गर्नुपर्छ।"],
   requirement:["Check the appointment type, available dates, required paperwork and insurance details with the clinic.","अपोइन्टमेन्टको प्रकार, खाली समय, कागजात र बीमाको विवरण क्लिनिकसँग जाँच्नुहोस्।"],
   ready:["Would you like to practice requesting an appointment or ask a clinician your medical question?","अपोइन्टमेन्ट माग्ने अभ्यास गर्ने कि चिकित्सकलाई स्वास्थ्य प्रश्न सोध्ने?"],
-  done:["We have discussed the clinic's process. No real appointment was booked. Please seek professional help for medical concerns.",
-   "क्लिनिकको प्रक्रिया बुझ्यौँ। वास्तविक अपोइन्टमेन्ट बुक भएको छैन। स्वास्थ्य समस्या भए चिकित्सकसँग सल्लाह लिनुहोस्।"]
+  done:["You're welcome. Please bring your documents, and speak with the clinician about any medical concerns. Take care!",
+   "स्वागत छ। कागजात ल्याउनुहोस् र स्वास्थ्य समस्या भए चिकित्सकलाई भन्नुहोस्। स्वस्थ रहनुहोस्!"]
  },
  Work:{
   intro:["Thanks for explaining. Which outcome are you hoping for at work?","बुझाउनुभएकोमा धन्यवाद। काममा के चाहनुहुन्छ?"],
   priorities:[["I'd like a clear schedule or instructions.","स्पष्ट तालिका वा निर्देशन चाहिन्छ।","requirements"],
    ["I'd like to find a better way to do it.","यसलाई राम्रो तरिकाले गर्ने उपाय चाहिन्छ।","quality"],
    ["Could I ask a supervisor to review this?","व्यवस्थापकलाई जाँच्न भन्न सक्छु?","review"]],
-  proposal:["Let's identify the relevant workplace rules and who can answer this request. The manager, not the role-play, makes any decision.",
-   "सम्बन्धित कार्यस्थल नियम र जिम्मेवार व्यक्ति पहिचान गरौँ। निर्णय व्यवस्थापकले गर्छ, अभ्यासले होइन।"],
+  proposal:["Let's check the work schedule and policy together. I can tell you what options are available.",
+   "कामको तालिका र नियम सँगै हेरौँ। उपलब्ध विकल्प बताउँछु।"],
   alternative:["We can suggest a different schedule, approach or responsible person and ask what is possible.","अर्को तालिका, तरिका वा जिम्मेवार व्यक्तिलाई अनुरोध गर्न सक्छौँ।"],
   requirement:["Explain the situation and your preferred solution, then check the actual workplace policy and approval process.","अवस्था र चाहेको समाधान बताएर वास्तविक नियम र स्वीकृतिको प्रक्रिया जाँच्नुहोस्।"],
-  ready:["We can rehearse a polite request to the supervisor, but nothing has been approved or changed.","व्यवस्थापकलाई सभ्य अनुरोध गर्ने अभ्यास गर्न सक्छौँ; केही स्वीकृत वा परिवर्तन भएको छैन।"],
+  ready:["I understand. I'll check with the supervisor and explain what we can do.","बुझेँ। व्यवस्थापकसँग जाँचेर के गर्न मिल्छ बताउँछु।"],
   done:["Thanks for explaining your work situation. Please confirm the next step with your supervisor. Have a good day!",
    "कामको अवस्था बताउनुभएकोमा धन्यवाद। अर्को कदम व्यवस्थापकसँग पुष्टि गर्नुहोस्। शुभ दिन!"]
  },
@@ -102,9 +102,9 @@ const categories={
    "यो सेवाका कागजात, शुल्क र अपोइन्टमेन्ट आवश्यक छ कि जाँचौँ।"],
   alternative:["If that isn't suitable, we can discuss a different appointment or available service level.","यो मिलेन भने अर्को समय वा सेवाको स्तरबारे सोधौँ।"],
   requirement:["Ask for the official instructions, written estimate and any cancellation conditions before agreeing.","सहमति दिनुअघि आधिकारिक निर्देशन, लिखित खर्च र रद्द गर्ने नियम माग्नुहोस्।"],
-  ready:["We can rehearse the request and the next step; this practice doesn't submit or approve any service.","अनुरोध र अर्को कदमको अभ्यास गरौँ; यसले वास्तविक सेवा दर्ता वा स्वीकृत गर्दैन।"],
-  done:["Thank you. You have practiced making a service request. No real service was ordered. Goodbye!",
-   "धन्यवाद। सेवा माग्ने अभ्यास भयो। कुनै वास्तविक सेवा अर्डर भएको छैन। बिदा!"]
+  ready:["I can explain the next steps and help you find the right person to handle your request.","अर्को प्रक्रिया बुझाएर सही कर्मचारीकहाँ पठाउन सक्छु।"],
+  done:["Thanks for explaining what you need. Let us know if you have any more questions. Goodbye!",
+   "आवश्यकता बताउनुभएकोमा धन्यवाद। अरू प्रश्न भए भन्नुहोस्। बिदा!"]
  },
  Home:{
   intro:["Thanks. What is the main concern with your home?","धन्यवाद। घरमा मुख्य चिन्ता के हो?"],
@@ -115,7 +115,7 @@ const categories={
    "मर्मत, खर्च वा समयअघि समस्या स्पष्ट बुझ्नुपर्छ।"],
   alternative:["We can ask about a different repair option or appointment, depending on the actual problem.","समस्या अनुसार अर्को मर्मत उपाय वा अपोइन्टमेन्टबारे सोध्न सक्छौँ।"],
   requirement:["Describe the problem and ask for a written estimate and authorization process before any work.","मर्मतअघि समस्या बताएर लिखित खर्च र स्वीकृति प्रक्रिया माग्नुहोस्।"],
-  ready:["We can discuss scheduling a visit, but no real repair or appointment has been confirmed.","भेट्ने समयबारे छलफल गर्न सक्छौँ; वास्तविक मर्मत वा अपोइन्टमेन्ट पुष्टि भएको छैन।"],
+  ready:["Let's look at the available appointment times for someone to inspect the problem.","समस्या जाँच्न आउने कर्मचारीको उपलब्ध समय हेरौँ।"],
   done:["Thanks for reporting the issue. Please confirm the repair arrangement with the provider. Goodbye!",
    "समस्या बताउनुभएकोमा धन्यवाद। मर्मत व्यवस्था सेवा प्रदायकसँग पुष्टि गर्नुहोस्। बिदा!"]
  },
@@ -128,7 +128,7 @@ const categories={
    "सुरक्षित जाँचबाट सुरु गरौँ। पासवर्ड वा कोड नदिनुहोस्; जोखिमपूर्ण परिवर्तनअघि डाटा सुरक्षित राख्नुहोस्।"],
   alternative:["We could try a different safe diagnostic step or consult the device maker's official support.","अर्को सुरक्षित जाँच वा निर्माताको आधिकारिक सहायता लिन सक्छौँ।"],
   requirement:["Check the exact model, symptoms, official instructions and data-backup status before repair.","मर्मतअघि मोडेल, समस्या, आधिकारिक निर्देशन र ब्याकअप जाँच्नुहोस्।"],
-  ready:["We can rehearse what to tell technical support. No device settings were changed by this practice.","प्राविधिकलाई के भन्ने अभ्यास गरौँ। यस अभ्यासले कुनै सेटिङ परिवर्तन गरेको छैन।"],
+  ready:["Tell me what happened, and we'll go through a few safe checks together.","के भयो बताउनुहोस्, अनि केही सुरक्षित जाँच सँगै गरौँ।"],
   done:["I hope that helped. Keep your data safe, and contact official support if the problem continues. Goodbye!",
    "मद्दत भएको आशा छ। डाटा सुरक्षित राख्नुहोस् र समस्या जारी रहे आधिकारिक सहायता लिनुहोस्। बिदा!"]
  },
@@ -141,7 +141,7 @@ const categories={
    "आधिकारिक बैंक वा सेवा प्रक्रिया अपनाउनुहोस्। शुल्क र निर्देशन बुझौँ, तर यहाँ पिन, पासवर्ड वा ओटीपी नदिनुहोस्।"],
   alternative:["We could discuss another supported service or transfer method after checking the official fees and rules.","आधिकारिक शुल्क र नियम जाँचेर अर्को उपलब्ध सेवा वा तरिकाबारे कुरा गरौँ।"],
   requirement:["Verify identification requirements, account details and any limits through the institution's secure channels.","पहिचान, खाता विवरण र सीमा संस्थाको सुरक्षित माध्यमबाट पुष्टि गर्नुहोस्।"],
-  ready:["We can rehearse the bank request, but no actual deposit, withdrawal or transfer will occur.","बैंकमा अनुरोध गर्ने अभ्यास गर्न सक्छौँ, तर कुनै वास्तविक जम्मा, निकासा वा ट्रान्सफर हुँदैन।"],
+  ready:["Certainly. I'll explain the steps and what identification we'll need.","अवश्य। प्रक्रिया र चाहिने परिचयपत्र बताउँछु।"],
   done:["Thanks for checking the details. Please complete any real transaction only through official secure channels.",
    "विवरण जाँच्नुभएकोमा धन्यवाद। वास्तविक कारोबार आधिकारिक सुरक्षित माध्यमबाट मात्र गर्नुहोस्।"]
  },
@@ -193,7 +193,7 @@ const categories={
    "समय, दर्ता र पहुँच आयोजकसँग सोधौँ; उपलब्धता अनुमान नगरौँ।"],
   alternative:["We could check another activity or session if this one doesn't work for you.","यो नमिले अर्को गतिविधि वा सत्र जाँच्न सक्छौँ।"],
   requirement:["Check official event information, registration rules and current hours before attending.","जानुअघि आधिकारिक सूचना, दर्ता नियम र हालको समय जाँच्नुहोस्।"],
-  ready:["We can practice contacting the organizer, but no participation has been registered.","आयोजकलाई सम्पर्क गर्ने अभ्यास गरौँ; वास्तविक दर्ता भएको छैन।"],
+  ready:["I can show you how to sign up and explain the next steps.","दर्ता कसरी गर्ने र अर्को कदम बुझाउन सक्छु।"],
   done:["Thanks for your interest! Please check the event details before visiting. Hope to see you there!",
    "रुचिका लागि धन्यवाद! जानुअघि कार्यक्रमको विवरण जाँच्नुहोस्। त्यहाँ भेटौँला!"]
  }
@@ -223,8 +223,8 @@ const alternateService={
    "व्यवस्थापक वा अर्को सेवाको विकल्प उपयोगी हुन सक्छ। अपवादको ग्यारेन्टी छैन।"],
   requirement:["Verify the receipt or order, relevant dates, item condition and the store's written terms.",
    "रसिद वा अर्डर, मिति, सामानको अवस्था र पसलका लिखित नियम जाँच्नुहोस्।"],
-  ready:["We can practice requesting a review or explanation. No actual refund, exchange or account change has been approved.",
-   "जाँच वा व्याख्या माग्ने अभ्यास गर्न सक्छौँ। वास्तविक पैसा फिर्ता, साट्ने वा खाता परिवर्तन स्वीकृत भएको छैन।"],
+  ready:["Let's look at the details and see what options the store can offer.",
+   "विवरण जाँचेर पसलले के विकल्प दिन सक्छ हेरौँ।"],
   done:["Thank you for explaining the issue. We'll need the actual store's decision before promising any result. Goodbye!",
    "समस्या बताउनुभएकोमा धन्यवाद। नतिजाको वाचाअघि वास्तविक पसलको निर्णय चाहिन्छ। बिदा!"]
  },
@@ -257,7 +257,7 @@ const alternateService={
    "समस्याअनुसार अर्को बाटो, काउन्टर, रिपोर्ट वा सेवा विकल्पबारे सोध्न सक्छौँ।"],
   requirement:["Confirm the reference number if available, travel date, official policy and correct provider contact. Do not share sensitive details in public.",
    "उपलब्ध भए रिफरेन्स नम्बर, यात्रा मिति, आधिकारिक नियम र सही सम्पर्क पुष्टि गर्नुहोस्। निजी विवरण सार्वजनिक नगर्नुहोस्।"],
-  ready:["We can practice asking the correct staff for a status or solution; no ticket, compensation or rebooking has been approved.",
+  ready:["I'll help you find the right desk and explain the next steps.",
    "सही कर्मचारीसँग अवस्था वा समाधान सोध्ने अभ्यास गरौँ; टिकट, क्षतिपूर्ति वा पुनःबुकिङ स्वीकृत भएको छैन।"],
   done:["Thank you for explaining. Please follow up with the actual operator to confirm the next step. Safe travels!",
    "समस्या बताउनुभएकोमा धन्यवाद। अर्को कदम वास्तविक सेवा प्रदायकसँग पुष्टि गर्नुहोस्। शुभ यात्रा!"]
@@ -292,10 +292,10 @@ const interviewHelp={
   "अर्को अन्तर्वार्ता प्रश्न अभ्यास गरौँ वा भर्तीकर्तासँग कामबारे सोधौँ।"],
  requirement:["Review the job description, interview instructions and your real experience before answering.",
   "उत्तरअघि जागिरको विवरण, अन्तर्वार्ता निर्देशन र आफ्नो वास्तविक अनुभव जाँच्नुहोस्।"],
- ready:["Let's rehearse a concise, truthful answer. No job offer or interview outcome is guaranteed.",
-  "छोटो र साँचो उत्तरको अभ्यास गरौँ। जागिरको नतिजाको ग्यारेन्टी छैन।"],
- done:["Thank you for the interview practice. We will explain any real next steps through the employer. Have a good day!",
-  "अन्तर्वार्ता अभ्यासका लागि धन्यवाद। वास्तविक अर्को चरण रोजगारदाताले बताउँछन्। शुभ दिन!"]
+ ready:["That's a helpful answer. Could you give me a specific example from your experience?",
+  "राम्रो उत्तर। आफ्नो अनुभवबाट ठोस उदाहरण दिनुहुन्छ?"],
+ done:["Thank you for coming in. We'll be in touch about the next steps. Have a good day!",
+  "आउनुभएकोमा धन्यवाद। अर्को चरणबारे खबर गर्छौँ। शुभ दिन!"]
 };
 const buyable=new Set(Object.keys(purchase));
 const categoryOf=(scene)=>window.sikauMoreTopics?.find(t=>t.id===scene)?.category||
@@ -322,8 +322,8 @@ function phone(node,state,config){
  const money="NPR "+price.toLocaleString("en-US");
  if(node==='phone-pitch'||node==='phone-budget'){
   return r(node,
-   "For this fictional shop conversation, I can show you "+model+" at a SAMPLE price of "+money+". These are invented practice prices, not current Nepal retail quotes. Would you like to compare it, ask about the features, or choose it?",
-   "यो काल्पनिक पसलको अभ्यासमा "+model+" को नमुना मूल्य रु. "+price.toLocaleString("en-US")+" हो। यो वास्तविक नेपाली बजारको मूल्य होइन। तुलना गर्ने, विशेषता सोध्ने कि छान्ने?",[
+   "I recommend "+model+" for "+money+". Would you like to compare the features or go with this one?",
+   "तपाईंलाई "+model+" रु. "+price.toLocaleString("en-US")+" पर्छ। विशेषता तुलना गर्ने कि यही लिने?",[
     option(state.offer==="basic"?"This is still above my budget. I'd rather wait.":"That's too expensive. Do you have a cheaper phone?",
     state.offer==="basic"?"यो अझै बजेटभन्दा महँगो छ। पछि आउँछु।":"त्यो धेरै महँगो छ। सस्तो फोन छ?",
     state.offer==="basic"?"closing":"phone-pitch",{offer:premium?"budget":"basic",priority:"budget"}),
@@ -363,8 +363,8 @@ function phone(node,state,config){
    option("I'd rather compare another phone.","अर्को फोन तुलना गर्छु।","phone-pitch",{offer:"budget"})
   ]);
  if(node==='phone-checkout')return r(node,
-  "In this role-play, your sample "+model+" quote is "+money+" before any variant, tax or accessory differences. Nothing has been charged. How would you prefer to pay in a real shop?",
-  "यस अभ्यासमा "+model+" को नमुना मूल्य रु. "+price.toLocaleString("en-US")+" हो। साइज, कर र सामान अनुसार वास्तविक मूल्य फरक हुन्छ। यहाँ पैसा काटिएको छैन। वास्तविक पसलमा कसरी तिर्न चाहनुहुन्छ?",[
+  "The "+model+" costs "+money+" before any extras. Would you like to pay with cash or a card?",
+  "तपाईंले छान्नुभएको "+model+" रु. "+price.toLocaleString("en-US")+" पर्छ। नगद कि कार्डले तिर्नुहुन्छ?",[
    option("I'll pay with cash.","नगद तिर्छु।","phone-finish",{payment:"cash"}),
    option("Can I pay with a credit or debit card?","क्रेडिट वा डेबिट कार्डले तिर्न मिल्छ?","phone-finish",{payment:"card"}),
    option("Is a QR or digital payment option available?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","phone-finish",{payment:"digital"}),
@@ -373,15 +373,15 @@ function phone(node,state,config){
  if(node==='phone-finish'){
   const method={cash:"cash",card:"a bank card",digital:"a QR/digital method"}[state.payment]||"your preferred method";
   return r(node,
-   "In our practice checkout, you've chosen "+model+" and selected "+method+". We'd confirm the exact total, process payment securely and provide a receipt in a real store. Here, NO purchase or charge was made. Thank you for shopping with us!",
-   "यो अभ्यासमा "+model+" र "+method+" रोज्नुभयो। वास्तविक पसलमा अन्तिम रकम जाँचेर सुरक्षित भुक्तानी र रसिद दिइन्छ। यहाँ कुनै सामान खरिद वा पैसा कटौती भएको छैन। धन्यवाद!",[
+   "Great choice! You've chosen "+model+" and you're paying with "+method+". Here's your receipt. Thank you for shopping with us!",
+   "राम्रो छनोट! "+model+" र "+method+" रोज्नुभयो। वास्तविक पसलमा अन्तिम रकम जाँचेर सुरक्षित भुक्तानी र रसिद दिइन्छ। यहाँ कुनै सामान खरिद वा पैसा कटौती भएको छैन। धन्यवाद!",[
     option("Thank you. Could I have the receipt?","धन्यवाद। रसिद दिनुहुन्छ?","phone-receipt",{}),
     option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{})
    ]);
  }
  if(node==='phone-receipt')return r(node,
-  "Of course. A real store would issue a receipt after successful payment, showing the model, amount and any return terms. This is only a practice example, so there is no actual receipt. Have a good day!",
-  "अवश्य। वास्तविक भुक्तानीपछि फोन, रकम र फिर्ताका नियमसहित रसिद दिइन्छ। यो अभ्यास भएकाले वास्तविक रसिद छैन। शुभ दिन!",[
+  "Of course! Here's your receipt with the phone model, amount and return information. Have a great day!",
+  "अवश्य। यो तपाईंको रसिद। फोनको मोडेल, रकम र फिर्ताका सर्त यहाँ छन्। शुभ दिन!",[
    option("Thanks! Have a nice day.","धन्यवाद! शुभ दिन।","end",{}),
    option("Can I ask one more question?","अझ एउटा प्रश्न सोध्न सक्छु?","phone-warranty",{})
   ]);
@@ -412,11 +412,11 @@ function build(node,state,config){
   if(!commerce)return "";
   const high=state.offer!=="budget"&&state.offer!=="basic";
   const value=state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[high?1:2];
-  return " A FICTIONAL example for "+prices[0]+" is NPR "+value.toLocaleString("en-US")+
-   ". This is a made-up lesson price, not current stock or a real retail quote.";
+  return " The price of "+prices[0]+" is NPR "+value.toLocaleString("en-US")+
+   ".";
  };
- const quoteNe=()=>!commerce?"":" यो अभ्यासमा "+prices[0]+" को काल्पनिक मूल्य रु. "+
-  (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो, वास्तविक बजार मूल्य होइन।";
+ const quoteNe=()=>!commerce?"":" राम्रो छनोट! "+prices[0]+" को मूल्य रु. "+
+  (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो।";
  if(node==='review'){
   if(legacy)return r(node,
     path[5]+" You said: “"+detail[0]+"” What would you like to check next?",
@@ -455,7 +455,7 @@ function build(node,state,config){
    ]);
  }
  if(node==='alternative')return r(node,
-  set.alternative[0]+(commerce?" Here's a lower-cost practice example."+quote():""),
+  set.alternative[0]+(commerce?" Here's a more affordable option."+quote():""),
   set.alternative[1]+(commerce?quoteNe():""),[
    option("That alternative sounds better. Let's continue.","त्यो विकल्प राम्रो लाग्यो। अघि बढौँ।","verify",{}),
    option("Could I compare it with the first choice?","पहिलो विकल्पसँग तुलना गर्न सक्छु?","proposal",{offer:"premium"}),
@@ -477,8 +477,8 @@ function build(node,state,config){
    option("I want a different option after all.","बरु अर्को विकल्प चाहिन्छ।","alternative",{offer:"budget"}),
    option("Thanks. I won't proceed today.","धन्यवाद। आज अघि बढ्दिनँ।","closing",{})
   ]);
- if(node==='action')return r(node,set.ready[0]+" You can ask a clear question or describe your preferred next step; no real application, booking or change has been made.",
-  set.ready[1]+" स्पष्ट प्रश्न वा चाहेको अर्को कदम बताउनुहोस्; कुनै वास्तविक आवेदन, बुकिङ वा परिवर्तन भएको छैन।",[
+ if(node==='action')return r(node,set.ready[0]+" Would you like me to explain anything else?",
+  set.ready[1]+" अरू केही बुझाइदिऊँ?",[
    option("That approach works. Thanks for explaining.","त्यो तरिका मिल्यो। बुझाइदिनुभएकोमा धन्यवाद।","confirmation",{decision:"agreed"}),
    option("Could we try a different approach?","अर्को तरिका हेरौँ?","alternative",{}),
    option("Can we check the requirements again?","आवश्यकता फेरि जाँचौँ?","requirements",{})
@@ -486,8 +486,8 @@ function build(node,state,config){
  if(node==='checkout'){
   if(!commercial)return build("action",state,config);
   return r(node,
-   "Let's review the sample "+target+" request. We'll need the final price and availability confirmed by the actual business. How would you prefer to pay if you decided to go ahead?",
-   "यो अभ्यास "+target+" को विवरण हेरौँ। वास्तविक पसलले अन्तिम मूल्य र उपलब्धता पुष्टि गर्नुपर्छ। अघि बढ्दा कसरी तिर्नुहुन्छ?",[
+   "Let's go over your "+target+" order. Would you prefer to pay with cash, card or QR?",
+   "तपाईंको "+target+" को अर्डर हेरौँ। नगद, कार्ड वा क्यूआरमध्ये कसरी तिर्नुहुन्छ?",[
     option("I'd pay with cash.","नगद तिर्छु।","confirmation",{payment:"cash",decision:"agreed"}),
     option("I'd use a debit or credit card.","डेबिट वा क्रेडिट कार्ड प्रयोग गर्छु।","confirmation",{payment:"card",decision:"agreed"}),
     option("Can I use a QR or digital payment?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","confirmation",{payment:"digital",decision:"agreed"}),
@@ -496,18 +496,18 @@ function build(node,state,config){
  }
  if(node==='confirmation'){
   const ending=commerce&&state.payment?
-   "In this fictional practice, you chose "+state.payment+" as your payment method. In a real business, staff would confirm the final total and provide a receipt after successful payment. No money has been charged here.":
+   "You've chosen "+state.payment+" as your payment method. Here's your receipt.":
    set.done[0];
   const endingNe=commerce&&state.payment?
-   "यो काल्पनिक अभ्यासमा "+state.payment+" भुक्तानी तरिका रोज्नुभयो। वास्तविक पसलमा अन्तिम रकम पुष्टि गरी भुक्तानीपछि रसिद दिइन्छ। यहाँ पैसा काटिएको छैन।":set.done[1];
+   "तपाईंले "+state.payment+" भुक्तानी तरिका रोज्नुभयो। यो तपाईंको रसिद।":set.done[1];
   return r(node,ending+" Thank you for talking with me!",endingNe+" कुराकानीका लागि धन्यवाद!",[
    option("Thank you. Have a nice day!","धन्यवाद। शुभ दिन!","end",{}),
    option("Could you explain the next steps again?","अर्को कदम फेरि बुझाउनुहुन्छ?","requirements",{})
   ]);
  }
  if(node==='closing')return r(node,
-  state.decision==="later"?"That's fine. You can decide later; nothing has been ordered, paid for or approved. "+set.done[0]:set.done[0],
-  state.decision==="later"?"ठीक छ। पछि निर्णय गर्न सक्नुहुन्छ; केही अर्डर, भुक्तानी वा स्वीकृत भएको छैन। "+set.done[1]:set.done[1],[
+  state.decision==="later"?"No problem. You're welcome to come back whenever you're ready. "+set.done[0]:set.done[0],
+  state.decision==="later"?"ठीक छ। तयार भएपछि फेरि आउनुहोस्। "+set.done[1]:set.done[1],[
    option("Thanks. Goodbye!","धन्यवाद। बिदा!","end",{}),
    option("Can we discuss something else?","अर्को कुरा गरौँ?","opening",{priority:"",offer:""})
   ]);
