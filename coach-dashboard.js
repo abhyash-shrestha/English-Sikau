@@ -1043,6 +1043,16 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  function restoreDraft(saved){
   const scene=scenarios.find(x=>x.id===saved.sceneId);
   if(!scene)return;
+  // An untouched draft from the previous scripted version should get the
+  // new context-first dialogue. Never discard a conversation with replies.
+  const untouched=saved.index===0&&!saved.pendingChoice&&
+   !saved.history?.some(entry=>entry&&entry.reply);
+  const oldClothing=saved.sceneId==='return-shirt'&&
+   /how can i help you with this shirt today/i.test(saved.steps?.[0]?.npc||'');
+  const oldFixedTopic=saved.sceneId!=='return-shirt'&&!saved.isBranchingStory;
+  if(untouched&&(oldClothing||oldFixedTopic)){
+   coachDrafts?.remove();start(scene);return;
+  }
   const state=Object.assign(Object.create(null),saved.storeState||{});
   active={...scene,coachOriginal:scene,steps:saved.steps.map(personalizeCoachStep),
    coachPracticeNumber:Number.isSafeInteger(saved.practiceNumber)?saved.practiceNumber:1,
