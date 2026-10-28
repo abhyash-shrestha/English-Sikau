@@ -1003,7 +1003,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   if(typeof text!=='string')return text;
   return text.replace(/\bSita\b/gi,coachLearnerName)
    .replace(/सीता/g,coachLearnerName)
-   .replace(/आफ्नो नाम काल्पनिक राख्न सकिन्छ।/g,'आफ्नै नाम प्रयोग गर्नुहोस्।')
+   .replace(/नाम काल्पनिक राख्न सकिन्छ।/g,'आफ्नै नाम प्रयोग गर्नुहोस्।')
    .replace(/आफ्नो नाम काल्पनिक राखेर परिचय दिनुहोस्।/g,'आफ्नै नाम प्रयोग गरेर परिचय दिनुहोस्।');
  };
  const personalizeCoachStep=step=>{
@@ -1011,6 +1011,16 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   const updated={...step};
   for(const key of ['npc','npcNe','answer','answerNe','after','goal','hint'])
    if(typeof updated[key]==='string')updated[key]=introText(updated[key]);
+  // A name requested in a hotel or café should also use this learner's
+  // signed-in first name, not a generic 'under my name' placeholder.
+  if(/may i have your booking name\?/i.test(updated.npc||'')){
+   updated.answer='The booking is under '+coachLearnerName+'.';
+   updated.answerNe='बुकिङ '+coachLearnerName+' को नाममा छ।';
+  }
+  if(/should we call your name when it.s ready\?/i.test(updated.npc||'')){
+   updated.answer='Yes, please call '+coachLearnerName+' when it is ready.';
+   updated.answerNe='हो, तयार भएपछि '+coachLearnerName+' भनेर बोलाउनुहोस्।';
+  }
   if(Array.isArray(step.accept))updated.accept=step.accept.map(introText);
   if(Array.isArray(step.storeOptions))
    updated.storeOptions=step.storeOptions.map(item=>({
