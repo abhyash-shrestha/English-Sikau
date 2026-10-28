@@ -437,6 +437,86 @@ function validTyped(typed,step){
   return terms.length&&terms.every(t=>value.split(' ').some(w=>w===t||w.startsWith(t)&&(t.length>=5)));
  });
 }
+
+/* Coach's authored questions are examples, not exact-answer tests.
+ * When the private AI backend has not been configured, these *limited*
+ * offline prompts keep basic yes/no replies moving without claiming to
+ * understand all grammar or meanings.
+ */
+function coachOfflineStep(npc,npcNe,answer,answerNe){
+ const i=normalize(npc).length%coachDistractors.length;
+ return {npc,npcNe,goal:'आफ्नै अंग्रेजी शब्द प्रयोग गरेर स्वाभाविक उत्तर दिनुहोस्।',
+  answer,answerNe,accept:[answer],hint:'Use your own words to answer the question.',
+  bad1:coachDistractors[i],bad2:coachDistractors[(i+4)%coachDistractors.length],
+  after:'Thank you for explaining.'};
+}
+function coachNoReceiptPath(){
+ const pairs=[
+ ["That's okay. Do you have an email confirmation or an order number?","ठीक छ। इमेल पुष्टि वा अर्डर नम्बर छ?","I can look for the confirmation email on my phone.","म फोनमा पुष्टि इमेल खोज्न सक्छु।"],
+ ["Take your time. When did you purchase this shirt?","हतार छैन। यो कमिज कहिले किन्नुभयो?","I bought it last weekend.","मैले गएको सप्ताहन्त किनेको थिएँ।"],
+ ["Was it bought online or in our store?","अनलाइन किन्नुभयो कि यहीँ पसलमा?","I bought it in this store.","मैले यही पसलमा किनेको हुँ।"],
+ ["May I check the tag on the shirt?","कमिजको ट्याग हेर्न सक्छु?","Sure, here is the tag.","अवश्य, यो ट्याग हो।"],
+ ["What seems to be the problem with the shirt?","कमिजमा के समस्या छ?","It's too small for me.","यो मलाई सानो भयो।"],
+ ["Would you prefer another size or store credit?","अर्को साइज चाहिन्छ कि स्टोर क्रेडिट?","I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।"],
+ ["Let me check whether we have the larger size.","ठूलो साइज छ कि जाँच गर्छु।","Thank you. I appreciate your help.","धन्यवाद। तपाईंको मद्दतको कदर गर्छु।"],
+ ["Good news. We have a larger size. Would you like to try it on?","खुसीको खबर। ठूलो साइज छ। लगाएर हेर्नुहुन्छ?","Yes, could you show me the fitting room?","हो, कपडा लगाएर हेर्ने कोठा देखाउनुहुन्छ?"],
+ ["How does the new size feel?","नयाँ साइज कस्तो छ?","It fits much better, thank you.","यो धेरै राम्रोसँग मिल्यो, धन्यवाद।"],
+ ["I can request an exchange, subject to our return policy. Is that okay?","फिर्ता नियमअनुसार साट्ने अनुरोध गर्न सक्छु। ठीक छ?","Yes, please tell me if anything else is required.","हुन्छ, अरू केही चाहिन्छ भने भन्नुहोस्।"],
+ ["Would you like a copy of the exchange details?","साटेको विवरणको प्रति चाहिन्छ?","Yes, an email copy would be helpful.","हो, इमेलमा प्रति भए सजिलो हुन्छ।"],
+ ["Is there anything else I can help you with?","अरू केही मद्दत चाहिन्छ?","No, that's everything. Thank you for helping me.","होइन, यति नै हो। मद्दत गर्नुभएकोमा धन्यवाद।"]
+ ];
+ return pairs.map(([a,b,c,d])=>coachOfflineStep(a,b,c,d));
+}
+function coachOfflineReview(reply,step,scene){
+ const original=String(reply||'').trim();
+ const lower=normalize(original),question=normalize(step.npc);
+ const negative=/^(no|nope|nah|not really|i do not|i dont|i havent|i have not)\b/.test(lower);
+ const affirmative=/^(yes|yeah|yep|sure|of course|i do|i have)\b/.test(lower);
+ const isShortAnswer=negative||affirmative;
+ const receiptQuestion=scene?.id==='return-shirt'&&/\breceipt\b/.test(question);
+ const words=lower.split(' ').filter(Boolean);
+ if(words.length<2&&!isShortAnswer)return {accepted:false,corrected:original,why_ne:'पूरा उत्तर लेख्नुहोस्।'};
+ let corrected=original.replace(/\s+/g,' ').trim();
+ let tip='This is an offline practice suggestion, not an AI grammar check.';
+ if(negative&&/^(no|nope|nah)(?:[, ]+i)?(?:[, ]+(?:dont|do not))?$/i.test(lower)){
+  corrected=receiptQuestion?"No, I don't have the receipt.":"No, I don't.";
+  tip=receiptQuestion?'A complete sentence makes your meaning clearer.':'Add a comma after “No” and a full stop.';
+ }else if(/^yes\s+i\s+(?:do|have)$/i.test(lower)){
+  corrected=receiptQuestion?'Yes, I have the receipt.':"Yes, I do.";
+ }else if(/^i no have (?:the )?receipt\.?$/i.test(lower)){
+  corrected="I don't have the receipt.";
+  tip='Use “don’t have” instead of “no have.”';
+ }else{
+  corrected=corrected.replace(/^i\b/,'I');
+  if(!/[.!?]$/.test(corrected))corrected+='.';
+  if(/^(yes|no)\s+/i.test(corrected))corrected=corrected.replace(/^(Yes|No)\s+/,'$1, ');
+ }
+ // Do not reject a meaningful self-written answer merely because it
+ // disagrees with the authored sample; continue as unverified practice.
+ return {accepted:true,corrected,why_ne:tip,
+  learner_ne:receiptQuestion&&negative?'होइन, मसँग रसिद छैन।':'',
+  mode:'offline',receiptNo:receiptQuestion&&(negative||/\b(?:dont|do not|no|havent|have not)\s+(?:have\s+)?(?:the\s+)?receipt\b/.test(lower))};
+}
+function coachSafeAIReply(raw){
+ if(!raw||typeof raw!=='object')throw Error('AI response is missing');
+ const feedback=raw.feedback,follow=raw.next;
+ if(!feedback||typeof feedback.accepted!=='boolean'||typeof feedback.corrected!=='string')
+  throw Error('Invalid AI feedback');
+ const take=(x,n)=>typeof x==='string'?x.slice(0,n).trim():'';
+ const next=follow&&typeof follow==='object'?{
+  npc:take(follow.npc,280),npcNe:take(follow.npc_ne,350),
+  goal:take(follow.goal_ne,300),answer:take(follow.example_en,350),
+  answerNe:take(follow.example_ne,350),
+  hint:'Respond naturally to the new question in your own words.',
+  bad1:'I want to buy a yellow bus.',bad2:'The floor is a funny sandwich.',
+  accept:[],after:''
+ }:null;
+ return {accepted:feedback.accepted,corrected:take(feedback.corrected,450),
+  improved:take(feedback.improved,450),why_ne:take(feedback.why_ne,450),
+  learner_ne:take(feedback.learner_ne,300),mode:'ai',
+  next:next?.npc&&next?.answer&&next?.npcNe?next:null};
+}
+
 function shuffledChoices(step){
  const values=[{value:step.answer,correct:true},{value:step.bad1,correct:false},{value:step.bad2,correct:false}];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
@@ -766,7 +846,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Guided bilingual conversations. Writing mode checks key phrases; use Ask AI Coach for deeper grammar feedback. · लेख्ने अभ्यासमा मुख्य शब्द जाँचिन्छ। विस्तृत सुधारका लागि AI Coach प्रयोग गर्नुहोस्।');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','Write your own response. When the private AI service is configured, Coach gives grammar feedback and adapts the next question. Until then, a limited offline practice mode is available. · आफ्नै उत्तर लेख्नुहोस्। AI उपलब्ध भए अर्थ र व्याकरण जाँच हुनेछ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -840,7 +920,7 @@ window.enhanceCoachDashboard=function(doc){
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
    const readAll=add(doc,buttons,'button','sikau-convo-secondary','📖 Read full conversation · पूरा संवाद');readAll.type='button';
-   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const line of active.steps){const pair=add(doc,transcript,'div','sikau-convo-full-pair');add(doc,pair,'strong','',active.partner+': '+line.npc);add(doc,pair,'p','', 'You: '+line.answer);if(showNepali)add(doc,pair,'small','',line.npcNe+' / '+line.answerNe);}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
+   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',active.partner+': '+line.npc);add(doc,pair,'p','','You: '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
    const another=add(doc,buttons,'button','sikau-convo-secondary','Explore more situations · थप विषय');another.type='button';another.addEventListener('click',back);
    return;
   }
@@ -872,7 +952,9 @@ window.enhanceCoachDashboard=function(doc){
    const learnerLine=add(doc,transcript,'div','sikau-convo-bubble learner');
    add(doc,learnerLine,'strong','','You · तपाईं');
    add(doc,learnerLine,'p','',history.reply||prior.answer);
-   if(showNepali)add(doc,learnerLine,'small','',prior.answerNe);
+   const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?prior.answerNe:'');
+   if(showNepali&&translated)add(doc,learnerLine,'small','',translated);
+   if(history.corrected&&normalize(history.corrected)!==normalize(history.reply))add(doc,learnerLine,'small','','Suggested: '+history.corrected);
   }
   const cols=add(doc,stage,'div','sikau-convo-session');
   const situ=add(doc,cols,'div','sikau-convo-dialogue');
@@ -927,18 +1009,63 @@ window.enhanceCoachDashboard=function(doc){
    const check=add(doc,controls,'button','sikau-convo-primary','Check reply · उत्तर जाँच्नुहोस्');check.type='button';
    const hint=add(doc,controls,'button','sikau-convo-secondary','💡 Hint · संकेत');hint.type='button';
    const revealBtn=add(doc,controls,'button','sikau-convo-secondary','👁 Model reply · नमुना');revealBtn.type='button';
-   function evaluate(){
-    const value=input.value.trim();if(!value){result.className='sikau-convo-feedback warning';result.textContent='Write a sentence to practice. · कृपया वाक्य लेख्नुहोस्।';return;}
+   let busy=false;
+   async function evaluate(){
+    if(busy||check.disabled)return;
+    const value=input.value.trim();
+    if(!value){result.className='sikau-convo-feedback warning';result.textContent='Write a reply to practice. · कृपया उत्तर लेख्नुहोस्।';return;}
+    const current=active,turn=index;
     attempts++;
-    if(validTyped(value,step)){
-      successful++;dialogueHistory[index]={reply:value,kind:'written'};check.disabled=true;showResult(true);
-    }else{
-      result.className='sikau-convo-feedback warning';
-      result.replaceChildren();
-      add(doc,result,'strong','','Try another phrase · अर्को तरिका प्रयोग गर्नुहोस्');
-      add(doc,result,'p','','This guided checker looks for key phrases, not full AI grammar. A different correct expression may not match.');
-      add(doc,result,'small','','अर्थ मिल्ने शब्द प्रयोग गर्नुहोस्। चाहेमा नमुना उत्तर हेर्नुहोस्।');
+    let review=null,aiFailed=false;
+    if(typeof window.sikauConversationAI==='function'&&window.sikauCoachAIConfigured){
+     busy=true;check.disabled=true;check.textContent='Checking reply… · उत्तर जाँच्दै…';
+     result.className='sikau-convo-feedback info';
+     result.textContent='Checking the meaning and grammar of your reply…';
+     try{
+      const past=active.steps.slice(Math.max(0,index-6),index).map((prior,i)=>{
+       const ix=Math.max(0,index-6)+i;
+       return {speaker:active.partner,question:prior.npc,reply:dialogueHistory[ix]?.reply||prior.answer};
+      });
+      const output=await window.sikauConversationAI({
+       situation:active.title,place:active.place,partner:active.partner,
+       turn:index+1,totalTurns:active.steps.length,
+       question:step.npc,questionNe:step.npcNe,
+       learnerReply:value,history:past
+      });
+      review=coachSafeAIReply(output);
+     }catch(_){aiFailed=true;}
+     finally{busy=false;if(current===active&&turn===index)check.disabled=false;}
     }
+    if(current!==active||turn!==index||mode!=='write')return;
+    if(!review)review=coachOfflineReview(value,step,active);
+    result.replaceChildren();
+    result.className='sikau-convo-feedback '+(review.accepted?'success':'warning');
+    add(doc,result,'strong','',review.accepted?(review.mode==='ai'?'✅ Answer understood · उत्तर बुझियो':'✅ Reply recorded for practice · अभ्यासका लागि उत्तर राखियो'):'💡 Improve this answer · उत्तर सुधारौँ');
+    if(review.corrected){
+     add(doc,result,'small','',review.mode==='ai'?'Corrected English · सच्याइएको अंग्रेजी':'Suggested wording · सम्भावित राम्रो वाक्य');
+     add(doc,result,'p','',review.corrected);
+    }
+    if(review.improved&&review.improved!==review.corrected){
+     add(doc,result,'small','','More natural · अझ स्वाभाविक');
+     add(doc,result,'p','',review.improved);
+    }
+    if(review.why_ne)add(doc,result,'small','',review.why_ne);
+    if(review.mode!=='ai')add(doc,result,'small','',aiFailed?
+      'AI is temporarily unavailable. This is limited offline feedback, not a full grammar check.':
+      'Limited offline practice: full grammar checking and flexible replies require the private AI service.');
+    if(!review.accepted)return;
+    successful++;
+    dialogueHistory[index]={reply:value,corrected:review.corrected||'',learnerNe:review.learner_ne||'',kind:review.mode};
+    if(review.next&&index+1<active.steps.length){
+     active.steps[index+1]={...step,...review.next,goal:review.next.goal||step.goal};
+     active.steps[index].after=review.next.npc;
+    }else if(review.receiptNo&&index+1<active.steps.length){
+     active.steps.splice(index+1,active.steps.length-index-1,...coachNoReceiptPath());
+     active.steps[index].after=active.steps[index+1].npc;
+    }
+    input.readOnly=true;check.disabled=true;
+    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish conversation →':'Continue conversation → · कुराकानी जारी राख्नुहोस्');
+    next.type='button';next.addEventListener('click',goNext);
    }
    check.addEventListener('click',evaluate);
    input.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();evaluate();}});
