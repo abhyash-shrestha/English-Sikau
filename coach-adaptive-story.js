@@ -23,6 +23,13 @@ function build(node,state){
   opts.push(chooseItem("Actually, could we discuss a different question?","बरु अर्को प्रश्नबारे कुरा गर्न सकिन्छ?","opening",{}));
  }else if(node==='review'){
   [npc,npcNe]=[path[5],path[6]];
+  // Extended topics also respond to the specific detail the learner picked.
+  // Original 27 topics do not carry optional reactions and stay unchanged.
+  const response=path[7]?.[state.detail];
+  if(response&&response.length===2){
+   npc=response[0]+' '+npc;
+   npcNe=response[1]+' '+npcNe;
+  }
   opts=[
    chooseItem("That answers my question. Thank you!","मेरो प्रश्नको उत्तर पाएँ। धन्यवाद!","end"),
    chooseItem("What should I do next?","अब मैले के गर्नुपर्छ?","followup"),
