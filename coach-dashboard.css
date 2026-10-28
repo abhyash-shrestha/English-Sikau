@@ -1145,3 +1145,37 @@ html[data-sikau-theme="dark"] .sikau-convo-resume-copy small{color:#c4d3e9}
  .sikau-convo-topics{margin-inline:-7px;padding-inline:7px}
  .sikau-convo-load-more{width:100%}
 }
+
+
+/* Mobile Coach chat: one natural page scroll instead of nested scroll panes. */
+@media (max-width: 767px) {
+ #coach .sikau-convo-stage,
+ #coach .sikau-convo-chat-layout,
+ #coach .sikau-convo-chat-choices,
+ #coach .sikau-convo-chat-thread {min-width:0!important;max-width:100%!important}
+ #coach .sikau-convo-chat-layout{display:flex!important;flex-direction:column!important;gap:12px!important}
+ #coach .sikau-convo-transcript.sikau-convo-chat-thread{
+  width:100%!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;overscroll-behavior:auto!important;
+  scroll-behavior:auto!important;padding:12px!important;
+ }
+ #coach .sikau-convo-chat-choices{width:100%!important;padding:13px!important}
+ #coach .sikau-chat-message{max-width:100%!important}
+ #coach .sikau-chat-message-body{max-width:100%!important;overflow-wrap:anywhere}
+ #coach .sikau-chat-message-body p{font-size:14px!important;line-height:1.6!important}
+ #coach .sikau-chat-option-copy{font-size:14px!important;line-height:1.5!important}
+ #coach .sikau-chat-option-copy small{font-size:12px!important;line-height:1.55!important}
+ #coach .sikau-convo-option.sikau-chat-option{min-height:56px!important;padding:12px!important}
+ #coach .sikau-convo-chat-choices .sikau-convo-primary{min-height:48px!important}
+ #coach .sikau-convo-stage-head{gap:8px!important;flex-wrap:wrap!important}
+ #coach .sikau-convo-stage-head button{min-height:42px!important;touch-action:manipulation}
+ #coach .sikau-chat-top{position:static!important;margin:-12px -12px 10px!important}
+ #coach .sikau-convo-hero-actions button{min-height:48px!important}
+}
+@media (max-width: 400px) {
+ #coach .sikau-convo-hero-actions{grid-template-columns:1fr!important}
+ #coach .sikau-convo-situation{padding:10px!important}
+ #coach .sikau-convo-chat-choices{padding:11px!important}
+ #coach .sikau-chat-top{gap:5px!important}
+ #coach .sikau-chat-top-pill{white-space:normal!important}
+}
