@@ -17,12 +17,13 @@ function itemText(s,state,ne=false){
  if(ne)return s.replace(/कमिज/g,g[1]);
  const [name,,plural]=g;
  return s.replace(/Was this shirt purchased/g,plural?'Were these '+name+' purchased':'Was this '+name+' purchased')
+  .replace(/the shirt has been worn/gi,'the '+name+(plural?' have':' has')+' been worn')
+  .replace(/a different shirt/gi,plural?'different '+name:'a different '+name)
   .replace(/this shirt/gi,plural?'these '+name:'this '+name)
   .replace(/the shirt/gi,'the '+name)
-  .replace(/a different shirt/gi,plural?'different '+name:'a different '+name)
   .replace(/shirt/gi,name)
-  .replace(/the tags were removed/g,'the tags were removed')
-  .replace(/the shirt has been worn/g,plural?'the '+name+' have been worn':'the '+name+' has been worn');
+  .replace(/exchange it if possible/gi,plural?'exchange them if possible':'exchange it if possible')
+  .replace(/keep it for now/gi,plural?'keep them for now':'keep it for now');
 }
 function step(id,state){
  const row=(npc,npcNe,options,speaker="Store assistant",emoji="🛍️")=>{
