@@ -575,26 +575,57 @@ function coachFollowUpStep(details){
 }
 function coachReplyVariations(value){
  const a=String(value||'').trim();
+ if(!a)return [];
  const forms=new Set([a]);
+ const add=next=>{if(next&&normalize(next)!==normalize(a))forms.add(next);};
+ if(/^thank you[.!]?$/i.test(a)||/^thanks[.!]?$/i.test(a)){
+  add('Thanks a lot.');add('Thank you very much.');
+  return Array.from(forms);
+ }
+ if(/^no,?\s*thank you[.!]?$/i.test(a)){
+  add("No thanks, I'm all set.");add("I'm okay, thank you.");
+  return Array.from(forms);
+ }
+ if(/^yes[,.!?]?\s*/i.test(a)){
+  const rest=a.replace(/^yes[,.!?]?\s*/i,'');
+  if(rest){add('Yes. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add("Yes, that's right. "+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  else {add('Yes, certainly.');add('Yes, absolutely.');}
+  return Array.from(forms);
+ }
+ if(/^no[,.!?]?\s*/i.test(a)){
+  const rest=a.replace(/^no[,.!?]?\s*/i,'');
+  if(rest){add('No. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add('Actually, no. '+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  else{add('No, thank you.');add('Not this time, thank you.');}
+  return Array.from(forms);
+ }
  const replacements=[
   [/^I'd like /i,'I would like '],[/^I would like /i,"I'd like "],
+  [/^I'd prefer /i,'I would prefer '],[/^I would prefer /i,"I'd prefer "],
   [/^Could you /i,'Can you '],[/^Can you /i,'Could you '],
   [/^Could I /i,'May I '],[/^May I /i,'Could I '],
   [/^I'm /i,'I am '],[/^I've /i,'I have '],[/^I'll /i,'I will '],
   [/^I don't /i,'I do not '],[/^I can't /i,'I cannot '],
   [/^It's /i,'It is '],[/^That's /i,'That is '],
   [/^Thanks,/i,'Thank you,'],[/^Thank you,/i,'Thanks,'],
-  [/^Yes, /i,'Yes, certainly. '],[/^No, /i,'No, actually. ']
+  [/^I want to /i,"I'd like to "],[/^I'd like to /i,'I would like to ']
  ];
- for(const [pattern,replace] of replacements){
-  if(pattern.test(a))forms.add(a.replace(pattern,replace));
- }
- // Conversation fillers provide neutral alternatives without inventing facts.
- if(!/^well[, ]/i.test(a))forms.add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
- if(!/^to be clear[, ]/i.test(a))forms.add('To clarify, '+a.charAt(0).toLowerCase()+a.slice(1));
- return Array.from(forms).filter(x=>x.trim().length>1);
+ for(const [pattern,replacement] of replacements)if(pattern.test(a))add(a.replace(pattern,replacement));
+ if(/^I(?:\s|')/i.test(a)&&a.length>=12)
+  add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
+ if(/^Could you |^Can you /i.test(a))
+  add(a.replace(/^(?:Could|Can) you /i,'Would you please '));
+ if(/^I'd like |^I would like |^I want /i.test(a))
+  add('If possible, '+a.charAt(0).toLowerCase()+a.slice(1));
+ if(!/^well,|^thank|^thanks|^sure/i.test(a)&&a.length>=18)
+  add('To clarify, '+a.charAt(0).toLowerCase()+a.slice(1));
+ // For rare short phrases there may not be a direct grammatical rewrite.
+ // Distinct, polite context does not change the learner's underlying fact.
+ if(forms.size<3)add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
+ if(forms.size<3)add('To be clear, '+a.charAt(0).toLowerCase()+a.slice(1));
+ return Array.from(forms).slice(0,3);
 }
-
 function coachEquivalentReply(sentence){
  const value=String(sentence||'').trim();
  const changes=[
