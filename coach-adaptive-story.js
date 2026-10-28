@@ -11,44 +11,135 @@ for(const entry of (Array.isArray(window.sikauMoreTopics)?window.sikauMoreTopics
  configs[entry.id]=entry.config;
 }
 const chooseItem=(value,ne,next,patch)=>({value,ne,next,patch:patch||{},correct:true});
+const option=(en,ne,next,patch={})=>chooseItem(en,ne,next,patch);
 function build(node,state){
- const config=configs[state.scene],path=config[1][state.path]||config[1][0];
- let npc,npcNe,opts;
+ const config=configs[state.scene];
+ if(!config)throw Error('Unknown Coach topic: '+state.scene);
+ const path=config[1][state.path]||config[1][0];
+ const guide=window.sikauCoachGuidance?.get(state.scene,config,state.path,state.detail??0);
+ if(!guide)throw Error('Coach guidance failed to load');
+ const chosen=path[4][state.detail??0]||path[4][0];
+ let npc,npcNe,opts=[];
  if(node==='opening'){
   [npc,npcNe]=config[0];
-  opts=config[1].map((p,i)=>chooseItem(p[0],p[1],'detail',{path:i,detail:null}));
+  opts=config[1].map((p,i)=>option(p[0],p[1],'detail',{path:i,detail:null}));
  }else if(node==='detail'){
   [npc,npcNe]=[path[2],path[3]];
-  opts=path[4].map((d,i)=>chooseItem(d[0],d[1],'review',{detail:i}));
-  opts.push(chooseItem("Actually, could we discuss a different question?","बरु अर्को प्रश्नबारे कुरा गर्न सकिन्छ?","opening",{}));
+  opts=path[4].map((d,i)=>option(d[0],d[1],'review',{detail:i}));
+  opts.push(option("Could we start with a different question?","अर्को प्रश्नबाट सुरु गर्न सक्छौँ?","opening",{}));
+  opts.push(option("Thanks, I'm just gathering information.","धन्यवाद, अहिले जानकारी मात्र लिँदै छु।","closing",{}));
  }else if(node==='review'){
-  [npc,npcNe]=[path[5],path[6]];
-  // Extended topics also respond to the specific detail the learner picked.
-  // Original 27 topics do not carry optional reactions and stay unchanged.
-  const response=path[7]?.[state.detail];
-  if(response&&response.length===2){
-   npc=response[0]+' '+npc;
-   npcNe=response[1]+' '+npcNe;
+  [npc,npcNe]=[guide.message,guide.messageNe];
+  const social=['Everyday','Family'].includes(guide.category);
+  opts=[
+   option(guide.question[0],guide.question[1],'answer',{}),
+   option(social?"Could we talk about a different part of this?":"Could we compare that with another option?",
+     social?"यसबारे अर्को कुरा गरौँ?":"यो अर्को विकल्पसँग तुलना गर्न सक्छौँ?","compare",{}),
+   option(social?"What's a natural question I could ask next?":
+     guide.category==='Education'?"Could we continue with a useful practice step?":
+     "What would we need to check before going ahead?",
+     social?"अर्को स्वाभाविक प्रश्न के सोध्ने?":
+     guide.category==='Education'?"अर्को उपयोगी अभ्यास गरौँ?":
+     "अघि बढ्नुअघि के जाँच्नुपर्छ?","nextSteps",{}),
+   option(social?"Thanks, I enjoyed our conversation.":"Thanks, that helps. I'll decide later.",
+     social?"धन्यवाद, कुरा गर्न रमाइलो लाग्यो।":"धन्यवाद, उपयोगी भयो। पछि निर्णय गर्छु।","closing",{})
+  ];
+ }else if(node==='answer'){
+  [npc,npcNe]=[guide.question[2],guide.question[3]];
+  const social=['Everyday','Family'].includes(guide.category);
+  opts=[
+   option(social?"Could we discuss another idea?":"Could we compare another option too?",
+    social?"अर्को विचारबारे कुरा गरौँ?":"अर्को विकल्प पनि तुलना गरौँ?","compare",{}),
+   option(social?"How could I keep the conversation going?":"What are the next practical steps?",
+    social?"कुराकानी कसरी अघि बढाउने?":"अबको व्यवहारिक कदम के हो?","nextSteps",{}),
+   option("That's clear. Thanks for your help.","स्पष्ट भयो। मद्दतका लागि धन्यवाद।","closing",{})
+  ];
+ }else if(node==='compare'){
+  const next=guide.alternate;
+  const social=['Everyday','Family'].includes(guide.category);
+  npc=social?
+   "We could also talk about “"+next[0]+"” if you like. Which part interests you?":
+   "You mentioned “"+chosen[0]+"” and could also consider “"+next[0]+"”. We can compare these without assuming one is better. Which matters more?";
+  npcNe=social?
+   "चाहनुहुन्छ भने “"+next[1]+"” बारे पनि कुरा गरौँ। कुन कुरामा रुचि छ?":
+   "तपाईंले “"+chosen[1]+"” भन्नुभयो र “"+next[1]+"” पनि हेर्न सकिन्छ। कुन महत्त्वपूर्ण छ?";
+  opts=[
+   option(next[0],next[1],'review',{detail:next[2]}),
+   option("I'd rather focus on my original choice.","पहिलो रोजाइमा ध्यान दिन चाहन्छु।","review",{}),
+   option("Could we check the practical next step?","व्यवहारिक अर्को कदम जाँचौँ?","nextSteps",{}),
+   option("I think I have enough to decide later.","पछि निर्णय गर्न पुग्ने जानकारी भयो।","closing",{})
+  ];
+ }else if(node==='nextSteps'||node==='followup'){
+  if(['Everyday','Family'].includes(guide.category)){
+   npc="A good way to keep talking about “"+guide.subject[0]+"” is to ask a relevant question, listen to the reply, and follow the other person's interests.";
+   npcNe="“"+guide.subject[1]+"” बारे थप कुरा गर्दा सम्बन्धित प्रश्न सोध्नुहोस्, उत्तर सुन्नुहोस् र अर्काको रुचिअनुसार कुरा बढाउनुहोस्।";
+  }else{
+   npc="Before taking the next step with “"+guide.subject[0]+"”, "+guide.proceed[0];
+   npcNe="“"+guide.subject[1]+"” बारे अर्को कदमअघि, "+guide.proceed[1];
   }
   opts=[
-   chooseItem("That answers my question. Thank you!","मेरो प्रश्नको उत्तर पाएँ। धन्यवाद!","end"),
-   chooseItem("What should I do next?","अब मैले के गर्नुपर्छ?","followup"),
-   chooseItem("I'd like to ask about something else.","म अर्को विषयमा सोध्न चाहन्छु।","opening")];
- }else if(node==='followup'){
-  npc="The next step depends on your specific circumstances. We can review the details without assuming an outcome. Would you like to keep talking?";
-  npcNe="अर्को कदम तपाईंको अवस्थाअनुसार फरक हुन्छ। नतिजा अनुमान नगरी विवरण बुझ्न सक्छौँ। थप कुरा गर्ने?";
+   option("What requirements or costs should I check first?","पहिले कुन सर्त वा खर्च जाँच्ने?","requirements",{}),
+   option("I'd like to move forward if everything is suitable.","सबै कुरा मिल्यो भने अघि बढ्न चाहन्छु।","proceed",{}),
+   option("Actually, could we compare another option first?","बरु अर्को विकल्प पनि तुलना गरौँ?","compare",{}),
+   option("Thank you. I'll decide after checking the details.","धन्यवाद। विवरण जाँचेर निर्णय गर्छु।","closing",{})
+  ];
+ }else if(node==='requirements'){
+  npc=guide.guidance[2];npcNe=guide.guidance[3];
   opts=[
-   chooseItem("Yes, let's go through the details once more.","हुन्छ, विवरण फेरि बुझौँ।","detail"),
-   chooseItem("I'd like to discuss a different option.","म अर्को विकल्पबारे कुरा गर्न चाहन्छु।","opening"),
-   chooseItem("No, that's enough for now. Thanks!","होइन, अहिलेलाई पुग्यो। धन्यवाद!","end")];
- }else throw Error("Unknown scenario node "+node);
- // Never force a minimum length, and do not trap the learner in a loop.
- if(node==='detail')opts.push(chooseItem("I have what I need for now. Thanks!","अहिलेलाई चाहिएको जानकारी पाएँ। धन्यवाद!","end"));
- const speaker=node==='opening'?null:null;
+   option("Could we go over the next steps again?","अर्को चरण फेरि बुझौँ?","nextSteps",{}),
+   option("I'd like to continue if the requirements are met.","सर्त मिले अघि बढ्न चाहन्छु।","proceed",{}),
+   option("I'll check those details before deciding. Thank you.","निर्णयअघि विवरण जाँच्नेछु। धन्यवाद।","closing",{})
+  ];
+ }else if(node==='proceed'){
+  const endings={
+   Shopping:["Of course. We'd check the actual item and total price first; nothing has been purchased or paid for.","अवश्य। पहिले सामान र कुल मूल्य जाँच्नेछौँ; कुनै खरिद वा भुक्तानी भएको छैन।"],
+   "Food & Drink":["Let's confirm the dish, any changes, and the final price with staff before placing an order.","अर्डरअघि कर्मचारीसँग खाना, परिवर्तन र अन्तिम मूल्य पुष्टि गरौँ।"],
+   Travel:["Let's verify the date, route and available service before any ticket or reservation is made.","टिकट वा बुकिङअघि मिति, बाटो र उपलब्ध सेवा पुष्टि गरौँ।"],
+   Healthcare:["We can contact the clinic to check suitable appointment times; nothing has been booked yet.","क्लिनिकसँग उपयुक्त समय जाँच्न सक्छौँ; कुनै अपोइन्टमेन्ट बुक भएको छैन।"],
+   Work:["We'll prepare the request and check it with the appropriate supervisor. No workplace change has been approved.","अनुरोध तयार गरेर व्यवस्थापकसँग जाँचौँ। काममा कुनै परिवर्तन स्वीकृत भएको छैन।"],
+   Services:["We'd confirm the provider's process and fees before submitting any request.","अनुरोध पेश गर्नुअघि सेवा प्रदायकको प्रक्रिया र शुल्क पुष्टि गरौँ।"],
+   Everyday:["That sounds good. Let's respond to the other person and continue only when it feels natural.","राम्रो विचार। अर्काको उत्तरअनुसार स्वाभाविक रूपमा कुराकानी जारी राखौँ।"],
+   Home:["We'll check the relevant details and ask for an estimate before arranging any work.","काम मिलाउनुअघि विवरण र खर्च अनुमान मागौँ।"],
+   Education:["Let's find a suitable example or activity and check the instructions before starting.","सुरु गर्नुअघि उपयुक्त उदाहरण र निर्देशन जाँचौँ।"],
+   Technology:["Let's try a safe first check without changing or revealing private account data.","निजी जानकारी नदिई सुरक्षित पहिलो जाँच गरौँ।"],
+   Money:["We'll review the official process and verify the details securely. No transaction has taken place.","आधिकारिक प्रक्रिया र विवरण सुरक्षित रूपमा जाँचौँ। कुनै कारोबार भएको छैन।"],
+   Community:["We'll check the organizer's current information before confirming any participation.","सहभागिता पुष्टि गर्नुअघि आयोजकको हालको जानकारी जाँचौँ।"],
+   Family:["Let's ask the other people involved what they think before making a final plan.","अन्तिम योजनाअघि सम्बन्धित सबैको विचार बुझौँ।"]
+  };
+  [npc,npcNe]=endings[guide.category]||endings.Everyday;
+  opts=[
+   option("That sounds good. Thanks for explaining.","राम्रो लाग्यो। बुझाइदिनुभएकोमा धन्यवाद।","closing",{}),
+   option("Could I ask about another possibility?","अर्को सम्भावनाबारे सोध्न सक्छु?","compare",{}),
+   option("I'd like to review the requirements once more.","आवश्यकता फेरि बुझ्न चाहन्छु।","requirements",{})
+  ];
+ }else if(node==='closing'){
+  const lines={
+   Shopping:["You're welcome. Take your time comparing your options, and ask us if you'd like to see anything else. Have a great day!","स्वागत छ। विकल्प तुलना गरेर निर्णय गर्नुहोस्। अरू केही हेर्न चाहे सोध्नुहोस्। शुभ दिन!"],
+   "Food & Drink":["You're welcome! Feel free to check the menu again when you're ready. Have a nice day!","स्वागत छ! तयार भएपछि मेनु फेरि हेर्नुहोस्। शुभ दिन!"],
+   Travel:["Glad I could help. Please confirm the current schedule before traveling. Safe travels!","मद्दत गर्न पाउँदा खुसी लाग्यो। यात्रा अघि समयतालिका पुष्टि गर्नुहोस्। शुभ यात्रा!"],
+   Healthcare:["I'm glad I could explain the process. Please contact the clinic for any medical concerns. Take care!","प्रक्रिया बुझाउन पाउँदा खुसी लाग्यो। स्वास्थ्य समस्या भए क्लिनिकसँग सम्पर्क गर्नुहोस्। स्वस्थ रहनुहोस्!"],
+   Work:["Thanks for discussing this with me. Check with your supervisor before making changes. Have a good shift!","यस विषयमा कुरा गर्नुभएकोमा धन्यवाद। परिवर्तनअघि व्यवस्थापकसँग पुष्टि गर्नुहोस्। राम्रो काम होस्!"],
+   Services:["You're welcome. Check the service requirements and any fees before proceeding. Have a good day!","स्वागत छ। अघि बढ्नुअघि सेवा सर्त र शुल्क जाँच्नुहोस्। शुभ दिन!"],
+   Everyday:["It was lovely chatting with you. Thanks for sharing your thoughts. See you again!","तपाईंसँग कुरा गर्न रमाइलो लाग्यो। विचार बाँड्नुभएकोमा धन्यवाद। फेरि भेटौँला!"],
+   Home:["I hope that helped. Confirm the details and estimate before arranging anything. Take care!","मद्दत भएको आशा छ। कुनै काम मिलाउनुअघि विवरण र खर्च पुष्टि गर्नुहोस्। शुभकामना!"],
+   Education:["Good questions today! Keep practicing and ask whenever you need another example. See you next time!","आज राम्रो प्रश्न सोध्नुभयो! अभ्यास गर्दै जानुहोस्। अर्को पटक भेटौँला!"],
+   Technology:["Glad we could talk it through. Remember to keep your data safe. Have a good day!","समस्या बुझ्न पाउँदा खुसी लाग्यो। डाटा सुरक्षित राख्नुहोस्। शुभ दिन!"],
+   Money:["You're welcome. Please use the official secure channel if you proceed. Take care!","स्वागत छ। अघि बढ्दा आधिकारिक सुरक्षित माध्यम प्रयोग गर्नुहोस्। शुभकामना!"],
+   Community:["Thanks for your interest! Check the event details before visiting. Hope to see you there!","रुचि देखाउनुभएकोमा धन्यवाद! जानुअघि कार्यक्रमको विवरण जाँच्नुहोस्। त्यहाँ भेटौँला!"],
+   Family:["Thanks for talking it through. I hope everyone finds a plan that works. Speak again soon!","कुराकानीका लागि धन्यवाद। सबैलाई मिल्ने योजना बनोस्। फेरि कुरा गरौँला!"]
+  };
+  [npc,npcNe]=lines[guide.category]||lines.Everyday;
+  opts=[
+   option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{}),
+   option("One more thing—could we start a new question?","अझ एउटा कुरा—नयाँ प्रश्न सोध्न सक्छु?","opening",{})
+  ];
+ }else throw Error('Unknown Coach dialogue node '+node);
+ if(!npc||!npcNe||opts.length<2||opts.some(o=>!o.value||!o.ne||!o.next))
+  throw Error('Invalid Coach options for '+state.scene+':'+node);
  return {nodeId:node,npc,npcNe,storeOptions:opts,answer:opts[0].value,
   answerNe:opts[0].ne,speaker:null,
-  goal:"Choose the response that fits your situation. · आफ्नो अवस्था मिल्ने उत्तर छान्नुहोस्।",
-  hint:"Every reply is possible. Your choice changes the next question."};
+  goal:'Choose a response that fits the actual conversation · कुराकानीअनुसार उत्तर छान्नुहोस्',
+  hint:'Your choice changes the next line. You can also finish naturally.'};
 }
 function start(scene){
  if(!configs[scene.id])return null;
@@ -74,6 +165,18 @@ function choose(active,item,index){
 function options(step){
  return {multi:true,branching:true,options:(step.storeOptions||[]).map(v=>({...v}))};
 }
-const api=Object.freeze({start,choose,options,topics:Object.keys(configs)});
+function reconcile(active,index,pendingChoice){
+ if(!active?.isBranchingStory||!Array.isArray(active.steps))return false;
+ const old=active.steps[index];
+ if(!old?.nodeId)return false;
+ try{
+  const fresh=build(old.nodeId,active.storyState||{scene:active.id,path:0,detail:0});
+  active.steps[index]=pendingChoice?
+   {...old,npc:fresh.npc,npcNe:fresh.npcNe,answer:old.answer,answerNe:old.answerNe}:
+   {...old,...fresh};
+  return true;
+ }catch(_){return false}
+}
+const api=Object.freeze({start,choose,options,reconcile,topics:Object.keys(configs)});
 if(typeof window!=='undefined')window.sikauAdaptiveStory=api;
 })();

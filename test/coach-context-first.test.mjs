@@ -5,13 +5,17 @@ import vm from 'node:vm';
 const root=new URL('../',import.meta.url);
 const source=name=>fs.readFileSync(new URL(name,root),'utf8');
 function load(name,context){
-  const window=context||{};
-  vm.runInNewContext(source(name),{window});
-  return window;
+ const window=context||{};
+ const sources=name==='coach-adaptive-story.js'?
+  ['coach-topic-catalog-1.js','coach-topic-catalog-2.js',
+   'coach-topic-expansion.js','coach-legacy-followups.js',
+   'coach-followups.js','coach-adaptive-story.js']:[name];
+ for(const src of sources)vm.runInNewContext(source(src),{window},{filename:src});
+ return window;
 }
-test('all guided topics have a neutral opening and 27 adaptive configs',()=>{
+test('all 174 adaptive topics have a neutral opening',()=>{
   const w=load('coach-adaptive-story.js');
-  assert.equal(w.sikauAdaptiveStory.topics.length,27);
+  assert.equal(w.sikauAdaptiveStory.topics.length,174);
   for(const id of w.sikauAdaptiveStory.topics){
     const scene=w.sikauAdaptiveStory.start({id,title:id});
     assert.match(scene.steps[0].npc,/^(hello|hi|welcome|good)/i);
@@ -26,14 +30,19 @@ test('guided responses branch and allow short or longer conversations',()=>{
       const short=make();
       api.choose(short,short.steps[0].storeOptions[p],0);
       api.choose(short,short.steps[1].storeOptions[detail],1);
-      api.choose(short,short.steps[2].storeOptions[0],2);
+      api.choose(short,short.steps[2].storeOptions[3],2);
+      assert.equal(short.steps.at(-1).nodeId,'closing');
+      api.choose(short,short.steps[3].storeOptions[0],3);
       assert.equal(short.storyCompleted,true);
       const long=make();
       api.choose(long,long.steps[0].storeOptions[p],0);
       api.choose(long,long.steps[1].storeOptions[detail],1);
-      api.choose(long,long.steps[2].storeOptions[1],2);
-      api.choose(long,long.steps[3].storeOptions[0],3);
-      api.choose(long,long.steps[4].storeOptions.at(-1),4);
+      api.choose(long,long.steps[2].storeOptions[0],2);
+      api.choose(long,long.steps[3].storeOptions[1],3);
+      api.choose(long,long.steps[4].storeOptions[0],4);
+      api.choose(long,long.steps[5].storeOptions[1],5);
+      api.choose(long,long.steps[6].storeOptions[0],6);
+      api.choose(long,long.steps[7].storeOptions[0],7);
       assert.equal(long.storyCompleted,true);
       assert.ok(long.steps.length>short.steps.length);
     }
@@ -63,7 +72,7 @@ test('adaptive drafts keep the chosen path, and Visa integration remains present
   assert.equal(d.read().storyState.path,1);
   assert.equal(d.read().storyState.detail,2);
   assert.match(source('coach-dashboard.js'),/installVisaSidebar\(doc,shell,visaController\)/);
-  assert.match(source('index.html'),/coach-adaptive-story\.js\?v=20261028-context-first-r3/);
+  assert.match(source('index.html'),/coach-adaptive-story\.js\?v=20261028-meaningful-chat-r7/);
 });
 
 
