@@ -562,13 +562,35 @@ function coachShuffleOptions(items){
  }
  return copy;
 }
+
+function coachEquivalentReply(sentence){
+ const value=String(sentence||'').trim();
+ const changes=[
+  [/^I'd like to /i,'I would like to '],
+  [/^I'd like /i,'I would like '],
+  [/^Could you /i,'Can you '],
+  [/^Could I /i,'May I '],
+  [/^I'm /i,'I am '],
+  [/^It's /i,'It is '],
+  [/^I've /i,'I have '],
+  [/^I don't /i,'I do not '],
+  [/^I can't /i,'I cannot '],
+  [/^I want to /i,"I'd like to "],
+  [/^Thank you /i,'Thanks ']
+ ];
+ for(const [pattern,replacement] of changes){
+  if(pattern.test(value))return value.replace(pattern,replacement);
+ }
+ return '';
+}
+
 function coachReplyOptions(step,scene){
  const line=normalize(step.npc),sceneId=scene?.id;
  const choice=(value,ne,branch)=>({value,ne,correct:true,branch:branch||null});
  const wrong={value:step.bad1||"My favorite color is blue.",correct:false};
  if(sceneId==='return-shirt'){
   if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line)){
-   return {multi:true,options:coachShuffleOptions([
+   return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I only tried it on at home.","हो, मैले घरमा लगाएर मात्र हेरेको थिएँ।"),
     choice("Yes, it is still unworn and the tags are attached.","हो, यो अझै नलगाइएको छ र ट्याग पनि छ।"),
     choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn"),
@@ -576,7 +598,7 @@ function coachReplyOptions(step,scene){
    ])};
   }
   if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line)){
-   return {multi:true,options:coachShuffleOptions([
+   return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I have the receipt right here.","हो, रसिद यहीँ छ।"),
     choice("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।"),
     choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing"),
@@ -584,25 +606,28 @@ function coachReplyOptions(step,scene){
    ])};
   }
   if(/\b(?:damaged|wrong size)\b/.test(line)){
-   return {multi:true,options:coachShuffleOptions([
+   return {multi:true,branching:true,options:coachShuffleOptions([
     choice("The size doesn't fit me.","यो साइज मलाई मिल्दैन।"),
     choice("The stitching is damaged.","यसको सिलाइ बिग्रेको छ।","damaged"),
     wrong
    ])};
   }
   if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line)){
-   return {multi:true,options:coachShuffleOptions([
+   return {multi:true,branching:true,options:coachShuffleOptions([
     choice("I'd prefer a refund, please.","म पैसा फिर्ता चाहन्छु।"),
     choice("I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।","exchange"),
     wrong
    ])};
   }
  }
- // Most lessons still follow their authored practice route. We only add an
- // opposite answer when its follow-up has been written to respect that choice.
- return {multi:false,options:coachShuffleOptions([
-  choice(step.answer,step.answerNe),{value:step.bad1,correct:false},
-  {value:step.bad2,correct:false}
+ // Safe paraphrases preserve the original meaning. Different facts or
+ // opposite yes/no responses are offered only when a real next path exists.
+ const sameMeaning=coachEquivalentReply(step.answer);
+ const valid=[choice(step.answer,step.answerNe)];
+ if(sameMeaning&&normalize(sameMeaning)!==normalize(step.answer))
+  valid.push(choice(sameMeaning,step.answerNe));
+ return {multi:valid.length>1,branching:false,options:coachShuffleOptions([
+  ...valid,{value:step.bad1,correct:false},{value:step.bad2,correct:false}
  ])};
 }
 
@@ -1063,7 +1088,9 @@ window.enhanceCoachDashboard=function(doc){
   add(doc,choiceHead,'small','','Choose what YOU would say. · आफूले भन्ने उत्तर छान्नुहोस्।');
   const replyPlan=coachReplyOptions(step,active);
   if(replyPlan.multi){
-   add(doc,feedback,'p','sikau-chat-multi-hint','✨ More than one answer makes sense here. Your choice can change the conversation. · धेरै उत्तर मिल्न सक्छन्।');
+   add(doc,feedback,'p','sikau-chat-multi-hint',replyPlan.branching?
+    '✨ More than one answer is valid. Your choice may change what happens next. · दुईवटा उत्तर पनि मिल्न सक्छन्।':
+    '✨ Different natural sentences can mean the same thing. · एउटै कुरा भन्न धेरै तरिका हुन्छन्।');
   }else if(step.goal){
    add(doc,feedback,'p','sikau-chat-goal',step.goal);
   }
@@ -1103,7 +1130,7 @@ window.enhanceCoachDashboard=function(doc){
      b.classList.add('is-correct');
      b.querySelector('.sikau-chat-option-radio').textContent='✓';
      options.querySelectorAll('button').forEach(x=>x.disabled=true);
-     if(item.branch&&index<active.steps.length-1){
+     if(item.branch){
       const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
       if(alternate.length){
        active.steps.splice(index+1,active.steps.length-index-1,...alternate);
