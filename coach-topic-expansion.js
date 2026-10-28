@@ -172,11 +172,21 @@ function buildRow(row){
  ];
  const routes=focus.map((item,i)=>{
   const first=[firstEN[i](item),firstNE[i](neFocus[i])];
-  const q="You mentioned "+item+". "+pattern.q;
-  const qNe="तपाईंले "+neFocus[i]+" भन्नुभयो। "+pattern.ne;
-  const response="Thanks for explaining your interest in "+item+". "+pattern.result;
-  const responseNe=neFocus[i]+" बारे बताउनुभएकोमा धन्यवाद। "+pattern.resultNe;
-  return [first[0],first[1],q,qNe,pattern.a,response,responseNe,detailReactions[category]];
+  const social=category==='Family'||category==='Everyday';
+  const q="Of course. You mentioned "+item+". What would you like to explore first?";
+  const qNe="अवश्य। तपाईंले "+neFocus[i]+" भन्नुभयो। पहिले के बुझ्न चाहनुहुन्छ?";
+  const choices=social?[
+   ["Could we talk more about "+item+"?","हामी "+neFocus[i]+" बारे थप कुरा गरौँ?"],
+   ["What do you think about "+item+"?",neFocus[i]+" बारे तपाईंको विचार के छ?"],
+   ["Could we make a plan related to "+item+"?",neFocus[i]+" सँग सम्बन्धित योजना बनाऔँ?"]
+  ]:[
+   ["Could you help me with "+item+"?","मलाई "+neFocus[i]+" मा मद्दत गर्नुहुन्छ?"],
+   ["What should I know or check about "+item+"?",neFocus[i]+" बारे के जान्न वा जाँच्नुपर्छ?"],
+   ["Is there another option for "+item+"?",neFocus[i]+" को अर्को विकल्प छ?"]
+  ];
+  const response="I understand you want to discuss "+item+". "+pattern.result;
+  const responseNe=neFocus[i]+" बारे कुरा गर्न चाहनुहुन्छ भन्ने बुझेँ। "+pattern.resultNe;
+  return [first[0],first[1],q,qNe,choices,response,responseNe,detailReactions[category]];
  });
  return Object.freeze({id,emoji,title,ne,category,place,partner,level:'Easy',
   config:[openings[category],routes]});
