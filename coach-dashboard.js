@@ -997,7 +997,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  // The parent app supplies the first name from its verified signed-in user.
  // Never mutate the global scenarios: another learner might sign in later.
  const signedInFirstName=typeof _firstName==='string'?
-  _firstName.trim().split(/\s+/u)[0].replace(/[<>\\u0000-\\u001f]/g,'').slice(0,32):'';
+  _firstName.trim().split(/\s+/u)[0].replace(/[<>\u0000-\u001f]/g,'').slice(0,32):'';
  const coachLearnerName=signedInFirstName||'Learner';
  const introText=text=>{
   if(typeof text!=='string')return text;
