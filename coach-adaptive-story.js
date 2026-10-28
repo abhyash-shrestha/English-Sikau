@@ -16,6 +16,19 @@ function build(node,state){
  const config=configs[state.scene];
  if(!config)throw Error('Unknown Coach topic: '+state.scene);
  const path=config[1][state.path]||config[1][0];
+ // Keep original initial discovery, but hand off the remaining conversation
+ // to a genuine scenario-aware journey: offers, changes, checks and closure.
+ if(node!=='opening'&&node!=='detail'&&window.sikauCoachJourneys){
+  const journey=window.sikauCoachJourneys.build(node,state,config);
+  if(journey)return journey;
+  // Already-saved old node IDs migrate to a contextual proposal.
+  if(!['review','proposal','alternative','requirements','verify','action',
+       'checkout','confirmation','closing','phone-pitch','phone-budget',
+       'phone-demo','phone-options','phone-accessory','phone-checkout',
+       'phone-finish','phone-receipt','phone-warranty'].includes(node))
+   return window.sikauCoachJourneys.build('review',state,config);
+ }
+
  const guide=window.sikauCoachGuidance?.get(state.scene,config,state.path,state.detail??0);
  if(!guide)throw Error('Coach guidance failed to load');
  const chosen=path[4][state.detail??0]||path[4][0];

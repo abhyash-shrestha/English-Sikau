@@ -48,7 +48,10 @@
         state.path<0||state.path>2||
         !(state.detail===null||Number.isInteger(state.detail)&&state.detail>=0&&state.detail<=2))
       throw Error('Invalid Coach story state');
-     d.storyState={scene:d.sceneId,path:state.path,detail:state.detail};
+     const extras=Object.create(null);
+     for(const key of ['priority','offer','payment','variant','accessories','decision'])
+      if(typeof state[key]==='string'&&state[key].length<=60)extras[key]=state[key];
+     d.storyState={scene:d.sceneId,path:state.path,detail:state.detail,...extras};
     }
     return d;
    }catch(_){remove();return null}
@@ -65,7 +68,10 @@
     isBranchingStory:!!a.isBranchingStory,
     storyCompleted:!!a.storyCompleted,
     storyState:a.isBranchingStory?{
-     scene:a.id,path:a.storyState?.path,detail:a.storyState?.detail
+     scene:a.id,path:a.storyState?.path,detail:a.storyState?.detail,
+     ...Object.fromEntries(['priority','offer','payment','variant','accessories','decision']
+      .filter(k=>typeof a.storyState?.[k]==='string'&&a.storyState[k].length<=60)
+      .map(k=>[k,a.storyState[k]]))
     }:null,
     pendingChoice:data.pendingChoice?{
      value:String(data.pendingChoice.value||'').slice(0,700),
