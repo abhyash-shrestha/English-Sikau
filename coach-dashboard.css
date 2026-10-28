@@ -1179,24 +1179,3 @@ html[data-sikau-theme="dark"] .sikau-convo-resume-copy small{color:#c4d3e9}
  #coach .sikau-chat-top{gap:5px!important}
  #coach .sikau-chat-top-pill{white-space:normal!important}
 }
-
-
-/* iPhone topic browser: avoid oversized repetitive tags and tall tiles. */
-@media(max-width:530px){
- #coach .sikau-convo-browser{padding:10px!important}
- #coach .sikau-convo-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:11px 0 7px!important}
- #coach .sikau-convo-situation{
-  min-height:120px!important;height:auto!important;padding:10px!important;gap:5px!important;
-  border-radius:14px!important;
- }
- #coach .sikau-convo-situation-icon{
-  width:34px!important;height:34px!important;font-size:20px!important;border-radius:10px!important
- }
- #coach .sikau-convo-situation-main{gap:2px!important}
- #coach .sikau-convo-situation-main strong{font-size:13px!important;line-height:1.25!important}
- #coach .sikau-convo-situation-main small{font-size:11px!important;line-height:1.25!important}
- #coach .sikau-convo-situation-meta{
-  min-height:20px!important;font-size:10px!important;padding:3px 9px!important;
-  line-height:1.25!important;margin-top:auto!important;
- }
-}
