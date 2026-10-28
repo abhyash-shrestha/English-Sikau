@@ -1715,6 +1715,21 @@ function sikauApplyOuterDisplayLanguage(selected){
  if(greeting)greeting.textContent=greetings[mode];
  const progressButton=$('cloudStoryToggle');
  if(progressButton)progressButton.textContent=progress[mode];
+ const progressPanel=$('cloudStoryProgress');
+ if(progressPanel){
+  const title=progressPanel.querySelector('.cloud-story-info strong');
+  const note=progressPanel.querySelector('.cloud-story-info small');
+  const refresh=$('cloudStoryRefresh');
+  const labels={
+   'en-ne':['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।','↻ Refresh · ताजा गर्नुहोस्'],
+   'en-roman':['☁️ Verified chapter progress · Pramanit adhyaya pragati','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · Taja garnuhos'],
+   all:['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति (Pramanit adhyaya pragati)','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · ताजा गर्नुहोस् (Taja garnuhos)'],
+   en:['☁️ Verified chapter progress','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh']
+  }[mode];
+  if(title)title.textContent=labels[0];
+  if(note)note.textContent=labels[1];
+  if(refresh)refresh.textContent=labels[2];
+ }
  const exit=$('exit');
  if(exit&&exit.firstChild?.nodeType===Node.TEXT_NODE)exit.firstChild.nodeValue=signout[mode];
  const ref=$('studentMembershipReference');
