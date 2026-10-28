@@ -1079,80 +1079,6 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
  }
 }
 
-
-/* iPhone learning workspace: compact two-row secure header.
-   Preserve full personalized greeting, original controls, and all Appwrite gates. */
-@media (max-width:650px){
- #protected #bar.student-topbar{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) auto!important;
-  grid-template-rows:auto auto!important;
-  align-items:center!important;
-  gap:3px 7px!important;
-  min-height:0!important;
-  padding:6px 10px 6px!important;
-  border-radius:0!important;
- }
- #protected #bar.student-topbar > .student-topbar-brand{
-  grid-column:1!important;grid-row:1!important;
-  order:initial!important;gap:6px!important;min-width:0!important;
- }
- #protected .student-brand-flag{
-  width:27px!important;height:27px!important;
-  flex-basis:27px!important;font-size:17px!important;border-radius:8px!important;
- }
- #protected .student-topbar-brand strong{font-size:15px!important;letter-spacing:-.035em!important}
- #protected #bar.student-topbar > .student-top-actions{
-  grid-column:2!important;grid-row:1!important;
-  display:flex!important;justify-content:flex-end!important;align-items:center!important;
-  gap:5px!important;min-width:0!important;margin:0!important;
- }
- #protected #sikauUiBuild{display:none!important}
- #protected #bar #sikauThemeProtected,
- #protected #bar #exit{
-  width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;
-  padding:0!important;margin:0!important;
-  display:inline-flex!important;align-items:center!important;justify-content:center!important;
-  border-radius:10px!important;box-sizing:border-box!important;
-  -webkit-tap-highlight-color:transparent;
- }
- #protected #bar #sikauThemeProtected{font-size:19px!important}
- #protected #bar #exit{
-  font-size:0!important;color:#fff!important;
-  background:#ffffff18!important;border:1px solid #ffffff78!important;box-shadow:none!important;
- }
- #protected #bar #exit span{font-size:19px!important;line-height:1!important;color:#fff!important}
- #protected #bar.student-topbar > .student-topbar-welcome{
-  grid-column:1!important;grid-row:2!important;
-  order:initial!important;align-items:center!important;justify-content:flex-start!important;
-  padding:1px 0!important;gap:0!important;margin:0!important;
-  border:0!important;border-radius:0!important;background:transparent!important;
-  box-shadow:none!important;width:100%!important;min-width:0!important;
- }
- #protected .student-welcome-copy{min-width:0!important;max-width:100%!important;gap:0!important}
- #protected #studentTopGreeting{
-  display:block!important;font-size:clamp(12px,3.35vw,14px)!important;
-  line-height:1.25!important;white-space:normal!important;overflow:visible!important;
-  text-overflow:clip!important;overflow-wrap:anywhere!important;
-  letter-spacing:-.015em!important;
- }
- #protected #bar.student-topbar > #cloudStoryToggle{
-  grid-column:2!important;grid-row:2!important;
-  order:initial!important;justify-self:end!important;align-self:center!important;
-  display:grid!important;place-items:center!important;
-  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
-  max-width:36px!important;padding:0!important;margin:0!important;
-  font-size:0!important;line-height:1!important;white-space:nowrap!important;border-radius:10px!important;
- }
- #protected #bar #cloudStoryToggle::before{content:"⭐";font-size:20px;line-height:1}
- #protected #bar #cloudStoryToggle[aria-expanded="true"]::before{content:"📊"}
- #protected #gameStudioNote{display:none!important}
-}
-@media (max-width:350px){
- #protected .student-topbar-brand strong{font-size:13px!important}
- #protected #studentTopGreeting{font-size:12px!important}
-}
-
 </style>
 </head>
 <body>
@@ -1192,11 +1118,11 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
     <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back 👋 नमस्ते 🙏</strong></div>
     <span id="sessionNote" class="student-access-tag"></span>
   </div>
-  <button type="button" id="cloudStoryToggle" aria-label="My progress · मेरो प्रगति" title="My progress" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
+  <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
   <div class="student-top-actions">
     <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v4 · checking</span>
     <button id="sikauThemeProtected" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
-    <button type="button" id="exit" aria-label="Sign out · लगआउट" title="Sign out">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
+    <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
   </div>
 </div>
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
@@ -1213,9 +1139,9 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <script src="./coach-journeys.js?v=20261028-phone-storage-r10"></script>
 <script src="./coach-adaptive-story.js?v=20261028-realistic-flow-r8"></script>
 <script src="./coach-drafts.js?v=20261028-realistic-flow-r8"></script>
-<script src="./coach-dashboard.js?v=20261028-iphone-compact-r11"></script>
+<script src="./coach-dashboard.js?v=20261028-phone-mobile-r10"></script>
 <script src="./translate-studio-v4.js?v=20261021-remove-examples-r1"></script>
-<script src="./sidebar-unified.js?v=20261028-iphone-compact-r1"></script>
+<script src="./sidebar-unified.js?v=20261021-sidebar-parity-r1"></script>
 <script src="./all-tabs-responsive.js?v=20261021-dark-contrast-r1"></script>
 <script src="./words-studio.js?v=20261020-shuffle-220-r1"></script>
 <script src="./writing-coach-dashboard.js?v=20261022-proofreading-quality-r1"></script>
