@@ -1037,7 +1037,7 @@ window.enhanceCoachDashboard=function(doc){
     if(!review)review=coachOfflineReview(value,step,active);
     result.replaceChildren();
     result.className='sikau-convo-feedback '+(review.accepted?'success':'warning');
-    add(doc,result,'strong','',review.accepted?'✅ Your answer is understood · उत्तर बुझियो':'💡 Let's improve this answer · उत्तर सुधारौँ');
+    add(doc,result,'strong','',review.accepted?'✅ Your answer is understood · उत्तर बुझियो':'💡 Improve this answer · उत्तर सुधारौँ');
     if(review.corrected){
      add(doc,result,'small','',review.mode==='ai'?'Corrected English · सच्याइएको अंग्रेजी':'Suggested wording · सम्भावित राम्रो वाक्य');
      add(doc,result,'p','',review.corrected);
