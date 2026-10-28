@@ -65,3 +65,37 @@ test('adaptive drafts keep the chosen path, and Visa integration remains present
   assert.match(source('coach-dashboard.js'),/installVisaSidebar\(doc,shell,visaController\)/);
   assert.match(source('index.html'),/coach-adaptive-story\.js\?v=20261028-context-first-r3/);
 });
+
+
+test('gift flows never require recipient purchase dates or receipts',()=>{
+ const w=load('coach-store-story.js'),api=w.sikauStoreStory;
+ const pick=(story,i)=>api.choose(story,story.steps.at(-1).storeOptions[i],story.steps.length-1);
+ for(let item=0;item<6;item++)for(let reason=0;reason<3;reason++)
+ for(let condition=0;condition<3;condition++)for(let proof=0;proof<3;proof++){
+  const story=api.start({id:'return-shirt'});
+  pick(story,0);pick(story,item);pick(story,0);pick(story,2);
+  pick(story,reason);pick(story,condition);
+  assert.ok(story.steps.at(-1).storeOptions.every(o=>!/paper receipt|digital receipt/i.test(o.value)));
+  pick(story,proof);
+  assert.equal(story.steps.at(-1).nodeId,'timing');
+  assert.match(story.steps.at(-1).npc,/gift/i);
+  assert.ok(story.steps.at(-1).storeOptions.every(o=>!/^(I bought|I ordered|I purchased)/i.test(o.value)));
+  assert.ok(story.steps.at(-1).storeOptions.every(o=>o.ne));
+ }
+});
+test('all purchase origins and old saved gifts keep consistent followups',()=>{
+ const w=load('coach-store-story.js'),api=w.sikauStoreStory;
+ const pick=(story,i)=>api.choose(story,story.steps.at(-1).storeOptions[i],story.steps.length-1);
+ for(let source=0;source<4;source++){
+  const story=api.start({id:'return-shirt'});
+  pick(story,0);pick(story,0);pick(story,0);pick(story,source);pick(story,0);pick(story,0);pick(story,2);
+  if(story.steps.at(-1).nodeId==='evidence')pick(story,2);
+  assert.equal(story.steps.at(-1).nodeId,'timing');
+  if(source>=2)assert.ok(story.steps.at(-1).storeOptions.every(o=>!/^I bought/i.test(o.value)));
+ }
+ const saved=api.start({id:'return-shirt'});
+ saved.storeState={item:'multiple',source:'gift',receipt:'missing',evidence:'none',giftProof:'none'};
+ saved.steps=[api.step('timing',{item:'shirt',source:'store'})];
+ assert.equal(api.reconcile(saved,0,null),true);
+ assert.ok(saved.steps[0].storeOptions.every(o=>!/^I bought/i.test(o.value)));
+});

@@ -41,7 +41,7 @@ function step(id,state){
  switch(id){
  case "opening":return row("Hello! Welcome to the store. How can I help you today?",
   "नमस्ते! पसलमा स्वागत छ। आज कसरी मद्दत गरूँ?",[
-  opt("I need some help with clothing I bought.","मैले किनेको लुगाबारे मद्दत चाहिएको छ।","item"),
+  opt("I need some help with clothing.","लुगाबारे मद्दत चाहिएको छ।","item"),
   opt("I'd like to ask about returning or exchanging something.","केही सामान फिर्ता वा साट्नेबारे सोध्न चाहन्छु।","item"),
   opt("Could you tell me your return policy?","फिर्ता गर्ने नियम बताइदिनुहुन्छ?","policy")]);
  case "item":return row("Sure. What item or items are we talking about?",
@@ -54,71 +54,122 @@ function step(id,state){
   opt("I have several clothing items.","मसँग धेरै लुगाहरू छन्।","intent",{item:"multiple"})]);
  case "intent":return row("Thanks for explaining. What would you like to do?",
   "बुझाइदिनुभएकोमा धन्यवाद। तपाईं के गर्न चाहनुहुन्छ?",[
-  opt("I'd like a refund if possible.","सम्भव भए पैसा फिर्ता चाहन्छु।","reason",{intent:"refund"}),
-  opt("I'd like to exchange it if possible.","सम्भव भए साट्न चाहन्छु।","reason",{intent:"exchange"}),
+  opt("I'd like a refund if possible.","सम्भव भए पैसा फिर्ता चाहन्छु।","purchase",{intent:"refund"}),
+  opt("I'd like to exchange it if possible.","सम्भव भए साट्न चाहन्छु।","purchase",{intent:"exchange"}),
   opt("I'm not sure yet. Could you explain my options?","अहिलेसम्म निश्चित छैन। विकल्पहरू बुझाइदिनुहुन्छ?","policy",{intent:"information"}),
   opt("I was only checking the policy. Thanks!","म नियम बुझ्न मात्र आएको थिएँ। धन्यवाद!","end",{intent:"keep"})]);
  case "policy":return row("Of course. Eligibility depends on the purchase date, proof of purchase and item condition. What would you like to do?",
   "अवश्य। फिर्ता मिल्ने कुरा मिति, प्रमाण र सामानको अवस्थामा भर पर्छ। तपाईं के गर्न चाहनुहुन्छ?",[
-  opt("I'd like to see whether I can get my money back.","पैसा फिर्ता पाइन्छ कि बुझ्न चाहन्छु।","item",{intent:"refund"}),
-  opt("I'd prefer to exchange it for another size.","म अर्को साइजसँग साट्न चाहन्छु।","item",{intent:"exchange"}),
+  opt("I'd like to see whether I can get my money back.","पैसा फिर्ता पाइन्छ कि बुझ्न चाहन्छु।",state.item?"purchase":"item",{intent:"refund"}),
+  opt("Could we discuss exchange options?","साट्ने विकल्पबारे कुरा गर्न सक्छौँ?",state.item?"purchase":"item",{intent:"exchange"}),
   opt("Thanks. I'll decide later.","धन्यवाद। पछि निर्णय गर्छु।","end",{intent:"keep"})]);
- case "reason":return row(state.intent==="exchange"?
-   "I can check exchange options. Why would you like a different shirt?":
-   "I can look into your request. Why would you like to bring the shirt back?",
-  "तपाईंको अनुरोध जाँच्न सक्छु। कमिज किन फिर्ता गर्न वा साट्न चाहनुहुन्छ?",[
-  opt("The size doesn't fit me.","साइज मलाई मिल्दैन।","condition",{reason:"size"}),
-  opt("The stitching seems defective.","सिलाइ बिग्रेको जस्तो छ।","condition",{reason:"defect"}),
-  opt("I changed my mind after buying it.","किनिसकेपछि मेरो मन फेरियो।","condition",{reason:"mind"})]);
- case "condition":return row("Thanks. Have you worn the shirt, or have you only tried it on?",
-  "धन्यवाद। कमिज लगाइसक्नुभयो कि लगाएर मात्र हेर्नुभयो?",[
-  opt("I only tried it on at home, and the tags are attached.","घरमा लगाएर मात्र हेरेको हुँ, ट्याग अझै छ।","receipt",{condition:"tried"}),
-  opt("Yes, I wore it outside once.","हो, एकपटक बाहिर लगाएको थिएँ।","receipt",{condition:"worn"}),
-  opt("I haven't worn it, but I removed the tags.","लगाएको छैन, तर ट्याग हटाएँ।","receipt",{condition:"no-tags"})]);
- case "receipt":return row("Do you have a receipt or another proof of purchase?",
-  "रसिद वा किनेको अर्को प्रमाण छ?",[
-  opt("Yes, I have the paper receipt.","हो, कागजी रसिद छ।","purchase",{receipt:"paper"}),
-  opt("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।","purchase",{receipt:"digital"}),
-  opt("No, I can't find my receipt.","होइन, रसिद भेट्टाउन सकिनँ।","evidence",{receipt:"missing"})]);
- case "evidence":return row("I understand. Without a receipt, we might need extra proof or a manager's review. Can you find anything showing the purchase?",
-  "बुझेँ। रसिद नभए थप प्रमाण वा व्यवस्थापकको जाँच चाहिन सक्छ। किनिएको कुनै प्रमाण भेटिन्छ?",[
-  opt("I can look for the payment in my bank statement.","बैंक स्टेटमेन्टमा भुक्तानी खोज्न सक्छु।","purchase",{evidence:"bank"}),
-  opt("I might have an order confirmation email.","अर्डर पुष्टि इमेल हुन सक्छ।","purchase",{evidence:"email"}),
-  opt("I don't have any proof at the moment.","अहिले कुनै प्रमाण छैन।","purchase",{evidence:"none"})]);
- case "purchase":return row("Was this shirt purchased here, ordered online, or given to you as a gift?",
-  "यो कमिज यहीँ किनिएको हो, अनलाइन अर्डर हो, कि उपहार हो?",[
-  opt("I bought it in this store.","मैले यही पसलमा किनेको हुँ।","timing",{source:"store"}),
-  opt("I ordered it online.","मैले अनलाइन अर्डर गरेको हुँ।","online",{source:"online"}),
-  opt("It was a gift, so I'm not sure where it was bought.","यो उपहार थियो, कहाँ किनिएको हो थाहा छैन।","gift",{source:"gift"})]);
- case "online":return row("Online orders can have separate return steps. Can you access the order details?",
-  "अनलाइन अर्डरको फिर्ता प्रक्रिया फरक हुन सक्छ। अर्डरको विवरण खोल्न सक्नुहुन्छ?",[
-  opt("Yes, I have the order number.","हो, अर्डर नम्बर छ।","timing",{onlineProof:"number"}),
-  opt("I can't access my account right now.","अहिले खातामा जान सक्दिनँ।","timing",{onlineProof:"unavailable"}),
-  opt("Someone else placed the order for me.","अरू कसैले मेरो लागि अर्डर गरेका थिए।","timing",{onlineProof:"someone-else"})]);
- case "gift":return row("A gift receipt or purchase details may help us review this. Do you have anything from the person who gave it to you?",
-  "उपहार रसिद वा खरिद विवरणले मद्दत गर्न सक्छ। उपहार दिने व्यक्तिबाट केही छ?",[
-  opt("Yes, I have a gift receipt.","हो, उपहार रसिद छ।","timing",{giftProof:"receipt"}),
-  opt("I can ask them for the order information.","अर्डरको विवरण उहाँसँग सोध्न सक्छु।","timing",{giftProof:"ask"}),
-  opt("I'd prefer not to contact the gift giver.","उपहार दिने व्यक्तिलाई सम्पर्क गर्न चाहन्नँ।","timing",{giftProof:"none"})]);
- case "timing":return row("About when was the shirt purchased? The date may affect the available options.",
-  "कमिज करिब कहिले किनिएको थियो? मितिले विकल्पमा असर पर्न सक्छ।",[
+ case "reason":{
+  const gift=state.source==="gift";
+  return row(gift?"I understand this was a gift. Why are you considering returning or exchanging it?":
+    "Could you tell me why you'd like to return or exchange the clothing?",
+    gift?"यो उपहार रहेछ। किन फिर्ता वा साट्ने सोच्नुभएको हो?":
+    "यो लुगा किन फिर्ता वा साट्न चाहनुहुन्छ?",[
+   opt("The size doesn't fit me.","साइज मलाई मिल्दैन।","condition",{reason:"size"}),
+   opt("The clothing seems defective.","लुगा बिग्रिएको जस्तो छ।","condition",{reason:"defect"}),
+   opt(gift?"It's not quite my style.":"I've changed my mind about keeping it.",
+    gift?"यो मेरो शैलीसँग मेल खाँदैन।":"यो राख्ने मेरो मन बदलेँ।","condition",{reason:"mind"})
+  ]);
+ }
+ case "condition":return row("Thanks. What condition is the clothing in?",
+  "धन्यवाद। लुगाको अवस्था कस्तो छ?",[
+  opt("I only tried it on at home, and the tags are attached.","घरमा लगाएर मात्र हेरेको हुँ, ट्याग अझै छन्।","receipt",{condition:"tried"}),
+  opt("It has been worn or used outside.","बाहिर लगाएको वा प्रयोग गरेको छ।","receipt",{condition:"worn"}),
+  opt("It hasn't been worn outside, but I removed the tags.","बाहिर लगाएको छैन, तर ट्याग हटाएँ।","receipt",{condition:"no-tags"})]);
+ case "receipt":{
+  if(state.source==="gift")return row("Because this was a gift, do you have a gift receipt or any purchase information?",
+   "यो उपहार भएकोले उपहार रसिद वा खरिदको विवरण केही छ?",[
+   opt("Yes, I have a gift receipt.","हो, मसँग उपहार रसिद छ।","timing",{receipt:"gift",giftProof:"receipt",evidence:"gift-receipt"}),
+   opt("I could ask the person who gave it to me.","म उपहार दिने व्यक्तिलाई सोध्न सक्छु।","timing",{receipt:"missing",giftProof:"ask",evidence:"none"}),
+   opt("No, I don't have proof, and I'd rather not contact them.","होइन, प्रमाण छैन र सम्पर्क पनि गर्न चाहन्नँ।","timing",{receipt:"missing",giftProof:"none",evidence:"none"})]);
+  if(state.source==="unknown")return row("Do you have anything that might help identify where these clothes came from?",
+   "यी लुगाहरू कहाँबाट आएका हुन् भन्ने पत्ता लगाउने कुनै विवरण छ?",[
+   opt("I have a receipt, but I don't recognize the store.","रसिद छ, तर पसल चिन्न सकिनँ।","timing",{receipt:"paper"}),
+   opt("I only have the tags or labels.","ट्याग वा लेबल मात्र छन्।","timing",{receipt:"missing",evidence:"labels"}),
+   opt("No, I don't have any purchase information.","होइन, मसँग खरिद विवरण छैन।","timing",{receipt:"missing",evidence:"none"})]);
+  if(state.source==="online")return row("Do you have an order number or confirmation for the online purchase?",
+   "अनलाइन खरिदको अर्डर नम्बर वा पुष्टि छ?",[
+   opt("Yes, I have an order number.","हो, अर्डर नम्बर छ।","timing",{receipt:"digital",onlineProof:"number"}),
+   opt("I have the confirmation email.","पुष्टि इमेल छ।","timing",{receipt:"digital",onlineProof:"email"}),
+   opt("No, I can't access the order details.","होइन, अर्डर विवरण खोल्न सक्दिनँ।","timing",{receipt:"missing",evidence:"none",onlineProof:"unavailable"})]);
+  return row("Do you have a receipt or another proof of purchase?",
+   "रसिद वा खरिद प्रमाण छ?",[
+   opt("Yes, I have the paper receipt.","हो, कागजी रसिद छ।","timing",{receipt:"paper"}),
+   opt("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।","timing",{receipt:"digital"}),
+   opt("No, I can't find my receipt.","होइन, रसिद भेट्टाएको छैन।","evidence",{receipt:"missing"})]);
+ }
+ case "evidence":return row("If you don't have a receipt, we might need alternative evidence. Is anything available?",
+  "रसिद छैन भने अर्को प्रमाण चाहिन सक्छ। केही उपलब्ध छ?",[
+  opt("I can check my bank or card transactions.","बैंक वा कार्डको कारोबार जाँच्न सक्छु।",state.source?"timing":"purchase",{evidence:"bank"}),
+  opt("I might have an order confirmation email.","अर्डर पुष्टि इमेल हुन सक्छ।",state.source?"timing":"purchase",{evidence:"email"}),
+  opt("I don't have any proof right now.","अहिले कुनै प्रमाण छैन।",state.source?"timing":"purchase",{evidence:"none"})]);
+ case "purchase":return row("Do you know how the clothing was obtained?",
+  "लुगा कसरी प्राप्त भएको थियो थाहा छ?",[
+  opt("I bought it at this store.","मैले यही पसलमा किनेको हुँ।","reason",{source:"store"}),
+  opt("I ordered it online.","मैले अनलाइन अर्डर गरेको हुँ।","reason",{source:"online"}),
+  opt("Someone gave it to me as a gift.","कसैले मलाई उपहार दिएको हो।","reason",{source:"gift"}),
+  opt("I'm not sure where it originally came from.","यो कहाँबाट आएको हो थाहा छैन।","reason",{source:"unknown"})]);
+ case "online":return row("For an online order, can you access the order confirmation?",
+ "अनलाइन अर्डरको पुष्टि विवरण भेटाउन सक्नुहुन्छ?",[
+ opt("Yes, I have an order number.","हो, अर्डर नम्बर छ।","timing",{onlineProof:"number",receipt:"digital"}),
+ opt("I have an order confirmation email.","अर्डर पुष्टि इमेल छ।","timing",{onlineProof:"email",receipt:"digital"}),
+ opt("No, I can't access the details.","होइन, विवरण खोल्न सक्दिनँ।","timing",{onlineProof:"unavailable"})]);
+ case "gift":return row("Since this was a gift, do you have a gift receipt or any details from the person who gave it to you?",
+ "यो उपहार भएकाले उपहार रसिद वा दिने व्यक्तिबाट केही विवरण छ?",[
+ opt(state.evidence==="none"?"I found a gift receipt since we last spoke.":"Yes, I have a gift receipt.",
+ state.evidence==="none"?"पछि उपहार रसिद भेट्टाएँ।":"हो, उपहार रसिद छ।","timing",
+ {giftProof:"receipt",receipt:"gift",evidence:"gift-receipt"}),
+ opt("I could ask the gift giver for more information.","उपहार दिने व्यक्तिलाई थप जानकारी सोध्न सक्छु।","timing",{giftProof:"ask"}),
+ opt("I don't have details, and I don't want to contact them.","विवरण छैन र सम्पर्क पनि गर्न चाहन्नँ।","timing",{giftProof:"none",evidence:"none"})]);
+ case "timing":{
+ if(state.source==="gift")return row("Do you know when you received the gift? It's okay not to know when it was originally purchased.",
+  "उपहार कहिले पाउनुभयो थाहा छ? सुरुमा कहिले किनिएको हो थाहा नभए पनि हुन्छ।",[
+  opt("I received it yesterday, but I don't know when it was bought.","हिजो पाएको हुँ, तर कहिले किनिएको थाहा छैन।","review",{timing:"gift-yesterday"}),
+  opt("I received it two weeks ago, but I don't know the purchase date.","दुई हप्ताअघि पाएको हुँ, तर किनिएको मिति थाहा छैन।","review",{timing:"gift-weeks"}),
+  opt("I'm not sure when the gift was originally purchased.","उपहार कहिले किनिएको थियो थाहा छैन।","review",{timing:"unknown"})]);
+ if(state.source==="online")return row("About when did you place the online order?",
+ "अनलाइन अर्डर करिब कहिले गर्नुभएको थियो?",[
+  opt("I placed the order yesterday.","हिजो अर्डर गरेँ।","review",{timing:"yesterday"}),
+  opt("I placed it about two weeks ago.","करिब दुई हप्ताअघि अर्डर गरेँ।","review",{timing:"two-weeks"}),
+  opt("I don't remember the order date.","अर्डर गरेको मिति याद छैन।","review",{timing:"unknown"})]);
+ if(state.source==="unknown")return row("Do you have any idea when the clothing was originally obtained?",
+ "लुगा सुरुमा कहिले ल्याइएको थियो केही थाहा छ?",[
+  opt("It may have been obtained recently, but I'm not sure.","हालै प्राप्त भएको हुन सक्छ, तर पक्का छैन।","review",{timing:"unknown"}),
+  opt("I received it a few weeks ago.","केही हप्ताअघि पाएको हुँ।","review",{timing:"two-weeks"}),
+  opt("I don't know the date at all.","मिति पटक्कै थाहा छैन।","review",{timing:"unknown"})]);
+ return row("About when did you buy the clothing? The date may affect the options.",
+ "लुगा करिब कहिले किन्नुभएको थियो? मितिले उपलब्ध विकल्पमा असर पर्छ।",[
   opt("I bought it yesterday.","हिजो किनेको हुँ।","review",{timing:"yesterday"}),
-  opt("It was purchased about two weeks ago.","करिब दुई हप्ताअघि किनेको थियो।","review",{timing:"two-weeks"}),
-  opt("It was a few months ago, so I may be past the return period.","केही महिना भयो, फिर्ता अवधि सकिएको हुन सक्छ।","review",{timing:"older"})]);
+  opt("I bought it about two weeks ago.","करिब दुई हप्ताअघि किनेको हुँ।","review",{timing:"two-weeks"}),
+  opt("I bought it a few months ago.","केही महिनाअघि किनेको हुँ।","review",{timing:"older"}),
+  opt("I don't remember exactly when I bought it.","किनेको ठ्याक्कै याद छैन।","review",{timing:"unknown"})]);
+ }
  case "review":{
   const flags=[];
-  if(state.receipt==="missing"&&state.evidence==="none")flags.push("there is no proof of purchase");
-  else if(state.receipt==="missing")flags.push("the receipt is missing");
-  if(state.condition==="worn")flags.push("the shirt has been worn");
+  const hasProof=["paper","digital","gift"].includes(state.receipt)||
+    state.giftProof==="receipt"||state.evidence==="gift-receipt";
+  if(!hasProof)flags.push("proof of purchase has not yet been confirmed");
+  if(state.evidence==="bank"||state.evidence==="email")
+    flags.push("you may be able to locate additional evidence");
+  if(state.condition==="worn")flags.push("the clothing has been worn or used");
   if(state.condition==="no-tags")flags.push("the tags were removed");
   if(state.timing==="older")flags.push("the return period may have passed");
-  if(state.source==="gift"&&state.giftProof==="none")flags.push("this was a gift without a receipt");
-  const reason=flags.length?"I see that "+flags.join(", and ")+". ":"Thank you for the details. ";
-  return row(reason+"I must check our policy before I can promise any refund or exchange. Would you like a manager to review this?",
-   "विवरण बुझेँ। पैसा फिर्ता वा साट्ने वाचा गर्नुअघि पसलको नियम जाँच्नुपर्छ। व्यवस्थापकबाट जाँच गराउने?",[
-   opt("Yes, please ask the manager to review my situation.","हो, व्यवस्थापकलाई मेरो अवस्था जाँच्न भन्नुहोस्।","manager",{managerRequested:true}),
-   opt("Could you explain the alternatives first?","पहिले अन्य विकल्प बुझाइदिनुहुन्छ?","alternatives"),
-   opt("Could I see the return policy in writing?","फिर्ता नियम लिखित रूपमा हेर्न सक्छु?","written")]);
+  if(state.source==="gift"){
+   flags.push("this was a gift");
+   if(state.giftProof==="none")flags.push("you prefer not to contact the giver");
+   if(["unknown","gift-yesterday","gift-weeks"].includes(state.timing))
+    flags.push("the original purchase date is unknown");
+  }else if(state.timing==="unknown")flags.push("the purchase date is unknown");
+  const summary=flags.length?"From what you've told me, "+flags.join("; ")+". ":"Thanks for the details. ";
+  return row(summary+"We must review the store's policy before promising a refund, exchange, or store credit. Would you like a manager to check?",
+   "तपाईंको अवस्थाअनुसार पसलको नियम जाँच्नुपर्छ। पैसा फिर्ता वा साट्ने पक्का छैन। व्यवस्थापकसँग जाँच गराउने?",[
+   opt("Yes, please ask a manager to review this.","हो, व्यवस्थापकलाई जाँच्न भन्नुहोस्।","manager",{managerRequested:true}),
+   opt("Could you explain any other options first?","पहिले अन्य विकल्प बुझाइदिनुहुन्छ?","alternatives"),
+   opt("Could I see the return policy in writing?","फिर्ताको नियम लिखित रूपमा देखाउनुहुन्छ?","written")]);
  }
  case "alternatives":return row("Depending on our policy, a refund, exchange or store credit may be possible. We still need to review the item and purchase. What would you prefer?",
   "नियमअनुसार पैसा फिर्ता, साट्ने वा स्टोर क्रेडिट सम्भव हुन सक्छ। सामान र खरिद जाँच्नुपर्छ। के चाहनुहुन्छ?",[
@@ -131,19 +182,20 @@ function step(id,state){
   opt("Please explain the exchange or store-credit options.","साट्ने वा स्टोर क्रेडिटका विकल्प बुझाउनुहोस्।","alternatives"),
   opt("Thank you. I'll read the policy and decide later.","धन्यवाद। नियम पढेर पछि निर्णय गर्छु।","end")]);
  case "manager":{
-  const flags=[];
-  if(state.receipt==="missing")flags.push("a missing receipt");
-  if(state.condition==="worn")flags.push("a shirt that has been worn");
-  if(state.condition==="no-tags")flags.push("removed tags");
-  if(state.timing==="older")flags.push("an older purchase");
-  if(state.source==="gift")flags.push("a gift purchase");
-  const description=flags.length?" I understand this involves "+flags.join(", ")+".":" I understand you would like a return reviewed.";
-  return row("Hello, I'm the store manager."+description+" I can review the policy, but I can't promise an exception. What would you like me to check?",
-   "नमस्ते, म पसलको व्यवस्थापक हुँ। नियम जाँच्न सक्छु, तर अपवादको ग्यारेन्टी छैन। के जाँच गरूँ?",[
-   opt("Could you check whether a refund is possible?","पैसा फिर्ता सम्भव छ कि जाँच गर्नुहुन्छ?","managerReview",{intent:"refund"}),
-   opt("Could you check whether an exchange is possible?","साट्न मिल्छ कि जाँच गर्नुहुन्छ?","managerReview",{intent:"exchange"}),
-   opt("Could store credit be an option?","स्टोर क्रेडिट विकल्प हुन सक्छ?","managerReview",{intent:"store-credit"})
-  ],"Store manager","👩‍💼");
+ const flags=[];
+ if(state.receipt==="missing"&&state.evidence!=="gift-receipt")
+   flags.push("no confirmed proof of purchase yet");
+ if(state.condition==="worn")flags.push("worn or used clothing");
+ if(state.condition==="no-tags")flags.push("removed tags");
+ if(state.timing==="older")flags.push("an older purchase");
+ if(state.source==="gift")flags.push("an item received as a gift");
+ const description=flags.length?" I understand this involves "+flags.join(", ")+".":" I understand you'd like a return reviewed.";
+ return row("Hello, I'm the store manager."+description+" I can review the policy, but I can't promise an exception. What would you like me to check?",
+ "नमस्ते, म पसलको व्यवस्थापक हुँ। नियम जाँच्न सक्छु, तर अपवाद पक्का छैन। के जाँच गरौँ?",[
+ opt("Could you check whether a refund is possible?","पैसा फिर्ता हुन सक्छ कि जाँच गर्नुहुन्छ?","managerReview",{intent:"refund"}),
+ opt("Could you check whether an exchange is possible?","साट्न मिल्छ कि जाँच गर्नुहुन्छ?","managerReview",{intent:"exchange"}),
+ opt("Could store credit be an option?","स्टोर क्रेडिट सम्भव छ कि?","managerReview",{intent:"store-credit"})
+ ],"Store manager","👩‍💼");
  }
  case "managerReview":{
   const preference=state.intent==="refund"?"a refund":state.intent==="exchange"?"an exchange":"store credit";
@@ -151,7 +203,7 @@ function step(id,state){
    "तपाईंको चाहना बुझेँ। सामान र खरिद प्रमाण जाँच्नुपर्छ। स्वीकृत नभए कसरी अघि बढ्ने?",[
    opt("Please explain any other options available.","अरू उपलब्ध विकल्प बुझाउनुहोस्।","close",{outcome:"options"}),
    opt("Could I receive the decision in writing?","निर्णय लिखित रूपमा पाउँछु?","close",{outcome:"written"}),
-   opt("I understand. I can keep the shirt if nothing is possible.","बुझेँ। केही नमिले कमिज राख्न सक्छु।","close",{outcome:"keep"})
+   opt("I understand. I can keep the clothing if nothing is possible.","बुझेँ। केही नमिले कमिज राख्न सक्छु।","close",{outcome:"keep"})
   ],"Store manager","👩‍💼");
  }
  case "close":return row(state.outcome==="written"?
@@ -176,7 +228,14 @@ function choose(active,item,index){
  if(!active?.isBranchingStore||active.storeCompleted||index!==active.steps.length-1)
   throw Error("Clothing-store conversation is out of sync");
  if(!item||!item.next||!item.value||!item.ne)throw Error("Missing dialogue choice");
- Object.assign(active.storeState,item.patch||{});
+ const patch=item.patch||{};
+ if(patch.source&&active.storeState.source!==patch.source){
+  for(const key of ["receipt","evidence","giftProof","onlineProof","timing"])
+   delete active.storeState[key];
+ }
+ if(patch.receipt&&patch.receipt!=="missing"&&patch.evidence===undefined)
+  delete active.storeState.evidence;
+ Object.assign(active.storeState,patch);
  active.storeCompleted=item.next==="end";
  if(!active.storeCompleted){
   const next=step(item.next,active.storeState);
@@ -185,10 +244,17 @@ function choose(active,item,index){
  }
  return {finished:active.storeCompleted,turns:active.steps.length};
 }
+function reconcile(active,index,pendingChoice){
+ if(!active?.isBranchingStore||!Array.isArray(active.steps)||pendingChoice)return false;
+ const old=active.steps[index];
+ if(!old?.nodeId)return false;
+ try{active.steps[index]={...old,...step(old.nodeId,active.storeState||{})};return true;}
+ catch(_){return false}
+}
 function options(stepObj){
  if(!stepObj?.storeOptions)return null;
  return {multi:true,branching:true,options:stepObj.storeOptions.map(v=>({...v}))};
 }
-const api=Object.freeze({start,choose,options,step});
+const api=Object.freeze({start,choose,options,step,reconcile});
 if(typeof window!=="undefined")window.sikauStoreStory=api;
 })();
