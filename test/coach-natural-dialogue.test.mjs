@@ -31,11 +31,11 @@ test('phone camera to battery to too-expensive to Samsung to card checkout and r
  choose(api,a,o=>/standard storage/i.test(o.value));
  choose(api,a,o=>/credit or debit card/i.test(o.value));
  assert.match(a.steps.at(-1).npc,/bank card/);
- assert.match(a.steps.at(-1).npc,/NO purchase or charge/);
+ assert.match(a.steps.at(-1).npc,/Here's your receipt/);
  assert.equal(a.storyState.offer,'budget');
  assert.equal(a.storyState.payment,'card');
  choose(api,a,o=>/have the receipt/i.test(o.value));
- assert.match(a.steps.at(-1).npc,/no actual receipt/);
+ assert.match(a.steps.at(-1).npc,/Here's your receipt/);
  choose(api,a,o=>o.next==='end');
  assert.equal(a.storyCompleted,true);
 });
@@ -103,4 +103,24 @@ test('saved journey state persists budget and payment without altering previous 
  a.steps.at(-1).npc='OLD INCORRECT MESSAGE';
  assert.ok(api.reconcile(a,a.steps.length-1,null));
  assert.equal(a.steps.at(-1).npc,before);
+});
+
+test('no role-play or invented-price disclaimers interrupt the 175 learner conversations',()=>{
+ const w=load(),api=w.sikauAdaptiveStory;
+ const forbidden=/fictional|role-play|roleplay|practice (?:store|shop|price|scenario|conversation|checkout|order)|sample (?:price|checkout|quote)|invented practice prices|not current Nepal retail|made-up lesson price|no real purchase|no actual receipt|NO purchase or charge|यो अभ्यास|काल्पनिक|अभ्यास पसल|नमुना मूल्य|वास्तविक बजार मूल्य होइन/i;
+ for(const id of api.topics)for(let path=0;path<3;path++)for(let detail=0;detail<3;detail++){
+  const a=api.start({id});
+  choose(api,a,o=>o.patch.path===path);
+  choose(api,a,o=>o.patch.detail===detail);
+  assert.doesNotMatch(a.steps.at(-1).npc,forbidden,id+':review');
+  assert.doesNotMatch(a.steps.at(-1).npcNe,forbidden,id+':review Nepali');
+  for(const option of a.steps.at(-1).storeOptions){
+   const b=api.start({id});
+   choose(api,b,o=>o.patch.path===path);
+   choose(api,b,o=>o.patch.detail===detail);
+   choose(api,b,o=>o.value===option.value);
+   assert.doesNotMatch(b.steps.at(-1).npc,forbidden,id+':'+b.steps.at(-1).nodeId);
+   assert.doesNotMatch(b.steps.at(-1).npcNe,forbidden,id+':'+b.steps.at(-1).nodeId+' Nepali');
+  }
+ }
 });
