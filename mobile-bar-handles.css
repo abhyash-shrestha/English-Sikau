@@ -20,6 +20,11 @@
   margin:0 auto!important;border-radius:0 0 14px 14px!important;
  }
  #protected #sikauMobileTopHandle:focus-visible{outline:3px solid #326cdb!important;outline-offset:2px!important}
+ /* Hide the lesson's second top toolbar together with the outer header. */
+ html.sikau-refresh.sikau-mobile-top-hidden .app-header,
+ html.sikau-refresh.sikau-mobile-top-hidden:has(#tr.sikau-translated:not([hidden])) .app-header{
+  display:none!important;
+ }
  html.sikau-refresh #sikauMobileBottomHandle{
   display:flex!important;align-items:center!important;justify-content:center!important;
   position:fixed!important;left:50%!important;transform:translateX(-50%)!important;
