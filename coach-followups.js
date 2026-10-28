@@ -152,7 +152,7 @@ function get(id,config,path,detail){
   category,
   message:prefix+" "+(!custom&&reaction?current[5]+" ":"")+(!custom?guide[0]:""),
   messageNe:prefixNe+" "+(!custom&&reaction?current[6]+" ":"")+(!custom?guide[1]:""),
-  question:custom?.[2]?.[0]||[guide[2],guide[3],guide[4],guide[5]],
+  question:custom?.[2]||[guide[2],guide[3],guide[4],guide[5]],
   guidance:[guide[2],guide[3],guide[4],guide[5]],
   proceed:[guide[4],guide[5]],
   alternate:[alternate[0],alternate[1],(detail+1)%3],
