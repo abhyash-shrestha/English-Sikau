@@ -151,8 +151,10 @@ function step(id,state){
  case "review":{
   const flags=[];
   const hasProof=["paper","digital","gift"].includes(state.receipt)||
-    state.giftProof==="receipt"||["bank","email","gift-receipt"].includes(state.evidence);
-  if(!hasProof)flags.push("we still need to verify proof of purchase");
+    state.giftProof==="receipt"||state.evidence==="gift-receipt";
+  if(!hasProof)flags.push("proof of purchase has not yet been confirmed");
+  if(state.evidence==="bank"||state.evidence==="email")
+    flags.push("you may be able to locate additional evidence");
   if(state.condition==="worn")flags.push("the clothing has been worn or used");
   if(state.condition==="no-tags")flags.push("the tags were removed");
   if(state.timing==="older")flags.push("the return period may have passed");
@@ -181,8 +183,8 @@ function step(id,state){
   opt("Thank you. I'll read the policy and decide later.","धन्यवाद। नियम पढेर पछि निर्णय गर्छु।","end")]);
  case "manager":{
  const flags=[];
- if(state.receipt==="missing"&&!["bank","email","gift-receipt"].includes(state.evidence))
-   flags.push("no verified proof of purchase");
+ if(state.receipt==="missing"&&state.evidence!=="gift-receipt")
+   flags.push("no confirmed proof of purchase yet");
  if(state.condition==="worn")flags.push("worn or used clothing");
  if(state.condition==="no-tags")flags.push("removed tags");
  if(state.timing==="older")flags.push("an older purchase");
