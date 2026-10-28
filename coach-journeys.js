@@ -322,8 +322,8 @@ function phone(node,state,config){
  const money="NPR "+price.toLocaleString("en-US");
  if(node==='phone-pitch'||node==='phone-budget'){
   return r(node,
-   "I recommend "+model+" for "+money+". Would you like to compare the features or go with this one?",
-   "तपाईंलाई "+model+" रु. "+price.toLocaleString("en-US")+" पर्छ। विशेषता तुलना गर्ने कि यही लिने?",[
+   "I'd recommend the "+model+" for "+money+". Would you like to compare its features or go with this one?",
+   "म "+model+" सिफारिस गर्छु। यसको मूल्य रु. "+price.toLocaleString("en-US")+" हो। विशेषता तुलना गर्ने कि यही लिने?",[
     option(state.offer==="basic"?"This is still above my budget. I'd rather wait.":"That's too expensive. Do you have a cheaper phone?",
     state.offer==="basic"?"यो अझै बजेटभन्दा महँगो छ। पछि आउँछु।":"त्यो धेरै महँगो छ। सस्तो फोन छ?",
     state.offer==="basic"?"closing":"phone-pitch",{offer:premium?"budget":"basic",priority:"budget"}),
@@ -364,7 +364,7 @@ function phone(node,state,config){
   ]);
  if(node==='phone-checkout')return r(node,
   "The "+model+" costs "+money+" before any extras. Would you like to pay with cash or a card?",
-  "तपाईंले छान्नुभएको "+model+" रु. "+price.toLocaleString("en-US")+" पर्छ। नगद कि कार्डले तिर्नुहुन्छ?",[
+  "तपाईंले छान्नुभएको "+model+" को मूल्य रु. "+price.toLocaleString("en-US")+" हो। नगद कि कार्डले तिर्नुहुन्छ?",[
    option("I'll pay with cash.","नगद तिर्छु।","phone-finish",{payment:"cash"}),
    option("Can I pay with a credit or debit card?","क्रेडिट वा डेबिट कार्डले तिर्न मिल्छ?","phone-finish",{payment:"card"}),
    option("Is a QR or digital payment option available?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","phone-finish",{payment:"digital"}),
@@ -374,7 +374,7 @@ function phone(node,state,config){
   const method={cash:"cash",card:"a bank card",digital:"a QR/digital method"}[state.payment]||"your preferred method";
   return r(node,
    "Great choice! You've chosen "+model+" and you're paying with "+method+". Here's your receipt. Thank you for shopping with us!",
-   "राम्रो छनोट! "+model+" र "+method+" रोज्नुभयो। वास्तविक पसलमा अन्तिम रकम जाँचेर सुरक्षित भुक्तानी र रसिद दिइन्छ। यहाँ कुनै सामान खरिद वा पैसा कटौती भएको छैन। धन्यवाद!",[
+   "राम्रो छनोट! तपाईंले "+model+" छान्नुभयो र "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"आफ्नो रोजाइको माध्यम")+" बाट भुक्तानी गर्नुभयो। यो तपाईंको रसिद। आउनुभएकोमा धन्यवाद!",[
     option("Thank you. Could I have the receipt?","धन्यवाद। रसिद दिनुहुन्छ?","phone-receipt",{}),
     option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{})
    ]);
@@ -412,10 +412,10 @@ function build(node,state,config){
   if(!commerce)return "";
   const high=state.offer!=="budget"&&state.offer!=="basic";
   const value=state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[high?1:2];
-  return " The price of "+prices[0]+" is NPR "+value.toLocaleString("en-US")+
+  return " The "+prices[0]+" costs NPR "+value.toLocaleString("en-US")+
    ".";
  };
- const quoteNe=()=>!commerce?"":" राम्रो छनोट! "+prices[0]+" को मूल्य रु. "+
+ const quoteNe=()=>!commerce?"":" "+prices[0]+" को मूल्य रु. "+
   (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो।";
  if(node==='review'){
   if(legacy)return r(node,
@@ -427,8 +427,8 @@ function build(node,state,config){
      option("Thanks, that's enough information for now.","धन्यवाद, अहिलेलाई जानकारी पुग्यो।","closing",{})
     ]);
   return r(node,
-   "You mentioned "+focus+". "+set.intro[0],
-   "तपाईंलाई "+detail[1]+" भन्ने बुझेँ। "+set.intro[1],[
+   "I see. "+set.intro[0],
+   "बुझेँ। "+set.intro[1],[
     ...set.priorities.map(p=>option(p[0],p[1],"proposal",{priority:p[2],offer:p[2]==="budget"?"budget":"premium"})),
     option("I'd rather explore a different option.","बरु अर्को विकल्प हेर्न चाहन्छु।","alternative",{offer:state.offer==="budget"?"basic":"budget"}),
     option("I only needed information. Thank you!","जानकारी मात्र चाहिएको थियो। धन्यवाद।","closing",{})
@@ -442,9 +442,10 @@ function build(node,state,config){
     option("I'll think about it. Thank you.","सोचेर निर्णय गर्छु। धन्यवाद।","closing",{})
    ]);
   const name=state.priority==="budget"?"price":state.priority==="quality"?"quality":state.priority||"needs";
+  const nameNe={budget:"मूल्य",quality:"गुणस्तर",fit:"आवश्यकता",quick:"समय",time:"समय",requirements:"सर्त",security:"सुरक्षा",professional:"विशेषज्ञ सहायता",review:"जाँच",share:"विचार",listen:"अरूको विचार",plan:"योजना",specific:"विशेष अनुरोध"}[state.priority]||"आवश्यकता";
   return r(node,
-   "You mentioned "+focus+". Your priority is "+name+". "+set.proposal[0]+quote(),
-   "तपाईंले "+detail[1]+" भन्नुभयो। तपाईंको प्राथमिकता "+name+" हो। "+set.proposal[1]+quoteNe(),[
+   "I see. Your main priority is "+name+". "+set.proposal[0]+quote(),
+   "बुझेँ। तपाईंका लागि "+nameNe+" महत्त्वपूर्ण रहेछ। "+set.proposal[1]+quoteNe(),[
     option(commercial?"That sounds good. What should we confirm first?":"That sounds reasonable. What is the next step?",
       commercial?"राम्रो लाग्यो। पहिले के पुष्टि गर्ने?":"ठीक लाग्यो। अर्को कदम के हो?","verify",{}),
     option(commercial?"It's too expensive or doesn't suit me. Is there an alternative?":
@@ -470,8 +471,8 @@ function build(node,state,config){
  if(node==='verify')return r(node,
   "Before going ahead with "+target+", "+set.requirement[0]+" "+set.ready[0],
   target+" बारे अघि बढ्नुअघि, "+set.requirement[1]+" "+set.ready[1],[
-   option(participatory?"Let's discuss a simple plan together.":"Yes, let's practice the next step.",
-     participatory?"सँगै सरल योजना बनाऔँ।":"हो, अर्को कदमको अभ्यास गरौँ।",
+   option(participatory?"Let's discuss a simple plan together.":"Yes, let's go ahead with the next step.",
+     participatory?"सँगै सरल योजना बनाऔँ।":"हुन्छ, अर्को कदममा अघि बढौँ।",
      commercial?"checkout":"action",{}),
    option("Could you remind me of the requirements?","आवश्यकता फेरि सम्झाउनुहुन्छ?","requirements",{}),
    option("I want a different option after all.","बरु अर्को विकल्प चाहिन्छ।","alternative",{offer:"budget"}),
@@ -496,10 +497,10 @@ function build(node,state,config){
  }
  if(node==='confirmation'){
   const ending=commerce&&state.payment?
-   "You've chosen "+state.payment+" as your payment method. Here's your receipt.":
+   "Thank you. "+({cash:"You've paid in cash.",card:"Your card payment is complete.",digital:"Your QR payment is complete."}[state.payment]||"Your payment is complete.")+" Here's your receipt.":
    set.done[0];
   const endingNe=commerce&&state.payment?
-   "तपाईंले "+state.payment+" भुक्तानी तरिका रोज्नुभयो। यो तपाईंको रसिद।":set.done[1];
+   "तपाईंले "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"आफ्नो रोजाइको माध्यम")+" बाट तिर्नुभयो। यो तपाईंको रसिद।":set.done[1];
   return r(node,ending+" Thank you for talking with me!",endingNe+" कुराकानीका लागि धन्यवाद!",[
    option("Thank you. Have a nice day!","धन्यवाद। शुभ दिन!","end",{}),
    option("Could you explain the next steps again?","अर्को कदम फेरि बुझाउनुहुन्छ?","requirements",{})
