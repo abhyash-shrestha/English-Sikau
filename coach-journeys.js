@@ -198,6 +198,71 @@ const categories={
    "रुचिका लागि धन्यवाद! जानुअघि कार्यक्रमको विवरण जाँच्नुहोस्। त्यहाँ भेटौँला!"]
  }
 };
+const shoppingHelp=new Set([
+ "compare-prices","ask-discount","checkout-payment","self-checkout",
+ "return-electronics","warranty-question","pick-up-order","custom-tailoring"
+]);
+const foodHelp=new Set([
+ "ask-menu-allergy","split-restaurant-bill","wrong-food-order","grocery-expiry"
+]);
+const travelHelp=new Set([
+ "rideshare-pickup","missed-bus","airport-baggage","airport-security",
+ "flight-delay","hotel-room-problem","hotel-checkout","car-gas-station",
+ "roadside-assistance","tourist-information","border-customs"
+]);
+const alternateService={
+ shopping:{
+  intro:["Thanks for explaining the store question. What would you like help resolving first?",
+   "पसलको प्रश्न बताउनुभएकोमा धन्यवाद। पहिले के समाधान चाहिन्छ?"],
+  priorities:[["Please help me check the receipt, price or order details.","रसिद, मूल्य वा अर्डर विवरण जाँच्न मद्दत गर्नुहोस्।","requirements"],
+   ["I'd like to understand the store policy.","पसलको नियम बुझ्न चाहन्छु।","quality"],
+   ["Could someone help resolve this issue?","समस्या समाधान गर्न कसैले मद्दत गर्नुहुन्छ?","review"]],
+  proposal:["Let's check the relevant order, item or store policy instead of assuming a purchase or refund is already approved.",
+   "पहिले अर्डर, सामान वा नियम जाँचौँ; खरिद वा पैसा फिर्ता स्वीकृत भएको अनुमान नगरौँ।"],
+  alternative:["A supervisor or a different service option may help. We can ask without promising an exception.",
+   "व्यवस्थापक वा अर्को सेवाको विकल्प उपयोगी हुन सक्छ। अपवादको ग्यारेन्टी छैन।"],
+  requirement:["Verify the receipt or order, relevant dates, item condition and the store's written terms.",
+   "रसिद वा अर्डर, मिति, सामानको अवस्था र पसलका लिखित नियम जाँच्नुहोस्।"],
+  ready:["We can practice requesting a review or explanation. No actual refund, exchange or account change has been approved.",
+   "जाँच वा व्याख्या माग्ने अभ्यास गर्न सक्छौँ। वास्तविक पैसा फिर्ता, साट्ने वा खाता परिवर्तन स्वीकृत भएको छैन।"],
+  done:["Thank you for explaining the issue. We'll need the actual store's decision before promising any result. Goodbye!",
+   "समस्या बताउनुभएकोमा धन्यवाद। नतिजाको वाचाअघि वास्तविक पसलको निर्णय चाहिन्छ। बिदा!"]
+ },
+ food:{
+  intro:["I understand your concern about the meal or service. What should we check first?",
+   "खाना वा सेवाको चिन्ता बुझेँ। पहिले के जाँच्ने?"],
+  priorities:[["Could you check the order or bill details?","अर्डर वा बिलको विवरण जाँच्नुहुन्छ?","requirements"],
+   ["I'd like staff to check the ingredients or issue.","कर्मचारीले सामग्री वा समस्या जाँचून्।","quality"],
+   ["Could a manager help if needed?","आवश्यक भए व्यवस्थापकले मद्दत गर्नुहुन्छ?","review"]],
+  proposal:["Let's review the actual order, bill or ingredients with staff before deciding on a correction. We shouldn't claim anything is safe without verification.",
+   "सुधारको निर्णयअघि कर्मचारीसँग अर्डर, बिल वा सामग्री जाँचौँ। पुष्टि नगरी खाना सुरक्षित छ भन्न मिल्दैन।"],
+  alternative:["We can ask about a corrected order, another menu option or a manager review depending on the issue.",
+   "समस्याअनुसार अर्डर सच्याउने, अर्को खाना वा व्यवस्थापकसँग जाँच्ने सोधौँ।"],
+  requirement:["Ask staff to confirm the exact order, itemized bill or ingredients and the restaurant's applicable rules.",
+   "कर्मचारीसँग अर्डर, विस्तृत बिल वा सामग्री र सम्बन्धित नियम पुष्टि गर्नुहोस्।"],
+  ready:["We can rehearse how to explain the problem politely. No meal, refund or change has actually been processed.",
+   "सभ्य तरिकाले समस्या बताउने अभ्यास गरौँ। वास्तविक खाना, पैसा फिर्ता वा परिवर्तन गरिएको छैन।"],
+  done:["Thanks for explaining your concern. The restaurant staff would need to verify and resolve the real issue. Take care!",
+   "चिन्ता बताउनुभएकोमा धन्यवाद। वास्तविक समस्या कर्मचारीले जाँचेर समाधान गर्नुपर्छ। शुभ दिन!"]
+ },
+ travel:{
+  intro:["Thanks for describing the travel issue. What's the most important concern?",
+   "यात्राको समस्या बताउनुभएकोमा धन्यवाद। मुख्य चिन्ता के हो?"],
+  priorities:[["I need help finding the correct desk or process.","सही काउन्टर वा प्रक्रिया खोज्न चाहिन्छ।","requirements"],
+   ["I'd like an update or alternative solution.","अवस्था वा अर्को समाधान चाहिन्छ।","quality"],
+   ["Can staff check this urgently?","कर्मचारीले छिटो जाँच्न सक्छन्?","time"]],
+  proposal:["Let's check the actual ticket, booking, baggage record or service policy relevant to the issue. A solution cannot be guaranteed until the provider reviews it.",
+   "समस्यासँग सम्बन्धित टिकट, बुकिङ, सामान रेकर्ड वा सेवा नियम जाँचौँ। प्रदायकको निर्णयअघि समाधान पक्का छैन।"],
+  alternative:["We can ask about a different route, counter, report or service option depending on the problem.",
+   "समस्याअनुसार अर्को बाटो, काउन्टर, रिपोर्ट वा सेवा विकल्पबारे सोध्न सक्छौँ।"],
+  requirement:["Confirm the reference number if available, travel date, official policy and correct provider contact. Do not share sensitive details in public.",
+   "उपलब्ध भए रिफरेन्स नम्बर, यात्रा मिति, आधिकारिक नियम र सही सम्पर्क पुष्टि गर्नुहोस्। निजी विवरण सार्वजनिक नगर्नुहोस्।"],
+  ready:["We can practice asking the correct staff for a status or solution; no ticket, compensation or rebooking has been approved.",
+   "सही कर्मचारीसँग अवस्था वा समाधान सोध्ने अभ्यास गरौँ; टिकट, क्षतिपूर्ति वा पुनःबुकिङ स्वीकृत भएको छैन।"],
+  done:["Thank you for explaining. Please follow up with the actual operator to confirm the next step. Safe travels!",
+   "समस्या बताउनुभएकोमा धन्यवाद। अर्को कदम वास्तविक सेवा प्रदायकसँग पुष्टि गर्नुहोस्। शुभ यात्रा!"]
+ }
+};
 const buyable=new Set(Object.keys(purchase));
 const categoryOf=(scene)=>window.sikauMoreTopics?.find(t=>t.id===scene)?.category||
   window.sikauCoachGuidance?.old?.[scene]||"Everyday";
@@ -292,10 +357,15 @@ function build(node,state,config){
  const scene=state.scene,path=config[1][state.path]||config[1][0],detail=path[4][state.detail??0]||path[4][0];
  const specialized=scene==="buy-phone"?phone(node,state,config):null;
  if(specialized)return specialized;
- const cat=categoryOf(scene),set=categories[cat]||categories.Everyday;
+ const cat=categoryOf(scene),set=
+  shoppingHelp.has(scene)?alternateService.shopping:
+  foodHelp.has(scene)?alternateService.food:
+  travelHelp.has(scene)?alternateService.travel:
+  categories[cat]||categories.Everyday;
+ const isIssue=shoppingHelp.has(scene)||foodHelp.has(scene)||travelHelp.has(scene);
  const descriptor=detail[0].replace(/[.!?]+$/,'').toLowerCase(),target=path[0].replace(/[.!?]+$/,'').toLowerCase();
  const prices=purchase[scene],commerce=buyable.has(scene)&&state.path!==2;
- const commercial=cashCats.has(cat),participatory=["Everyday","Family"].includes(cat);
+ const commercial=cashCats.has(cat)&&!isIssue,participatory=["Everyday","Family"].includes(cat);
  const quote=()=>{
   if(!commerce)return "";
   const high=state.offer!=="budget"&&state.offer!=="basic";
