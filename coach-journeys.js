@@ -365,6 +365,7 @@ function build(node,state,config){
  const isIssue=shoppingHelp.has(scene)||foodHelp.has(scene)||travelHelp.has(scene);
  const descriptor=detail[0].replace(/[.!?]+$/,'').toLowerCase(),target=path[0].replace(/[.!?]+$/,'').toLowerCase();
  const prices=purchase[scene],commerce=buyable.has(scene)&&state.path!==2;
+ const legacy=window.sikauLegacyFollowups?.[scene]?.[state.path]||null;
  const commercial=cashCats.has(cat)&&!isIssue,participatory=["Everyday","Family"].includes(cat);
  const quote=()=>{
   if(!commerce)return "";
@@ -376,8 +377,16 @@ function build(node,state,config){
  const quoteNe=()=>!commerce?"":" यो अभ्यासमा "+prices[0]+" को काल्पनिक मूल्य रु. "+
   (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो, वास्तविक बजार मूल्य होइन।";
  if(node==='review'){
+  if(legacy)return r(node,
+    path[5]+" You mentioned: “"+detail[0]+".” What would you like to check next?",
+    path[6]+" तपाईंले “"+detail[1]+"” भन्नुभयो। अब के बुझ्ने?",[
+     option(legacy[0],legacy[1],"proposal",{priority:"specific"}),
+     option("Could you explain the requirements or conditions?","आवश्यकता वा सर्त बुझाइदिनुहुन्छ?","requirements",{}),
+     option("Is there a different option we could discuss?","अर्को विकल्पबारे पनि कुरा गरौँ?","alternative",{offer:"budget"}),
+     option("Thanks, that's enough information for now.","धन्यवाद, अहिलेलाई जानकारी पुग्यो।","closing",{})
+    ]);
   return r(node,
-   "I understand you're interested in "+descriptor+". "+set.intro[0],
+   "You mentioned “"+detail[0]+".” "+set.intro[0],
    "तपाईंलाई "+detail[1]+" भन्ने बुझेँ। "+set.intro[1],[
     ...set.priorities.map(p=>option(p[0],p[1],"proposal",{priority:p[2],offer:p[2]==="budget"?"budget":"premium"})),
     option("I'd rather explore a different option.","बरु अर्को विकल्प हेर्न चाहन्छु।","alternative",{offer:state.offer==="budget"?"basic":"budget"}),
@@ -385,6 +394,12 @@ function build(node,state,config){
    ]);
  }
  if(node==='proposal'){
+  if(legacy&&state.priority==="specific")return r(node,legacy[2],legacy[3],[
+    option("That sounds helpful. How would we proceed?","उपयोगी लाग्यो। कसरी अघि बढ्ने?","verify",{}),
+    option("Could you explain the requirements first?","पहिले आवश्यकता बुझाइदिनुहुन्छ?","requirements",{}),
+    option("What other choices might work?","अरू कुन विकल्प मिल्न सक्छ?","alternative",{}),
+    option("I'll think about it. Thank you.","सोचेर निर्णय गर्छु। धन्यवाद।","closing",{})
+   ]);
   const name=state.priority==="budget"?"price":state.priority==="quality"?"quality":state.priority||"needs";
   return r(node,
    "Since you mentioned "+descriptor+" and prioritised "+name+", "+set.proposal[0]+quote(),
