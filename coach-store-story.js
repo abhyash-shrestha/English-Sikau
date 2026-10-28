@@ -25,6 +25,92 @@ function itemText(s,state,ne=false){
   .replace(/exchange it if possible/gi,plural?'exchange them if possible':'exchange it if possible')
   .replace(/keep it for now/gi,plural?'keep them for now':'keep it for now');
 }
+// Branch outcomes are examples of a fictional store's policy, not a claim
+// about any real retailer. Confirm a transaction or a store-specific item
+// label before a manager can decide on a courtesy exception.
+function assess(state){
+ const receipt=["paper","digital","gift"].includes(state.receipt)||
+  state.giftProof==="receipt"||state.evidence==="gift-receipt";
+ const verified=state.verification==="receipt-check" && receipt &&
+  ["store","online","gift"].includes(state.source);
+ const label=state.verification==="label-match";
+ if(!verified&&!label)return "unverified";
+ if(state.condition==="worn")return state.reason==="defect"?"quality-review":"used-denied";
+ if(state.timing==="older")return "late-denied";
+ if(!verified){
+  if(["tried","no-tags"].includes(state.condition)&&label)
+   return "courtesy-credit";
+  return "unverified";
+ }
+ if(state.condition==="no-tags")return "courtesy-credit";
+ if(state.source==="gift")return "gift-credit";
+ if(state.intent==="exchange")return "exchange-approved";
+ if(state.intent==="store-credit")return "standard-credit";
+ return "refund-approved";
+}
+function policyDecision(state){
+ const outcome=assess(state);
+ const lines={
+ "unverified":[
+  "I'm sorry. I couldn't verify a purchase from this store, so I can't approve a refund, exchange, or store credit today. An item that looks like ours alone isn't enough. If you find a gift receipt, order confirmation, or other proof, we can review it again.",
+  "माफ गर्नुहोस्। यो सामान यही पसलबाट किनिएको पुष्टि भएन। त्यसैले आज पैसा फिर्ता, साट्ने वा स्टोर क्रेडिट स्वीकृत गर्न सक्दिनँ। रसिद वा खरिद प्रमाण भेटे फेरि जाँच गर्न सकिन्छ।"],
+ "used-denied":[
+  "After checking the item and our practice-store return rules, I'm sorry—we can't accept this worn or used item as a normal return. I can't offer a refund or courtesy credit in this case.",
+  "सामान र यो अभ्यास पसलको नियम जाँच्दा, प्रयोग भएको सामान सामान्य फिर्ता लिन मिल्दैन। त्यसैले पैसा फिर्ता वा सौजन्य स्टोर क्रेडिट दिन सकिँदैन।"],
+ "late-denied":[
+  "The purchase appears to be outside our practice-store return window. I'm sorry, so I can't approve a normal refund or exchange. We can explain how to request a separate review, but it isn't guaranteed.",
+  "किनमेलको समय यो अभ्यास पसलको फिर्ता अवधि बाहिर परेको देखिन्छ। त्यसैले सामान्य पैसा फिर्ता वा साट्न स्वीकृति दिन मिल्दैन। थप जाँच माग्न सक्नुहुन्छ, तर ग्यारेन्टी छैन।"],
+ "quality-review":[
+  "This may be a defective item rather than a standard return. I can't approve a refund yet, but I can explain how we document the fault and request a quality or warranty review.",
+  "यो सामान्य फिर्ताभन्दा सामानको त्रुटि हुन सक्छ। अहिले पैसा फिर्ता स्वीकृत गर्न सक्दिनँ, तर त्रुटि प्रमाणित गरी गुणस्तर वा वारेन्टी जाँच गर्न सकिन्छ।"],
+ "courtesy-credit":[
+  "I checked the store-specific item label in this practice scenario. It matches merchandise we carry, but we still cannot verify the original transaction. As the manager, I'm willing to make a one-time courtesy exception: store credit, not a cash or card refund. This is only an example of a discretionary policy, not something every store offers.",
+  "यस अभ्यासमा पसलको विशेष लेबल जाँच्दा हामीले बेच्ने सामानसँग मिल्यो, तर मूल खरिद पुष्टि भएन। व्यवस्थापकको एकपटकको सौजन्य अपवादमा नगद फिर्ता होइन, स्टोर क्रेडिट दिन सक्छु। सबै पसलमा यस्तो सुविधा हुँदैन।"],
+ "gift-credit":[
+  "I've checked the gift receipt and this item for our practice store. We can offer an exchange or store credit to the gift recipient, but not a cash refund to you. Would you like to use the credit?",
+  "यस अभ्यास पसलको उपहार रसिद र सामान जाँचेँ। उपहार पाउनेलाई साट्ने वा स्टोर क्रेडिट दिन सकिन्छ, तर तपाईंलाई नगद फिर्ता होइन। स्टोर क्रेडिट लिनुहुन्छ?"],
+ "exchange-approved":[
+  "I checked the receipt and the clothing condition. In this practice scenario, it meets our exchange rules. We can exchange it for an available item; any price difference would need to be settled.",
+  "यो अभ्यासमा रसिद र सामानको अवस्था जाँच्दा साट्ने नियम पूरा भएको छ। उपलब्ध सामानसँग साट्न सकिन्छ। मूल्य फरक भए हिसाब मिलाउनुपर्छ।"],
+ "standard-credit":[
+  "I checked the purchase and condition. The item qualifies under this practice-store policy, and I can issue store credit instead of a refund. The credit can be used for future eligible purchases here.",
+  "यस अभ्यासमा खरिद र सामानको अवस्था जाँच्दा योग्य छ। पैसा फिर्ताको सट्टा स्टोर क्रेडिट दिन सक्छु। पछि यही पसलमा सामान किन्न प्रयोग हुन्छ।"],
+ "refund-approved":[
+  "I verified the purchase details and item condition in this practice scenario. Under this store's example policy, the return is eligible, so we can issue a refund to the original payment method, subject to its processing time.",
+  "यस अभ्यासमा खरिद विवरण र सामानको अवस्था पुष्टि भयो। यस पसलको उदाहरण नियमअनुसार मूल भुक्तानी माध्यममा पैसा फिर्ता गर्न मिल्छ। रकम आउन केही समय लाग्न सक्छ।"]
+ };
+ return {outcome, en:lines[outcome][0],ne:lines[outcome][1]};
+}
+function outcomeOptions(state){
+ const outcome=assess(state);
+ const opts=(arr)=>arr.map(v=>opt(...v));
+ if(["courtesy-credit","gift-credit","standard-credit"].includes(outcome))
+  return opts([
+   ["Could you explain how the store credit works?","स्टोर क्रेडिट कसरी चल्छ बुझाइदिनुहुन्छ?","creditExplain"],
+   ["Yes, I'll accept the store credit.","हुन्छ, स्टोर क्रेडिट लिन्छु।","close",{outcome:"credit-accepted"}],
+   ["I'd rather keep the item for now.","अहिले सामान आफूसँग राख्छु।","close",{outcome:"credit-declined"}]
+  ]);
+ if(outcome==="refund-approved")return opts([
+  ["Yes, please refund the original payment method.","हुन्छ, पहिले तिरेको माध्यममै पैसा फिर्ता गर्नुहोस्।","close",{outcome:"refund-processed"}],
+  ["How long can the refund take?","पैसा फिर्ता आउन कति समय लाग्छ?","refundExplain"],
+  ["I prefer an exchange instead.","बरु सामान साट्न चाहन्छु।","close",{outcome:"exchange-requested"}]
+ ]);
+ if(outcome==="exchange-approved")return opts([
+  ["Thank you. I'd like to exchange it.","धन्यवाद। सामान साट्न चाहन्छु।","close",{outcome:"exchange-requested"}],
+  ["Could you explain how price differences work?","मूल्य फरक भए के हुन्छ?","exchangeExplain"],
+  ["I'll think about it and return later.","यसमा सोचेर पछि आउँछु।","close",{outcome:"decide-later"}]
+ ]);
+ if(outcome==="quality-review")return opts([
+  ["How can I request a quality inspection?","गुणस्तर जाँच कसरी माग्ने?","qualityExplain"],
+  ["I'll bring photos or other evidence.","फोटो वा अरू प्रमाण ल्याउँछु।","close",{outcome:"return-with-proof"}],
+  ["I understand. I'll decide later.","बुझेँ। पछि निर्णय गर्छु।","close",{outcome:"decide-later"}]
+ ]);
+ return opts([
+  ["Could you explain why the return was declined?","फिर्ता किन अस्वीकार भयो बुझाइदिनुहुन्छ?","denialExplain"],
+  ["I'll look for proof or ask about another review.","प्रमाण खोज्छु वा फेरि जाँच गराउँछु।","close",{outcome:"return-with-proof"}],
+  ["I understand. I'll keep the item for now.","बुझेँ। अहिलेलाई सामान राख्छु।","close",{outcome:"declined"}]
+ ]);
+}
 function step(id,state){
  const row=(npc,npcNe,options,speaker="Store assistant",emoji="🛍️")=>{
   if(options.length<2)throw Error("Each Coach story step needs responses");
