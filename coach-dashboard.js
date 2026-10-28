@@ -5,7 +5,7 @@
  */
 (function(){
 'use strict';
-const STYLE_URL=new URL('coach-dashboard.css?v=20261028-chat-multichoice-r1',document.baseURI).href;
+const STYLE_URL=new URL('coach-dashboard.css?v=20261028-all-valid-choices-r2',document.baseURI).href;
 const scenarios=[{"id":"return-shirt","emoji":"👕","title":"Return clothing","ne":"लुगा फिर्ता","category":"Shopping","place":"Clothing store · कपडा पसल","partner":"Store assistant","level":"Easy","steps":[{"npc":"Hello! How can I help you today?","npcNe":"नमस्ते! म तपाईंलाई कसरी मद्दत गर्न सक्छु?","goal":"यो कमिज फिर्ता गर्न चाहन्छु भन्नुहोस्।","answer":"I'd like to return this shirt, please.","answerNe":"म यो कमिज फिर्ता गर्न चाहन्छु।","bad1":"I was walking here yesterday.","bad2":"The shirt is blue and the sky is blue.","accept":["return shirt","return this","bring shirt back"],"hint":"Use “I'd like to return…” to be polite.","after":"Of course. Do you have your receipt?"},{"npc":"Do you have your receipt?","npcNe":"के तपाईंसँग रसिद छ?","goal":"रसिद छ भन्नुहोस्।","answer":"Yes, I have the receipt right here.","answerNe":"हो, रसिद यहीँ छ।","bad1":"Please give me another sandwich.","bad2":"My receipt likes the weather.","accept":["have receipt","here receipt","receipt right here"],"hint":"“Here is my receipt” is also natural.","after":"Thanks. Is there a problem with the shirt?"},{"npc":"What is wrong with the shirt?","npcNe":"कमिजमा के समस्या छ?","goal":"साइज सानो छ भन्नुहोस्।","answer":"It's too small for me.","answerNe":"यो मलाई धेरै सानो भयो।","bad1":"I want to buy a larger television.","bad2":"I'm from Kathmandu, thank you.","accept":["too small","size small","doesn't fit","does not fit"],"hint":"You can say “It doesn't fit.”","after":"Would you like a refund or an exchange?"},{"npc":"Would you like a refund or an exchange?","npcNe":"पैसा फिर्ता चाहिन्छ कि साट्न चाहनुहुन्छ?","goal":"पैसा फिर्ता चाहिन्छ भन्नुहोस्।","answer":"I'd prefer a refund, please.","answerNe":"म पैसा फिर्ता लिन चाहन्छु।","bad1":"My refund is at school.","bad2":"No, I want a bus ticket.","accept":["refund","money back","return my money"],"hint":"“I'd prefer…” is softer than “I want…”.","after":"Absolutely. I'll process the refund. Thank you!"}]},{"id":"buy-phone","emoji":"📱","title":"Buy a phone","ne":"फोन किन्नु","category":"Shopping","place":"Phone shop · मोबाइल पसल","partner":"Salesperson","level":"Easy","steps":[{"npc":"Welcome! What are you looking for?","npcNe":"स्वागत छ! तपाईं के खोज्दै हुनुहुन्छ?","goal":"नयाँ फोन चाहिन्छ भन्नुहोस्।","answer":"I'm looking for a new phone.","answerNe":"म नयाँ फोन खोज्दै छु।","bad1":"I'd like to book a hotel.","bad2":"I saw a movie yesterday.","accept":["new phone","buy phone","looking phone"],"hint":"get used to “I'm looking for…”","after":"We have many models. What is your budget?"},{"npc":"What is your budget?","npcNe":"तपाईंको बजेट कति छ?","goal":"पाँच सय डलरभन्दा कम भन्नुहोस्।","answer":"My budget is under five hundred dollars.","answerNe":"मेरो बजेट पाँच सय डलरभन्दा कम छ।","bad1":"I would like a bag of rice.","bad2":"I am going to school tomorrow.","accept":["under five hundred","under 500","less than 500","budget 500"],"hint":"Use “under” or “less than” for a maximum price.","after":"I can show you a few phones in that range."},{"npc":"Would you like to compare these two phones?","npcNe":"यी दुई फोन तुलना गर्न चाहनुहुन्छ?","goal":"क्यामेरा र ब्याट्रीबारे सोध्नुहोस्।","answer":"Which phone has a better camera and battery?","answerNe":"कुन फोनको क्यामेरा र ब्याट्री राम्रो छ?","bad1":"What time is the restaurant open?","bad2":"I need a new shirt.","accept":["camera battery","better camera","better battery"],"hint":"“Which phone has…?” asks about features.","after":"This one has a stronger battery."},{"npc":"Would you like to buy it today?","npcNe":"आज नै किन्न चाहनुहुन्छ?","goal":"वारेन्टी छ कि छैन सोध्नुहोस्।","answer":"Does it come with a warranty?","answerNe":"के यसमा वारेन्टी छ?","bad1":"Is there a train to the airport?","bad2":"I like watermelon juice.","accept":["warranty","guarantee"],"hint":"Ask “Does it come with…?” to check what is included.","after":"Yes, it has a one-year warranty."}]},{"id":"directions","emoji":"🗺️","title":"Ask for directions","ne":"बाटो सोध्नु","category":"Travel","place":"City street · सहरको सडक","partner":"Local resident","level":"Easy","steps":[{"npc":"Excuse me, can I help you?","npcNe":"माफ गर्नुहोस्, म मद्दत गर्न सक्छु?","goal":"अस्पताल कहाँ छ भनेर सोध्नुहोस्।","answer":"Could you tell me where the hospital is?","answerNe":"अस्पताल कहाँ छ भनेर बताइदिनुहुन्छ?","bad1":"I would like to buy a shirt.","bad2":"I ate rice today.","accept":["where hospital","hospital direction","find hospital","get hospital"],"hint":"“Could you tell me where…?” sounds polite.","after":"The hospital is near the main road."},{"npc":"Are you walking or driving?","npcNe":"तपाईं हिँडेर जाँदै हुनुहुन्छ कि गाडीमा?","goal":"हिँडेर जाँदै छु भन्नुहोस्।","answer":"I'm walking there.","answerNe":"म हिँडेर जाँदै छु।","bad1":"My car is a yellow banana.","bad2":"I need a small shirt.","accept":["walking","on foot","walk there"],"hint":"“I'm going on foot” means walking.","after":"Great! Go straight for two blocks."},{"npc":"Do I turn left at the lights?","npcNe":"बत्ती भएको ठाउँमा बायाँ मोड्ने हो?","goal":"बायाँ मोड्नुपर्ने हो भनेर पुष्टि गर्नुहोस्।","answer":"Should I turn left at the traffic lights?","answerNe":"ट्राफिक बत्तीमा बायाँ मोड्नुपर्छ?","bad1":"My favorite food is momo.","bad2":"Where is my homework?","accept":["turn left","left at lights","left traffic"],"hint":"Use “Should I…?” to confirm directions.","after":"Yes, then the hospital will be on your right."},{"npc":"Anything else?","npcNe":"अरू केही चाहिन्छ?","goal":"धन्यवाद भन्नुहोस्।","answer":"Thank you so much for your help!","answerNe":"तपाईंको मद्दतका लागि धेरै धन्यवाद!","bad1":"Can I return this phone?","bad2":"The weather is green.","accept":["thank you","thanks"],"hint":"“Thank you so much” is friendly and natural.","after":"You're very welcome. Have a good day!"}]},{"id":"call-hospital","emoji":"☎️","title":"Call for an appointment","ne":"फोनबाट अपोइन्टमेन्ट","category":"Healthcare","place":"Phone call · टेलिफोन","partner":"Hospital receptionist","level":"Medium","steps":[{"npc":"Good morning, Valley Clinic. How may I help you?","npcNe":"शुभ प्रभात, भ्याली क्लिनिक। कसरी मद्दत गर्न सक्छु?","goal":"डाक्टरसँग भेट्ने समय मिलाउन चाहन्छु भन्नुहोस्।","answer":"I'd like to make an appointment with a doctor.","answerNe":"म डाक्टरसँग भेट्ने समय मिलाउन चाहन्छु।","bad1":"Can I order a pizza, please?","bad2":"Where can I buy a jacket?","accept":["make appointment","book appointment","see doctor","schedule visit"],"hint":"“Make an appointment” is a standard expression.","after":"Certainly. Is this for a routine visit?"},{"npc":"What is the reason for your appointment?","npcNe":"अपोइन्टमेन्टको कारण के हो?","goal":"सामान्य स्वास्थ्य जाँचका लागि हो भन्नुहोस्।","answer":"It's for a routine checkup.","answerNe":"यो सामान्य स्वास्थ्य जाँचका लागि हो।","bad1":"I need directions to the museum.","bad2":"I lost my bus ticket.","accept":["routine checkup","regular checkup","annual physical","general checkup","checkup"],"hint":"“Routine checkup” means a regular health visit.","after":"We have an opening on Thursday."},{"npc":"Would Thursday at ten work for you?","npcNe":"बिहीबार दस बजे ठीक हुन्छ?","goal":"त्यो समय ठीक छ भन्नुहोस्।","answer":"Yes, Thursday at ten works for me.","answerNe":"हो, बिहीबार दस बजे ठीक छ।","bad1":"I want a refund for my shoes.","bad2":"My phone has a nice camera.","accept":["thursday ten","thursday 10","time works","that works","yes please"],"hint":"“That works for me” means the time is convenient.","after":"Great. Please arrive fifteen minutes early."},{"npc":"Do you have any questions?","npcNe":"के तपाईंको कुनै प्रश्न छ?","goal":"के ल्याउनुपर्ने हो भनेर सोध्नुहोस्।","answer":"What should I bring to my appointment?","answerNe":"मैले अपोइन्टमेन्टमा के ल्याउनुपर्छ?","bad1":"Can I get a large coffee?","bad2":"The sky is cloudy.","accept":["what bring","need bring","bring appointment","bring insurance"],"hint":"A useful question to ask during a phone booking.","after":"Please bring your ID and insurance card, if you have one."}]},{"id":"hospital-checkin","emoji":"🏥","title":"Check in at a hospital","ne":"अस्पतालमा दर्ता","category":"Healthcare","place":"Hospital desk · अस्पताल काउन्टर","partner":"Receptionist","level":"Easy","steps":[{"npc":"Hello! How can I help you?","npcNe":"नमस्ते! म कसरी मद्दत गर्न सक्छु?","goal":"अपोइन्टमेन्ट छ भनेर भन्नुहोस्।","answer":"I have an appointment at eleven.","answerNe":"मेरो एघार बजे अपोइन्टमेन्ट छ।","bad1":"I'd like to buy apples.","bad2":"I need to return a shirt.","accept":["have appointment","appointment eleven","appointment 11"],"hint":"Start with “I have an appointment.”","after":"May I have your name, please?"},{"npc":"Can you confirm your date of birth?","npcNe":"जन्ममिति पुष्टि गर्न सक्नुहुन्छ?","goal":"जन्ममिति दिन तयार छु भन्नुहोस्, वास्तविक जानकारी आवश्यक छैन।","answer":"Yes, I can confirm my date of birth.","answerNe":"हो, म मेरो जन्ममिति पुष्टि गर्न सक्छु।","bad1":"The bus is near the lake.","bad2":"This is my shopping receipt.","accept":["confirm birth","date of birth","yes i can"],"hint":"Avoid entering real personal details in practice.","after":"Thank you. Do you have your insurance card?"},{"npc":"Do you have your insurance card?","npcNe":"बीमाको कार्ड छ?","goal":"कार्ड छ भन्नुहोस्।","answer":"Yes, I have my insurance card.","answerNe":"हो, मसँग बीमाको कार्ड छ।","bad1":"I'd like some hot tea.","bad2":"Can you repair my phone?","accept":["insurance card","have insurance","here my card"],"hint":"“Here is my insurance card” also works.","after":"Thanks. Please take a seat."},{"npc":"Do you know where to wait?","npcNe":"कहाँ पर्खने थाहा छ?","goal":"कहाँ बस्ने भनेर सोध्नुहोस्।","answer":"Where should I wait, please?","answerNe":"म कहाँ पर्खनुपर्छ?","bad1":"How expensive is this phone?","bad2":"I want a refund.","accept":["where wait","where sit","waiting area"],"hint":"Use “Where should I…?” for directions.","after":"Please wait in the seating area over there."}]},{"id":"restaurant","emoji":"🍽️","title":"Order at a restaurant","ne":"रेस्टुरेन्टमा खाना","category":"Food & Drink","place":"Restaurant · रेस्टुरेन्ट","partner":"Server","level":"Easy","steps":[{"npc":"Welcome! How many people are dining?","npcNe":"स्वागत छ! कति जना खाना खानुहुन्छ?","goal":"दुई जनाका लागि टेबल माग्नुहोस्।","answer":"A table for two, please.","answerNe":"कृपया दुई जनाका लागि टेबल।","bad1":"I need to buy a phone.","bad2":"I want to catch a bus.","accept":["table two","two people","two please"],"hint":"“A table for two” is a useful restaurant phrase.","after":"Right this way. Here are your menus."},{"npc":"Are you ready to order?","npcNe":"अर्डर दिन तयार हुनुहुन्छ?","goal":"मोमो र पानी माग्नुहोस्।","answer":"I'd like momo and a glass of water, please.","answerNe":"म मोमो र एक गिलास पानी चाहन्छु।","bad1":"I need a refund for my shirt.","bad2":"Where is the train station?","accept":["momo water","momo glass","order momo"],"hint":"“I'd like…” is more polite than “Give me…”.","after":"Sure! Would you like anything else?"},{"npc":"Would you like your food spicy?","npcNe":"खाना पिरो चाहिन्छ?","goal":"अलि कम पिरो बनाउन अनुरोध गर्नुहोस्।","answer":"Could you make it less spicy, please?","answerNe":"कृपया अलि कम पिरो बनाइदिनुहुन्छ?","bad1":"Can I borrow your notebook?","bad2":"I like new phones.","accept":["less spicy","not too spicy","mild please","not spicy"],"hint":"Use “Could you…?” for a polite request.","after":"Of course. I'll ask the kitchen."},{"npc":"How was your meal?","npcNe":"खाना कस्तो लाग्यो?","goal":"खाना मिठो थियो र बिल चाहिन्छ भन्नुहोस्।","answer":"It was delicious. Could we have the bill, please?","answerNe":"खाना मिठो थियो। बिल दिनुहुन्छ?","bad1":"Can you show me the hospital?","bad2":"I forgot my homework.","accept":["delicious bill","bill please","check please","food good bill"],"hint":"“The bill” or “the check” is natural.","after":"Thank you! I'll bring the bill now."}]},{"id":"groceries","emoji":"🛒","title":"Grocery shopping","ne":"किराना किनमेल","category":"Shopping","place":"Grocery store · किराना पसल","partner":"Store worker","level":"Easy","steps":[{"npc":"Hi! Are you looking for something?","npcNe":"नमस्ते! तपाईं केही खोज्दै हुनुहुन्छ?","goal":"स्याउ कहाँ छ भनेर सोध्नुहोस्।","answer":"Where can I find the apples?","answerNe":"स्याउ कहाँ पाउँछु?","bad1":"I need a doctor.","bad2":"Where is the hotel?","accept":["find apples","where apples","apples aisle"],"hint":"“Where can I find…?” helps in stores.","after":"The apples are in the produce section."},{"npc":"Do you need anything else?","npcNe":"अरू केही चाहिन्छ?","goal":"ताजा सागसब्जी पनि चाहिन्छ भन्नुहोस्।","answer":"Yes, I'm looking for fresh vegetables too.","answerNe":"हो, मलाई ताजा तरकारी पनि चाहिन्छ।","bad1":"My train is leaving soon.","bad2":"I'd like a room with a view.","accept":["fresh vegetables","looking vegetables","need vegetables"],"hint":"“Fresh produce” includes fruits and vegetables.","after":"They are beside the fruit."},{"npc":"Would you like a bag?","npcNe":"झोला चाहिन्छ?","goal":"पुनःप्रयोग गर्न मिल्ने झोला छ भन्नुहोस्।","answer":"No, thank you. I brought my own bag.","answerNe":"पर्दैन, धन्यवाद। मैले आफ्नै झोला ल्याएको छु।","bad1":"Please book my flight.","bad2":"I need to return my car.","accept":["own bag","brought bag","have bag","no bag"],"hint":"You can politely decline with “No, thank you.”","after":"Great! Have a good day."}]},{"id":"pharmacy","emoji":"💊","title":"At the pharmacy","ne":"औषधि पसलमा","category":"Healthcare","place":"Pharmacy · औषधि पसल","partner":"Pharmacist","level":"Medium","steps":[{"npc":"Hello, what can I help you find?","npcNe":"नमस्ते, के खोज्न मद्दत गरौं?","goal":"सामान्य दुखाइका लागि औषधिबारे सोध्न चाहन्छु भन्नुहोस्।","answer":"Could I ask about medicine for a headache?","answerNe":"टाउको दुखाइका लागि औषधिबारे सोध्न मिल्छ?","bad1":"I want to buy a winter coat.","bad2":"Can you show me your phones?","accept":["medicine headache","headache medicine","headache relief"],"hint":"This is language practice, not medication advice.","after":"Of course. Are you taking any other medicines?"},{"npc":"Do you have any allergies?","npcNe":"के तपाईंलाई कुनै एलर्जी छ?","goal":"थाहा छैन, डाक्टर वा फार्मासिस्टसँग जाँच्न चाहन्छु भन्नुहोस्।","answer":"I'm not sure. Could you help me check?","answerNe":"मलाई निश्चित छैन। जाँच्न मद्दत गर्नुहुन्छ?","bad1":"I would like a restaurant table.","bad2":"My shirt is too small.","accept":["not sure check","help check","ask doctor","check allergies"],"hint":"It's okay to say when you do not know something.","after":"Of course. We can talk through the information."},{"npc":"Do you have any other questions?","npcNe":"अरू कुनै प्रश्न छ?","goal":"औषधिको निर्देशन कहाँ पढ्ने भनेर सोध्नुहोस्।","answer":"Where can I read the instructions?","answerNe":"म निर्देशन कहाँ पढ्न सक्छु?","bad1":"Where is the airport gate?","bad2":"Can I get more rice?","accept":["read instructions","medicine directions","instructions label"],"hint":"Always ask a qualified professional about medicines.","after":"The instructions are on the label. Please ask us if anything is unclear."}]},{"id":"coffee","emoji":"☕","title":"Order at a café","ne":"क्याफेमा अर्डर","category":"Food & Drink","place":"Café · क्याफे","partner":"Barista","level":"Easy","steps":[{"npc":"Hi! What can I get for you?","npcNe":"नमस्ते! तपाईंलाई के चाहिन्छ?","goal":"एउटा सानो चिया माग्नुहोस्।","answer":"Could I have a small tea, please?","answerNe":"मलाई एउटा सानो चिया दिनुहुन्छ?","bad1":"Can you fix my bicycle?","bad2":"I need to find a doctor.","accept":["small tea","tea please","cup tea"],"hint":"“Could I have…?” is polite in cafés.","after":"Sure. Would you like sugar?"},{"npc":"Would you like sugar?","npcNe":"चिनी हाल्ने?","goal":"चिनी नहाल्ने भन्नुहोस्।","answer":"No sugar, please.","answerNe":"कृपया चिनी नहाल्नुहोस्।","bad1":"I need a new jacket.","bad2":"I am going to Pokhara.","accept":["no sugar","without sugar","skip sugar"],"hint":"“Without sugar” is another way to say this.","after":"No problem. Anything else?"},{"npc":"Is that for here or to go?","npcNe":"यहीँ खाने कि लैजाने?","goal":"लैजाने भन्नुहोस्।","answer":"To go, please.","answerNe":"लैजान्छु, कृपया।","bad1":"I need an appointment.","bad2":"The phone is broken.","accept":["to go","take away","takeout"],"hint":"“To go” is common in American English.","after":"Okay! Your tea will be ready soon."}]},{"id":"interview","emoji":"💼","title":"Job interview","ne":"जागिर अन्तर्वार्ता","category":"Work","place":"Office interview · कार्यालय","partner":"Interviewer","level":"Medium","steps":[{"npc":"Welcome. Can you introduce yourself?","npcNe":"स्वागत छ। आफ्नो परिचय दिन सक्नुहुन्छ?","goal":"आफ्नो परिचय दिनुहोस्, नाम काल्पनिक राख्न सकिन्छ।","answer":"My name is Sita, and I'm happy to be here.","answerNe":"मेरो नाम सीता हो। यहाँ आउन पाउँदा खुशी छु।","bad1":"Where can I buy tomatoes?","bad2":"I would like two coffees.","accept":["my name","happy here","glad here","thank you opportunity"],"hint":"Start with a confident, simple greeting.","after":"Nice to meet you, Sita."},{"npc":"Why are you interested in this job?","npcNe":"यो जागिरमा तपाईंको रुचि किन छ?","goal":"सिक्न र ग्राहकलाई मद्दत गर्न मन पर्छ भन्नुहोस्।","answer":"I enjoy helping customers and learning new skills.","answerNe":"मलाई ग्राहकलाई मद्दत गर्न र नयाँ सीप सिक्न मन पर्छ।","bad1":"I need a refund for my shoes.","bad2":"My friend lives by a lake.","accept":["help customers","learn skills","like job","interested work"],"hint":"Show how your interests match the position.","after":"That's great."},{"npc":"What is one of your strengths?","npcNe":"तपाईंको एउटा राम्रो पक्ष के हो?","goal":"समयमा पुग्छु र जिम्मेवारीपूर्वक काम गर्छु भन्नुहोस्।","answer":"I'm reliable and I arrive on time.","answerNe":"म भरपर्दो छु र समयमा आइपुग्छु।","bad1":"I would like spicy momo.","bad2":"Where is the bathroom?","accept":["reliable","on time","punctual","responsible"],"hint":"Use an example when you describe a strength.","after":"Thank you."},{"npc":"Do you have any questions for us?","npcNe":"हामीलाई सोध्नुपर्ने केही प्रश्न छ?","goal":"तालिमबारे सोध्नुहोस्।","answer":"What training will I receive?","answerNe":"मैले कस्तो तालिम पाउँछु?","bad1":"Can you give me a taxi?","bad2":"I'd like a large orange juice.","accept":["training","learn role","onboarding"],"hint":"Asking questions shows interest.","after":"Good question. Let me explain our training process."}]},{"id":"work-shift","emoji":"🧰","title":"At work","ne":"काममा कुराकानी","category":"Work","place":"Workplace · कार्यस्थल","partner":"Supervisor","level":"Easy","steps":[{"npc":"Good morning! Are you ready for your shift?","npcNe":"शुभ प्रभात! कामका लागि तयार हुनुहुन्छ?","goal":"काम सुरु गर्न तयार छु भन्नुहोस्।","answer":"Yes, I'm ready to start my shift.","answerNe":"हो, म काम सुरु गर्न तयार छु।","bad1":"I need a plane ticket.","bad2":"I like that blue mountain.","accept":["ready shift","ready start","ready work"],"hint":"“I'm ready to start” is a useful work phrase.","after":"Great. Please check the deliveries first."},{"npc":"Can you check the inventory?","npcNe":"सामानको मौज्दात जाँच्न सक्नुहुन्छ?","goal":"अवश्य, अहिले जाँच गर्छु भन्नुहोस्।","answer":"Sure, I'll check the inventory now.","answerNe":"अवश्य, म अहिले मौज्दात जाँच्छु।","bad1":"Please bring my restaurant bill.","bad2":"This shirt is too small.","accept":["check inventory","count stock","check stock"],"hint":"“I'll…” is short for “I will…”.","after":"Thanks. Let me know when you're finished."},{"npc":"Have you finished counting?","npcNe":"गन्ने काम सक्नुभयो?","goal":"काम सकें र सामान थप्नुपर्छ भन्नुहोस्।","answer":"Yes, I've finished, but we need more supplies.","answerNe":"हो, मैले सकेँ तर थप सामान चाहिन्छ।","bad1":"I need an apple for my lunch.","bad2":"I am visiting the hospital.","accept":["finished supplies","done need more","finished stock"],"hint":"“I've finished” uses present perfect.","after":"Thanks for the update. We'll order more."}]},{"id":"take-bus","emoji":"🚌","title":"Take public transport","ne":"बस यात्रा","category":"Travel","place":"Bus stop · बस स्टप","partner":"Driver","level":"Easy","steps":[{"npc":"Hello! Where are you going?","npcNe":"नमस्ते! तपाईं कहाँ जाँदै हुनुहुन्छ?","goal":"सहरको केन्द्र जान चाहन्छु भन्नुहोस्।","answer":"I'd like to go downtown, please.","answerNe":"म सहरको केन्द्र जान चाहन्छु।","bad1":"Can I make a doctor appointment?","bad2":"I bought a new shirt.","accept":["go downtown","to downtown","city center"],"hint":"“Downtown” is common in US cities.","after":"Sure. This bus goes downtown."},{"npc":"How many tickets do you need?","npcNe":"कति टिकट चाहिन्छ?","goal":"एउटा टिकट चाहिन्छ भन्नुहोस्।","answer":"One ticket, please.","answerNe":"एउटा टिकट दिनुहोस्।","bad1":"I need three tomatoes.","bad2":"My phone is charging.","accept":["one ticket","single ticket","just one"],"hint":"Keep ticket requests simple.","after":"Here you go."},{"npc":"Do you want to know where to get off?","npcNe":"कहाँ ओर्लिने जान्न चाहनुहुन्छ?","goal":"सहर केन्द्रमा पुगेपछि बताइदिन भन्नुहोस्।","answer":"Could you tell me when we reach downtown?","answerNe":"सहरको केन्द्र पुगेपछि बताइदिनुहुन्छ?","bad1":"Can I exchange these shoes?","bad2":"Is the food very spicy?","accept":["tell downtown","reach downtown","when get off","stop downtown"],"hint":"“Tell me when…” is helpful on public transport.","after":"Of course. I'll let you know."}]},{"id":"hotel","emoji":"🏨","title":"Check in at a hotel","ne":"होटलमा चेकइन","category":"Travel","place":"Hotel desk · होटल काउन्टर","partner":"Receptionist","level":"Easy","steps":[{"npc":"Welcome! Do you have a reservation?","npcNe":"स्वागत छ! कोठा बुक गर्नुभएको छ?","goal":"बुक गरेको छु भन्नुहोस्।","answer":"Yes, I have a reservation.","answerNe":"हो, मैले कोठा बुक गरेको छु।","bad1":"I need a doctor's appointment.","bad2":"I would like to order momo.","accept":["have reservation","booked room","booking"],"hint":"“Reservation” and “booking” are both used.","after":"Wonderful. May I have your name?"},{"npc":"Would you prefer one bed or two?","npcNe":"एउटा बेड कि दुई वटा?","goal":"एउटा ठूलो बेड चाहिन्छ भन्नुहोस्।","answer":"One large bed, please.","answerNe":"एउटा ठूलो बेड चाहिन्छ।","bad1":"I bought two phones.","bad2":"Please give me two sandwiches.","accept":["one large bed","one bed","single large bed"],"hint":"“I'd prefer one large bed” also works.","after":"No problem."},{"npc":"Do you need help with your luggage?","npcNe":"सामानसँग मद्दत चाहिन्छ?","goal":"सामान कोठासम्म लैजान मद्दत माग्नुहोस्।","answer":"Could someone help me carry my luggage?","answerNe":"कसैले मेरो सामान बोक्न मद्दत गर्नुहुन्छ?","bad1":"Where can I return a shirt?","bad2":"Can I order more tea?","accept":["help luggage","carry luggage","help bags","carry bags"],"hint":"“Could someone help…?” is a polite request.","after":"Of course. Someone will help you."}]},{"id":"airport","emoji":"✈️","title":"At the airport","ne":"विमानस्थलमा","category":"Travel","place":"Airport · विमानस्थल","partner":"Airline agent","level":"Medium","steps":[{"npc":"Good afternoon! Where are you flying today?","npcNe":"शुभ दिउँसो! आज कहाँ उड्दै हुनुहुन्छ?","goal":"पोखरा जाँदै छु भन्नुहोस्।","answer":"I'm flying to Pokhara today.","answerNe":"म आज पोखरा उड्दै छु।","bad1":"I need a new phone.","bad2":"I'd like some vegetables.","accept":["flying pokhara","going pokhara","flight pokhara"],"hint":"“I'm flying to…” names your destination.","after":"May I see your travel document?"},{"npc":"Are you checking a bag?","npcNe":"सामान चेकइन गर्दै हुनुहुन्छ?","goal":"एउटा झोला चेकइन गर्न चाहन्छु भन्नुहोस्।","answer":"Yes, I'd like to check one bag.","answerNe":"हो, म एउटा झोला चेकइन गर्न चाहन्छु।","bad1":"Can you exchange my shirt?","bad2":"I need a cup of tea.","accept":["check one bag","one checked bag","check bag"],"hint":"“Check a bag” means putting it in the aircraft hold.","after":"Thank you. Here is your boarding pass."},{"npc":"Do you know where your gate is?","npcNe":"गेट कहाँ छ थाहा छ?","goal":"गेट कहाँ छ भनेर सोध्नुहोस्।","answer":"Could you tell me where my gate is?","answerNe":"मेरो गेट कहाँ छ बताइदिनुहुन्छ?","bad1":"Can you book my hospital visit?","bad2":"Where is the nearest shoe store?","accept":["where gate","find gate","which gate"],"hint":"“Gate” means the boarding area.","after":"It's Gate 6, straight ahead."}]},{"id":"bank","emoji":"🏦","title":"At a bank","ne":"बैंकमा कुराकानी","category":"Services","place":"Bank counter · बैंक काउन्टर","partner":"Teller","level":"Medium","steps":[{"npc":"Hello! How may I help you?","npcNe":"नमस्ते! कसरी मद्दत गर्न सक्छु?","goal":"खाता बारे प्रश्न छ भन्नुहोस्।","answer":"I have a question about my account.","answerNe":"मलाई मेरो खाताबारे प्रश्न छ।","bad1":"I'd like a table for three.","bad2":"Where is the bus station?","accept":["question account","help account","about account"],"hint":"You do not need to give private account information in practice.","after":"Certainly. What would you like to know?"},{"npc":"Do you need a statement?","npcNe":"स्टेटमेन्ट चाहिन्छ?","goal":"गत महिनाको स्टेटमेन्ट चाहिन्छ भन्नुहोस्।","answer":"Yes, I'd like last month's statement.","answerNe":"हो, मलाई गत महिनाको स्टेटमेन्ट चाहिन्छ।","bad1":"I'd like a bowl of soup.","bad2":"Can you wash my clothes?","accept":["last month statement","bank statement","monthly statement"],"hint":"“I'd like…” is a courteous request.","after":"I can help with that."},{"npc":"Anything else today?","npcNe":"आज अरू केही चाहिन्छ?","goal":"काम सकियो धन्यवाद भन्नुहोस्।","answer":"That's all, thank you for your help.","answerNe":"यति नै हो, मद्दतका लागि धन्यवाद।","bad1":"I'd like to travel to Pokhara.","bad2":"I need to make a hotel reservation.","accept":["that's all","thank you","thanks","no more"],"hint":"“That's all” is useful when you are done.","after":"You're welcome! Have a nice day."}]},{"id":"phone-repair","emoji":"🛠️","title":"Repair a phone","ne":"फोन मर्मत","category":"Shopping","place":"Repair shop · मर्मत पसल","partner":"Technician","level":"Easy","steps":[{"npc":"Hi there! What's wrong with your phone?","npcNe":"नमस्ते! फोनमा के समस्या छ?","goal":"फोनको स्क्रिन फुटेको छ भन्नुहोस्।","answer":"My phone screen is cracked.","answerNe":"मेरो फोनको स्क्रिन फुटेको छ।","bad1":"I need a hotel reservation.","bad2":"Can I buy some potatoes?","accept":["screen cracked","cracked screen","screen broken","broken screen"],"hint":"“Cracked” means there are lines or breaks in glass.","after":"I see. When did that happen?"},{"npc":"Does the phone still turn on?","npcNe":"फोन अझै चल्छ?","goal":"फोन चल्छ तर टचले काम गर्दैन भन्नुहोस्।","answer":"It turns on, but the touch screen doesn't work.","answerNe":"फोन खुल्छ तर टच स्क्रिनले काम गर्दैन।","bad1":"The soup is delicious.","bad2":"My school is nearby.","accept":["turns on touch","touch not work","screen not respond","touch broken"],"hint":"“It turns on” means the device powers up.","after":"Let me examine it."},{"npc":"Would you like a repair estimate?","npcNe":"मर्मत खर्चको अनुमान चाहिन्छ?","goal":"मर्मत कति खर्च पर्छ भनेर सोध्नुहोस्।","answer":"How much will the repair cost?","answerNe":"मर्मत कति खर्च लाग्छ?","bad1":"Where can I get a bus ticket?","bad2":"I'd like coffee with milk.","accept":["repair cost","how much fix","price repair","estimate cost"],"hint":"Always ask for an estimate before approving work.","after":"I'll check and give you an estimate."}]},{"id":"new-friend","emoji":"🤝","title":"Meet someone new","ne":"नयाँ साथी भेट्ने","category":"Everyday","place":"Community event · भेटघाट","partner":"New friend","level":"Easy","steps":[{"npc":"Hi! I don't think we've met. What's your name?","npcNe":"नमस्ते! हामी पहिले भेटेका छैनौं होला। नाम के हो?","goal":"आफ्नो नाम काल्पनिक राखेर परिचय दिनुहोस्।","answer":"Hi, I'm Sita. Nice to meet you!","answerNe":"नमस्ते, म सीता हुँ। भेटेर खुशी लाग्यो।","bad1":"Can I get my money back?","bad2":"Where is the supermarket?","accept":["i'm sita","my name","nice meet","im sita"],"hint":"Introduce yourself and say “Nice to meet you.”","after":"Nice to meet you too, Sita!"},{"npc":"Where are you from?","npcNe":"तपाईं कहाँबाट हुनुहुन्छ?","goal":"नेपालबाट आएको भन्नुहोस्।","answer":"I'm originally from Nepal.","answerNe":"म मूलतः नेपालबाट हुँ।","bad1":"I would like one bus ticket.","bad2":"My phone screen is cracked.","accept":["from nepal","originally nepal","nepal"],"hint":"“Originally from” describes where you are from.","after":"That's wonderful!"},{"npc":"What do you like doing in your free time?","npcNe":"फुर्सदमा के गर्न मन पर्छ?","goal":"घुम्न र किताब पढ्न मन पर्छ भन्नुहोस्।","answer":"I enjoy traveling and reading books.","answerNe":"मलाई घुम्न र किताब पढ्न मन पर्छ।","bad1":"I need a receipt for a shirt.","bad2":"My doctor is in the hospital.","accept":["travel reading","read books","enjoy reading","like travel"],"hint":"“I enjoy…” is a natural way to describe hobbies.","after":"Me too! It was nice talking with you."}]},{"id":"school-help","emoji":"📚","title":"Ask a teacher","ne":"शिक्षकसँग कुराकानी","category":"Everyday","place":"Classroom · कक्षाकोठा","partner":"Teacher","level":"Easy","steps":[{"npc":"Good morning! Do you have a question?","npcNe":"शुभ प्रभात! कुनै प्रश्न छ?","goal":"एउटा शब्दको अर्थ बुझिनँ भन्नुहोस्।","answer":"I don't understand this word.","answerNe":"म यो शब्द बुझ्दिनँ।","bad1":"I want to buy a new phone.","bad2":"Where can I return my shirt?","accept":["don't understand word","meaning word","what means"],"hint":"“I don't understand…” is okay to say in class.","after":"No problem. Let's look at it together."},{"npc":"Would you like another example?","npcNe":"अर्को उदाहरण चाहिन्छ?","goal":"अर्को उदाहरण दिनुहोस् भन्नुहोस्।","answer":"Could you give me another example?","answerNe":"अर्को उदाहरण दिनुहुन्छ?","bad1":"How much is this shirt?","bad2":"Please give me a hospital appointment.","accept":["another example","more examples","example please"],"hint":"“Could you…” is polite when asking a teacher.","after":"Of course! Here's another example."},{"npc":"Does that make sense now?","npcNe":"अहिले बुझ्नुभयो?","goal":"अहिले बुझेँ, धन्यवाद भन्नुहोस्।","answer":"Yes, I understand now. Thank you!","answerNe":"हो, अहिले बुझें। धन्यवाद।","bad1":"I need a taxi to the airport.","bad2":"I like my new shoes.","accept":["understand now","got it thank","yes thank"],"hint":"“I understand now” shows progress.","after":"Excellent! Keep practicing."}]}];
 const topics=['All','Shopping','Healthcare','Food & Drink','Travel','Work','Services','Everyday'];
 
@@ -563,6 +563,69 @@ function coachShuffleOptions(items){
  return copy;
 }
 
+
+/* At least one genuine alternate storyline in each of the 28 subjects.
+ * Each branch has its own translated follow-up; scripted practice only.
+ * All other turns provide equivalent natural phrasings (not fake wrong answers).
+ */
+const coachSceneAlternateChoices={"buy-phone":{"trigger":"Would you like to hold the phone?","alternatives":[{"value":"Not yet. Could you tell me how heavy it is?","ne":"अहिले होइन। कति भारी छ बताउनुहुन्छ?","followup":["Of course. Would you also like to compare its size with another model?","अवश्य। अर्को मोडलसँग आकार पनि तुलना गर्न चाहनुहुन्छ?","Yes, please show me the smaller model.","हो, सानो मोडल पनि देखाउनुहोस्।"]}]},"directions":{"trigger":"Which entrance are you looking for?","alternatives":[{"value":"I need the accessible side entrance.","ne":"मलाई सजिलै छिर्न मिल्ने छेउको प्रवेशद्वार चाहिन्छ।","followup":["The side entrance is nearby. Would you like step-free directions?","छेउको प्रवेशद्वार नजिकै छ। सिँढी नभएको बाटो बताऊँ?","Yes, a step-free route would be helpful.","हो, सिँढी नभएको बाटो उपयोगी हुन्छ।"]}]},"call-hospital":{"trigger":"Are you an existing patient?","alternatives":[{"value":"No, this would be my first visit.","ne":"होइन, यो मेरो पहिलो भेट हुनेछ।","followup":["Welcome. Would you like me to explain the new-patient registration process?","स्वागत छ। नयाँ बिरामीको दर्ता प्रक्रिया बुझाऊँ?","Yes, please explain the first steps.","हो, सुरुको प्रक्रिया बुझाउनुहोस्।"]}]},"hospital-checkin":{"trigger":"Did you find the correct reception desk?","alternatives":[{"value":"No, I am not sure this is the right desk.","ne":"होइन, यही सही काउन्टर हो कि थाहा छैन।","followup":["No problem. Would you like me to check which department you need?","चिन्ता नगर्नुहोस्। कुन विभाग चाहिन्छ जाँच गरूँ?","Yes, please help me find the right department.","हो, सही विभाग भेट्टाउन मद्दत गर्नुहोस्।"]}]},"restaurant":{"trigger":"Would you like a table by the window?","alternatives":[{"value":"Could we have a quiet table away from the door instead?","ne":"सट्टामा ढोकाबाट टाढाको शान्त टेबल दिनुहुन्छ?","followup":["Certainly. Would a table toward the back work for you?","अवश्य। पछाडितिरको टेबल ठीक हुन्छ?","Yes, that would be lovely. Thank you.","हो, त्यो राम्रो हुन्छ। धन्यवाद।"]}]},"groceries":{"trigger":"Do you have a shopping list today?","alternatives":[{"value":"No, I am just looking for ingredients for dinner.","ne":"होइन, म बेलुकीको खानाका सामग्री हेर्दै छु।","followup":["I can help. Are you looking for vegetables or something else first?","म मद्दत गर्न सक्छु। पहिले तरकारी चाहिएको हो कि अरू केही?","Could you show me the vegetable section?","तरकारी भएको ठाउँ देखाउनुहुन्छ?"]}]},"pharmacy":{"trigger":"Are you picking up a prescription today?","alternatives":[{"value":"Yes, I am here to collect a refill.","ne":"हो, म औषधि फेरि लिन आएको हुँ।","followup":["Of course. Would you like us to check if the refill is ready?","अवश्य। औषधि तयार छ कि जाँच गरौँ?","Yes, please check whether it is ready.","हो, तयार छ कि जाँच गर्नुहोस्।"]}]},"coffee":{"trigger":"Are you ordering for yourself?","alternatives":[{"value":"No, I am ordering drinks for two people.","ne":"होइन, म दुई जनाका लागि पेय अर्डर गर्दै छु।","followup":["Thanks for letting me know. Would you like both drinks in the same size?","जानकारीका लागि धन्यवाद। दुवै पेय एउटै साइजमा चाहिन्छ?","Yes, the same size would be great.","हो, एउटै साइज ठीक हुन्छ।"]}]},"interview":{"trigger":"What interested you in this position?","alternatives":[{"value":"I enjoy learning how technology works and helping people.","ne":"मलाई प्रविधि सिक्न र मानिसलाई मद्दत गर्न मन पर्छ।","followup":["That is useful. Could you share an example of helping someone?","त्यो उपयोगी छ। कसैलाई मद्दत गरेको उदाहरण दिनुहुन्छ?","Yes, I helped a customer solve a phone problem.","हो, मैले ग्राहकको फोनको समस्या समाधान गर्न मद्दत गरेँ।"]}]},"work-shift":{"trigger":"Could you check the delivery list?","alternatives":[{"value":"Yes, but may I count the boxes before I confirm it?","ne":"हो, तर पुष्टि गर्नुअघि बाकस गन्न सक्छु?","followup":["Good idea. Can you tell me if the quantities match afterward?","राम्रो विचार। त्यसपछि संख्या मिल्यो कि बताउनुहुन्छ?","Yes, I will report any missing items.","हो, कम सामान भए जानकारी दिन्छु।"]}]},"take-bus":{"trigger":"Are you waiting for the downtown bus?","alternatives":[{"value":"No, I am waiting for the bus to the airport.","ne":"होइन, म विमानस्थल जाने बस पर्खिरहेको छु।","followup":["This stop serves different routes. Would you like help checking the airport bus?","यहाँ विभिन्न रुटका बस आउँछन्। विमानस्थल जाने बस जाँचौँ?","Yes, please help me check the route.","हो, रुट जाँच्न मद्दत गर्नुहोस्।"]}]},"hotel":{"trigger":"How many nights will you stay?","alternatives":[{"value":"I will be staying for just one night.","ne":"म एक रात मात्र बस्नेछु।","followup":["Thank you. Would you like to know tomorrow's checkout time?","धन्यवाद। भोलिको चेकआउट समय जान्न चाहनुहुन्छ?","Yes, what time should I check out?","हो, कति बजे चेकआउट गर्नुपर्छ?"]}]},"airport":{"trigger":"Are you checking in for your flight?","alternatives":[{"value":"I need to check in, but I cannot find the counter.","ne":"मलाई चेकइन गर्नुछ, तर काउन्टर भेटेको छैन।","followup":["I can help. Would you like directions to the airline counter?","म मद्दत गर्छु। एयरलाइन्स काउन्टरको बाटो चाहिन्छ?","Yes, please tell me where it is.","हो, त्यो कहाँ छ बताउनुहोस्।"]}]},"bank":{"trigger":"What brings you to the branch today?","alternatives":[{"value":"I have a question about the monthly account fee.","ne":"मलाई खाताको मासिक शुल्कबारे प्रश्न छ।","followup":["I can explain the fees. Would you like us to review the recent charge first?","म शुल्क बुझाउन सक्छु। पहिले हालको शुल्क जाँचौँ?","Yes, please explain that charge.","हो, त्यो शुल्क बुझाउनुहोस्।"]}]},"phone-repair":{"trigger":"When did you first notice the problem?","alternatives":[{"value":"The screen started freezing after the phone fell.","ne":"फोन खसेपछि स्क्रिन अड्किन थाल्यो।","followup":["I see. Does it freeze in every app or just one?","बुझेँ। सबै एपमा अड्किन्छ कि एउटामा मात्र?","It happens in several apps.","धेरै एपमा यस्तो हुन्छ।"]}]},"new-friend":{"trigger":"Is this your first time at this event?","alternatives":[{"value":"No, I came here once last year.","ne":"होइन, गत वर्ष पनि एकपटक आएको थिएँ।","followup":["Welcome back! Did you enjoy the event last year?","फेरि स्वागत छ! गत वर्षको कार्यक्रम रमाइलो लागेको थियो?","Yes, I met some friendly people.","हो, केही मिलनसार मानिस भेटेको थिएँ।"]}]},"school-help":{"trigger":"What part of the lesson is difficult?","alternatives":[{"value":"I understand the sentences, but I am confused about verb tenses.","ne":"म वाक्य बुझ्छु, तर क्रियाको कालमा अलमल हुन्छ।","followup":["Let's work on that. Would you like to compare past and present tense?","त्यसैमा अभ्यास गरौँ। भूत र वर्तमान काल तुलना गर्ने?","Yes, an example would help.","हो, उदाहरणले मद्दत गर्छ।"]}]},"rent-home":{"trigger":"What is your preferred move-in date?","alternatives":[{"value":"I can move in as soon as the apartment is available.","ne":"घर खाली हुनासाथ सर्न सक्छु।","followup":["Understood. Would you like to discuss the earliest possible move-in date?","बुझेँ। सबैभन्दा चाँडो सर्न सकिने मितिबारे कुरा गर्ने?","Yes, please tell me the earliest date.","हो, सबैभन्दा चाँडो मिति बताउनुहोस्।"]}]},"home-internet":{"trigger":"How many people use the internet at home?","alternatives":[{"value":"Four people use it for work and school.","ne":"घरमा चार जनाले काम र पढाइका लागि इन्टरनेट चलाउँछन्।","followup":["Thanks. Do several people make video calls at the same time?","धन्यवाद। धेरै जनाले एकै समयमा भिडियो कल गर्छन्?","Yes, that happens often in our home.","हो, हाम्रो घरमा त्यो प्रायः हुन्छ।"]}]},"delivery-help":{"trigger":"What item are you waiting for?","alternatives":[{"value":"I am waiting for a winter jacket.","ne":"म जाडोको ज्याकेट पर्खिरहेको छु।","followup":["Thanks. Was the jacket part of one order or several packages?","धन्यवाद। त्यो ज्याकेट एउटै अर्डरको हो कि धेरै प्याकेजको?","It was part of one order.","त्यो एउटै अर्डरको भाग थियो।"]}]},"dental-office":{"trigger":"Is this your first visit to our office?","alternatives":[{"value":"No, I visited this dental office last year.","ne":"होइन, म गत वर्ष यो दन्त क्लिनिक आएको थिएँ।","followup":["Welcome back. Would you like us to check your previous appointment information?","फेरि स्वागत छ। अघिल्लो भेटको विवरण जाँचौँ?","Yes, please check the previous record.","हो, अघिल्लो विवरण जाँच्नुहोस्।"]}]},"parent-meeting":{"trigger":"How has your child been doing at home?","alternatives":[{"value":"My child enjoys math but needs extra help with reading.","ne":"मेरो बच्चालाई गणित मन पर्छ, तर पढाइमा थप मद्दत चाहिन्छ।","followup":["Thank you. Would you like some easy reading practice ideas for home?","धन्यवाद। घरमा पढ्ने सजिला अभ्यासका सुझाव चाहिन्छ?","Yes, please recommend some activities.","हो, केही अभ्यास सुझाउनुहोस्।"]}]},"shift-request":{"trigger":"Which day do you need off?","alternatives":[{"value":"Could I take next Monday off instead of Friday?","ne":"शुक्रबारको सट्टा अर्को सोमबार बिदा लिन सक्छु?","followup":["I can review Monday. Is this for a personal appointment?","सोमबारको कुरा जाँच्न सक्छु। के व्यक्तिगत भेटका लागि हो?","Yes, I have an appointment that day.","हो, त्यो दिन मेरो भेट छ।"]}]},"card-lost":{"trigger":"When did you notice your card was missing?","alternatives":[{"value":"I realized it was gone last night.","ne":"हिजो राति कार्ड हराएको थाहा पाएँ।","followup":["Thank you. Have you noticed any account activity since last night?","धन्यवाद। हिजो रातिदेखि खातामा कुनै कारोबार देख्नुभयो?","I have not checked yet. I will review it.","अहिलेसम्म जाँचेको छैन। अब जाँच्छु।"]}]},"send-mail":{"trigger":"Where are you sending this package?","alternatives":[{"value":"I am sending it to my friend in India.","ne":"म यो प्याकेज भारतमा साथीलाई पठाउँदै छु।","followup":["Thanks. Would you like to compare the available international shipping services?","धन्यवाद। अन्तर्राष्ट्रिय ढुवानी विकल्प तुलना गर्ने?","Yes, please show me the available options.","हो, उपलब्ध विकल्प देखाउनुहोस्।"]}]},"car-repair":{"trigger":"What seems to be wrong with your car?","alternatives":[{"value":"The brakes squeal when I slow down.","ne":"गति घटाउँदा ब्रेकबाट चर्को आवाज आउँछ।","followup":["Thank you. Is the sound worse when the brakes are cold?","धन्यवाद। ब्रेक चिसो हुँदा आवाज बढी आउँछ?","Yes, I notice it early in the morning.","हो, बिहान त्यो बढी सुनिन्छ।"]}]},"library":{"trigger":"Are you looking for fiction or nonfiction?","alternatives":[{"value":"I would prefer a short nonfiction book about nature.","ne":"मलाई प्रकृतिबारे छोटो गैरकाल्पनिक किताब चाहिन्छ।","followup":["Nice choice. Would you like a book with pictures or mostly text?","राम्रो छनोट। चित्रसहितको किताब चाहिन्छ कि लेख मात्रै भएको?","A book with pictures would help me understand.","चित्रसहितको किताब भए बुझ्न सजिलो हुन्छ।"]}]}};
+function coachFollowUpStep(details){
+ if(!Array.isArray(details)||details.length!==4)return null;
+ return coachOfflineStep(...details);
+}
+function coachReplyVariations(value){
+ const a=String(value||'').trim();
+ if(!a)return [];
+ const forms=new Set([a]);
+ const add=next=>{if(next&&normalize(next)!==normalize(a))forms.add(next);};
+ if(/^thank you[.!]?$/i.test(a)||/^thanks[.!]?$/i.test(a)){
+  add('Thanks a lot.');add('Thank you very much.');
+  return Array.from(forms);
+ }
+ if(/^no,?\s*thank you[.!]?$/i.test(a)){
+  add("No thanks, I'm all set.");add("I'm okay, thank you.");
+  return Array.from(forms);
+ }
+ if(/^yes[,.!?]?\s*/i.test(a)){
+  const rest=a.replace(/^yes[,.!?]?\s*/i,'');
+  if(rest){add('Yes, of course. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add('Absolutely. '+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  else {add('Yes, certainly.');add('Yes, absolutely.');}
+  return Array.from(forms);
+ }
+ if(/^no[,.!?]?\s*/i.test(a)){
+  const rest=a.replace(/^no[,.!?]?\s*/i,'');
+  if(rest){add('Actually, no. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add("I'm afraid not. "+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  else{add('No, thank you.');add('Not this time, thank you.');}
+  return Array.from(forms);
+ }
+ const replacements=[
+  [/^I'd like /i,'I would like '],[/^I would like /i,"I'd like "],
+  [/^I'd prefer /i,'I would prefer '],[/^I would prefer /i,"I'd prefer "],
+  [/^Could you /i,'Can you '],[/^Can you /i,'Could you '],
+  [/^Could I /i,'May I '],[/^May I /i,'Could I '],
+  [/^I'm /i,'I am '],[/^I've /i,'I have '],[/^I'll /i,'I will '],
+  [/^I don't /i,'I do not '],[/^I can't /i,'I cannot '],
+  [/^It's /i,'It is '],[/^That's /i,'That is '],
+  [/^Thanks,/i,'Thank you,'],[/^Thank you,/i,'Thanks,'],
+  [/^I want to /i,"I'd like to "],[/^I'd like to /i,'I would like to ']
+ ];
+ for(const [pattern,replacement] of replacements)if(pattern.test(a))add(a.replace(pattern,replacement));
+ if(/^I(?:\s|')/i.test(a)&&a.length>=12)
+  add('Well, '+a);
+ if(/^Could you |^Can you /i.test(a))
+  add(a.replace(/^(?:Could|Can) you /i,'Would you please '));
+ if(/^I'd like |^I would like |^I want /i.test(a))
+  add('If possible, '+a);
+ if(!/^well,|^thank|^thanks|^sure/i.test(a)&&a.length>=18)
+  add('To clarify, '+a);
+ // For rare short phrases there may not be a direct grammatical rewrite.
+ // Distinct, polite context does not change the learner's underlying fact.
+ if(forms.size<3)add('Well, '+a);
+ if(forms.size<3)add('To be clear, '+a);
+ return Array.from(forms).slice(0,3);
+}
 function coachEquivalentReply(sentence){
  const value=String(sentence||'').trim();
  const changes=[
@@ -586,50 +649,76 @@ function coachEquivalentReply(sentence){
 
 function coachReplyOptions(step,scene){
  const line=normalize(step.npc),sceneId=scene?.id;
- const choice=(value,ne,branch)=>({value,ne,correct:true,branch:branch||null});
+ const choice=(value,ne,branch=null,followup=null)=>({
+  value,ne,correct:true,branch,followup
+ });
+ // These situations really do have different possible outcomes: model the
+ // consequences instead of pretending one predetermined answer is correct.
  if(sceneId==='return-shirt'){
-  if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line)){
+  if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I only tried it on at home.","हो, मैले घरमा लगाएर मात्र हेरेको थिएँ।"),
     choice("Yes, it is still unworn and the tags are attached.","हो, यो अझै नलगाइएको छ र ट्याग पनि छ।"),
-    choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn"),
-    {value:"I bought this shirt last Saturday.",correct:false}
+    choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn")
    ])};
-  }
-  if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line)){
+  if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I have the receipt right here.","हो, रसिद यहीँ छ।"),
     choice("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।"),
-    choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing"),
-    {value:"Could I try a different color?",correct:false}
+    choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing")
    ])};
-  }
-  if(/\b(?:damaged|wrong size)\b/.test(line)){
+  if(/\b(?:damaged|wrong size)\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("The size doesn't fit me.","यो साइज मलाई मिल्दैन।"),
     choice("The stitching is damaged.","यसको सिलाइ बिग्रेको छ।","damaged"),
-    {value:"Yes, I still have the receipt.",correct:false}
+    choice("I received the wrong color.","मैले फरक रङ पाएँ।",null,
+      ["I'm sorry. Would you like to check the color you originally ordered?","माफ गर्नुहोस्। सुरुमा मागेको रङ जाँच्ने?",
+       "Yes, I ordered a blue shirt.","हो, मैले नीलो कमिज मागेको थिएँ।"])
    ])};
-  }
-  if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line)){
+  if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("I'd prefer a refund, please.","म पैसा फिर्ता चाहन्छु।"),
     choice("I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।","exchange"),
-    {value:"I purchased it last Friday.",correct:false}
+    choice("Could you explain both options before I decide?","निर्णय गर्नुअघि दुवै विकल्प बुझाइदिनुहुन्छ?",null,
+     ["Of course. Would you like me to start with the exchange policy?","अवश्य। पहिले साट्ने नियम बताऊँ?",
+      "Yes, please explain the exchange policy first.","हो, कृपया पहिले साट्ने नियम बुझाउनुहोस्।"])
    ])};
-  }
+  if(/\bwas it bought online or in our store\b/.test(line))
+   return {multi:true,branching:true,options:coachShuffleOptions([
+    choice("I bought it in this store.","मैले यही पसलमा किनेको हुँ।",null,
+      ["Thanks. Do you remember which branch you visited?","धन्यवाद। कुन शाखामा किन्नुभएको थियो थाहा छ?",
+       "I bought it at the downtown branch.","मैले सहरको मुख्य शाखामा किनेको थिएँ।"]),
+    choice("I ordered it online.","मैले अनलाइन अर्डर गरेको थिएँ।",null,
+      ["I understand. Can you find your order confirmation email?","बुझेँ। अर्डर पुष्टि इमेल भेट्टाउन सक्नुहुन्छ?",
+       "Yes, let me check my inbox.","हो, इमेलको इनबक्स हेर्छु।"]),
+    choice("It was a gift, so I am not sure where it was bought.","यो उपहार थियो, कहाँ किनिएको हो थाहा छैन।",null,
+      ["No problem. Can you ask the person who gave it to you for a gift receipt?","ठीक छ। उपहार दिने व्यक्तिसँग रसिद माग्न सक्नुहुन्छ?",
+       "Yes, I can ask them about the receipt.","हो, रसिदबारे उहाँलाई सोध्न सक्छु।"])
+   ])};
+  if(/\bwhen did you purchase this shirt\b/.test(line))
+   return {multi:true,branching:false,options:coachShuffleOptions([
+    choice("I bought it last weekend.","मैले गएको सप्ताहन्त किनेको हुँ।"),
+    choice("I bought it yesterday.","मैले हिजो किनेको हुँ।"),
+    choice("I purchased it two weeks ago.","मैले दुई हप्ताअघि किनेको हुँ।")
+   ])};
  }
- // Safe paraphrases preserve the original meaning. Different facts or
- // opposite yes/no responses are offered only when a real next path exists.
- const sameMeaning=coachEquivalentReply(step.answer);
- const valid=[choice(step.answer,step.answerNe)];
- if(sameMeaning&&normalize(sameMeaning)!==normalize(step.answer))
-  valid.push(choice(sameMeaning,step.answerNe));
- return {multi:valid.length>1,branching:false,options:coachShuffleOptions([
-  ...valid,{value:step.bad1,correct:false},{value:step.bad2,correct:false}
- ])};
+ const special=coachSceneAlternateChoices[sceneId];
+ const trigger=special&&normalize(special.trigger);
+ if(trigger&&line.includes(trigger)){
+  const base=choice(step.answer,step.answerNe);
+  const alternatives=special.alternatives.map(v=>choice(v.value,v.ne,null,v.followup));
+  const equivalent=coachReplyVariations(step.answer)
+   .find(v=>normalize(v)!==normalize(step.answer));
+  if(equivalent)alternatives.push(choice(equivalent,step.answerNe));
+  return {multi:true,branching:true,options:coachShuffleOptions([base,...alternatives].slice(0,3))};
+ }
+ // Default: three *real*, meaning-preserving ways of saying the same thing.
+ // Never invent a false statement or a nonsensical distractor. The next
+ // question stays scripted because the underlying meaning did not change.
+ const variants=coachReplyVariations(step.answer);
+ const options=variants.slice(0,3).map(v=>choice(v,step.answerNe));
+ return {multi:true,branching:false,options:coachShuffleOptions(options)};
 }
-
 function shuffledChoices(step){
  const values=[{value:step.answer,correct:true},{value:step.bad1,correct:false},{value:step.bad2,correct:false}];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
@@ -959,7 +1048,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Practice real-life English by choosing the response that fits the conversation. Wrong choices show clear feedback, and each lesson has Nepali support. · कुराकानीमा मिल्ने उत्तर छानेर अभ्यास गर्नुहोस्।');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -1084,32 +1173,24 @@ window.enhanceCoachDashboard=function(doc){
   const feedback=add(doc,chatLayout,'section','sikau-convo-reply sikau-convo-chat-choices');
   const choiceHead=add(doc,feedback,'div','sikau-chat-choice-header');
   add(doc,choiceHead,'strong','','🎯 Your turn · तपाईंको पालो');
-  add(doc,choiceHead,'small','','Choose what YOU would say. · आफूले भन्ने उत्तर छान्नुहोस्।');
+  add(doc,choiceHead,'small','','Every choice is a possible response. · सबै विकल्प मिल्ने उत्तर हुन्।');
   const replyPlan=coachReplyOptions(step,active);
-  if(replyPlan.multi){
-   add(doc,feedback,'p','sikau-chat-multi-hint',replyPlan.branching?
-    '✨ More than one answer is valid. Your choice may change what happens next. · दुईवटा उत्तर पनि मिल्न सक्छन्।':
-    '✨ Different natural sentences can mean the same thing. · एउटै कुरा भन्न धेरै तरिका हुन्छन्।');
-  }else if(step.goal){
-   add(doc,feedback,'p','sikau-chat-goal',step.goal);
-  }
+  add(doc,feedback,'p','sikau-chat-multi-hint',replyPlan.branching?
+   '✨ All choices are possible replies. Pick the one you would actually say—your story may change. · सबै उत्तर मिल्छन्। तपाईंको अवस्था छान्नुहोस्।':
+   '✨ All three are valid ways to reply. Pick the wording you like and say it aloud. · तीनै उत्तर मिल्छन्। मन परेको छान्नुहोस्।');
   const result=add(doc,feedback,'div','sikau-convo-feedback');
   result.setAttribute('role','status');result.setAttribute('aria-live','polite');
 
-  function showResult(success,item){
+  function showResult(item){
    result.replaceChildren();
-   result.className='sikau-convo-feedback '+(success?'success':'warning');
-   add(doc,result,'strong','',success?'✅ Great! That answer works · राम्रो उत्तर!':'💡 Not related to this situation · यहाँ नमिल्ने उत्तर');
-   add(doc,result,'p','',success?
-    'You chose: '+item.value:
-    'That answer does not respond to the other person. Try a different reply.');
-   if(success&&showNepali&&item.ne)add(doc,result,'small','',item.ne);
-   if(success&&item.branch)add(doc,result,'small','','💬 The next part of the chat will follow your choice.');
-   if(success){
-    if(index===active.steps.length-1)add(doc,result,'p','sikau-convo-next-line','💬 '+active.partner+': '+step.after);
-    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
-    next.type='button';next.addEventListener('click',goNext);
-   }
+   result.className='sikau-convo-feedback success';
+   add(doc,result,'strong','','💬 Good choice! · राम्रो छनोट');
+   add(doc,result,'p','','You chose: '+item.value);
+   if(showNepali)add(doc,result,'small','',item.ne);
+   if(item.branch||item.followup)add(doc,result,'small','','Your next chat message will reflect this choice. · अबको कुराकानी यसैअनुसार अघि बढ्नेछ।');
+   const next=add(doc,result,'button','sikau-convo-primary',
+    index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
+   next.type='button';next.addEventListener('click',goNext);
   }
   const options=add(doc,feedback,'div','sikau-convo-options');
   for(const item of replyPlan.options){
@@ -1118,30 +1199,33 @@ window.enhanceCoachDashboard=function(doc){
    add(doc,b,'span','sikau-chat-option-radio','◯');
    const copy=add(doc,b,'span','sikau-chat-option-copy');
    add(doc,copy,'span','',item.value);
-   if(item.ne&&showNepali)add(doc,copy,'small','',item.ne);
+   if(showNepali)add(doc,copy,'small','',item.ne);
    b.addEventListener('click',()=>{
     if(b.disabled)return;
     attempts++;
-    if(item.correct){
-     successful++;
-     dialogueHistory[index]={reply:item.value,answerNe:item.ne||step.answerNe,
-       learnerNe:item.ne||'',kind:'guided'};
-     b.classList.add('is-correct');
-     b.querySelector('.sikau-chat-option-radio').textContent='✓';
-     options.querySelectorAll('button').forEach(x=>x.disabled=true);
-     if(item.branch){
-      const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
-      if(alternate.length){
-       active.steps.splice(index+1,active.steps.length-index-1,...alternate);
-       active.steps[index].after=alternate[0].npc;
-      }
+    successful++;
+    dialogueHistory[index]={reply:item.value,answerNe:item.ne,
+      learnerNe:item.ne,kind:'guided'};
+    b.classList.add('is-selected');
+    b.querySelector('.sikau-chat-option-radio').textContent='✓';
+    options.querySelectorAll('button').forEach(x=>x.disabled=true);
+    if(item.branch){
+     const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
+     if(alternate.length){
+      active.steps.splice(index+1,active.steps.length-index-1,...alternate);
+      active.steps[index].after=alternate[0].npc;
      }
-     showResult(true,item);
-    }else{
-     b.classList.add('is-incorrect');
-     b.querySelector('.sikau-chat-option-radio').textContent='×';
-     b.disabled=true;showResult(false,item);
+    }else if(item.followup){
+     const extra=coachFollowUpStep(item.followup);
+     if(extra){
+      // Insert one natural consequence before returning to the original
+      // conversation; retain every previous selected response.
+      active.steps.splice(index+1,0,extra);
+      active.steps[index].after=extra.npc;
+      extra.after=active.steps[index+2]?.npc||'Thank you for sharing that.';
+     }
     }
+    showResult(item);
    });
   }
   feedback.appendChild(result);
@@ -1149,7 +1233,7 @@ window.enhanceCoachDashboard=function(doc){
   skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
-  add(doc,note,'p','',step.hint);
+  add(doc,note,'p','','Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
   // Show the newest question without requiring learners to scroll through all
   // earlier chat messages. Keep every previous bubble available above.
   stage.appendChild(fullPreview);
