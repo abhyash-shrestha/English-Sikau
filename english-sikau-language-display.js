@@ -124,7 +124,7 @@
    }
   }
  }
- let observer=null,scheduled=false,dirty=new Set(),mode='';
+ let observer=null,scheduled=false,dirty=new Set(),mode='',lastNotified='';
  function decorate(root){
   if(!root)return;
   const walker=d.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
@@ -183,6 +183,11 @@
   h.dataset.sikauDisplayLanguage=next;
   select.title='Display language · '+names[next];
   select.setAttribute('aria-label','Display language: '+names[next]);
+  if(next!==lastNotified){
+   lastNotified=next;
+   // Only a display preference (no account/lesson data) crosses the srcdoc boundary.
+   try{d.defaultView?.parent?.postMessage?.({type:'sikau-display-language',mode:next},'*')}catch(_){}
+  }
   try{
    if(changed||!dirty.size){
     decorate(d.body);
