@@ -1103,3 +1103,27 @@ html[data-sikau-theme="dark"] .sikau-store-fact{
  background:#4d2c49;color:#ffe1f1;border-color:#87536f
 }
 @media(max-width:560px){.sikau-store-facts{gap:5px}.sikau-store-fact{font-size:10px;padding:5px 8px}}
+
+/* Coach local draft: simple Resume / Start over choice after browser refresh. */
+.sikau-convo-resume-host{margin:12px 0 16px}
+.sikau-convo-resume-card{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+ border:1px solid #e8cbe0;border-radius:17px;padding:16px;
+ background:linear-gradient(120deg,#fff8fc,#f3f6ff);box-shadow:0 7px 22px #4a2b6b0b;
+}
+.sikau-convo-resume-copy{flex:1 1 260px;min-width:0}
+.sikau-convo-resume-copy strong{font-size:15px;color:#8f2359}
+.sikau-convo-resume-copy p{font-size:13px;line-height:1.55;margin:6px 0;color:#344462}
+.sikau-convo-resume-copy small{font-size:12px;color:#65728b}
+.sikau-convo-resume-actions{display:flex;gap:9px;flex-wrap:wrap}
+.sikau-convo-resume-actions button{min-height:42px;padding:10px 15px;font-weight:800;border-radius:11px}
+.sikau-convo-restart{font-size:12px;min-height:39px;padding:9px 12px}
+html[data-sikau-theme="dark"] .sikau-convo-resume-card{background:linear-gradient(135deg,#30233f,#28364c);border-color:#85516f}
+html[data-sikau-theme="dark"] .sikau-convo-resume-copy strong{color:#ffc1df}
+html[data-sikau-theme="dark"] .sikau-convo-resume-copy p{color:#f1efff}
+html[data-sikau-theme="dark"] .sikau-convo-resume-copy small{color:#c4d3e9}
+@media(max-width:600px){
+ .sikau-convo-resume-card{padding:13px;gap:11px}
+ .sikau-convo-resume-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .sikau-convo-resume-actions button{font-size:12px;min-width:0;padding:9px 6px}
+}
