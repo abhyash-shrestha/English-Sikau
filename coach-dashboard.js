@@ -35,6 +35,26 @@ for(let i=0;i<coachAdditionalSpecs.length;i++){
  coachRoundsById[item.id]=alternate;
 }
 
+// The expanded catalog supplements the 28 existing stories. These stubs
+// provide topic browser metadata and safe fallback lesson lines. Actual
+// adaptive reply choices are supplied by sikauAdaptiveStory on start.
+for(const entry of (Array.isArray(window.sikauMoreTopics)?window.sikauMoreTopics:[])){
+ if(scenarios.some(s=>s.id===entry.id))throw Error('Duplicate Coach catalog ID '+entry.id);
+ const first=entry.config?.[1]?.[0];
+ const scene={id:entry.id,emoji:entry.emoji,title:entry.title,ne:entry.ne,
+  category:entry.category,place:entry.place,partner:entry.partner,
+  level:entry.level||'Easy',keywords:entry.config[1].flatMap(x=>[x[0],x[1]]).join(' '),
+  steps:[{npc:entry.config[0][0],npcNe:entry.config[0][1],
+   answer:first[0],answerNe:first[1],
+   goal:'Choose what matches your needs · आफ्नो आवश्यकता अनुसार छान्नुहोस्',
+   hint:'Every response can start a different conversation.'}]};
+ // Keep Buy Clothes beside Return Clothing so buying and returns
+ // are clearly separate everyday situations.
+ if(entry.id==='buy-clothes')scenarios.splice(1,0,scene);
+ else scenarios.push(scene);
+ if(!topics.includes(entry.category))topics.push(entry.category);
+}
+
 for(const [key,rounds] of Object.entries(coachOriginalSceneRounds)){
  coachRoundsById[key]=rounds.map((rows,j)=>coachBuildSteps(rows,100+j*50+Object.keys(coachOriginalSceneRounds).indexOf(key)));
 }
@@ -1168,15 +1188,19 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  add(doc,searchBox,'span','','🔎');
  const searchInput=add(doc,searchBox,'input','','');searchInput.type='search';searchInput.placeholder='Search: hospital, restaurant, directions…';
  searchInput.setAttribute('aria-label','Search real life situations');
- add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · Short or long depending on your choices · English + नेपाली.');
+ add(doc,filters,'p','sikau-convo-variety-hint',scenarios.length+' real-life topics · Choose a category or search · English + नेपाली · Conversations follow your choices.');
  const resumeHost=add(doc,browser,'div','sikau-convo-resume-host');resumeHost.hidden=true;
  const cards=add(doc,browser,'div','sikau-convo-cards');
+ const more=add(doc,browser,'button','sikau-convo-secondary sikau-convo-load-more','Show more situations · थप विषय');
+ more.type='button';more.hidden=true;
+ let visibleLimit=24;
+ more.addEventListener('click',()=>{visibleLimit+=24;drawCards();});
  const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
   return scenarios.filter(s=>(category==='All'||s.category===category)&&
-   (!search||normalize([s.title,s.ne,s.place,s.category,s.partner].join(' ')).includes(normalize(search))||
+   (!search||normalize([s.title,s.ne,s.place,s.category,s.partner,s.keywords||''].join(' ')).includes(normalize(search))||
    [s.title,s.ne,s.place,s.partner].join(' ').toLowerCase().includes(search.toLowerCase())));
  }
  function drawTopics(){
@@ -1184,14 +1208,18 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   for(const item of topics){
    const b=add(doc,topicsRow,'button','sikau-convo-topic'+(category===item?' active':''),item);
    b.type='button';b.setAttribute('aria-pressed',String(category===item));
-   b.addEventListener('click',()=>{category=item;drawTopics();drawCards();});
+   b.addEventListener('click',()=>{category=item;visibleLimit=24;drawTopics();drawCards();});
   }
  }
  function drawCards(){
   cards.replaceChildren();
   const shown=filtered();
-  if(!shown.length){add(doc,cards,'p','sikau-convo-empty','No matching situation. Try a different topic. · अर्को विषय खोज्नुहोस्।');return;}
-  for(const s of shown){
+  if(!shown.length){
+   more.hidden=true;
+   add(doc,cards,'p','sikau-convo-empty','No matching situation. Try a different topic. · अर्को विषय खोज्नुहोस्।');
+   return;
+  }
+  for(const s of shown.slice(0,visibleLimit)){
    const b=add(doc,cards,'button','sikau-convo-situation');b.type='button';
    b.setAttribute('aria-label',s.title+' · '+s.ne);
    add(doc,b,'span','sikau-convo-situation-icon',s.emoji);
@@ -1201,6 +1229,8 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    add(doc,b,'span','sikau-convo-situation-meta',s.level+' · Your choices guide the conversation');
    b.addEventListener('click',()=>start(s));
   }
+  more.hidden=shown.length<=visibleLimit;
+  if(!more.hidden)more.textContent='Show more situations · थप विषय ('+(shown.length-visibleLimit)+' left)';
  }
  function resetStage(){
   dialogueHistory=[];
@@ -1420,7 +1450,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   });
 
  }
- searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
+ searchInput.addEventListener('input',()=>{search=searchInput.value;visibleLimit=24;drawCards();});
 
  surprise.addEventListener('click',()=>{
   const options=scenarios.filter(s=>s.id!==lastId&&!recentTopics.includes(s.id));
