@@ -327,8 +327,16 @@ function phone(node,state,config){
    "तपाईंलाई "+detail[1]+" महत्त्वपूर्ण रहेछ। ब्याट्री र बजेट कस्तो छ? महँगो कि सस्तो फोन देखाऊँ?",[
     option("I care about the camera and battery. Show me a premium phone.","क्यामेरा र ब्याट्री राम्रो चाहिन्छ। राम्रो फोन देखाउनुहोस्।","phone-pitch",resetOffer("premium")),
     option("My budget is about NPR 50,000.","मेरो बजेट करिब रु. ५०,००० छ।","phone-pitch",resetOffer("budget")),
-    option("I'd like to compare both prices first.","पहिले दुवैको मूल्य तुलना गर्न चाहन्छु।","phone-pitch",resetOffer("premium")),
+    option("I'd like to compare both prices first.","पहिले दुवैको मूल्य तुलना गर्न चाहन्छु।","phone-compare",{}),
     option("I'm only looking today, thank you.","अहिले हेर्न मात्र आएको हुँ, धन्यवाद।","closing",{})
+   ]);
+  if(node==="phone-compare")return r(node,
+   "The iPhone 17 Pro Max starts at NPR 100,000 (256 GB), while the Samsung Galaxy S24 starts at NPR 50,000 (128 GB) in this practice store. That's a difference of NPR 50,000. Which one fits your budget?",
+   "यो अभ्यास पसलमा iPhone 17 Pro Max (256 GB) को सुरु मूल्य रु. 100,000 र Samsung Galaxy S24 (128 GB) को रु. 50,000 हो। फरक रु. 50,000 छ। तपाईंको बजेटमा कुन मिल्छ?",[
+    option("Show me the iPhone, please.","कृपया आइफोन देखाउनुहोस्।","phone-pitch",resetOffer("premium")),
+    option("The Samsung is closer to my budget.","सामसङ मेरो बजेटमा मिल्छ।","phone-pitch",resetOffer("budget")),
+    option("Can we compare the cameras and batteries too?","क्यामेरा र ब्याट्री पनि तुलना गरौँ?","phone-demo",{}),
+    option("I need some time to decide.","निर्णय गर्न अलि समय चाहिन्छ।","closing",{})
    ]);
   if(node==="phone-pitch"||node==="phone-budget")return r(node,
    "I'd recommend the "+model+". The "+selected.sizes[0][0]+" version is "+money(selected.base)+". Does that suit your budget?",
@@ -340,8 +348,8 @@ function phone(node,state,config){
     option("Thanks, I don't want to buy today.","धन्यवाद, आज किन्न चाहन्नँ।","closing",{})
    ]);
   if(node==="phone-demo")return r(node,
-   "Let's compare the camera, battery, storage and warranty. Which would you like to do next?",
-   "क्यामेरा, ब्याट्री, स्टोरेज र वारेन्टी तुलना गरौँ। अब के गर्न चाहनुहुन्छ?",[
+   "In this practice comparison, the iPhone is our premium camera-focused choice and the Samsung is the lower-priced alternative. For battery life, we'd compare rated battery information and how you use your phone, rather than guess. The starting prices are NPR 100,000 and NPR 50,000. Which would you like to explore?",
+   "यस अभ्यासमा आइफोन राम्रो क्यामेराका लागि महँगो विकल्प हो भने सामसङ कम मूल्यको विकल्प हो। ब्याट्रीका लागि अनुमान नगरी वास्तविक जानकारी र तपाईंको प्रयोग तुलना गरौँ। सुरु मूल्य क्रमशः रु. 100,000 र रु. 50,000 छन्। कुन हेर्नुहुन्छ?",[
     option("This model sounds good. Show me the storage options.","यो फोन ठीक लाग्यो। स्टोरेज देखाउनुहोस्।","phone-storage",{}),
     option("Could you show me a more affordable model?","सस्तो फोन पनि देखाउनुहोस्।","phone-pitch",resetOffer("budget")),
     option("What does the warranty cover?","वारेन्टीमा के के पर्छ?","phone-warranty",{}),
@@ -355,8 +363,8 @@ function phone(node,state,config){
     option("I'd rather wait for now.","अहिलेलाई पर्खन्छु।","closing",{})
    ]);
   if(node==="phone-options")return r(node,
-   "For the "+model+", the "+selected.sizes[0][0]+" version starts at "+money(selected.base)+". More storage costs extra, but changing the color doesn't. What would you prefer?",
-   model+" को "+selected.sizes[0][0]+" मूल्य "+rupees(selected.base)+" बाट सुरु हुन्छ। बढी स्टोरेजको थप मूल्य छ, तर रङ बदल्दा छैन। के चाहनुहुन्छ?",[
+   "For the "+model+", we have these practice storage choices: "+selected.sizes.map(s=>s[0]+" for "+money(selected.base+s[1])).join(", ")+". We can also offer black, blue or silver without a color fee. Which would you like?",
+   model+" का स्टोरेज विकल्प: "+selected.sizes.map(s=>s[0]+" "+rupees(selected.base+s[1])).join(", ")+"। कालो, निलो वा चाँदी रङ छान्दा थप शुल्क छैन। के चाहनुहुन्छ?",[
     option("The standard "+selected.sizes[0][0]+" is enough for me.","सामान्य "+selected.sizes[0][0]+" नै पुग्छ।","phone-quote",{storage:selected.sizes[0][0],variant:null}),
     option("I'd like more storage. How much would it cost?","मलाई बढी स्टोरेज चाहिन्छ। कति पर्छ?","phone-storage",{}),
     option("Could I choose a different color?","अर्को रङ छान्न सक्छु?","phone-color",{}),
