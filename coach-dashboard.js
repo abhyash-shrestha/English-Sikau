@@ -1017,7 +1017,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Practice real-life English by choosing the response that fits the conversation. Wrong choices show clear feedback, and each lesson has Nepali support. · कुराकानीमा मिल्ने उत्तर छानेर अभ्यास गर्नुहोस्।');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -1142,32 +1142,24 @@ window.enhanceCoachDashboard=function(doc){
   const feedback=add(doc,chatLayout,'section','sikau-convo-reply sikau-convo-chat-choices');
   const choiceHead=add(doc,feedback,'div','sikau-chat-choice-header');
   add(doc,choiceHead,'strong','','🎯 Your turn · तपाईंको पालो');
-  add(doc,choiceHead,'small','','Choose what YOU would say. · आफूले भन्ने उत्तर छान्नुहोस्।');
+  add(doc,choiceHead,'small','','Every choice is a possible response. · सबै विकल्प मिल्ने उत्तर हुन्।');
   const replyPlan=coachReplyOptions(step,active);
-  if(replyPlan.multi){
-   add(doc,feedback,'p','sikau-chat-multi-hint',replyPlan.branching?
-    '✨ More than one answer is valid. Your choice may change what happens next. · दुईवटा उत्तर पनि मिल्न सक्छन्।':
-    '✨ Different natural sentences can mean the same thing. · एउटै कुरा भन्न धेरै तरिका हुन्छन्।');
-  }else if(step.goal){
-   add(doc,feedback,'p','sikau-chat-goal',step.goal);
-  }
+  add(doc,feedback,'p','sikau-chat-multi-hint',replyPlan.branching?
+   '✨ All choices are possible replies. Pick the one you would actually say—your story may change. · सबै उत्तर मिल्छन्। तपाईंको अवस्था छान्नुहोस्।':
+   '✨ All three are valid ways to reply. Pick the wording you like and say it aloud. · तीनै उत्तर मिल्छन्। मन परेको छान्नुहोस्।');
   const result=add(doc,feedback,'div','sikau-convo-feedback');
   result.setAttribute('role','status');result.setAttribute('aria-live','polite');
 
-  function showResult(success,item){
+  function showResult(item){
    result.replaceChildren();
-   result.className='sikau-convo-feedback '+(success?'success':'warning');
-   add(doc,result,'strong','',success?'✅ Great! That answer works · राम्रो उत्तर!':'💡 Not related to this situation · यहाँ नमिल्ने उत्तर');
-   add(doc,result,'p','',success?
-    'You chose: '+item.value:
-    'That answer does not respond to the other person. Try a different reply.');
-   if(success&&showNepali&&item.ne)add(doc,result,'small','',item.ne);
-   if(success&&item.branch)add(doc,result,'small','','💬 The next part of the chat will follow your choice.');
-   if(success){
-    if(index===active.steps.length-1)add(doc,result,'p','sikau-convo-next-line','💬 '+active.partner+': '+step.after);
-    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
-    next.type='button';next.addEventListener('click',goNext);
-   }
+   result.className='sikau-convo-feedback success';
+   add(doc,result,'strong','','💬 Good choice! · राम्रो छनोट');
+   add(doc,result,'p','','You chose: '+item.value);
+   if(showNepali)add(doc,result,'small','',item.ne);
+   if(item.branch||item.followup)add(doc,result,'small','','Your next chat message will reflect this choice. · अबको कुराकानी यसैअनुसार अघि बढ्नेछ।');
+   const next=add(doc,result,'button','sikau-convo-primary',
+    index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
+   next.type='button';next.addEventListener('click',goNext);
   }
   const options=add(doc,feedback,'div','sikau-convo-options');
   for(const item of replyPlan.options){
@@ -1176,30 +1168,33 @@ window.enhanceCoachDashboard=function(doc){
    add(doc,b,'span','sikau-chat-option-radio','◯');
    const copy=add(doc,b,'span','sikau-chat-option-copy');
    add(doc,copy,'span','',item.value);
-   if(item.ne&&showNepali)add(doc,copy,'small','',item.ne);
+   if(showNepali)add(doc,copy,'small','',item.ne);
    b.addEventListener('click',()=>{
     if(b.disabled)return;
     attempts++;
-    if(item.correct){
-     successful++;
-     dialogueHistory[index]={reply:item.value,answerNe:item.ne||step.answerNe,
-       learnerNe:item.ne||'',kind:'guided'};
-     b.classList.add('is-correct');
-     b.querySelector('.sikau-chat-option-radio').textContent='✓';
-     options.querySelectorAll('button').forEach(x=>x.disabled=true);
-     if(item.branch){
-      const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
-      if(alternate.length){
-       active.steps.splice(index+1,active.steps.length-index-1,...alternate);
-       active.steps[index].after=alternate[0].npc;
-      }
+    successful++;
+    dialogueHistory[index]={reply:item.value,answerNe:item.ne,
+      learnerNe:item.ne,kind:'guided'};
+    b.classList.add('is-selected');
+    b.querySelector('.sikau-chat-option-radio').textContent='✓';
+    options.querySelectorAll('button').forEach(x=>x.disabled=true);
+    if(item.branch){
+     const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
+     if(alternate.length){
+      active.steps.splice(index+1,active.steps.length-index-1,...alternate);
+      active.steps[index].after=alternate[0].npc;
      }
-     showResult(true,item);
-    }else{
-     b.classList.add('is-incorrect');
-     b.querySelector('.sikau-chat-option-radio').textContent='×';
-     b.disabled=true;showResult(false,item);
+    }else if(item.followup){
+     const extra=coachFollowUpStep(item.followup);
+     if(extra){
+      // Insert one natural consequence before returning to the original
+      // conversation; retain every previous selected response.
+      active.steps.splice(index+1,0,extra);
+      active.steps[index].after=extra.npc;
+      extra.after=active.steps[index+2]?.npc||'Thank you for sharing that.';
+     }
     }
+    showResult(item);
    });
   }
   feedback.appendChild(result);
@@ -1207,7 +1202,7 @@ window.enhanceCoachDashboard=function(doc){
   skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
-  add(doc,note,'p','',step.hint);
+  add(doc,note,'p','','Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
   // Show the newest question without requiring learners to scroll through all
   // earlier chat messages. Keep every previous bubble available above.
   stage.appendChild(fullPreview);
