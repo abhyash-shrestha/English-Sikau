@@ -9,7 +9,8 @@ function load(){
  const window={};
  for(const name of [
   'coach-topic-catalog-1.js','coach-topic-catalog-2.js',
-  'coach-topic-expansion.js','coach-adaptive-story.js']){
+  'coach-topic-expansion.js','coach-legacy-followups.js',
+  'coach-followups.js','coach-adaptive-story.js']){
   vm.runInNewContext(file(name),{window},{filename:name});
  }
  return window;
@@ -37,14 +38,19 @@ test('each new topic offers bilingual branching, early ending and longer followu
    api.choose(a,a.steps[1].storeOptions[detail],1);
    assert.ok(a.steps[2].npcNe&&a.steps[2].npc);
    assert.ok(a.steps[2].storeOptions.every(o=>o.ne&&o.value));
-   api.choose(a,a.steps[2].storeOptions[0],2);
+   api.choose(a,a.steps[2].storeOptions[3],2);
+   assert.equal(a.steps.at(-1).nodeId,'closing');
+   api.choose(a,a.steps.at(-1).storeOptions[0],3);
    assert.equal(a.storyCompleted,true);
    const longer=api.start({id:topic.id,title:topic.title});
    api.choose(longer,longer.steps[0].storeOptions[p],0);
    api.choose(longer,longer.steps[1].storeOptions[detail],1);
-   api.choose(longer,longer.steps[2].storeOptions[1],2);
-   api.choose(longer,longer.steps[3].storeOptions[0],3);
-   api.choose(longer,longer.steps[4].storeOptions.at(-1),4);
+   api.choose(longer,longer.steps[2].storeOptions[0],2);
+   api.choose(longer,longer.steps[3].storeOptions[1],3);
+   api.choose(longer,longer.steps[4].storeOptions[0],4);
+   api.choose(longer,longer.steps[5].storeOptions[1],5);
+   api.choose(longer,longer.steps[6].storeOptions[0],6);
+   api.choose(longer,longer.steps[7].storeOptions[0],7);
    assert.equal(longer.storyCompleted,true);
   }
 });
@@ -79,10 +85,11 @@ test('new Buy Clothes lesson is not Return Clothing',()=>{
 test('safe load order and category layout for the larger browser',()=>{
  const html=file('index.html'),code=file('coach-dashboard.js');
  const order=['coach-topic-catalog-1.js','coach-topic-catalog-2.js',
-  'coach-topic-expansion.js','coach-adaptive-story.js','coach-dashboard.js'];
+  'coach-topic-expansion.js','coach-legacy-followups.js','coach-followups.js',
+  'coach-adaptive-story.js','coach-dashboard.js'];
  let prev=-1;
  for(const name of order){
-  const i=html.indexOf('./'+name+'?v=20261028-175topics-r1');
+  const i=html.indexOf('./'+name+'?v=');
   assert.ok(i>prev,'script order '+name);prev=i;
  }
  assert.match(code,/scenarios\.length\+' real-life topics/);
