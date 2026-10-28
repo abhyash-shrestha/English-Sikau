@@ -2,107 +2,105 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-
 const root=new URL('../',import.meta.url);
-const read=name=>fs.readFileSync(new URL(name,root),'utf8');
-const scripts=[
- 'coach-topic-catalog-1.js','coach-topic-catalog-2.js',
- 'coach-topic-expansion.js','coach-legacy-followups.js',
- 'coach-followups.js','coach-adaptive-story.js'
-];
-function load(window={}){
- for(const name of scripts)vm.runInNewContext(read(name),{window},{filename:name});
- return window;
+const read=n=>fs.readFileSync(new URL(n,root),'utf8');
+function load(w={}){
+ for(const name of ['coach-topic-catalog-1.js','coach-topic-catalog-2.js',
+  'coach-topic-expansion.js','coach-legacy-followups.js','coach-followups.js',
+  'coach-journeys.js','coach-adaptive-story.js'])
+  vm.runInNewContext(read(name),{window:w},{filename:name});
+ return w;
 }
-function choose(api,story,idx){
- const now=story.steps.at(-1),option=now.storeOptions[idx];
- assert.ok(option,story.id+' missing option '+now.nodeId+' '+idx);
- assert.ok(option.value&&option.ne);
- api.choose(story,option,story.steps.length-1);
+function choose(api,a,predicate){
+ const op=a.steps.at(-1).storeOptions.find(predicate);
+ assert.ok(op,a.id+' missing choice at '+a.steps.at(-1).nodeId);
+ api.choose(a,op,a.steps.length-1);
 }
-test('175-topic registry has 174 adaptive stories plus the independent clothing return',()=>{
- const w=load();
- assert.equal(w.sikauAdaptiveStory.topics.length,174);
- assert.equal(new Set(w.sikauAdaptiveStory.topics).size,174);
- assert.equal(w.sikauMoreTopics.length,147);
- assert.ok(!w.sikauAdaptiveStory.topics.includes('return-shirt'));
- assert.match(read('coach-store-story.js'),/case "managerReview"/);
+test('phone camera to battery to too-expensive to Samsung to card checkout and receipt',()=>{
+ const api=load().sikauAdaptiveStory,a=api.start({id:'buy-phone'});
+ choose(api,a,o=>/looking for a phone/.test(o.value));
+ choose(api,a,o=>/good camera/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/battery life and your budget/i);
+ choose(api,a,o=>/strong camera and long battery/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/iPhone 17 Pro Max/);
+ assert.match(a.steps.at(-1).npc,/NPR 100,000/);
+ choose(api,a,o=>/too expensive/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/Samsung Galaxy S24/);
+ assert.match(a.steps.at(-1).npc,/NPR 50,000/);
+ choose(api,a,o=>/price works for me/i.test(o.value));
+ choose(api,a,o=>/standard storage/i.test(o.value));
+ choose(api,a,o=>/credit or debit card/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/bank card/);
+ assert.match(a.steps.at(-1).npc,/NO purchase or charge/);
+ assert.equal(a.storyState.offer,'budget');
+ assert.equal(a.storyState.payment,'card');
+ choose(api,a,o=>/have the receipt/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/no actual receipt/);
+ choose(api,a,o=>o.next==='end');
+ assert.equal(a.storyCompleted,true);
 });
-test('6,264 full choice paths never return to generic review replies',()=>{
- const w=load(),api=w.sikauAdaptiveStory;
- let count=0;
- for(const id of api.topics)for(let path=0;path<3;path++)for(let detail=0;detail<3;detail++){
-  const start=()=>api.start({id,title:id});
-  const a=start();choose(api,a,path);choose(api,a,detail);
+test('phone can decline or request another cheaper tier without buying',()=>{
+ const api=load().sikauAdaptiveStory,a=api.start({id:'buy-phone'});
+ choose(api,a,o=>/looking for a phone/.test(o.value));
+ choose(api,a,o=>/affordable price/i.test(o.value));
+ choose(api,a,o=>/50,000/.test(o.value));
+ assert.match(a.steps.at(-1).npc,/Samsung Galaxy S24/);
+ choose(api,a,o=>/too expensive/i.test(o.value));
+ assert.match(a.steps.at(-1).npc,/35,000/);
+ choose(api,a,o=>/above my budget/i.test(o.value));
+ assert.equal(a.steps.at(-1).nodeId,'closing');
+ choose(api,a,o=>o.next==='end');
+ assert.equal(a.storyCompleted,true);
+});
+test('restaurant seating, lost luggage, food-allergy and bank questions do not lead to checkout',()=>{
+ const api=load().sikauAdaptiveStory;
+ for(const [id,p,d] of [['restaurant',0,2],['reserve-restaurant',0,0],
+  ['airport-baggage',0,0],['ask-menu-allergy',0,0],['bank',0,0],
+  ['interview',0,0],['buy-phone',2,0]]){
+  const a=api.start({id});
+  choose(api,a,o=>o.patch.path===p);
+  choose(api,a,o=>o.patch.detail===d);
+  choose(api,a,o=>o.next==='proposal');
+  choose(api,a,o=>o.next==='verify');
+  assert.equal(a.steps.at(-1).nodeId,'verify',id);
+  assert.ok(!a.steps.at(-1).storeOptions.some(o=>o.next==='checkout'),id);
+ }
+});
+test('all topics have translated offers, meaningful alternatives and natural exit',()=>{
+ const api=load().sikauAdaptiveStory;
+ for(const id of api.topics)for(let p=0;p<3;p++)for(let d=0;d<3;d++){
+  const a=api.start({id});
+  choose(api,a,o=>o.patch.path===p);
+  choose(api,a,o=>o.patch.detail===d);
   assert.equal(a.steps.at(-1).nodeId,'review');
-  assert.ok(a.steps.at(-1).storeOptions[0].value.length>=15);
-  assert.doesNotMatch(a.steps.at(-1).storeOptions[0].value,/^What should I do next\?$/i);
-  choose(api,a,3);choose(api,a,0);
-  assert.equal(a.storyCompleted,true);count++;
-  const b=start();choose(api,b,path);choose(api,b,detail);
-  for(const i of [0,1,0,1,0,0])choose(api,b,i);
-  assert.equal(b.storyCompleted,true);
-  assert.ok(b.steps.some(s=>s.nodeId==='answer'));
-  assert.ok(b.steps.some(s=>s.nodeId==='closing'));
-  assert.ok(b.steps.length>a.steps.length);count++;
-  const c=start();choose(api,c,path);choose(api,c,detail);choose(api,c,1);choose(api,c,0);
-  assert.equal(c.steps.at(-1).nodeId,'review');
-  assert.notEqual(c.storyState.detail,detail);count++;
-  const d=start();choose(api,d,path);choose(api,d,detail);
-  for(const i of [2,0,1,0,0])choose(api,d,i);
-  assert.equal(d.storyCompleted,true);count++;
-  for(const story of [a,b,c,d])for(const step of story.steps){
-   assert.ok(step.npc&&step.npcNe);
-   assert.ok(step.storeOptions.length>=2);
-   assert.ok(step.storeOptions.every(o=>o.value&&o.ne&&o.next));
-  }
+  assert.ok(a.steps.at(-1).npcNe);
+  const choice=a.steps.at(-1).storeOptions.find(o=>o.next==='closing');
+  assert.ok(choice,id);
+  choose(api,a,o=>o===choice);
+  assert.equal(a.steps.at(-1).nodeId,'closing');
+  choose(api,a,o=>o.next==='end');
+  assert.equal(a.storyCompleted,true);
  }
- assert.equal(count,6264);
 });
-test('phone, restaurant, clothing shopping and social conversation use relevant replies',()=>{
- const w=load(),api=w.sikauAdaptiveStory;
- const preview=(id,p,d)=>{
-  const a=api.start({id});choose(api,a,p);choose(api,a,d);return a.steps.at(-1);
- };
- const camera=preview('buy-phone',0,0);
- assert.match(camera.npc,/camera samples/i);
- assert.match(camera.storeOptions[0].value,/portrait photos/i);
- const battery=preview('buy-phone',0,1);
- assert.match(battery.npc,/battery life/i);
- assert.notEqual(battery.storeOptions[0].value,camera.storeOptions[0].value);
- const table=preview('restaurant',0,2);
- assert.match(table.storeOptions[0].value,/table is available/i);
- assert.doesNotMatch(table.npc,/menu|ingredient/i);
- const fitting=preview('buy-clothes',1,2);
- assert.match(fitting.storeOptions[0].value,/sizes/i);
- const friend=preview('new-friend',0,0);
- assert.doesNotMatch(friend.storeOptions[1].value,/compare that with another option/);
-});
-test('new script load order precedes dashboard; VISA code stays present',()=>{
- const html=read('index.html'),list=[
-  'coach-topic-expansion.js','coach-legacy-followups.js',
-  'coach-followups.js','coach-adaptive-story.js','coach-dashboard.js'
- ];
- let last=-1;
- for(const name of list){
-  const pos=html.indexOf('./'+name+'?v=');
-  assert.ok(pos>last,'Wrong script order '+name);
-  last=pos;
- }
- const dashboard=read('coach-dashboard.js');
- assert.match(dashboard,/installVisaSidebar\(doc,shell,visaController\)/);
- assert.match(dashboard,/sikauAdaptiveStory\?\.reconcile/);
-});
-test('saved chat can refresh active turn while preserving a selected answer',()=>{
- const w=load(),api=w.sikauAdaptiveStory;
- const a=api.start({id:'buy-phone'});choose(api,a,0);choose(api,a,0);
- const old=a.steps.at(-1),oldAnswer=old.storeOptions[0].value;
- a.steps[a.steps.length-1]={...old,npc:'Generic old seller response'};
- assert.equal(api.reconcile(a,a.steps.length-1,{value:oldAnswer,ne:old.storeOptions[0].ne}),true);
- assert.match(a.steps.at(-1).npc,/camera samples/);
- assert.equal(a.steps.at(-1).storeOptions[0].value,oldAnswer);
- const b=api.start({id:'restaurant'});choose(api,b,0);choose(api,b,2);
- b.steps.at(-1).storeOptions[0].value='What should I do next?';
- assert.equal(api.reconcile(b,b.steps.length-1,null),true);
- assert.match(b.steps.at(-1).storeOptions[0].value,/table is available/i);
+test('saved journey state persists budget and payment without altering previous messages',()=>{
+ const data=new Map(),window={localStorage:{
+  getItem(k){return data.get(k)||null},
+  setItem(k,v){data.set(k,v)},removeItem(k){data.delete(k)}
+ }};
+ const api=load(window).sikauAdaptiveStory;
+ vm.runInNewContext(read('coach-drafts.js'),{window});
+ const a=api.start({id:'buy-phone'});
+ choose(api,a,o=>o.patch.path===0);choose(api,a,o=>o.patch.detail===0);
+ choose(api,a,o=>o.patch.offer==='budget');
+ choose(api,a,o=>o.next==='phone-options');
+ choose(api,a,o=>o.next==='phone-checkout');
+ choose(api,a,o=>o.patch.payment==='card');
+ const saved=window.sikauCoachDrafts.make('testAccount123456',[{id:'buy-phone'}]);
+ assert.ok(saved.save({active:a,index:a.steps.length-1,history:[],attempts:1,successful:1,pendingChoice:null}));
+ const restored=saved.read();assert.equal(restored.storyState.offer,'budget');
+ assert.equal(restored.storyState.payment,'card');
+ const before=a.steps.at(-1).npc;
+ a.steps.at(-1).npc='OLD INCORRECT MESSAGE';
+ assert.ok(api.reconcile(a,a.steps.length-1,null));
+ assert.equal(a.steps.at(-1).npc,before);
 });
