@@ -327,8 +327,16 @@ function phone(node,state,config){
    "तपाईंलाई "+detail[1]+" महत्त्वपूर्ण रहेछ। ब्याट्री र बजेट कस्तो छ? महँगो कि सस्तो फोन देखाऊँ?",[
     option("I care about the camera and battery. Show me a premium phone.","क्यामेरा र ब्याट्री राम्रो चाहिन्छ। राम्रो फोन देखाउनुहोस्।","phone-pitch",resetOffer("premium")),
     option("My budget is about NPR 50,000.","मेरो बजेट करिब रु. ५०,००० छ।","phone-pitch",resetOffer("budget")),
-    option("I'd like to compare both prices first.","पहिले दुवैको मूल्य तुलना गर्न चाहन्छु।","phone-pitch",resetOffer("premium")),
+    option("I'd like to compare both prices first.","पहिले दुवैको मूल्य तुलना गर्न चाहन्छु।","phone-compare",{}),
     option("I'm only looking today, thank you.","अहिले हेर्न मात्र आएको हुँ, धन्यवाद।","closing",{})
+   ]);
+  if(node==="phone-compare")return r(node,
+   "The iPhone 17 Pro Max starts at NPR 100,000 (256 GB), while the Samsung Galaxy S24 starts at NPR 50,000 (128 GB) in this practice store. That's a difference of NPR 50,000. Which one fits your budget?",
+   "यो अभ्यास पसलमा iPhone 17 Pro Max (256 GB) को सुरु मूल्य रु. 100,000 र Samsung Galaxy S24 (128 GB) को रु. 50,000 हो। फरक रु. 50,000 छ। तपाईंको बजेटमा कुन मिल्छ?",[
+    option("Show me the iPhone, please.","कृपया आइफोन देखाउनुहोस्।","phone-pitch",resetOffer("premium")),
+    option("The Samsung is closer to my budget.","सामसङ मेरो बजेटमा मिल्छ।","phone-pitch",resetOffer("budget")),
+    option("Can we compare the cameras and batteries too?","क्यामेरा र ब्याट्री पनि तुलना गरौँ?","phone-demo",{}),
+    option("I need some time to decide.","निर्णय गर्न अलि समय चाहिन्छ।","closing",{})
    ]);
   if(node==="phone-pitch"||node==="phone-budget")return r(node,
    "I'd recommend the "+model+". The "+selected.sizes[0][0]+" version is "+money(selected.base)+". Does that suit your budget?",
@@ -340,8 +348,8 @@ function phone(node,state,config){
     option("Thanks, I don't want to buy today.","धन्यवाद, आज किन्न चाहन्नँ।","closing",{})
    ]);
   if(node==="phone-demo")return r(node,
-   "Let's compare the camera, battery, storage and warranty. Which would you like to do next?",
-   "क्यामेरा, ब्याट्री, स्टोरेज र वारेन्टी तुलना गरौँ। अब के गर्न चाहनुहुन्छ?",[
+   "In this practice comparison, the iPhone is our premium camera-focused choice and the Samsung is the lower-priced alternative. For battery life, we'd compare rated battery information and how you use your phone, rather than guess. The starting prices are NPR 100,000 and NPR 50,000. Which would you like to explore?",
+   "यस अभ्यासमा आइफोन राम्रो क्यामेराका लागि महँगो विकल्प हो भने सामसङ कम मूल्यको विकल्प हो। ब्याट्रीका लागि अनुमान नगरी वास्तविक जानकारी र तपाईंको प्रयोग तुलना गरौँ। सुरु मूल्य क्रमशः रु. 100,000 र रु. 50,000 छन्। कुन हेर्नुहुन्छ?",[
     option("This model sounds good. Show me the storage options.","यो फोन ठीक लाग्यो। स्टोरेज देखाउनुहोस्।","phone-storage",{}),
     option("Could you show me a more affordable model?","सस्तो फोन पनि देखाउनुहोस्।","phone-pitch",resetOffer("budget")),
     option("What does the warranty cover?","वारेन्टीमा के के पर्छ?","phone-warranty",{}),
@@ -355,8 +363,8 @@ function phone(node,state,config){
     option("I'd rather wait for now.","अहिलेलाई पर्खन्छु।","closing",{})
    ]);
   if(node==="phone-options")return r(node,
-   "For the "+model+", the "+selected.sizes[0][0]+" version starts at "+money(selected.base)+". More storage costs extra, but changing the color doesn't. What would you prefer?",
-   model+" को "+selected.sizes[0][0]+" मूल्य "+rupees(selected.base)+" बाट सुरु हुन्छ। बढी स्टोरेजको थप मूल्य छ, तर रङ बदल्दा छैन। के चाहनुहुन्छ?",[
+   "For the "+model+", we have these practice storage choices: "+selected.sizes.map(s=>s[0]+" for "+money(selected.base+s[1])).join(", ")+". We can also offer black, blue or silver without a color fee. Which would you like?",
+   model+" का स्टोरेज विकल्प: "+selected.sizes.map(s=>s[0]+" "+rupees(selected.base+s[1])).join(", ")+"। कालो, निलो वा चाँदी रङ छान्दा थप शुल्क छैन। के चाहनुहुन्छ?",[
     option("The standard "+selected.sizes[0][0]+" is enough for me.","सामान्य "+selected.sizes[0][0]+" नै पुग्छ।","phone-quote",{storage:selected.sizes[0][0],variant:null}),
     option("I'd like more storage. How much would it cost?","मलाई बढी स्टोरेज चाहिन्छ। कति पर्छ?","phone-storage",{}),
     option("Could I choose a different color?","अर्को रङ छान्न सक्छु?","phone-color",{}),
@@ -410,19 +418,46 @@ function phone(node,state,config){
   if(node==="phone-checkout")return r(node,
    "Your "+description+" with "+accessoryText+" comes to "+money(total)+". How would you like to pay — cash, card or QR?",
    "तपाईंको "+description+" र "+accessoryNe+" गरी जम्मा "+rupees(total)+" भयो। नगद, कार्ड वा क्यूआरबाट तिर्नुहुन्छ?",[
-    option("I'll pay in cash.","नगद तिर्छु।","phone-finish",{payment:"cash"}),
-    option("I'll pay by debit or credit card.","डेबिट वा क्रेडिट कार्डले तिर्छु।","phone-finish",{payment:"card"}),
-    option("Can I pay by QR or digital wallet?","क्यूआर वा डिजिटल वालेटबाट तिर्न मिल्छ?","phone-finish",{payment:"digital"}),
-    option("Actually, I'm not ready to buy.","अहिले किन्न तयार छैन।","closing",{payment:"none"})
+    option("I'll pay in cash.","नगद तिर्छु।","phone-payment-info",{payment:"cash",paymentConfirmed:false}),
+    option("I'll pay by debit or credit card.","डेबिट वा क्रेडिट कार्डले तिर्छु।","phone-payment-info",{payment:"card",paymentConfirmed:false}),
+    option("Can I pay by QR or digital wallet?","क्यूआर वा डिजिटल वालेटबाट तिर्न मिल्छ?","phone-payment-info",{payment:"digital",paymentConfirmed:false}),
+    option("Actually, I'm not ready to buy.","अहिले किन्न तयार छैन।","closing",{payment:"none",paymentConfirmed:false,decision:"later"})
    ]);
-  if(node==="phone-finish")return r(node,
-   "Thank you! Payment by "+({cash:"cash",card:"card",digital:"QR"}[state.payment]||"your chosen method")+
-   " is complete. Your "+description+" with "+accessoryText+" totals "+money(total)+". Here's your receipt!",
-   "धन्यवाद! "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"तपाईंको माध्यम")+
-   " बाट भुक्तानी भयो। "+description+" र "+accessoryNe+" को जम्मा "+rupees(total)+"। यो रसिद लिनुहोस्!",[
-    option("Thank you. Can I keep the receipt?","धन्यवाद। रसिद लिन सक्छु?","phone-receipt",{}),
-    option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{})
+  if(node==="phone-payment-info"){
+   const scripts={
+    cash:["Of course, cash is accepted. The total is "+money(total)+". Please hand me the cash whenever you're ready.",
+      "अवश्य, नगद तिर्न मिल्छ। जम्मा "+rupees(total)+" हो। तयार भएपछि नगद दिनुहोस्।"],
+    card:["Yes, we accept debit and credit cards. The total is "+money(total)+". Please tap or insert your card and wait for approval.",
+      "हो, डेबिट र क्रेडिट कार्ड चल्छ। जम्मा "+rupees(total)+" हो। कार्ड ट्याप वा हालेर स्वीकृतिको प्रतीक्षा गर्नुहोस्।"],
+    digital:["Yes, you can pay by QR or a supported digital wallet. The total is "+money(total)+". Check the recipient and amount on the shop's QR before paying. Nothing has been charged yet.",
+      "हो, क्यूआर वा उपलब्ध डिजिटल वालेटबाट तिर्न मिल्छ। जम्मा "+rupees(total)+" हो। तिर्नुअघि पसलको क्यूआर, प्राप्तकर्ता र रकम जाँच्नुहोस्। अहिलेसम्म पैसा काटिएको छैन।"]
+   };
+   const script=scripts[state.payment];
+   if(!script)return phone("phone-checkout",state,config);
+   const paid={
+    cash:["Here is "+money(total)+" in cash.","यो "+rupees(total)+" नगद लिनुहोस्।"],
+    card:["My card payment was approved. Could you check?","मेरो कार्ड भुक्तानी स्वीकृत भयो। जाँचिदिनुहुन्छ?"],
+    digital:["I've sent "+money(total)+" by QR. Could you confirm it?","मैले क्यूआरबाट "+rupees(total)+" पठाएँ। पुष्टि गरिदिनुहुन्छ?"]
+   }[state.payment];
+   return r(node,script[0],script[1],[
+    option(paid[0],paid[1],"phone-finish",{paymentConfirmed:true}),
+    option("Could I pay by card instead?","बरु कार्डबाट तिर्न सक्छु?","phone-payment-info",{payment:"card",paymentConfirmed:false}),
+    option("Could I pay in cash instead?","बरु नगद तिर्न सक्छु?","phone-payment-info",{payment:"cash",paymentConfirmed:false}),
+    option("I'll come back and pay later.","पछि आएर तिर्छु।","closing",{payment:"none",paymentConfirmed:false,decision:"later"})
    ]);
+  }
+  if(node==="phone-finish"){
+   // Older saved lessons also wait for explicit payment instead of assuming it.
+   if(!state.paymentConfirmed)return phone(state.payment?"phone-payment-info":"phone-checkout",state,config);
+   const method={cash:"cash",card:"card",digital:"QR"}[state.payment]||"";
+   const methodNe={cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"";
+   return r(node,
+    "Thank you. I've confirmed your "+method+" payment of "+money(total)+" for the "+description+" with "+accessoryText+". Here's your receipt!",
+    "धन्यवाद। "+methodNe+" बाट "+rupees(total)+" भुक्तानी पुष्टि भयो। "+description+" र "+accessoryNe+" को रसिद लिनुहोस्!",[
+     option("Thank you. Can I keep the receipt?","धन्यवाद। रसिद लिन सक्छु?","phone-receipt",{}),
+     option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{})
+    ]);
+  }
   if(node==="phone-receipt")return r(node,
    "Of course. Your receipt shows "+description+", "+money(total)+" and the return policy. Have a great day!",
    "अवश्य। रसिदमा "+description+", "+rupees(total)+" र फिर्ताका नियम छन्। शुभ दिन!",[
@@ -533,18 +568,40 @@ function build(node,state,config){
   return r(node,
    "Let's go over your "+target+" order. Would you prefer to pay with cash, card or QR?",
    "तपाईंको "+target+" को अर्डर हेरौँ। नगद, कार्ड वा क्यूआरमध्ये कसरी तिर्नुहुन्छ?",[
-    option("I'd pay with cash.","नगद तिर्छु।","confirmation",{payment:"cash",decision:"agreed"}),
-    option("I'd use a debit or credit card.","डेबिट वा क्रेडिट कार्ड प्रयोग गर्छु।","confirmation",{payment:"card",decision:"agreed"}),
-    option("Can I use a QR or digital payment?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","confirmation",{payment:"digital",decision:"agreed"}),
-    option("Actually, I don't want to pay or order yet.","बरु अहिले तिर्न वा अर्डर गर्न चाहन्नँ।","closing",{decision:"later"})
+    option("I'd pay with cash.","नगद तिर्छु।","payment-guide",{payment:"cash",paymentConfirmed:false}),
+    option("I'd use a debit or credit card.","डेबिट वा क्रेडिट कार्ड प्रयोग गर्छु।","payment-guide",{payment:"card",paymentConfirmed:false}),
+    option("Can I use a QR or digital payment?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","payment-guide",{payment:"digital",paymentConfirmed:false}),
+    option("Actually, I don't want to pay or order yet.","बरु अहिले तिर्न वा अर्डर गर्न चाहन्नँ।","closing",{decision:"later",payment:"none",paymentConfirmed:false})
    ]);
  }
+ if(node==='payment-guide'){
+  if(!commercial)return build("action",state,config);
+  const scripts={
+   cash:["Yes, cash is fine. Please hand the cashier the bill amount when you're ready.","हो, नगद तिर्न मिल्छ। तयार भएपछि क्यासियरलाई बिलको रकम दिनुहोस्।"],
+   card:["Yes, debit and credit cards are accepted. Tap or insert your card and wait for approval.","हो, डेबिट र क्रेडिट कार्ड चल्छ। कार्ड ट्याप वा हालेर स्वीकृतिको प्रतीक्षा गर्नुहोस्।"],
+   digital:["Yes, QR and supported digital wallets are accepted here. Check the recipient and bill amount before paying. No payment has been made yet.","हो, यहाँ क्यूआर र उपलब्ध डिजिटल वालेट चल्छ। तिर्नुअघि प्राप्तकर्ता र बिलको रकम जाँच्नुहोस्। अहिलेसम्म भुक्तानी भएको छैन।"]
+  };
+  const script=scripts[state.payment];
+  if(!script)return build('checkout',state,config);
+  const paid={
+   cash:["I've handed the cashier the cash.","मैले क्यासियरलाई नगद दिएँ।"],
+   card:["My card payment was approved.","मेरो कार्ड भुक्तानी स्वीकृत भयो।"],
+   digital:["I've sent the QR payment. Can you confirm it?","मैले क्यूआर भुक्तानी पठाएँ। पुष्टि गरिदिनुहुन्छ?"]
+  }[state.payment];
+  return r(node,script[0],script[1],[
+   option(paid[0],paid[1],"confirmation",{paymentConfirmed:true,decision:"agreed"}),
+   option("Could I pay by card instead?","बरु कार्डबाट तिर्न मिल्छ?","payment-guide",{payment:"card",paymentConfirmed:false}),
+   option("Can I pay cash instead?","बरु नगद तिर्न सक्छु?","payment-guide",{payment:"cash",paymentConfirmed:false}),
+   option("I want to wait before paying.","तिर्नुअघि अलि पर्खन्छु।","closing",{decision:"later",payment:"none",paymentConfirmed:false})
+  ]);
+ }
  if(node==='confirmation'){
-  const ending=commerce&&state.payment?
-   "Thank you. "+({cash:"You've paid in cash.",card:"Your card payment is complete.",digital:"Your QR payment is complete."}[state.payment]||"Your payment is complete.")+" Here's your receipt.":
-   set.done[0];
-  const endingNe=commerce&&state.payment?
-   "तपाईंले "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"आफ्नो रोजाइको माध्यम")+" बाट तिर्नुभयो। यो तपाईंको रसिद।":set.done[1];
+  // In-progress lessons from before this fix may have jumped here after a question.
+  if(commercial&&state.payment&&!state.paymentConfirmed)return build('payment-guide',state,config);
+  const ending=commerce&&state.payment&&state.paymentConfirmed?
+   "Thank you. "+({cash:"I've received your cash payment.",card:"Your card payment was approved.",digital:"I've confirmed your QR payment."}[state.payment]||"Payment is complete.")+" Here's your receipt.":set.done[0];
+  const endingNe=commerce&&state.payment&&state.paymentConfirmed?
+   "तपाईंले "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"आफ्नो रोजाइको माध्यम")+" बाट तिरेको रकम पुष्टि भयो। यो रसिद लिनुहोस्।":set.done[1];
   return r(node,ending+" Thank you for talking with me!",endingNe+" कुराकानीका लागि धन्यवाद!",[
    option("Thank you. Have a nice day!","धन्यवाद। शुभ दिन!","end",{}),
    option("Could you explain the next steps again?","अर्को कदम फेरि बुझाउनुहुन्छ?","requirements",{})
