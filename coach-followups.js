@@ -144,15 +144,24 @@ function get(id,config,path,detail){
  const category=window.sikauMoreTopics?.find(s=>s.id===id)?.category||old[id]||"Everyday";
  const guide=g[category]||g.Everyday;
  const current=config[1][path],choice=current[4][detail],alternate=current[4][(detail+1)%3];
+ const shoppingClothes=id==="buy-clothes"?[
+  [["Could I compare the fit and warmth of these jackets?","यी ज्याकेटको साइज र न्यानोपन तुलना गरौँ?",
+    "Let's compare the material, comfort and actual sizes of the jackets available here.","यहाँ उपलब्ध ज्याकेटको सामग्री, आराम र साइज तुलना गरौँ।"],
+   ["May I try both sizes before deciding?","निर्णयअघि दुवै साइज लगाएर हेर्न सक्छु?",
+    "If the fitting room is available, try both sizes and check your comfort while moving.","ट्रायल रुम उपलब्ध भए दुवै लगाएर हिँड्दा कस्तो लाग्छ हेर्नुहोस्।"],
+   ["Could you show me the current price and discount terms?","हालको मूल्य र छुटका सर्त देखाइदिनुहुन्छ?",
+    "We can check each price tag and the current offer; discounts are not assumed.","प्रत्येक मूल्य ट्याग र हालको छुट जाँचौँ; छुट छ भनेर अनुमान नगरौँ।"]]
+ ][0][path]:null;
  const custom=id==="buy-phone"?phone[path]?.[detail]:null;
- const specific=window.sikauLegacyFollowups?.[id]?.[path];
+ const specific=shoppingClothes?.[0]===undefined?window.sikauLegacyFollowups?.[id]?.[path]:
+  shoppingClothes;
  const reaction=current[7]?.[detail];
  const prefix=custom?.[0]||specific&&current[5]||reaction?.[0]||current[5];
  const prefixNe=custom?.[1]||specific&&current[6]||reaction?.[1]||current[6];
  return {
   category,
-  message:prefix+(custom||specific?"":" "+(reaction?current[5]+" ":"")+guide[0]),
-  messageNe:prefixNe+(custom||specific?"":" "+(reaction?current[6]+" ":"")+guide[1]),
+  message:prefix+(custom||specific?"":reaction?" "+current[5]:" "+guide[0]),
+  messageNe:prefixNe+(custom||specific?"":reaction?" "+current[6]:" "+guide[1]),
   question:custom?.[2]||specific||[guide[2],guide[3],guide[4],guide[5]],
   guidance:specific||[guide[2],guide[3],guide[4],guide[5]],
   proceed:specific?[
