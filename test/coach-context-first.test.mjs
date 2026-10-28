@@ -1,0 +1,67 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const root=new URL('../',import.meta.url);
+const source=name=>fs.readFileSync(new URL(name,root),'utf8');
+function load(name,context){
+  const window=context||{};
+  vm.runInNewContext(source(name),{window});
+  return window;
+}
+test('all guided topics have a neutral opening and 27 adaptive configs',()=>{
+  const w=load('coach-adaptive-story.js');
+  assert.equal(w.sikauAdaptiveStory.topics.length,27);
+  for(const id of w.sikauAdaptiveStory.topics){
+    const scene=w.sikauAdaptiveStory.start({id,title:id});
+    assert.match(scene.steps[0].npc,/^(hello|hi|welcome|good)/i);
+    assert.equal(scene.steps[0].storeOptions.length,3);
+  }
+});
+test('guided responses branch and allow short or longer conversations',()=>{
+  const w=load('coach-adaptive-story.js'),api=w.sikauAdaptiveStory;
+  for(const id of api.topics){
+    for(let p=0;p<3;p++)for(let detail=0;detail<3;detail++){
+      const make=()=>api.start({id,title:id});
+      const short=make();
+      api.choose(short,short.steps[0].storeOptions[p],0);
+      api.choose(short,short.steps[1].storeOptions[detail],1);
+      api.choose(short,short.steps[2].storeOptions[0],2);
+      assert.equal(short.storyCompleted,true);
+      const long=make();
+      api.choose(long,long.steps[0].storeOptions[p],0);
+      api.choose(long,long.steps[1].storeOptions[detail],1);
+      api.choose(long,long.steps[2].storeOptions[1],2);
+      api.choose(long,long.steps[3].storeOptions[0],3);
+      api.choose(long,long.steps[4].storeOptions.at(-1),4);
+      assert.equal(long.storyCompleted,true);
+      assert.ok(long.steps.length>short.steps.length);
+    }
+  }
+});
+test('clothing is never assumed; all six garment types persist into dialogue',()=>{
+  const w=load('coach-store-story.js'),api=w.sikauStoreStory;
+  for(const item of ['shirt','pants','shoes','jacket','dress','multiple']){
+    const story=api.start({id:'return-shirt'});
+    assert.doesNotMatch(story.steps[0].npc,/shirt/i);
+    api.choose(story,story.steps[0].storeOptions[0],0);
+    api.choose(story,story.steps[1].storeOptions.find(x=>x.patch.item===item),1);
+    assert.equal(story.storeState.item,item);
+    api.choose(story,story.steps[2].storeOptions[0],2);
+    if(item!=='shirt')assert.doesNotMatch(story.steps.at(-1).npc,/shirt/i);
+  }
+});
+test('adaptive drafts keep the chosen path, and Visa integration remains present',()=>{
+  const data=new Map();
+  const localStorage={getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
+  const w={localStorage};load('coach-drafts.js',w);load('coach-adaptive-story.js',w);
+  const active=w.sikauAdaptiveStory.start({id:'restaurant'});
+  w.sikauAdaptiveStory.choose(active,active.steps[0].storeOptions[1],0);
+  w.sikauAdaptiveStory.choose(active,active.steps[1].storeOptions[2],1);
+  const d=w.sikauCoachDrafts.make('testUser123',[{id:'restaurant'}]);
+  assert.equal(d.save({active,index:2,history:[],attempts:0,successful:0,pendingChoice:null}),true);
+  assert.equal(d.read().storyState.path,1);
+  assert.equal(d.read().storyState.detail,2);
+  assert.match(source('coach-dashboard.js'),/installVisaSidebar\(doc,shell,visaController\)/);
+  assert.match(source('index.html'),/coach-adaptive-story\.js\?v=20261028-context-first-r3/);
+});
