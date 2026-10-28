@@ -64,7 +64,7 @@ function policyDecision(state){
   "सामान र हाम्रो पसलको नियम जाँच्दा, प्रयोग भएको सामान सामान्य फिर्ता लिन मिल्दैन। त्यसैले पैसा फिर्ता वा सौजन्य स्टोर क्रेडिट दिन सकिँदैन।"],
  "late-denied":[
   "The purchase appears to be outside our return period. I'm sorry, so I can't approve a normal refund or exchange. We can explain how to request a separate review, but it isn't guaranteed.",
-  "किनमेलको समय यो अभ्यास पसलको फिर्ता अवधि बाहिर परेको देखिन्छ। त्यसैले सामान्य पैसा फिर्ता वा साट्न स्वीकृति दिन मिल्दैन। थप जाँच माग्न सक्नुहुन्छ, तर ग्यारेन्टी छैन।"],
+  "किनमेल हाम्रो पसलको फिर्ता अवधिभन्दा पुरानो देखिन्छ। त्यसैले सामान्य पैसा फिर्ता वा साट्न स्वीकृति दिन मिल्दैन। थप जाँच माग्न सक्नुहुन्छ, तर ग्यारेन्टी छैन।"],
  "quality-review":[
   "This may be a defective item rather than a standard return. I can't approve a refund yet, but I can explain how we document the fault and request a quality or warranty review.",
   "यो सामान्य फिर्ताभन्दा सामानको त्रुटि हुन सक्छ। अहिले पैसा फिर्ता स्वीकृत गर्न सक्दिनँ, तर त्रुटि प्रमाणित गरी गुणस्तर वा वारेन्टी जाँच गर्न सकिन्छ।"],
@@ -79,7 +79,7 @@ function policyDecision(state){
   "यो अभ्यासमा रसिद र सामानको अवस्था जाँच्दा साट्ने नियम पूरा भएको छ। उपलब्ध सामानसँग साट्न सकिन्छ। मूल्य फरक भए हिसाब मिलाउनुपर्छ।"],
  "standard-credit":[
   "I checked the purchase and condition. The item qualifies under our return policy, and I can issue store credit instead of a refund. The credit can be used for future eligible purchases here.",
-  "यस अभ्यासमा खरिद र सामानको अवस्था जाँच्दा योग्य छ। पैसा फिर्ताको सट्टा स्टोर क्रेडिट दिन सक्छु। पछि यही पसलमा सामान किन्न प्रयोग हुन्छ।"],
+  "खरिद र सामानको अवस्था जाँच्दा यो योग्य देखिन्छ। पैसा फिर्ताको सट्टा स्टोर क्रेडिट दिन सक्छु। पछि यही पसलमा सामान किन्न प्रयोग हुन्छ।"],
  "refund-approved":[
   "I've verified the purchase details and item condition. The return is eligible, so we can issue a refund to the original payment method, subject to its processing time.",
   "खरिद विवरण र सामानको अवस्था पुष्टि भयो। हाम्रो नियमअनुसार मूल भुक्तानी माध्यममा पैसा फिर्ता गर्न मिल्छ। रकम आउन केही समय लाग्न सक्छ।"]
