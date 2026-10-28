@@ -845,6 +845,16 @@ window.enhanceCoachDashboard=function(doc){
    return;
   }
   const step=active.steps[index];
+  const fullPreview=add(doc,stage,'details','sikau-convo-dialogue-preview');
+  add(doc,fullPreview,'summary','','📖 Read the full example conversation · पूरा संवाद पढ्नुहोस्');
+  const previewBody=add(doc,fullPreview,'div','sikau-convo-preview-body');
+  for(const line of active.steps){
+   const sample=add(doc,previewBody,'div','sikau-convo-full-pair');
+   add(doc,sample,'strong','',active.partner+': '+line.npc);
+   if(showNepali)add(doc,sample,'small','',line.npcNe);
+   add(doc,sample,'p','','You: '+line.answer);
+   if(showNepali)add(doc,sample,'small','',line.answerNe);
+  }
   const progress=add(doc,stage,'div','sikau-convo-progress');
   add(doc,progress,'span','','Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
   const track=add(doc,progress,'div','sikau-convo-track');
