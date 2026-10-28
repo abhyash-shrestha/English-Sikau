@@ -145,16 +145,20 @@ function get(id,config,path,detail){
  const guide=g[category]||g.Everyday;
  const current=config[1][path],choice=current[4][detail],alternate=current[4][(detail+1)%3];
  const custom=id==="buy-phone"?phone[path]?.[detail]:null;
+ const specific=window.sikauLegacyFollowups?.[id]?.[path];
  const reaction=current[7]?.[detail];
- const prefix=custom?.[0]||reaction?.[0]||current[5];
- const prefixNe=custom?.[1]||reaction?.[1]||current[6];
+ const prefix=custom?.[0]||specific&&current[5]||reaction?.[0]||current[5];
+ const prefixNe=custom?.[1]||specific&&current[6]||reaction?.[1]||current[6];
  return {
   category,
-  message:prefix+" "+(!custom&&reaction?current[5]+" ":"")+(!custom?guide[0]:""),
-  messageNe:prefixNe+" "+(!custom&&reaction?current[6]+" ":"")+(!custom?guide[1]:""),
-  question:custom?.[2]||[guide[2],guide[3],guide[4],guide[5]],
-  guidance:[guide[2],guide[3],guide[4],guide[5]],
-  proceed:[guide[4],guide[5]],
+  message:prefix+(custom||specific?"":" "+(reaction?current[5]+" ":"")+guide[0]),
+  messageNe:prefixNe+(custom||specific?"":" "+(reaction?current[6]+" ":"")+guide[1]),
+  question:custom?.[2]||specific||[guide[2],guide[3],guide[4],guide[5]],
+  guidance:specific||[guide[2],guide[3],guide[4],guide[5]],
+  proceed:specific?[
+   "For your specific request, "+specific[2].charAt(0).toLowerCase()+specific[2].slice(1),
+   "तपाईंको अनुरोधका लागि, "+specific[3]
+  ]:[guide[4],guide[5]],
   alternate:[alternate[0],alternate[1],(detail+1)%3],
   focus:[choice[0],choice[1]],
   subject:[current[0],current[1]]
