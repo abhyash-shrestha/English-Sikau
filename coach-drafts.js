@@ -6,7 +6,7 @@
 (function(){
  'use strict';
  const VERSION=1, PREFIX='english-sikau-coach-draft-v1:';
- const allowStates=new Set(['intent','item','reason','condition','receipt','evidence','source','onlineProof','giftProof','timing','managerRequested','outcome']);
+ const allowStates=new Set(['intent','item','reason','condition','receipt','evidence','source','onlineProof','giftProof','timing','managerRequested','verification','outcome']);
  function make(userId,scenarios){
   if(typeof userId!=='string'||!(/^[a-zA-Z0-9_-]{6,128}$/.test(userId)))return null;
   let store=null;
