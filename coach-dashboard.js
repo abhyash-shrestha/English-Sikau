@@ -846,7 +846,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Write your own response. When the private AI service is configured, Coach gives grammar feedback and adapts the next question. Until then, a limited offline practice mode is available. · आफ्नै उत्तर लेख्नुहोस्। AI उपलब्ध भए अर्थ र व्याकरण जाँच हुनेछ।');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','Practice real-life English by choosing the response that fits the conversation. Wrong choices are explained, and each lesson has Nepali support. · कुराकानीमा मिल्ने उत्तर छानेर अभ्यास गर्नुहोस्।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -900,7 +900,6 @@ window.enhanceCoachDashboard=function(doc){
   if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
   renderStage();
  }
- function setMode(value){mode=value;choiceError='';typedError='';reveal=false;choices=[];renderStage();}
  function renderStage(){
   stage.replaceChildren();
   if(!active)return;
@@ -967,21 +966,16 @@ window.enhanceCoachDashboard=function(doc){
   hear.type='button';hear.addEventListener('click',()=>speak(doc,step.npc));
   add(doc,situ,'div','sikau-convo-your-turn','💬 Your turn · अब तपाईंको पालो');
   add(doc,situ,'p','sikau-convo-goal',step.goal);
-  const smallHelp=add(doc,situ,'p','sikau-convo-guide','You can choose a reply or write your own. · उत्तर छान्नुहोस् वा आफैं लेख्नुहोस्।');
+  const smallHelp=add(doc,situ,'p','sikau-convo-guide','Pick the reply that makes sense in this conversation. · कुराकानीसँग मिल्ने उत्तर छान्नुहोस्।');
   const feedback=add(doc,cols,'div','sikau-convo-reply');
-  const selector=add(doc,feedback,'div','sikau-convo-modes');
-  for(const [key,english,ne] of [['choose','👆 Tap a reply','उत्तर छान्नुहोस्'],['write','✍️ Write my reply','आफैं लेख्नुहोस्']]){
-   const m=add(doc,selector,'button','sikau-convo-mode'+(mode===key?' active':''),english);
-   m.type='button';m.setAttribute('aria-pressed',String(mode===key));m.title=ne;
-   m.addEventListener('click',()=>setMode(key));
-  }
+  add(doc,feedback,'div','sikau-convo-label','👆 Choose your response · सही उत्तर छान्नुहोस्');
   const result=add(doc,feedback,'div','sikau-convo-feedback');
   result.setAttribute('role','status');result.setAttribute('aria-live','polite');
   let resolved=false;
   function showResult(success,model,custom){
    result.replaceChildren();result.className='sikau-convo-feedback '+(success?'success':'warning');
-   const header=add(doc,result,'strong','',success?'✅ Good response! · राम्रो उत्तर':'💡 Try again · फेरि प्रयास');
-   add(doc,result,'p','',success?step.answer:'Choose a reply that fits the situation, or try different words.');
+   const header=add(doc,result,'strong','',success?'✅ Good response! · राम्रो उत्तर':'❌ This answer does not fit · यो उत्तर मिलेन');
+   add(doc,result,'p','',success?step.answer:'This reply does not answer the question. Choose an answer that fits this conversation.');
    if(showNepali)add(doc,result,'small','',success?step.answerNe:step.goal);
    if(success){
     if(index===active.steps.length-1)add(doc,result,'p','sikau-convo-next-line','💬 '+active.partner+': '+step.after);
@@ -989,112 +983,32 @@ window.enhanceCoachDashboard=function(doc){
     next.type='button';next.addEventListener('click',goNext);
    }
   }
-  if(mode==='choose'){
    choices=shuffledChoices(step);
    const options=add(doc,feedback,'div','sikau-convo-options');
    for(const item of choices){
     const b=add(doc,options,'button','sikau-convo-option',item.value);b.type='button';
     b.addEventListener('click',()=>{
+     if(b.disabled)return;
      attempts++;
-     if(item.correct){successful++;dialogueHistory[index]={reply:step.answer,kind:'guided'};options.querySelectorAll('button').forEach(x=>x.disabled=true);showResult(true);}
-     else{showResult(false);}
+     if(item.correct){
+      successful++;
+      dialogueHistory[index]={reply:step.answer,kind:'guided'};
+      b.classList.add('is-correct');
+      options.querySelectorAll('button').forEach(x=>x.disabled=true);
+      showResult(true);
+     }else{
+      b.classList.add('is-incorrect');
+      b.disabled=true;
+      showResult(false);
+     }
     });
-   }
-  }else{
-   add(doc,feedback,'label','sikau-convo-label','Write what you would say · आफूले भन्ने अंग्रेजी लेख्नुहोस्');
-   const input=add(doc,feedback,'textarea','sikau-convo-input');
-   input.rows=3;input.maxLength=500;input.placeholder='Example: I would like to…';
-   input.setAttribute('aria-label','Type your English response');
-   const controls=add(doc,feedback,'div','sikau-convo-write-controls');
-   const check=add(doc,controls,'button','sikau-convo-primary','Check reply · उत्तर जाँच्नुहोस्');check.type='button';
-   const hint=add(doc,controls,'button','sikau-convo-secondary','💡 Hint · संकेत');hint.type='button';
-   const revealBtn=add(doc,controls,'button','sikau-convo-secondary','👁 Model reply · नमुना');revealBtn.type='button';
-   let busy=false;
-   async function evaluate(){
-    if(busy||check.disabled)return;
-    const value=input.value.trim();
-    if(!value){result.className='sikau-convo-feedback warning';result.textContent='Write a reply to practice. · कृपया उत्तर लेख्नुहोस्।';return;}
-    const current=active,turn=index;
-    attempts++;
-    let review=null,aiFailed=false;
-    if(typeof window.sikauConversationAI==='function'&&window.sikauCoachAIConfigured){
-     busy=true;check.disabled=true;check.textContent='Checking reply… · उत्तर जाँच्दै…';
-     result.className='sikau-convo-feedback info';
-     result.textContent='Checking the meaning and grammar of your reply…';
-     try{
-      const past=active.steps.slice(Math.max(0,index-6),index).map((prior,i)=>{
-       const ix=Math.max(0,index-6)+i;
-       return {speaker:active.partner,question:prior.npc,reply:dialogueHistory[ix]?.reply||prior.answer};
-      });
-      const output=await window.sikauConversationAI({
-       situation:active.title,place:active.place,partner:active.partner,
-       turn:index+1,totalTurns:active.steps.length,
-       question:step.npc,questionNe:step.npcNe,
-       learnerReply:value,history:past
-      });
-      review=coachSafeAIReply(output);
-     }catch(_){aiFailed=true;}
-     finally{busy=false;if(current===active&&turn===index)check.disabled=false;}
-    }
-    if(current!==active||turn!==index||mode!=='write')return;
-    if(!review)review=coachOfflineReview(value,step,active);
-    result.replaceChildren();
-    result.className='sikau-convo-feedback '+(review.accepted?'success':'warning');
-    add(doc,result,'strong','',review.accepted?(review.mode==='ai'?'✅ Answer understood · उत्तर बुझियो':'✅ Reply recorded for practice · अभ्यासका लागि उत्तर राखियो'):'💡 Improve this answer · उत्तर सुधारौँ');
-    if(review.corrected){
-     add(doc,result,'small','',review.mode==='ai'?'Corrected English · सच्याइएको अंग्रेजी':'Suggested wording · सम्भावित राम्रो वाक्य');
-     add(doc,result,'p','',review.corrected);
-    }
-    if(review.improved&&review.improved!==review.corrected){
-     add(doc,result,'small','','More natural · अझ स्वाभाविक');
-     add(doc,result,'p','',review.improved);
-    }
-    if(review.why_ne)add(doc,result,'small','',review.why_ne);
-    if(review.mode!=='ai')add(doc,result,'small','',aiFailed?
-      'AI is temporarily unavailable. This is limited offline feedback, not a full grammar check.':
-      'Limited offline practice: full grammar checking and flexible replies require the private AI service.');
-    if(!review.accepted)return;
-    successful++;
-    dialogueHistory[index]={reply:value,corrected:review.corrected||'',learnerNe:review.learner_ne||'',kind:review.mode};
-    if(review.next&&index+1<active.steps.length){
-     active.steps[index+1]={...step,...review.next,goal:review.next.goal||step.goal};
-     active.steps[index].after=review.next.npc;
-    }else if(review.receiptNo&&index+1<active.steps.length){
-     active.steps.splice(index+1,active.steps.length-index-1,...coachNoReceiptPath());
-     active.steps[index].after=active.steps[index+1].npc;
-    }
-    input.readOnly=true;check.disabled=true;
-    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish conversation →':'Continue conversation → · कुराकानी जारी राख्नुहोस्');
-    next.type='button';next.addEventListener('click',goNext);
-   }
-   check.addEventListener('click',evaluate);
-   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();evaluate();}});
-   hint.addEventListener('click',()=>{result.className='sikau-convo-feedback info';result.textContent='💡 '+step.hint;});
-   revealBtn.addEventListener('click',()=>{
-    result.className='sikau-convo-feedback info';result.replaceChildren();
-    add(doc,result,'strong','','Model reply · नमुना उत्तर');
-    add(doc,result,'p','',step.answer);
-    if(showNepali)add(doc,result,'small','',step.answerNe);
-    const copy=add(doc,result,'button','sikau-convo-secondary','🔊 Hear example · सुन्नुहोस्');copy.type='button';copy.addEventListener('click',()=>speak(doc,step.answer));
-   });
-  }
-  const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरणमा जानुहोस् →');
+   }  feedback.appendChild(result);
+  const skip=add(doc,feedback,'button','sikau-convo-skip','Show example & skip · उदाहरण हेरेर अर्को →');
   skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','🌱 Useful language');
   add(doc,note,'p','',step.hint);
-  const realCoach=add(doc,feedback,'button','sikau-convo-native-link','✨ Ask AI Coach to correct my own reply →');
-  realCoach.type='button';
-  realCoach.addEventListener('click',()=>{
-   host.classList.add('sikau-convo-ai-open');
-   const input=feedback.querySelector('textarea');
-   const own=(input?.value||'').trim();
-   const prompt='Act as my friendly English conversation tutor. Situation: '+active.title+'. The other person said: '+step.npc+'. I want to say (Nepali): '+step.goal+'. My English reply: '+(own||'[I need help forming my answer]')+'. Check meaning and grammar, give a polished natural English reply, a Nepali explanation, and a sample follow-up question. Do not claim I completed a verified lesson.';
-   if(sendToNative(doc,ask,prompt)){
-    ask.scrollIntoView?.({behavior:'smooth',block:'center'});
-    notice.textContent='AI Coach question prepared. Press the existing Ask Coach button. · प्रश्न तयार छ, Ask Coach थिच्नुहोस्।';
-   }else{notice.textContent='Open the Coach form below to write your question. · तलको कोच फारममा प्रश्न लेख्नुहोस्।';}
-  });
+
  }
  searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
 
