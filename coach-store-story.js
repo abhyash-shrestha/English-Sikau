@@ -50,6 +50,11 @@ function assess(state){
 }
 function policyDecision(state){
  const outcome=assess(state);
+ if(outcome==="courtesy-credit"&&state.verification==="receipt-check"){
+  return {outcome,
+   en:"I verified the receipt, but the clothing doesn't meet our usual return conditions because its tags were removed. For this fictional store, I can approve a one-time courtesy store credit instead of a cash refund. This exception isn't a right or a guarantee at other stores.",
+   ne:"रसिद पुष्टि भयो, तर ट्याग हटेकाले सामान सामान्य फिर्ता नियममा पर्दैन। यस काल्पनिक अभ्यास पसलमा नगद फिर्ताको सट्टा एकपटकको सौजन्य स्टोर क्रेडिट स्वीकृत गर्न सक्छु। अरू पसलमा यसको ग्यारेन्टी छैन।"};
+ }
  const lines={
  "unverified":[
   "I'm sorry. I couldn't verify a purchase from this store, so I can't approve a refund, exchange, or store credit today. An item that looks like ours alone isn't enough. If you find a gift receipt, order confirmation, or other proof, we can review it again.",
