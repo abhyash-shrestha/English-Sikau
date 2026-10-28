@@ -935,3 +935,20 @@ html[data-sikau-theme="dark"] #coach .sikau-convo-dialogue-preview{
  background:#2d3045;border-color:#625772;
 }
 html[data-sikau-theme="dark"] #coach .sikau-convo-dialogue-preview summary{color:#ffc7e4}
+
+/* Single-mode guided Coach: clear right/wrong response without any writing UI. */
+.sikau-convo-reply>.sikau-convo-label{font-size:15px;font-weight:850;margin:0 0 14px;color:#273a65}
+.sikau-convo-option.is-incorrect,.sikau-convo-option.is-incorrect:disabled{
+ background:#fff0f0;border:2px solid #e75a61;color:#8d2530;opacity:1;
+}
+.sikau-convo-option.is-correct,.sikau-convo-option.is-correct:disabled{
+ background:#eaf9ec;border:2px solid #4eb476;color:#215f3c;opacity:1;
+}
+.sikau-convo-option:focus-visible{outline:3px solid #bd3976;outline-offset:2px}
+html[data-sikau-theme="dark"] .sikau-convo-option.is-incorrect{
+ background:#542d3c!important;color:#ffdae0!important;border-color:#e77d87!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] .sikau-convo-option.is-correct{
+ background:#214e3e!important;color:#e9ffee!important;border-color:#53b77a!important;opacity:1!important
+}
+html[data-sikau-theme="dark"] .sikau-convo-reply>.sikau-convo-label{color:#f4efff!important}
