@@ -284,22 +284,90 @@ function step(id,state){
  ],"Store manager","👩‍💼");
  }
  case "managerReview":{
-  const preference=state.intent==="refund"?"a refund":state.intent==="exchange"?"an exchange":"store credit";
-  return row("I understand you'd prefer "+preference+". I need to check the item and any purchase evidence. If the request cannot be approved, how would you like to proceed?",
-   "तपाईंको चाहना बुझेँ। सामान र खरिद प्रमाण जाँच्नुपर्छ। स्वीकृत नभए कसरी अघि बढ्ने?",[
-   opt("Please explain any other options available.","अरू उपलब्ध विकल्प बुझाउनुहोस्।","close",{outcome:"options"}),
-   opt("Could I receive the decision in writing?","निर्णय लिखित रूपमा पाउँछु?","close",{outcome:"written"}),
-   opt("I understand. I can keep the clothing if nothing is possible.","बुझेँ। केही नमिले कमिज राख्न सक्छु।","close",{outcome:"keep"})
+  const hasReceipt=["paper","digital","gift"].includes(state.receipt)||state.giftProof==="receipt";
+  if(hasReceipt)return row("Let's review the receipt and inspect the item against our practice-store policy. May I check the details?",
+    "यो अभ्यास पसलको नियमअनुसार रसिद र सामानको अवस्था जाँचौँ। विवरण जाँच गर्न दिनुहुन्छ?",[
+    opt("Yes, please check the receipt and the clothing.","हुन्छ, रसिद र लुगा जाँचिदिनुहोस्।","decision",{verification:"receipt-check"}),
+    opt("I'd like to bring more information before a decision.","निर्णयअघि थप विवरण ल्याउन चाहन्छु।","decision",{verification:"no-confirmation"}),
+    opt("I'd rather keep the item and decide later.","अहिले सामान राखेर पछि निर्णय गर्छु।","close",{outcome:"decide-later"})
+   ],"Store manager","👩‍💼");
+  return row("I haven't been able to verify a purchase from this store. I can check an internal store-specific product label, if there is one, but a matching style alone does not prove a purchase. Can I examine the label?",
+   "यो पसलबाट किनेको प्रमाण भेटिएन। पसलको विशेष उत्पादन लेबल भए जाँच्न सक्छु। मिल्दोजुल्दो सामान मात्र देखेर खरिद पुष्टि हुँदैन। लेबल हेर्न सक्छु?",[
+   opt("Yes, here is the inside store label. Please scan it.","हुन्छ, भित्रको पसलको लेबल छ। स्क्यान गर्नुहोस्।","decision",{verification:"label-match"}),
+   opt("There is no readable store label on this item.","यो सामानमा पढ्न मिल्ने पसलको लेबल छैन।","decision",{verification:"no-match"}),
+   opt("I can't provide a receipt or a store-identifying label.","रसिद वा पसल चिनिने लेबल केही पनि दिन सक्दिनँ।","decision",{verification:"no-proof"}),
+   opt("I'd rather look for purchase information and come back.","खरिद विवरण खोजेर पछि आउँछु।","close",{outcome:"return-with-proof"})
   ],"Store manager","👩‍💼");
  }
- case "close":return row(state.outcome==="written"?
-  "We can explain how to request a written review. The final decision depends on the policy and the item's condition. Any last questions?":
-  "Thank you for discussing your options. Any approval depends on the policy and review. Is there anything else I can explain?",
-  "उपलब्ध विकल्पबारे छलफल गर्नुभएकोमा धन्यवाद। स्वीकृति नियम र जाँचमा भर पर्छ। अरू केही बुझाउनुपर्छ?",[
-  opt("No, thanks for explaining everything.","होइन, सबै कुरा बुझाइदिनुभएकोमा धन्यवाद।","end"),
-  opt("Thanks. I understand the next steps.","धन्यवाद। अबको प्रक्रिया बुझेँ।","end"),
-  opt("I'll bring any additional proof if I find it.","थप प्रमाण भेटे ल्याउनेछु।","end")
+ case "decision":{
+  const result=policyDecision(state);
+  return row(result.en,result.ne,outcomeOptions(state),"Store manager","👩‍💼");
+ }
+ case "creditExplain":return row("Store credit is value we put on a store card for future eligible purchases here; it is not a cash refund. You can usually use it until the balance is spent. Expiry dates, restrictions and lost-card rules depend on the specific store, so I'd show you the written terms before issuing it. Would you like to accept this offer?",
+  "स्टोर क्रेडिट भनेको पछि यही पसलमा सामान किन्न प्रयोग हुने कार्डको रकम हो, नगद फिर्ता होइन। बाँकी रकम पुनः प्रयोग गर्न सकिन्छ। म्याद, सर्त र कार्ड हराएमा लाग्ने नियम लिखित रूपमा बुझ्नुपर्छ। लिन चाहनुहुन्छ?",[
+  opt("Yes, I'll take the store credit. Thank you.","हुन्छ, स्टोर क्रेडिट लिन्छु। धन्यवाद।","close",{outcome:"credit-accepted"}),
+  opt("No, I don't want store credit.","होइन, स्टोर क्रेडिट चाहिँदैन।","close",{outcome:"credit-declined"}),
+  opt("Could I see the written store-credit terms first?","पहिले स्टोर क्रेडिटका लिखित सर्त हेर्न सक्छु?","close",{outcome:"credit-terms"})
  ],"Store manager","👩‍💼");
+ case "refundExplain":return row("In this practice store, an approved refund goes to the original payment method. The bank or card provider controls how long it takes to appear, and we cannot promise a specific number of days. Would you like to proceed?",
+  "यस अभ्यास पसलमा स्वीकृत रकम पहिले तिरेको माध्यममै फर्किन्छ। बैंक वा कार्ड कम्पनीअनुसार समय लाग्छ, ठ्याक्कै कति दिन भन्ने वाचा गर्न सकिँदैन। अघि बढ्ने?",[
+  opt("Yes, please proceed with the refund.","हुन्छ, पैसा फिर्ता अघि बढाउनुहोस्।","close",{outcome:"refund-processed"}),
+  opt("I'd like an exchange instead.","बरु सामान साट्न चाहन्छु।","close",{outcome:"exchange-requested"}),
+  opt("I'll decide later. Thank you.","पछि निर्णय गर्छु। धन्यवाद।","close",{outcome:"decide-later"})
+ ],"Store manager","👩‍💼");
+ case "exchangeExplain":return row("For an exchange, we would inspect the item and check stock. If the replacement costs more, you may need to pay the difference; if it costs less, any balance depends on the store's written policy. Would you like to continue?",
+  "साट्दा सामान जाँचेर अर्को सामान उपलब्ध छ कि हेर्छौँ। नयाँ सामान महँगो भए फरक पैसा तिर्नुपर्ने हुन सक्छ; सस्तो भए बाँकी रकमबारे पसलको लिखित नियम लाग्छ। अघि बढ्ने?",[
+  opt("Yes, I'd like to exchange it.","हुन्छ, सामान साट्न चाहन्छु।","close",{outcome:"exchange-requested"}),
+  opt("I'll check the options and decide later.","विकल्प हेरेर पछि निर्णय गर्छु।","close",{outcome:"decide-later"})
+ ],"Store manager","👩‍💼");
+ case "qualityExplain":return row("For a possible defect, we would document the problem, check any warranty or consumer-rights process and explain the review steps. That is separate from a standard change-of-mind return, and no refund is guaranteed. Would you like to request that review?",
+ "सम्भावित त्रुटिका लागि समस्या टिपेर वारेन्टी वा उपभोक्ता अधिकारअनुसार जाँच गर्छौँ। यो सामान्य मन बदलिएको फिर्ताभन्दा फरक प्रक्रिया हो, पैसा फिर्ताको ग्यारेन्टी छैन। जाँच माग्ने?",[
+  opt("Yes, please tell me how to submit the item for inspection.","जाँचका लागि सामान कसरी बुझाउने बताइदिनुहोस्।","close",{outcome:"quality-request"}),
+  opt("I'll gather pictures and purchase information first.","पहिले फोटो र खरिद विवरण जुटाउँछु।","close",{outcome:"return-with-proof"})
+ ],"Store manager","👩‍💼");
+ case "denialExplain":{
+   const result=policyDecision(state);
+   return row(result.en+" If you locate new evidence, we can reconsider what the example policy permits. I can also explain the written return rules.",
+    result.ne+" नयाँ प्रमाण भेटिए उदाहरण नियमअनुसार फेरि जाँच्न सकिन्छ। लिखित फिर्ता नियम पनि बुझाउन सक्छु।",[
+    opt("I understand. I'll look for proof and return if I find it.","बुझेँ। प्रमाण भेटे फेरि आउँछु।","close",{outcome:"return-with-proof"}),
+    opt("Could I get the policy in writing?","नियम लिखित रूपमा पाउँछु?","close",{outcome:"written"}),
+    opt("Thanks. I'll keep the clothing for now.","धन्यवाद। अहिलेलाई लुगा राख्छु।","close",{outcome:"declined"})
+   ],"Store manager","👩‍💼");
+ }
+ case "close":{
+  const decision=policyDecision(state),status=decision.outcome,action=state.outcome;
+  let en,ne;
+  if(action==="credit-accepted"&&["courtesy-credit","gift-credit","standard-credit"].includes(status)){
+   en="In this practice scenario, we've agreed on store credit instead of cash. We'd issue it on a store card for future eligible purchases at this store. Keep the card safe and check the written balance, expiry and use rules. Thank you for working through the options with me.";
+   ne="यो अभ्यासमा नगदको सट्टा स्टोर क्रेडिटमा सहमति भयो। यही पसलमा पछि सामान किन्न कार्ड दिन्छौँ। कार्ड सुरक्षित राख्नुहोस् र बाँकी रकम, म्याद तथा प्रयोगका नियम जाँच्नुहोस्। धन्यवाद।";
+  }else if(action==="refund-processed"&&status==="refund-approved"){
+   en="Your return meets this practice store's rules. We can start the refund back to the original payment method; the actual bank posting time may vary. Here's your return confirmation for this role-play. Thank you for coming in.";
+   ne="यो अभ्यास पसलको नियमअनुसार फिर्ता मिल्छ। सुरुमा तिरेको माध्यममा पैसा फिर्ताको प्रक्रिया सुरु गर्न सकिन्छ; बैंकमा देखिन समय फरक हुन सक्छ। यो अभ्यासको फिर्ता पुष्टि हो। धन्यवाद।";
+  }else if(action==="exchange-requested"&&["exchange-approved","refund-approved"].includes(status)){
+   en="The exchange is eligible under this practice policy. We'll check stock and settle any price difference before completing it. If the replacement isn't available, we'd discuss the next allowed option. Thanks for coming in.";
+   ne="यो अभ्यास नियमअनुसार साट्न मिल्छ। अर्को सामान छ कि जाँचेर मूल्य फरक भए हिसाब मिलाउँछौँ। नभए अर्को मिल्ने विकल्पबारे छलफल गर्छौँ। धन्यवाद।";
+  }else if(action==="credit-declined"||action==="credit-terms"){
+   en=action==="credit-terms"?"Of course. Please read the written store-credit conditions before accepting anything. We have not issued a credit yet; you can decide after reviewing the terms.":"I understand. You don't have to accept the courtesy credit. We haven't processed any refund or credit; you can keep the item and decide later.";
+   ne=action==="credit-terms"?"अवश्य। स्टोर क्रेडिट लिनुअघि लिखित सर्त पढ्नुहोस्। अहिले कुनै क्रेडिट जारी भएको छैन। पढेर निर्णय गर्न सक्नुहुन्छ।":"बुझेँ। सौजन्य क्रेडिट लिनैपर्छ भन्ने छैन। कुनै रकम वा क्रेडिट प्रक्रिया गरिएको छैन। पछि निर्णय गर्न सक्नुहुन्छ।";
+  }else if(action==="quality-request"&&status==="quality-review"){
+   en="We haven't approved a refund. The next step is a documented defect inspection, with any decision made under the relevant warranty or consumer-rights process. Please bring the item and whatever supporting details you have.";
+   ne="अहिले पैसा फिर्ता स्वीकृत भएको छैन। अर्को कदम त्रुटिको जाँच हो। वारेन्टी वा उपभोक्ता अधिकारको नियमअनुसार निर्णय हुनेछ। सामान र भएका प्रमाण ल्याउनुहोस्।";
+  }else if(action==="return-with-proof"||action==="written"){
+   en=decision.en+" We haven't approved any refund or credit today. You're welcome to bring purchase evidence or ask for a copy of the relevant policy, and we can review the request again.";
+   ne=decision.ne+" आज कुनै पैसा फिर्ता वा क्रेडिट स्वीकृत भएको छैन। खरिद प्रमाण ल्याउन वा लिखित नियम माग्न सक्नुहुन्छ। फेरि जाँच गर्नेछौँ।";
+  }else if(action==="decide-later"){
+   en="Understood. We haven't processed a return or issued credit. Keep the item and any receipt or labels safe while you decide, and remember that time limits may apply.";
+   ne="बुझेँ। कुनै सामान फिर्ता वा क्रेडिट जारी गरिएको छैन। निर्णय नगर्दासम्म सामान, रसिद वा लेबल सुरक्षित राख्नुहोस्। समयसीमा हुन सक्छ।";
+  }else{
+   en=decision.en+" I'm sorry we couldn't resolve the return the way you hoped today. If new proof becomes available, the store can review it again. Thank you for visiting.";
+   ne=decision.ne+" आज चाहेजस्तो समाधान नहुँदा माफ गर्नुहोस्। नयाँ प्रमाण भेटिए फेरि जाँच गर्न सकिन्छ। आउनुभएकोमा धन्यवाद।";
+  }
+  return row(en,ne,[
+   opt("I understand. Thank you for explaining.","बुझेँ। स्पष्ट बुझाइदिनुभएकोमा धन्यवाद।","end"),
+   opt("Thanks. I'll follow up if I need to.","धन्यवाद। आवश्यक भए फेरि सम्पर्क गर्नेछु।","end"),
+   opt("Have a good day. Goodbye!","तपाईंको दिन राम्रो होस्। बिदा!","end")
+  ],"Store manager","👩‍💼");
+ }
  default:throw Error("Unknown clothing-store conversation node: "+id);
  }
 }
