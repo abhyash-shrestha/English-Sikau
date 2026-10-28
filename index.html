@@ -1130,6 +1130,7 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-stories.js?v=20261024-r1"></script>
 <script src="./festival-dashboard-preview.js?v=20261024-stories-r1"></script>
+<script src="./mobile-bar-handles.js?v=20261028-handles-r1"></script>
 <script src="./coach-store-story.js?v=20261028-dialogue-only-r9"></script>
 <script src="./coach-topic-catalog-1.js?v=20261028-175topics-r1"></script>
 <script src="./coach-topic-catalog-2.js?v=20261028-175topics-r1"></script>
@@ -2733,6 +2734,8 @@ function personalizeStudentLesson(){
   sikauApplyLessonTheme(doc);
   sikauImproveLessonControls(doc);
   sikauHideRetiredCoachSections(doc);
+  // Optional visibility handles run only after verified lesson content loads.
+  try{window.sikauMobileBarHandles?.install(doc);}catch(error){console.warn('Mobile bar handles:',error)}
 }
 $('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
 // Keep the visible festival schedule current across Nepal midnight, even without navigation.

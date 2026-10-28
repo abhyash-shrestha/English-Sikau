@@ -1,0 +1,54 @@
+/* Optional mobile hide/show handles; unchanged original navigation when expanded. */
+@media(max-width:767px){
+ #protected #sikauMobileTopHandle{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  align-self:center!important;flex:0 0 27px!important;
+  height:27px!important;min-height:27px!important;
+  min-width:66px!important;width:66px!important;
+  padding:0!important;margin:-9px auto 0!important;
+  position:relative!important;z-index:20!important;
+  box-sizing:border-box!important;
+  border:1px solid #bf9bba!important;border-radius:0 0 14px 14px!important;
+  background:#fff7fc!important;color:#7a2957!important;
+  box-shadow:0 3px 8px #2c1a3b24!important;
+  font:900 17px/1 system-ui,sans-serif!important;
+  cursor:pointer!important;touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent;
+ }
+ #protected.sikau-mobile-top-hidden #bar.student-topbar{display:none!important}
+ #protected.sikau-mobile-top-hidden #sikauMobileTopHandle{
+  margin:0 auto!important;border-radius:0 0 14px 14px!important;
+ }
+ #protected #sikauMobileTopHandle:focus-visible{outline:3px solid #326cdb!important;outline-offset:2px!important}
+ /* Hide the lesson's second top toolbar together with the outer header. */
+ html.sikau-refresh.sikau-mobile-top-hidden .app-header,
+ html.sikau-refresh.sikau-mobile-top-hidden:has(#tr.sikau-translated:not([hidden])) .app-header{
+  display:none!important;
+ }
+ html.sikau-refresh #sikauMobileBottomHandle{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:fixed!important;left:50%!important;transform:translateX(-50%)!important;
+  bottom:var(--sikau-handle-bottom,90px)!important;z-index:2147483000!important;
+  min-width:70px!important;width:70px!important;
+  min-height:27px!important;height:27px!important;
+  margin:0!important;padding:0!important;
+  border:1px solid #b0b8ce!important;border-radius:12px 12px 0 0!important;
+  box-sizing:border-box!important;background:#fff7fc!important;color:#8d235c!important;
+  box-shadow:0 -3px 9px #26385020!important;
+  font:900 18px/1 system-ui,sans-serif!important;
+  cursor:pointer!important;touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+ }
+ html.sikau-refresh.sikau-mobile-bottom-hidden #mobileModes.nav{display:none!important}
+ html.sikau-refresh.sikau-mobile-bottom-hidden body{padding-bottom:12px!important}
+ html.sikau-refresh.sikau-mobile-bottom-hidden #sikauMobileBottomHandle{
+  bottom:calc(4px + env(safe-area-inset-bottom,0px))!important;
+  border-radius:12px 12px 0 0!important;
+ }
+ html.sikau-refresh #sikauMobileBottomHandle:focus-visible{
+  outline:3px solid #326cdb!important;outline-offset:2px!important;
+ }
+}
+@media(min-width:768px){
+ #protected #sikauMobileTopHandle,#sikauMobileBottomHandle{display:none!important}
+}
