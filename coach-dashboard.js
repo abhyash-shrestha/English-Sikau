@@ -1071,6 +1071,10 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   pendingChoice=saved.pendingChoice&&typeof saved.pendingChoice.value==='string'?
    {value:introText(saved.pendingChoice.value),ne:introText(String(saved.pendingChoice.ne||''))}:null;
   finished=false;choices=[];reveal=false;choiceError='';typedError='';
+  // Update only the CURRENT unanswered question from old saved clothing
+  // conversations; keep all previous chat messages and answers unchanged.
+  const upgraded=active.isBranchingStore&&window.sikauStoreStory?.reconcile?.(active,index,pendingChoice);
+  if(upgraded)saveDraft();
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
   renderStage();
@@ -1273,14 +1277,18 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    const addFact=(value,label)=>{if(value)tags.push(label)};
    addFact(state.intent==='refund','💵 Refund requested');
    addFact(state.intent==='exchange','🔁 Exchange requested');
-   addFact(state.intent==='keep','🛍️ Keep the shirt');
-   addFact(state.receipt==='missing','🧾 No receipt');
+   addFact(state.intent==='keep','🛍️ Decided to finish');
+   addFact(state.item,'🧥 '+({shirt:'Shirt',pants:'Pants',shoes:'Shoes',jacket:'Jacket',dress:'Dress',multiple:'Multiple items'}[state.item]||'Clothing'));
+   addFact(state.receipt==='missing',state.source==='gift'?'🎁 No gift receipt':'🧾 No receipt');
+   addFact(state.receipt==='gift','🧾 Gift receipt');
    addFact(state.receipt==='paper','🧾 Paper receipt');
    addFact(state.receipt==='digital','📱 Digital receipt');
    addFact(state.condition==='worn','👕 Worn outside');
    addFact(state.condition==='no-tags','🏷️ Tags removed');
    addFact(state.source==='online','🌐 Online order');
    addFact(state.source==='gift','🎁 Gift');
+   addFact(state.source==='unknown','❔ Origin unknown');
+   addFact(state.timing==='unknown','📅 Purchase date unknown');
    addFact(state.timing==='older','📅 Possibly past return period');
    addFact(state.managerRequested===true,'👩‍💼 Manager review');
    if(tags.length){
