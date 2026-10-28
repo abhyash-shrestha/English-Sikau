@@ -61,7 +61,7 @@ function step(id,state){
  case "policy":return row("Of course. Eligibility depends on the purchase date, proof of purchase and item condition. What would you like to do?",
   "अवश्य। फिर्ता मिल्ने कुरा मिति, प्रमाण र सामानको अवस्थामा भर पर्छ। तपाईं के गर्न चाहनुहुन्छ?",[
   opt("I'd like to see whether I can get my money back.","पैसा फिर्ता पाइन्छ कि बुझ्न चाहन्छु।",state.item?"purchase":"item",{intent:"refund"}),
-  opt("I'd prefer to exchange it for another size.","म अर्को साइजसँग साट्न चाहन्छु।",state.item?"purchase":"item",{intent:"exchange"}),
+  opt("Could we discuss exchange options?","साट्ने विकल्पबारे कुरा गर्न सक्छौँ?",state.item?"purchase":"item",{intent:"exchange"}),
   opt("Thanks. I'll decide later.","धन्यवाद। पछि निर्णय गर्छु।","end",{intent:"keep"})]);
  case "reason":{
   const gift=state.source==="gift";
@@ -86,6 +86,11 @@ function step(id,state){
    opt("Yes, I have a gift receipt.","हो, मसँग उपहार रसिद छ।","timing",{receipt:"gift",giftProof:"receipt",evidence:"gift-receipt"}),
    opt("I could ask the person who gave it to me.","म उपहार दिने व्यक्तिलाई सोध्न सक्छु।","timing",{receipt:"missing",giftProof:"ask",evidence:"none"}),
    opt("No, I don't have proof, and I'd rather not contact them.","होइन, प्रमाण छैन र सम्पर्क पनि गर्न चाहन्नँ।","timing",{receipt:"missing",giftProof:"none",evidence:"none"})]);
+  if(state.source==="unknown")return row("Do you have anything that might help identify where these clothes came from?",
+   "यी लुगाहरू कहाँबाट आएका हुन् भन्ने पत्ता लगाउने कुनै विवरण छ?",[
+   opt("I have a receipt, but I don't recognize the store.","रसिद छ, तर पसल चिन्न सकिनँ।","timing",{receipt:"paper"}),
+   opt("I only have the tags or labels.","ट्याग वा लेबल मात्र छन्।","timing",{receipt:"missing",evidence:"labels"}),
+   opt("No, I don't have any purchase information.","होइन, मसँग खरिद विवरण छैन।","timing",{receipt:"missing",evidence:"none"})]);
   if(state.source==="online")return row("Do you have an order number or confirmation for the online purchase?",
    "अनलाइन खरिदको अर्डर नम्बर वा पुष्टि छ?",[
    opt("Yes, I have an order number.","हो, अर्डर नम्बर छ।","timing",{receipt:"digital",onlineProof:"number"}),
