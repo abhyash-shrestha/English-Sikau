@@ -89,12 +89,16 @@ function policyDecision(state){
 function outcomeOptions(state){
  const outcome=assess(state);
  const opts=(arr)=>arr.map(v=>opt(...v));
- if(["courtesy-credit","gift-credit","standard-credit"].includes(outcome))
-  return opts([
+ if(["courtesy-credit","gift-credit","standard-credit"].includes(outcome)){
+  const choices=[
    ["Could you explain how the store credit works?","स्टोर क्रेडिट कसरी चल्छ बुझाइदिनुहुन्छ?","creditExplain"],
    ["Yes, I'll accept the store credit.","हुन्छ, स्टोर क्रेडिट लिन्छु।","close",{outcome:"credit-accepted"}],
    ["I'd rather keep the item for now.","अहिले सामान आफूसँग राख्छु।","close",{outcome:"credit-declined"}]
-  ]);
+  ];
+  if(outcome==="gift-credit")
+   choices.splice(2,0,["I'd prefer to exchange the gift instead.","बरु उपहारको सामान साट्न चाहन्छु।","close",{outcome:"exchange-requested"}]);
+  return opts(choices);
+ }
  if(outcome==="refund-approved")return opts([
   ["Yes, please refund the original payment method.","हुन्छ, पहिले तिरेको माध्यममै पैसा फिर्ता गर्नुहोस्।","close",{outcome:"refund-processed"}],
   ["How long can the refund take?","पैसा फिर्ता आउन कति समय लाग्छ?","refundExplain"],
@@ -348,7 +352,7 @@ function step(id,state){
   }else if(action==="refund-processed"&&status==="refund-approved"){
    en="Your return meets this practice store's rules. We can start the refund back to the original payment method; the actual bank posting time may vary. Here's your return confirmation for this role-play. Thank you for coming in.";
    ne="यो अभ्यास पसलको नियमअनुसार फिर्ता मिल्छ। सुरुमा तिरेको माध्यममा पैसा फिर्ताको प्रक्रिया सुरु गर्न सकिन्छ; बैंकमा देखिन समय फरक हुन सक्छ। यो अभ्यासको फिर्ता पुष्टि हो। धन्यवाद।";
-  }else if(action==="exchange-requested"&&["exchange-approved","refund-approved"].includes(status)){
+  }else if(action==="exchange-requested"&&["exchange-approved","refund-approved","gift-credit"].includes(status)){
    en="The exchange is eligible under this practice policy. We'll check stock and settle any price difference before completing it. If the replacement isn't available, we'd discuss the next allowed option. Thanks for coming in.";
    ne="यो अभ्यास नियमअनुसार साट्न मिल्छ। अर्को सामान छ कि जाँचेर मूल्य फरक भए हिसाब मिलाउँछौँ। नभए अर्को मिल्ने विकल्पबारे छलफल गर्छौँ। धन्यवाद।";
   }else if(action==="credit-declined"||action==="credit-terms"){
@@ -363,6 +367,12 @@ function step(id,state){
   }else if(action==="decide-later"){
    en="Understood. We haven't processed a return or issued credit. Keep the item and any receipt or labels safe while you decide, and remember that time limits may apply.";
    ne="बुझेँ। कुनै सामान फिर्ता वा क्रेडिट जारी गरिएको छैन। निर्णय नगर्दासम्म सामान, रसिद वा लेबल सुरक्षित राख्नुहोस्। समयसीमा हुन सक्छ।";
+  }else if(["courtesy-credit","gift-credit","standard-credit"].includes(status)){
+   en="We discussed a possible store-credit option, but nothing has been issued yet. You can review the terms and decide whether to accept. Thank you for visiting.";
+   ne="स्टोर क्रेडिटको विकल्पबारे कुरा भयो, तर अहिले केही जारी गरिएको छैन। लिखित सर्त पढेर स्वीकार गर्ने कि नगर्ने निर्णय गर्न सक्नुहुन्छ। धन्यवाद।";
+  }else if(["refund-approved","exchange-approved"].includes(status)){
+   en="The item appears eligible under this practice policy, but we haven't processed a refund or exchange yet. You can return to complete it after deciding. Thank you.";
+   ne="यस अभ्यासको नियमअनुसार सामान योग्य देखिन्छ, तर अहिले पैसा फिर्ता वा साट्ने प्रक्रिया गरिएको छैन। निर्णय गरेपछि फेरि आउन सक्नुहुन्छ। धन्यवाद।";
   }else{
    en=decision.en+" I'm sorry we couldn't resolve the return the way you hoped today. If new proof becomes available, the store can review it again. Thank you for visiting.";
    ne=decision.ne+" आज चाहेजस्तो समाधान नहुँदा माफ गर्नुहोस्। नयाँ प्रमाण भेटिए फेरि जाँच गर्न सकिन्छ। आउनुभएकोमा धन्यवाद।";
