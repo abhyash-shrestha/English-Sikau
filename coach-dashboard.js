@@ -1144,6 +1144,28 @@ window.enhanceCoachDashboard=function(doc){
    add(doc,sample,'p','','You: '+line.answer);
    if(showNepali)add(doc,sample,'small','',line.answerNe);
   }
+  if(active.isBranchingStore){
+   const state=active.storeState||{};
+   const tags=[];
+   const addFact=(value,label)=>{if(value)tags.push(label)};
+   addFact(state.intent==='refund','💵 Refund requested');
+   addFact(state.intent==='exchange','🔁 Exchange requested');
+   addFact(state.intent==='keep','🛍️ Keep the shirt');
+   addFact(state.receipt==='missing','🧾 No receipt');
+   addFact(state.receipt==='paper','🧾 Paper receipt');
+   addFact(state.receipt==='digital','📱 Digital receipt');
+   addFact(state.condition==='worn','👕 Worn outside');
+   addFact(state.condition==='no-tags','🏷️ Tags removed');
+   addFact(state.source==='online','🌐 Online order');
+   addFact(state.source==='gift','🎁 Gift');
+   addFact(state.timing==='older','📅 Possibly past return period');
+   addFact(state.managerRequested===true,'👩‍💼 Manager review');
+   if(tags.length){
+    const info=add(doc,stage,'div','sikau-store-facts');
+    info.setAttribute('aria-label','Details remembered in this role-play');
+    for(const tag of tags)add(doc,info,'span','sikau-store-fact',tag);
+   }
+  }
   const progress=add(doc,stage,'div','sikau-convo-progress');
   add(doc,progress,'span','',active.isBranchingStore?'Turn '+(index+1)+' · Your choices shape the story':'Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
   const track=add(doc,progress,'div','sikau-convo-track');
