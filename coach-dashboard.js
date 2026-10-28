@@ -517,6 +517,95 @@ function coachSafeAIReply(raw){
   next:next?.npc&&next?.answer&&next?.npcNe?next:null};
 }
 
+
+/* Only authored, context-aware alternatives are marked correct. Opposite
+ * truthful answers can be valid but may require a DIFFERENT story path.
+ * Do not infer grammar or correctness from a string or keyword match.
+ */
+function coachBranchDialogue(kind){
+ const paths={
+  worn:[
+   ["Thank you for being honest. Did you wear it outside?","साँचो भन्नुभएकोमा धन्यवाद। बाहिर लगाउनुभएको थियो?","Yes, I wore it outside once.","हो, मैले बाहिर एकपटक लगाएको थिएँ।"],
+   ["Do you still have the receipt or an order confirmation?","रसिद वा अर्डर पुष्टि अझै छ?","I can check for the order confirmation.","म अर्डर पुष्टि खोज्न सक्छु।"],
+   ["Our policy may not allow returns on used items. Would you like me to explain it?","लगाइसकेको सामान फिर्ता नहुन सक्छ। नियम बुझाइदिऊँ?","Yes, please explain the return policy.","हो, फिर्ता नियम बुझाइदिनुहोस्।"],
+   ["I can check if an exchange or store credit is possible. Would that help?","साट्न वा स्टोर क्रेडिट मिल्छ कि जाँच गर्न सक्छु। ठीक छ?","Yes, that would be helpful.","हो, त्यसले मद्दत गर्छ।"],
+   ["May I look at the shirt and its tags?","कमिज र ट्याग हेर्न सक्छु?","Of course. Here is the shirt.","अवश्य, यो कमिज हो।"],
+   ["I cannot promise a refund, but I can ask my manager. Would you like me to?","पैसा फिर्ता हुने ग्यारेन्टी छैन, तर व्यवस्थापकलाई सोध्न सक्छु। सोधूँ?","Yes, I would appreciate that.","हो, मलाई राम्रो लाग्नेछ।"],
+   ["The manager needs to review the condition of the shirt. Do you have time to wait?","व्यवस्थापकले कमिज जाँच्नुपर्छ। पर्खन सक्नुहुन्छ?","Yes, I can wait a few minutes.","हो, केही मिनेट पर्खन सक्छु।"],
+   ["We have explained the available options under our policy. Is anything unclear?","नियमअनुसार विकल्पहरू बतायौँ। केही अस्पष्ट छ?","No, I understand the options now.","होइन, अब विकल्पहरू बुझेँ।"],
+   ["Is there anything else you would like to ask?","अरू केही सोध्न चाहनुहुन्छ?","No, thank you for explaining everything.","होइन, सबै बुझाउनुभएकोमा धन्यवाद।"]
+  ],
+  damaged:[
+   ["I'm sorry about that. What part of the shirt is damaged?","त्यसका लागि माफ गर्नुहोस्। कमिजको कुन भाग बिग्रेको छ?","The stitching on one sleeve is coming apart.","एउटा बाहुलाको सिलाइ फुस्किरहेको छ।"],
+   ["Was it like that when you opened the package?","प्याकेट खोलेदेखि नै त्यस्तै थियो?","Yes, I noticed it when I opened it.","हो, खोलेपछि मैले देखेको थिएँ।"],
+   ["Do you have a receipt or order confirmation?","रसिद वा अर्डर पुष्टि छ?","Yes, I can show you my order email.","हो, अर्डर इमेल देखाउन सक्छु।"],
+   ["Would you prefer us to inspect it first?","पहिले सामान जाँच गरौँ?","Yes, please check the damaged sleeve.","हो, बिग्रेको बाहुला जाँच्नुहोस्।"],
+   ["Would you like to ask about an exchange or a refund?","साट्ने वा पैसा फिर्ताबारे सोध्न चाहनुहुन्छ?","Could you explain both options, please?","कृपया दुवै विकल्प बुझाइदिनुहुन्छ?"],
+   ["Availability and returns depend on our policy. Would you like me to check?","सामान र फिर्ता पसलको नियममा भर पर्छ। जाँच गरूँ?","Yes, please check what is possible.","हो, के सम्भव छ जाँचिदिनुहोस्।"],
+   ["Is there anything else I can help with today?","आज अरू केही मद्दत गरूँ?","No, thank you for your help.","होइन, मद्दतका लागि धन्यवाद।"]
+  ],
+  exchange:[
+   ["What size would you like instead?","सट्टामा कति साइज चाहिन्छ?","I'd like one size larger, please.","म एक साइज ठूलो चाहन्छु।"],
+   ["Would you like to try the larger size?","ठूलो साइज लगाएर हेर्ने?","Yes, may I use the fitting room?","हो, फिटिङ कोठा प्रयोग गर्न सक्छु?"],
+   ["Does the larger size fit better?","ठूलो साइज राम्रो मिल्यो?","Yes, this one fits much better.","हो, यो धेरै राम्रो मिल्यो।"],
+   ["May I check the receipt and the exchange policy?","रसिद र साट्ने नियम जाँच गरूँ?","Sure. Please let me know what is required.","पक्कै, के चाहिन्छ बताइदिनुहोस्।"],
+   ["Would you like a copy of the exchange information?","साटेको विवरणको प्रति चाहिन्छ?","Yes, please send it to my email.","हो, कृपया इमेलमा पठाइदिनुहोस्।"],
+   ["Anything else I can help you with?","अरू केही मद्दत गरूँ?","No, that is all. Thank you!","होइन, यति नै हो। धन्यवाद!"]
+  ]
+ };
+ return (paths[kind]||[]).map(([npc,npcNe,answer,answerNe])=>coachOfflineStep(npc,npcNe,answer,answerNe));
+}
+function coachShuffleOptions(items){
+ const copy=items.map(x=>({...x}));
+ for(let i=copy.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];
+ }
+ return copy;
+}
+function coachReplyOptions(step,scene){
+ const line=normalize(step.npc),sceneId=scene?.id;
+ const choice=(value,ne,branch)=>({value,ne,correct:true,branch:branch||null});
+ const wrong={value:step.bad1||"My favorite color is blue.",correct:false};
+ if(sceneId==='return-shirt'){
+  if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line)){
+   return {multi:true,options:coachShuffleOptions([
+    choice("Yes, I only tried it on at home.","हो, मैले घरमा लगाएर मात्र हेरेको थिएँ।"),
+    choice("Yes, it is still unworn and the tags are attached.","हो, यो अझै नलगाइएको छ र ट्याग पनि छ।"),
+    choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn"),
+    wrong
+   ])};
+  }
+  if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line)){
+   return {multi:true,options:coachShuffleOptions([
+    choice("Yes, I have the receipt right here.","हो, रसिद यहीँ छ।"),
+    choice("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।"),
+    choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing"),
+    wrong
+   ])};
+  }
+  if(/\b(?:damaged|wrong size)\b/.test(line)){
+   return {multi:true,options:coachShuffleOptions([
+    choice("The size doesn't fit me.","यो साइज मलाई मिल्दैन।"),
+    choice("The stitching is damaged.","यसको सिलाइ बिग्रेको छ।","damaged"),
+    wrong
+   ])};
+  }
+  if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line)){
+   return {multi:true,options:coachShuffleOptions([
+    choice("I'd prefer a refund, please.","म पैसा फिर्ता चाहन्छु।"),
+    choice("I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।","exchange"),
+    wrong
+   ])};
+  }
+ }
+ // Most lessons still follow their authored practice route. We only add an
+ // opposite answer when its follow-up has been written to respect that choice.
+ return {multi:false,options:coachShuffleOptions([
+  choice(step.answer,step.answerNe),{value:step.bad1,correct:false},
+  {value:step.bad2,correct:false}
+ ])};
+}
+
 function shuffledChoices(step){
  const values=[{value:step.answer,correct:true},{value:step.bad1,correct:false},{value:step.bad2,correct:false}];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
@@ -938,76 +1027,108 @@ window.enhanceCoachDashboard=function(doc){
   add(doc,progress,'span','','Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
   const track=add(doc,progress,'div','sikau-convo-track');
   const fill=add(doc,track,'div','sikau-convo-track-fill');fill.style.width=((index+1)/active.steps.length*100)+'%';
-  // Review the whole exchange while learning, rather than isolated prompts.
-  const transcript=add(doc,stage,'div','sikau-convo-transcript');
-  add(doc,transcript,'h4','','💬 Conversation so far · अहिलेसम्मको कुराकानी');
-  if(index===0)add(doc,transcript,'p','sikau-convo-history-empty','Start your conversation below. Your dialogue will appear here as you continue.');
+
+  // One chat window, with scrollable prior turns and the current message.
+  // This is practice-only; the transcript stays local to this lesson session.
+  const chatLayout=add(doc,stage,'div','sikau-convo-chat-layout');
+  const transcript=add(doc,chatLayout,'section','sikau-convo-transcript sikau-convo-chat-thread');
+  transcript.setAttribute('role','region');
+  transcript.setAttribute('aria-label','Current and previous conversation messages');
+  const chatHead=add(doc,transcript,'div','sikau-chat-top');
+  add(doc,chatHead,'div','sikau-chat-top-scene',active.emoji+' '+active.place);
+  add(doc,chatHead,'span','sikau-chat-top-pill','● Practice conversation · कुराकानी अभ्यास');
+  function bubble(who,english,ne,speaker){
+   const wrapper=add(doc,transcript,'div','sikau-chat-message '+who);
+   const avatar=add(doc,wrapper,'span','sikau-chat-avatar',who==='other'?active.emoji:'🙋');
+   avatar.setAttribute('aria-hidden','true');
+   const body=add(doc,wrapper,'div','sikau-chat-message-body');
+   add(doc,body,'strong','',speaker);
+   add(doc,body,'p','',english);
+   if(showNepali&&ne)add(doc,body,'small','',ne);
+   return body;
+  }
+  if(index===0)add(doc,transcript,'p','sikau-chat-start','🌟 Your story begins here. Pick a reply to keep the chat going!');
   for(let i=0;i<index;i++){
    const prior=active.steps[i],history=dialogueHistory[i]||{};
-   const npcLine=add(doc,transcript,'div','sikau-convo-bubble other');
-   add(doc,npcLine,'strong','',active.partner);
-   add(doc,npcLine,'p','',prior.npc);
-   if(showNepali)add(doc,npcLine,'small','',prior.npcNe);
-   const learnerLine=add(doc,transcript,'div','sikau-convo-bubble learner');
-   add(doc,learnerLine,'strong','','You · तपाईं');
-   add(doc,learnerLine,'p','',history.reply||prior.answer);
-   const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?prior.answerNe:'');
-   if(showNepali&&translated)add(doc,learnerLine,'small','',translated);
-   if(history.corrected&&normalize(history.corrected)!==normalize(history.reply))add(doc,learnerLine,'small','','Suggested: '+history.corrected);
+   bubble('other',prior.npc,prior.npcNe,active.partner);
+   const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?history.answerNe||prior.answerNe:'');
+   bubble('learner',history.reply||prior.answer,translated,'You · तपाईं');
   }
-  const cols=add(doc,stage,'div','sikau-convo-session');
-  const situ=add(doc,cols,'div','sikau-convo-dialogue');
-  const setting=add(doc,situ,'div','sikau-convo-setting',active.emoji+' '+active.place);
-  const utter=add(doc,situ,'div','sikau-convo-utterance');
-  add(doc,utter,'span','sikau-convo-speaker',active.partner+' says · भन्नुहुन्छ');
-  add(doc,utter,'p','sikau-convo-npc',step.npc);
-  if(showNepali)add(doc,utter,'p','sikau-convo-npc-ne',step.npcNe);
-  const hear=add(doc,utter,'button','sikau-convo-hear','🔊 Listen · सुन्नुहोस्');
+  const latest=bubble('other current',step.npc,step.npcNe,active.partner+' · Now');
+  const hear=add(doc,latest,'button','sikau-convo-hear','🔊 Listen · सुन्नुहोस्');
   hear.type='button';hear.addEventListener('click',()=>speak(doc,step.npc));
-  add(doc,situ,'div','sikau-convo-your-turn','💬 Your turn · अब तपाईंको पालो');
-  add(doc,situ,'p','sikau-convo-goal',step.goal);
-  const smallHelp=add(doc,situ,'p','sikau-convo-guide','Pick the reply that makes sense in this conversation. · कुराकानीसँग मिल्ने उत्तर छान्नुहोस्।');
-  const feedback=add(doc,cols,'div','sikau-convo-reply');
-  add(doc,feedback,'div','sikau-convo-label','👆 Choose your response · सही उत्तर छान्नुहोस्');
+  const feedback=add(doc,chatLayout,'section','sikau-convo-reply sikau-convo-chat-choices');
+  const choiceHead=add(doc,feedback,'div','sikau-chat-choice-header');
+  add(doc,choiceHead,'strong','','🎯 Your turn · तपाईंको पालो');
+  add(doc,choiceHead,'small','','Choose what YOU would say. · आफूले भन्ने उत्तर छान्नुहोस्।');
+  const replyPlan=coachReplyOptions(step,active);
+  if(replyPlan.multi){
+   add(doc,feedback,'p','sikau-chat-multi-hint','✨ More than one answer makes sense here. Your choice can change the conversation. · धेरै उत्तर मिल्न सक्छन्।');
+  }else if(step.goal){
+   add(doc,feedback,'p','sikau-chat-goal',step.goal);
+  }
   const result=add(doc,feedback,'div','sikau-convo-feedback');
   result.setAttribute('role','status');result.setAttribute('aria-live','polite');
-  function showResult(success){
-   result.replaceChildren();result.className='sikau-convo-feedback '+(success?'success':'warning');
-   const header=add(doc,result,'strong','',success?'✅ Good response! · राम्रो उत्तर':'❌ This answer does not fit · यो उत्तर मिलेन');
-   add(doc,result,'p','',success?step.answer:'This reply does not answer the question. Choose an answer that fits this conversation.');
-   if(showNepali)add(doc,result,'small','',success?step.answerNe:step.goal);
+
+  function showResult(success,item){
+   result.replaceChildren();
+   result.className='sikau-convo-feedback '+(success?'success':'warning');
+   add(doc,result,'strong','',success?'✅ Great! That answer works · राम्रो उत्तर!':'💡 Not related to this situation · यहाँ नमिल्ने उत्तर');
+   add(doc,result,'p','',success?
+    'You chose: '+item.value:
+    'That answer does not respond to the other person. Try a different reply.');
+   if(success&&showNepali&&item.ne)add(doc,result,'small','',item.ne);
+   if(success&&item.branch)add(doc,result,'small','','💬 The next part of the chat will follow your choice.');
    if(success){
     if(index===active.steps.length-1)add(doc,result,'p','sikau-convo-next-line','💬 '+active.partner+': '+step.after);
-    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish conversation →':'Next turn → · अर्को चरण');
+    const next=add(doc,result,'button','sikau-convo-primary',index===active.steps.length-1?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
     next.type='button';next.addEventListener('click',goNext);
    }
   }
-   choices=shuffledChoices(step);
-   const options=add(doc,feedback,'div','sikau-convo-options');
-   for(const item of choices){
-    const b=add(doc,options,'button','sikau-convo-option',item.value);b.type='button';
-    b.addEventListener('click',()=>{
-     if(b.disabled)return;
-     attempts++;
-     if(item.correct){
-      successful++;
-      dialogueHistory[index]={reply:step.answer,kind:'guided'};
-      b.classList.add('is-correct');
-      options.querySelectorAll('button').forEach(x=>x.disabled=true);
-      showResult(true);
-     }else{
-      b.classList.add('is-incorrect');
-      b.disabled=true;
-      showResult(false);
+  const options=add(doc,feedback,'div','sikau-convo-options');
+  for(const item of replyPlan.options){
+   const b=add(doc,options,'button','sikau-convo-option sikau-chat-option');
+   b.type='button';
+   add(doc,b,'span','sikau-chat-option-radio','◯');
+   const copy=add(doc,b,'span','sikau-chat-option-copy');
+   add(doc,copy,'span','',item.value);
+   if(item.ne&&showNepali)add(doc,copy,'small','',item.ne);
+   b.addEventListener('click',()=>{
+    if(b.disabled)return;
+    attempts++;
+    if(item.correct){
+     successful++;
+     dialogueHistory[index]={reply:item.value,answerNe:item.ne||step.answerNe,
+       learnerNe:item.ne||'',kind:'guided'};
+     b.classList.add('is-correct');
+     b.querySelector('.sikau-chat-option-radio').textContent='✓';
+     options.querySelectorAll('button').forEach(x=>x.disabled=true);
+     if(item.branch&&index<active.steps.length-1){
+      const alternate=item.branch==='receipt_missing'?coachNoReceiptPath():coachBranchDialogue(item.branch);
+      if(alternate.length){
+       active.steps.splice(index+1,active.steps.length-index-1,...alternate);
+       active.steps[index].after=alternate[0].npc;
+      }
      }
-    });
-   }
+     showResult(true,item);
+    }else{
+     b.classList.add('is-incorrect');
+     b.querySelector('.sikau-chat-option-radio').textContent='×';
+     b.disabled=true;showResult(false,item);
+    }
+   });
+  }
   feedback.appendChild(result);
   const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
   skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
-  add(doc,note,'strong','','🌱 Useful language');
+  add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
   add(doc,note,'p','',step.hint);
+  // Show the newest question without requiring learners to scroll through all
+  // earlier chat messages. Keep every previous bubble available above.
+  doc.defaultView?.requestAnimationFrame?.(()=>{
+   if(transcript.isConnected)transcript.scrollTop=transcript.scrollHeight;
+  });
 
  }
  searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
