@@ -6,7 +6,7 @@
 (function(){
  'use strict';
  const VERSION=1, PREFIX='english-sikau-coach-draft-v1:';
- const allowStates=new Set(['intent','reason','condition','receipt','evidence','source','onlineProof','giftProof','timing','managerRequested','outcome']);
+ const allowStates=new Set(['intent','item','reason','condition','receipt','evidence','source','onlineProof','giftProof','timing','managerRequested','outcome']);
  function make(userId,scenarios){
   if(typeof userId!=='string'||!(/^[a-zA-Z0-9_-]{6,128}$/.test(userId)))return null;
   let store=null;
@@ -41,6 +41,15 @@
      (d.isBranchingStore&&d.sceneId!=='return-shirt')||
      (d.pendingChoice&&typeof d.pendingChoice.value!=='string'))throw Error('Invalid Coach draft');
     d.storeState=cleanState(d.storeState);
+    if(d.isBranchingStory){
+     if(d.sceneId==='return-shirt')throw Error('Incorrect Coach story type');
+     const state=d.storyState;
+     if(!state||state.scene!==d.sceneId||!Number.isInteger(state.path)||
+        state.path<0||state.path>2||
+        !(state.detail===null||Number.isInteger(state.detail)&&state.detail>=0&&state.detail<=2))
+      throw Error('Invalid Coach story state');
+     d.storyState={scene:d.sceneId,path:state.path,detail:state.detail};
+    }
     return d;
    }catch(_){remove();return null}
   }
@@ -53,6 +62,11 @@
     coachRound:a.coachRound,practiceNumber:a.coachPracticeNumber,
     coachStyle:a.coachStyle,isBranchingStore:!!a.isBranchingStore,
     storeCompleted:!!a.storeCompleted,storeState:cleanState(a.storeState),
+    isBranchingStory:!!a.isBranchingStory,
+    storyCompleted:!!a.storyCompleted,
+    storyState:a.isBranchingStory?{
+     scene:a.id,path:a.storyState?.path,detail:a.storyState?.detail
+    }:null,
     pendingChoice:data.pendingChoice?{
      value:String(data.pendingChoice.value||'').slice(0,700),
      ne:String(data.pendingChoice.ne||'').slice(0,900)}:null};
