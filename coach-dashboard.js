@@ -1056,7 +1056,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   attempts=Number.isSafeInteger(saved.attempts)?saved.attempts:0;
   successful=Number.isSafeInteger(saved.successful)?saved.successful:0;
   pendingChoice=saved.pendingChoice&&typeof saved.pendingChoice.value==='string'?
-   {value:saved.pendingChoice.value,ne:String(saved.pendingChoice.ne||'')}:null;
+   {value:introText(saved.pendingChoice.value),ne:introText(String(saved.pendingChoice.ne||''))}:null;
   finished=false;choices=[];reveal=false;choiceError='';typedError='';
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
