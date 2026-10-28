@@ -141,6 +141,21 @@ function buildRow(row){
     "We can check the tag prices, current offers and exchange terms before you pay. Nothing is purchased until you choose to check out.",
     "तिर्नुअघि मूल्य, अहिलेका छुट र साट्ने नियम बुझौँ। तपाईंले बिल नतिरुन्जेल कुनै सामान किनिएको हुँदैन।"]
   ];
+  custom[0].push([
+   ["Let's check available jacket materials and warmth without assuming stock.","ज्याकेटको सामग्री र न्यानोपन जाँचौँ, स्टक अनुमान नगरौँ।"],
+   ["Waterproof options may be available; let's check the product labels.","पानी नछिर्ने विकल्प हुन सक्छन्। लेबल जाँचौँ।"],
+   ["We can compare the casual styles and their actual prices.","साधारण शैली र वास्तविक मूल्य तुलना गरौँ।"]
+  ]);
+  custom[1].push([
+   ["Let's find a larger size and see if it is comfortable.","ठूलो साइज खोजेर आरामदायी छ कि हेरौँ।"],
+   ["You can try both jeans sizes and compare the fit.","दुवै साइजको जिन्स लगाएर तुलना गर्न सक्नुहुन्छ।"],
+   ["I'll show you where the fitting room is, if it's available.","ट्रायल रुम उपलब्ध छ भने कहाँ छ देखाउँछु।"]
+  ]);
+  custom[2].push([
+   ["We should confirm the current discount at the checkout.","काउन्टरमा हालको छुट पुष्टि गर्नुपर्छ।"],
+   ["Let's check the price tag and any applicable taxes.","मूल्य ट्याग र लागू कर जाँचौँ।"],
+   ["I'll explain the exchange rules before you choose to buy.","किन्ने निर्णयअघि साट्ने नियम बुझाउँछु।"]
+  ]);
   return Object.freeze({id,emoji,title,ne,category,place,partner,level:'Easy',
    config:[["Hello! Welcome to the clothing store. What can I help you find today?",
     "नमस्ते! कपडा पसलमा स्वागत छ। आज के खोज्न मद्दत गरूँ?"],custom]});
