@@ -39,6 +39,72 @@ for(const [key,rounds] of Object.entries(coachOriginalSceneRounds)){
  coachRoundsById[key]=rounds.map((rows,j)=>coachBuildSteps(rows,100+j*50+Object.keys(coachOriginalSceneRounds).indexOf(key)));
 }
 
+
+/* Bilingual Coach extensions; practice-only, not stored as verified progress. */
+const coachDepthPairs={"return-shirt":[["Can I see the original payment card?","पहिले तिरेको कार्ड देखाउनुहुन्छ?","Yes, here is my debit card.","हो, यो मेरो डेबिट कार्ड हो।"],["Do you need an email receipt?","इमेल रसिद चाहिन्छ?","Yes, please send me an email receipt.","हो, इमेल रसिद पठाइदिनुहोस्।"],["Would you like to try a different size?","अर्को साइज लगाएर हेर्ने?","Yes, may I try a larger size?","हो, ठूलो साइज लगाएर हेर्न सक्छु?"],["Should I check if it's in stock?","स्टकमा छ कि जाँच गरूँ?","Yes, please check the stock.","हो, स्टक जाँचिदिनुहोस्।"],["When did you buy this item?","यो सामान कहिले किन्नुभयो?","I bought it last week.","मैले गएको हप्ता किनेको थिएँ।"],["Would store credit work for you?","पसलको क्रेडिटले हुन्छ?","I'd prefer a refund if possible.","सम्भव भए पैसा फिर्ता चाहन्छु।"]],"buy-phone":[["What do you use your phone for?","फोन केका लागि प्रयोग गर्नुहुन्छ?","Mostly for work and video calls.","धेरैजसो काम र भिडियो कलका लागि।"],["Is battery life important to you?","ब्याट्री टिक्ने समय महत्त्वपूर्ण छ?","Yes, I need all-day battery life.","हो, दिनभर टिक्ने ब्याट्री चाहिन्छ।"],["Would you like more storage?","थप स्टोरेज चाहिन्छ?","Yes, please show me larger storage options.","हो, बढी स्टोरेजका विकल्प देखाउनुहोस्।"],["Would you like to compare the screens?","स्क्रिन तुलना गर्न चाहनुहुन्छ?","Yes, show them side by side.","हो, दुवै सँगै देखाउनुहोस्।"],["Do you need help transferring data?","डाटा सार्न मद्दत चाहिन्छ?","Yes, I need to move my photos.","हो, फोटो सार्न मद्दत चाहिन्छ।"],["Would you like to review the return policy?","फिर्ता गर्ने नियम बुझ्ने?","Please explain the return period.","फिर्ता गर्ने समयसीमा बताउनुहोस्।"]],"directions":[["Are you looking for a landmark?","कुनै चिनिने ठाउँ खोज्दै हुनुहुन्छ?","Yes, the library is nearby.","हो, पुस्तकालय नजिक छ।"],["Would you prefer the shortest route?","छोटो बाटो चाहनुहुन्छ?","Yes, I'd prefer the shortest walking route.","हो, हिँड्ने छोटो बाटो चाहन्छु।"],["Are you carrying luggage?","सामान बोकेर जानुभएको छ?","Yes, I need a route with fewer stairs.","हो, कम सिँढी भएको बाटो चाहिन्छ।"],["Do you need to know the return route?","फर्कने बाटो पनि चाहिन्छ?","Yes, how can I get back here?","हो, यहाँ कसरी फर्कने?"],["Do you need a safe place to cross?","सुरक्षित बाटोबाट पार गर्न चाहनुहुन्छ?","Yes, where is the nearest crosswalk?","हो, नजिकको जेब्रा क्रसिङ कहाँ छ?"],["Would a phone map help?","फोनको नक्साले मद्दत गर्छ?","Could you show it on a map?","नक्सामा देखाइदिनुहुन्छ?"]],"call-hospital":[["Would you prefer morning or afternoon?","बिहान कि दिउँसो चाहिन्छ?","An afternoon visit works better.","दिउँसोको समय राम्रो मिल्छ।"],["Should we send an appointment reminder?","भेटको सम्झना पठाऊँ?","Yes, please send a text reminder.","हो, सन्देशबाट सम्झाइदिनुहोस्।"],["Is Friday convenient for you?","शुक्रबार मिल्छ?","Yes, Friday afternoon works for me.","हो, शुक्रबार दिउँसो मिल्छ।"],["Would you like an earlier opening?","चाँडो खाली समय चाहिन्छ?","Yes, please call if something opens.","हो, समय खाली भए फोन गर्नुहोस्।"],["Do you have a doctor's referral?","डाक्टरको रेफरल छ?","I'll ask my doctor to send it.","म डाक्टरलाई पठाउन भन्छु।"],["Do you need directions to the clinic?","क्लिनिक पुग्ने बाटो चाहिन्छ?","Where is the main entrance?","मुख्य प्रवेशद्वार कहाँ छ?"]],"hospital-checkin":[["Do you need help finding the floor?","तल्ला खोज्न मद्दत चाहिन्छ?","Yes, which floor should I go to?","हो, कुन तल्लामा जानुपर्छ?"],["Would you like an interpreter?","अनुवादक चाहिन्छ?","A Nepali interpreter would help.","नेपाली अनुवादक भए सजिलो हुन्छ।"],["Have you completed this form?","यो फाराम भरिसक्नुभयो?","I need help with one section.","एउटा भागमा मद्दत चाहिन्छ।"],["Would you like to confirm the time?","समय पुष्टि गर्ने?","Yes, please confirm my appointment time.","हो, भेटको समय पुष्टि गरिदिनुहोस्।"],["Do you need written instructions?","लिखित निर्देशन चाहिन्छ?","Yes, please give me a printed copy.","हो, छापिएको प्रति दिनुहोस्।"],["Have you found the waiting room?","पर्खने कोठा भेट्नुभयो?","Not yet. Could you show me?","अहिले छैन। देखाइदिनुहुन्छ?"]],"restaurant":[["Would you like to hear today's special?","आजको विशेष खाना सुन्ने?","Yes, what do you recommend?","हो, के सिफारिस गर्नुहुन्छ?"],["Do you have any allergies?","कुनै खानेकुराको एलर्जी छ?","Could you tell me the ingredients?","यसका सामग्री बताइदिनुहुन्छ?"],["Would you like an appetizer?","सुरुमा हल्का खाना चाहिन्छ?","Yes, let's share an appetizer.","हो, हल्का खाना बाँडेर खाऔँ।"],["Would you like dessert?","मिठाई चाहिन्छ?","Yes, can we share one dessert?","हो, एउटै मिठाई बाँडेर खान सक्छौँ?"],["Is the spice level okay?","पिरो ठीक छ?","It's a little too spicy for me.","मलाई अलि बढी पिरो भयो।"],["Would you like separate checks?","बिल छुट्टाछुट्टै चाहिन्छ?","Yes, could we pay separately?","हो, अलग-अलग तिर्न सक्छौँ?"]],"groceries":[["Would you like to see today's deals?","आजको छुट हेर्न चाहनुहुन्छ?","Are these vegetables on sale?","यी तरकारीमा छुट छ?"],["Do you need help at checkout?","बिल तिर्न मद्दत चाहिन्छ?","Where is the self-checkout counter?","आफैं बिल तिर्ने काउन्टर कहाँ छ?"],["Would you like a larger package?","ठूलो प्याकेट चाहिन्छ?","No, a small package is enough.","होइन, सानो प्याकेट पुग्छ।"],["Are you looking for frozen food?","जमेको खानेकुरा खोज्दै हुनुहुन्छ?","Yes, where are the frozen vegetables?","हो, जमेको तरकारी कहाँ छ?"],["Do you have a loyalty card?","सदस्यता कार्ड छ?","Yes, I'd like to use my rewards.","हो, रिवार्ड प्रयोग गर्न चाहन्छु।"],["Should I check the price?","मूल्य जाँच गरूँ?","Yes, please confirm the shelf price.","हो, र्‍याकको मूल्य पुष्टि गर्नुहोस्।"]],"pharmacy":[["Do you have a question about the label?","लेबलबारे प्रश्न छ?","Could you explain the instructions?","निर्देशन बुझाइदिनुहुन्छ?"],["Would you prefer to speak privately?","एकान्तमा कुरा गर्ने?","Yes, I'd like to speak privately.","हो, एकान्तमा कुरा गर्न चाहन्छु।"],["Would you like to check the refill date?","फेरि औषधि लिने मिति जाँच्ने?","Yes, please check my refill date.","हो, मिति जाँचिदिनुहोस्।"],["Do you need written directions?","लिखित निर्देशन चाहिन्छ?","Yes, please print the instructions.","हो, निर्देशन छापिदिनुहोस्।"],["Should we contact your doctor?","डाक्टरलाई सम्पर्क गरौँ?","Yes, please ask for clarification.","हो, थप स्पष्ट पार्न सोध्नुहोस्।"],["Do you have another question?","अर्को प्रश्न छ?","Can I speak with the pharmacist?","फार्मासिस्टसँग कुरा गर्न सक्छु?"]],"coffee":[["Would you like a bigger cup?","ठूलो कप चाहिन्छ?","No, the small size is perfect.","होइन, सानो आकार ठीक छ।"],["Would you like a snack?","खाजा चाहिन्छ?","Do you have any fresh pastries?","ताजा पेस्ट्री छन्?"],["Would you like your drink iced?","चिसो पेय चाहिन्छ?","No, I'd like it hot.","होइन, तातो चाहन्छु।"],["Do you prefer another kind of milk?","अर्को प्रकारको दूध चाहिन्छ?","Could I have oat milk instead?","सट्टामा ओट मिल्क दिनुहुन्छ?"],["Would you like to sit inside?","भित्र बसेर खाने?","Is there a table by the window?","झ्यालनजिक टेबल छ?"],["Do you need your receipt?","रसिद चाहिन्छ?","Yes, please put it in the bag.","हो, झोलामा राखिदिनुहोस्।"]],"interview":[["Can you describe a challenge at work?","कामको चुनौतीबारे बताउनुहुन्छ?","I stayed calm and solved the problem.","म शान्त रहेँ र समस्या समाधान गरेँ।"],["How do you learn a new task?","नयाँ काम कसरी सिक्नुहुन्छ?","I ask questions and take notes.","म प्रश्न सोध्छु र नोट लेख्छु।"],["How do you support your coworkers?","सहकर्मीलाई कसरी सहयोग गर्नुहुन्छ?","I listen and help when they need me.","म सुन्छु र चाहिँदा मद्दत गर्छु।"],["What happens when you make a mistake?","गल्ती भयो भने के गर्नुहुन्छ?","I report it and correct it quickly.","म जानकारी दिन्छु र छिटो सच्याउँछु।"],["How do you handle a busy day?","व्यस्त दिनमा कसरी काम गर्नुहुन्छ?","I prioritize tasks and stay organized.","म कामलाई प्राथमिकता दिएर व्यवस्थित रहन्छु।"],["Do you have questions about the schedule?","तालिकाबारे प्रश्न छ?","What is the usual weekly schedule?","सामान्य साप्ताहिक तालिका कस्तो छ?"]],"work-shift":[["Can you organize the storeroom?","भण्डार कोठा मिलाइदिनुहुन्छ?","Yes, I'll sort the boxes by category.","हो, बाकसहरू प्रकारअनुसार मिलाउँछु।"],["Have you checked expiration dates?","म्याद जाँच्नुभयो?","I'll check them before restocking.","सामान थप्नुअघि जाँच्छु।"],["Can you update our inventory?","सामान सूची अद्यावधिक गर्नुहुन्छ?","Yes, I'll update it after counting.","हो, गनेपछि अद्यावधिक गर्छु।"],["Did anything arrive missing?","केही सामान कम आयो?","Yes, two items are missing.","हो, दुईवटा सामान कम छन्।"],["Could you finish the closing checklist?","बन्द गर्ने सूची पूरा गर्नुहुन्छ?","Yes, I'll finish it before leaving.","हो, जानुअघि पूरा गर्छु।"],["Would you like help with the report?","रिपोर्टमा मद्दत चाहिन्छ?","Could you review the numbers with me?","अंकहरू मसँग जाँचिदिनुहुन्छ?"]],"take-bus":[["Would you like us to announce your stop?","तपाईंको बिसौनीमा भनिदिऊँ?","Yes, please tell me when we reach the library.","हो, पुस्तकालय पुगेपछि भनिदिनुहोस्।"],["Do you need to know the fare?","भाडा कति हो जान्ने?","How much is a one-way ticket?","एकतर्फी टिकट कति हो?"],["Will you transfer to another bus?","अर्को बस फेर्नुहुन्छ?","Yes, where do I transfer?","हो, कहाँ बस फेर्ने?"],["Would you like an earlier bus?","चाँडो छुट्ने बस चाहिन्छ?","Is there a bus before nine?","नौ बजेअघि बस छ?"],["Do you know the platform?","प्लेटफर्म थाहा छ?","Which platform should I use?","म कुन प्लेटफर्ममा जाने?"],["Do you need the last bus time?","अन्तिम बसको समय चाहिन्छ?","When does the last bus leave?","अन्तिम बस कहिले छुट्छ?"]],"hotel":[["Would you like breakfast included?","बिहानको खाना समावेश चाहिन्छ?","Is breakfast included in this rate?","यो मूल्यमा बिहानको खाना समावेश छ?"],["Would you prefer a quiet room?","शान्त कोठा चाहिन्छ?","I'd prefer a room away from the elevator.","लिफ्टबाट टाढाको कोठा चाहन्छु।"],["Do you know your room number?","कोठा नम्बर थाहा छ?","Could you tell me my room number?","मेरो कोठा नम्बर बताइदिनुहुन्छ?"],["Would you like extra towels?","थप तौलिया चाहिन्छ?","Could you send two extra towels?","दुईवटा थप तौलिया पठाउनुहुन्छ?"],["Do you need luggage storage?","झोला राख्ने सुविधा चाहिन्छ?","Could you keep my bags after checkout?","चेकआउटपछि झोला राखिदिनुहुन्छ?"],["Would you like a taxi booked?","ट्याक्सी बोलाइदिऊँ?","Please book a taxi for eight.","आठ बजे ट्याक्सी बुक गरिदिनुहोस्।"]],"airport":[["Do you know the baggage weight limit?","झोलाको तौल सीमा थाहा छ?","What is the weight limit?","तौल सीमा कति हो?"],["Are there fragile items in your bag?","झोलामा फुट्ने सामान छ?","Yes, please mark it as fragile.","हो, फुट्ने सामान भनेर चिन्ह लगाउनुहोस्।"],["Would you like to check boarding time?","बोर्डिङ समय जाँच्ने?","When does boarding begin?","बोर्डिङ कहिले सुरु हुन्छ?"],["Would you like to confirm the gate?","गेट पुष्टि गर्ने?","Yes, please confirm my gate.","हो, गेट पुष्टि गर्नुहोस्।"],["Do you have a connecting flight?","अर्को उडान समात्नुहुन्छ?","How much time do I have to transfer?","उडान फेर्न कति समय छ?"],["Do you need help finding security?","सुरक्षा जाँचको बाटो चाहिन्छ?","Where is the security checkpoint?","सुरक्षा जाँच कहाँ छ?"]],"bank":[["Do you need an account summary?","खाताको सारांश चाहिन्छ?","Could I get a printed summary?","छापिएको सारांश पाउँछु?"],["Would you like to check recent activity?","हालका कारोबार जाँच्ने?","Please show me my last transactions.","पछिल्ला कारोबार देखाउनुहोस्।"],["Would you like a deposit receipt?","जम्माको रसिद चाहिन्छ?","Yes, please print the deposit receipt.","हो, जम्माको रसिद छापिदिनुहोस्।"],["Do you need to make a transfer?","पैसा ट्रान्सफर गर्नुपर्छ?","Could you explain the transfer options?","ट्रान्सफरका विकल्प बुझाइदिनुहुन्छ?"],["Would you like to request a debit card?","डेबिट कार्ड माग्नुहुन्छ?","How can I apply for a debit card?","डेबिट कार्डका लागि कसरी आवेदन दिने?"],["Do you want to know the account fees?","खाताको शुल्क जान्न चाहनुहुन्छ?","Please explain the monthly fee.","मासिक शुल्क बुझाउनुहोस्।"]],"phone-repair":[["Has your phone fallen recently?","फोन हालै खसेको हो?","Yes, it fell yesterday.","हो, हिजो खसेको थियो।"],["Would you like an estimate first?","पहिले खर्च अनुमान चाहिन्छ?","Yes, please give me an estimate.","हो, खर्च अनुमान दिनुहोस्।"],["Have you backed up your photos?","फोटो ब्याकअप गर्नुभयो?","Not yet. May I back them up first?","अहिले छैन। पहिले ब्याकअप गर्न सक्छु?"],["Should we test the battery?","ब्याट्री जाँच गर्ने?","Yes, please check the battery health.","हो, ब्याट्री जाँच्नुहोस्।"],["When did charging stop working?","चार्ज कहिलेदेखि बन्द भयो?","It started two days ago.","दुई दिनअघि सुरु भयो।"],["Would you like to know the repair time?","मर्मतको समय जान्ने?","Approximately how long will it take?","लगभग कति समय लाग्छ?"]],"new-friend":[["What do you like about this city?","यो सहरमा के मन पर्छ?","I like the parks and quiet streets.","मलाई पार्क र शान्त सडक मन पर्छ।"],["Would you like to explore this weekend?","यस सप्ताहन्त घुम्न जाने?","Yes, that sounds fun.","हो, त्यो रमाइलो हुन्छ।"],["What do you do in your free time?","फुर्सदमा के गर्नुहुन्छ?","I enjoy cooking and photography.","मलाई खाना पकाउन र फोटो खिच्न मन पर्छ।"],["Would you like to meet for tea?","चिया खान भेट्ने?","Saturday afternoon works for me.","शनिबार दिउँसो मिल्छ।"],["Do you know a good restaurant?","राम्रो रेस्टुरेन्ट थाहा छ?","I know a nice place for momo.","मोमो पाउने राम्रो ठाउँ थाहा छ।"],["Do you call your family in Nepal?","नेपालमा परिवारलाई फोन गर्नुहुन्छ?","Yes, we often talk on video calls.","हो, हामी प्रायः भिडियो कल गर्छौँ।"]],"school-help":[["Would you like me to repeat the instruction?","निर्देशन फेरि भनिदिऊँ?","Could you say it more slowly?","अलि बिस्तारै भनिदिनुहुन्छ?"],["Would another example help?","अर्को उदाहरणले मद्दत गर्छ?","Yes, another example would help.","हो, अर्को उदाहरणले मद्दत गर्छ।"],["Would you like to work with a partner?","साथीसँग अभ्यास गर्ने?","Yes, I'd like to work with a partner.","हो, साथीसँग अभ्यास गर्न चाहन्छु।"],["Do you understand the first sentence?","पहिलो वाक्य बुझ्नुभयो?","Yes, but the second sentence is difficult.","हो, तर दोस्रो वाक्य गाह्रो छ।"],["Do you want feedback on your answer?","उत्तरमा सुझाव चाहिन्छ?","Please tell me how to improve it.","कसरी सुधार्ने बताउनुहोस्।"],["Can you explain it in your own words?","आफ्नै शब्दमा बुझाउन सक्नुहुन्छ?","I'll try. Please correct my mistakes.","प्रयास गर्छु। गल्ती सच्याइदिनुहोस्।"]],"rent-home":[["Are utilities included?","पानी-बिजुलीको शुल्क समावेश छ?","Does rent include water and heat?","भाडामा पानी र तताउने शुल्क समावेश छ?"],["Would you like to see the laundry area?","लुगा धुने ठाउँ हेर्ने?","Is laundry available in this building?","यो भवनमा लुगा धुने सुविधा छ?"],["How long of a lease do you want?","कति अवधिको सम्झौता चाहिन्छ?","I'd prefer a one-year lease.","म एक वर्षको सम्झौता चाहन्छु।"],["Do you have a question about pets?","पाल्तु जनावरबारे प्रश्न छ?","Could you explain the pet policy?","पाल्तु जनावरको नियम बताउनुहुन्छ?"],["Would you like another viewing?","फेरि घर हेर्ने?","Could I visit again on Sunday?","आइतबार फेरि आउन सक्छु?"],["Do you need parking details?","पार्किङको विवरण चाहिन्छ?","Is there an extra parking fee?","पार्किङको थप शुल्क छ?"]],"home-internet":[["How many devices do you use?","कतिवटा उपकरण चलाउनुहुन्छ?","About four devices at home.","घरमा लगभग चार उपकरण।"],["Do you need fast video calls?","छिटो भिडियो कल चाहिन्छ?","Yes, I need reliable video calls.","हो, भरपर्दो भिडियो कल चाहिन्छ।"],["Where should we install the router?","राउटर कहाँ राख्ने?","Please put it in the living room.","बैठक कोठामा राखिदिनुहोस्।"],["Do you need a technician to visit?","प्राविधिक घर आउनुपर्छ?","Could someone visit after work?","कामपछि कोही आउन सक्छ?"],["Does the problem affect all devices?","सबै उपकरणमा समस्या छ?","Yes, my phone and laptop both disconnect.","हो, फोन र ल्यापटप दुवै छुट्छन्।"],["Have you tried restarting the router?","राउटर फेरि सुरु गर्नुभयो?","Yes, I've restarted it twice.","हो, दुईपटक सुरु गरेँ।"]],"delivery-help":[["Have you checked tracking?","ट्र्याकिङ हेर्नुभयो?","Yes, it hasn't updated since Monday.","हो, सोमबारदेखि अपडेट छैन।"],["Should we investigate the delivery?","डेलिभरीको जाँच गरौँ?","Yes, please check the missing package.","हो, हराएको प्याकेज जाँच्नुहोस्।"],["Did reception receive the package?","रिसेप्सनले प्याकेज पायो?","No, they haven't received anything.","होइन, केही पाएका छैनन्।"],["Should we contact the courier?","कुरियरलाई सम्पर्क गर्ने?","Yes, please ask where it was left.","हो, कहाँ राखियो भनेर सोध्नुहोस्।"],["Would you prefer a refund?","पैसा फिर्ता चाहिन्छ?","Yes, I'd like a refund to my card.","हो, कार्डमा पैसा फिर्ता चाहिन्छ।"],["Do you need a new delivery date?","नयाँ डेलिभरी मिति चाहिन्छ?","Please confirm the expected date.","अनुमानित मिति पुष्टि गर्नुहोस्।"]],"dental-office":[["Have you felt this pain before?","पहिले पनि यस्तो दुखेको थियो?","No, the pain started this morning.","होइन, आज बिहानदेखि सुरु भयो।"],["Would you like an explanation of the procedure?","उपचारको प्रक्रिया बुझ्ने?","Yes, please explain the next step.","हो, अर्को चरण बुझाउनुहोस्।"],["Do you brush every day?","दिनहुँ ब्रस गर्नुहुन्छ?","Yes, I brush twice a day.","हो, दिनमा दुईपटक ब्रस गर्छु।"],["Would you like another cleaning appointment?","फेरि सफाइको समय राख्ने?","Yes, please book me for next month.","हो, अर्को महिनाका लागि बुक गर्नुहोस्।"],["Does the pain keep you awake?","दुखाइले निद्रा बिगार्छ?","Yes, it's difficult to sleep.","हो, सुत्न गाह्रो हुन्छ।"],["Would you like a cost estimate?","खर्च अनुमान चाहिन्छ?","Please give me an estimate first.","पहिले खर्च अनुमान दिनुहोस्।"]],"parent-meeting":[["What books does your child like?","बच्चालाई कस्ता किताब मन पर्छ?","My child likes picture books.","मेरो बच्चालाई चित्र भएका किताब मन पर्छ।"],["Would you like book suggestions?","किताबको सुझाव चाहिन्छ?","Please suggest reading practice books.","पढाइ अभ्यासका किताब सुझाउनुहोस्।"],["Does your child participate in class?","बच्चा कक्षामा सहभागी हुन्छ?","Is my child comfortable speaking in class?","कक्षामा बोल्न सहज छ?"],["Would weekly updates help?","साप्ताहिक जानकारीले मद्दत गर्छ?","Yes, a short update would help.","हो, छोटो जानकारी उपयोगी हुन्छ।"],["Would you like the school calendar?","विद्यालयको पात्रो चाहिन्छ?","Please share the upcoming dates.","आउँदा मिति पठाउनुहोस्।"],["Do you prefer email or phone?","इमेल कि फोन मन पर्छ?","Email is easier for me.","मलाई इमेल सजिलो हुन्छ।"]],"shift-request":[["Have you asked a coworker?","सहकर्मीलाई सोध्नुभयो?","Yes, someone may cover my shift.","हो, कसैले मेरो सिफ्ट सम्हाल्न सक्छ।"],["Would a morning shift work?","बिहानको सिफ्ट मिल्छ?","Yes, I can work in the morning.","हो, बिहान काम गर्न सक्छु।"],["Can you give more notice next time?","अर्कोपटक चाँडो खबर गर्नुहुन्छ?","Yes, I'll give advance notice.","हो, अगाडि नै खबर गर्छु।"],["Can you confirm your availability?","उपलब्धता पुष्टि गर्नुहुन्छ?","I'm available Sunday afternoon.","आइतबार दिउँसो खाली छु।"],["Would Tuesday work better?","मंगलबार बढी मिल्छ?","Yes, please move my shift to Tuesday.","हो, सिफ्ट मंगलबार सारिदिनुहोस्।"],["Will you update the scheduling app?","तालिका एप अपडेट गर्नुहुन्छ?","Yes, I'll update it today.","हो, आजै अपडेट गर्छु।"]],"card-lost":[["When did you last use the card?","कार्ड कहिले प्रयोग गर्नुभयो?","I used it yesterday afternoon.","हिजो दिउँसो प्रयोग गरेको थिएँ।"],["Did you see an unfamiliar charge?","नचिनेको कारोबार देख्नुभयो?","Yes, I need to dispute a transaction.","हो, कारोबारमा विवाद गर्नुपर्छ।"],["Would you like transaction alerts?","कारोबारका सूचना चाहिन्छ?","Yes, please turn on alerts.","हो, सूचना खोलिदिनुहोस्।"],["Should we review the next steps?","अर्को प्रक्रिया बुझ्ने?","What should I do if another charge appears?","अर्को खर्च देखियो भने के गर्ने?"],["Do you need it mailed to you?","हुलाकबाट पठाउनुपर्छ?","Yes, send it to my verified address.","हो, पुष्टि भएको ठेगानामा पठाउनुहोस्।"],["Do you want a delivery estimate?","पुग्ने समयको अनुमान चाहिन्छ?","How many business days will it take?","कति कामकाजी दिन लाग्छ?"]],"send-mail":[["Is anything fragile inside?","भित्र फुट्ने सामान छ?","Yes, please mark this as fragile.","हो, फुट्ने भनेर चिन्ह लगाउनुहोस्।"],["Do you want shipping insurance?","पठाउने बीमा चाहिन्छ?","How much would insurance cost?","बीमाको खर्च कति हुन्छ?"],["Would you like tracking?","ट्र्याकिङ चाहिन्छ?","Yes, please give me a tracking number.","हो, ट्र्याकिङ नम्बर दिनुहोस्।"],["Should the recipient sign for it?","पाउने व्यक्तिले हस्ताक्षर गर्नुपर्छ?","Yes, I'd like signature confirmation.","हो, हस्ताक्षर पुष्टि चाहिन्छ।"],["Do you need help with customs?","भन्सारमा मद्दत चाहिन्छ?","How should I describe these gifts?","यी उपहार कसरी लेख्ने?"],["Would you like to compare shipping options?","पठाउने विकल्प तुलना गर्ने?","Which option is affordable and trackable?","कुन विकल्प सस्तो र ट्र्याक गर्न मिल्छ?"]],"car-repair":[["Does the noise happen while turning?","मोड्दा आवाज आउँछ?","No, mostly when I brake.","होइन, ब्रेक लगाउँदा बढी।"],["Should we do a road test?","सडकमा चलाएर जाँच्ने?","Yes, please test it first.","हो, पहिले परीक्षण गर्नुहोस्।"],["Do you have the service records?","मर्मतको रेकर्ड छ?","I can bring my last receipt.","पछिल्लो रसिद ल्याउन सक्छु।"],["Should we call before extra repairs?","थप मर्मतअघि फोन गर्ने?","Yes, please call me before extra work.","हो, थप कामअघि फोन गर्नुहोस्।"],["Does the warning light stay on?","चेतावनी बत्ती बलिरहन्छ?","Yes, even when I'm driving.","हो, चलाउँदा पनि बल्छ।"],["Do you need the car back today?","आजै गाडी चाहिन्छ?","When will the car be ready?","गाडी कहिले तयार हुन्छ?"]],"library":[["Would you like help finding a book?","किताब खोज्न मद्दत चाहिन्छ?","I'd like an easy English storybook.","सजिलो अंग्रेजी कथाको किताब चाहिन्छ।"],["Do you know the borrowing period?","लैजाने अवधि थाहा छ?","How many weeks can I keep it?","कति हप्ता राख्न सक्छु?"],["Do you already have a library card?","पुस्तकालय कार्ड छ?","Not yet. Can I apply today?","अहिले छैन। आज बनाउन सक्छु?"],["Would you like intermediate books?","मध्यम स्तरका किताब चाहिन्छ?","Yes, I'd like to practice reading.","हो, पढ्ने अभ्यास गर्न चाहन्छु।"],["Do you want to reserve a computer?","कम्प्युटर बुक गर्ने?","Could I reserve one for an hour?","एक घण्टा बुक गर्न सक्छु?"],["Are you interested in speaking classes?","बोल्ने कक्षामा रुचि छ?","Yes, I'd like to join a conversation group.","हो, कुराकानी समूहमा सहभागी हुन चाहन्छु।"]]};
+const coachPracticeSkills=[
+ [
+ ["Could you explain that a little more?","अलि थप बुझाइदिनुहुन्छ?","Of course. Let me explain more clearly.","अवश्य, अझ स्पष्ट रूपमा बुझाउँछु।"],
+ ["Could you repeat the last part?","अन्तिम कुरा फेरि भन्नुहुन्छ?","Certainly. I'll repeat it more slowly.","पक्कै, अझ बिस्तारै दोहोर्‍याउँछु।"],
+ ["Can you put that another way?","अर्को तरिकाले भन्नुहुन्छ?","Yes, let me say it differently.","हो, अर्को तरिकाले भन्छु।"],
+ ["Can you clarify what you meant?","तपाईंको अर्थ स्पष्ट पार्नुहुन्छ?","Sure, I'll explain the main point again.","हुन्छ, मुख्य कुरा फेरि बुझाउँछु।"],
+ ["Would it help to take this step by step?","चरणबद्ध बुझ्दा सजिलो हुन्छ?","Yes, step by step would be helpful.","हो, चरणबद्ध भए सजिलो हुन्छ।"],
+ ["Do you need another example?","अर्को उदाहरण चाहिन्छ?","Yes, one more example would help.","हो, अर्को उदाहरणले मद्दत गर्छ।"],
+ ["Can I give you a moment to think?","सोच्न केही समय दिऊँ?","Yes, please give me a moment.","हो, अलिकति समय दिनुहोस्।"]
+ ],
+ [
+ ["Would you like to ask another question?","अर्को प्रश्न सोध्नुहुन्छ?","Yes, what happens next?","हो, अब के हुन्छ?"],
+ ["Do you want to know more before deciding?","निर्णयअघि थप जान्ने?","Yes, I'd like to understand the options.","हो, विकल्प बुझ्न चाहन्छु।"],
+ ["Is there anything you'd like me to explain?","केही बुझाइदिऊँ?","Could you explain the main detail?","मुख्य विवरण बुझाइदिनुहुन्छ?"],
+ ["Would you like to see an example?","उदाहरण हेर्ने?","Yes, could you show me one?","हो, एउटा देखाइदिनुहुन्छ?"],
+ ["Do you want to know the next step?","अर्को चरण जान्ने?","Yes, what should I do after this?","हो, यसपछि के गर्नुपर्छ?"],
+ ["Do you have another question?","अरू प्रश्न छ?","Yes, when should I follow up?","हो, कहिले फेरि सम्पर्क गर्ने?"],
+ ["Would written details be useful?","लिखित विवरण उपयोगी हुन्छ?","Yes, a short written summary would help.","हो, छोटो लिखित सारांशले मद्दत गर्छ।"]
+ ],
+ [
+ ["Does that sound right to you?","त्यो ठीक लाग्यो?","Yes, that matches what I understood.","हो, मैले बुझेकोसँग मिल्छ।"],
+ ["Should we confirm the details?","विवरण पुष्टि गर्ने?","Yes, let's check once more.","हो, फेरि एकपटक जाँचौँ।"],
+ ["Are you happy with that plan?","त्यो योजना ठीक छ?","Yes, that plan works for me.","हो, त्यो योजना मलाई मिल्छ।"],
+ ["Would you like to change anything?","केही परिवर्तन गर्ने?","I'd like to make one small change.","म एउटा सानो परिवर्तन गर्न चाहन्छु।"],
+ ["Should I write that down?","त्यो लेखेर राखूँ?","Yes, please write down the details.","हो, विवरण लेखिदिनुहोस्।"],
+ ["Are we on the same page now?","अब हामीले एउटै कुरा बुझेका छौँ?","Yes, I think we understand each other.","हो, एकअर्कालाई बुझेका छौँ।"],
+ ["Should I double-check this?","फेरि जाँच गरूँ?","Yes, I'd appreciate a quick check.","हो, छिटो जाँचिदिनुभयो भने राम्रो हुन्छ।"]
+ ],
+ [
+ ["Can I help you with anything else?","अरू मद्दत चाहिन्छ?","No, thank you. You've been helpful.","होइन, धन्यवाद। तपाईंले मद्दत गर्नुभयो।"],
+ ["Would you like to follow up tomorrow?","भोलि फेरि सम्पर्क गर्ने?","Yes, tomorrow would be convenient.","हो, भोलि सजिलो हुन्छ।"],
+ ["Do you have everything you need?","चाहिने सबै पाउनुभयो?","Yes, I have what I need. Thanks!","हो, चाहिएको पाएँ। धन्यवाद।"],
+ ["Would an email update help?","इमेलमा जानकारी उपयोगी हुन्छ?","Yes, an email update would be great.","हो, इमेलमा जानकारी पाए राम्रो हुन्छ।"],
+ ["When should I contact you again?","फेरि कहिले सम्पर्क गर्ने?","Tomorrow afternoon would be best.","भोलि दिउँसो उत्तम हुन्छ।"],
+ ["Do you need to confirm anything else?","अरू केही पुष्टि गर्नुपर्छ?","No, I know what to do next.","होइन, अब के गर्ने थाहा छ।"],
+ ["Any final questions before we finish?","अन्तिम प्रश्न छ?","No more questions. Have a good day!","अब प्रश्न छैन। तपाईंको दिन राम्रो होस्।"]
+ ]
+];
+function coachDepthStep(row,seed){
+ const [npc,npcNe,answer,answerNe]=row;
+ const words=answer.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/)
+  .filter(w=>w.length>=4&&!['would','could','please','have','that','this','with','your','from','what','when','want','like','them','more','first','very'].includes(w));
+ const keyword=words.slice(0,2).join(' ');
+ const k=seed%coachDistractors.length;
+ return {npc,npcNe,goal:'प्रश्न सुनेर अंग्रेजीमा आफ्नै उत्तर दिनुहोस्।',
+  answer,answerNe,accept:[answer,...(keyword?[keyword]:[])],
+  bad1:coachDistractors[k],bad2:coachDistractors[(k+7)%coachDistractors.length],
+  hint:'Respond with a complete, natural sentence. A polite follow-up is useful.',
+  after:'Thank you for explaining.'};
+}
+function coachExtendedSteps(scene,round,practiceNumber){
+ const rounds=[scene.steps,...(coachRoundsById[scene.id]||[])];
+ const copy=rounds[round].map(x=>({...x}));
+ const topic=coachDepthPairs[scene.id]||[];
+ const selected=topic.slice(round*2,round*2+2);
+ let salt=0;for(const ch of scene.id)salt=(salt*31+ch.charCodeAt(0))%9973;
+ const followups=selected.map((row,i)=>coachDepthStep(row,salt+round*10+i));
+ const skills=coachPracticeSkills.map((group,g)=>coachDepthStep(group[(practiceNumber+salt+g*2)%group.length],salt+practiceNumber+g*3));
+ const all=[...copy,followups[0],skills[0],followups[1],skills[1],skills[2],skills[3]].filter(Boolean);
+ for(let i=0;i<all.length-1;i++)all[i].after=all[i+1].npc;
+ return all;
+}
+
 // U.S. Visa Interview Study Hub · English Sikau
 // Guided English practice only. No eligibility predictions, legal advice or verified XP.
 // Government URLs below link to the live official pages rather than claiming to auto-sync policy.
@@ -591,34 +657,41 @@ window.enhanceCoachDashboard=function(doc){
  let active=null,index=0,category='All',search='',mode='choose',showNepali=true,attempts=0,successful=0,finished=false,choices=[],choiceError='',typedError='',reveal=false;
 
  let lastId=null;
- // Three distinct, complete conversations per topic. Keep only the last
- // round number (no text, answers, scores, or student information is stored).
+
+ // Per-topic practice counters; no answers, login, payments or progress stored.
  const coachRoundStorage='english-sikau-coach-round-v1';
- let coachRoundMemory=Object.create(null);
+ const topicHistoryStorage='english-sikau-coach-topic-history-v2';
+ let coachRoundMemory=Object.create(null),recentTopics=[];
  try{
   const fromStorage=JSON.parse(doc.defaultView.localStorage.getItem(coachRoundStorage)||'{}');
   if(fromStorage&&typeof fromStorage==='object'&&!Array.isArray(fromStorage)){
    for(const [id,n] of Object.entries(fromStorage))
-    if(typeof n==='number'&&Number.isInteger(n)&&n>=0&&n<=2)coachRoundMemory[id]=n;
+    if(Number.isSafeInteger(n)&&n>=0&&n<1000000)coachRoundMemory[id]=n;
   }
- }catch(_){/* Practice works even if browser storage is disabled. */}
+  const history=JSON.parse(doc.defaultView.localStorage.getItem(topicHistoryStorage)||'[]');
+  if(Array.isArray(history))recentTopics=history.filter(id=>typeof id==='string'&&scenarios.some(s=>s.id===id)).slice(-8);
+ }catch(_){/* Guided practice works without storage. */}
  function coachNextConversation(scene){
   const original=scene.coachOriginal||scene;
-  const other=coachRoundsById[original.id]||[];
-  const rounds=[original.steps,...other];
-  const previously=coachRoundMemory[original.id];
-  const index=Number.isInteger(previously)?(previously+1)%rounds.length:0;
-  coachRoundMemory[original.id]=index;
+  const rounds=[original.steps,...(coachRoundsById[original.id]||[])];
+  const prior=coachRoundMemory[original.id];
+  const practiceNumber=Number.isSafeInteger(prior)?prior+1:0;
+  const round=practiceNumber%rounds.length;
+  coachRoundMemory[original.id]=practiceNumber;
   try{doc.defaultView.localStorage.setItem(coachRoundStorage,JSON.stringify(coachRoundMemory))}catch(_){}
-  return {...original,coachOriginal:original,coachRound:index,coachTotalRounds:rounds.length,steps:rounds[index]};
+  const styles=['Everyday speaking','Ask more questions','Solve it politely'];
+  return {...original,coachOriginal:original,coachRound:round,
+   coachPracticeNumber:practiceNumber+1,coachStyle:styles[round],coachTotalRounds:rounds.length,
+   steps:coachExtendedSteps(original,round,practiceNumber)};
  }
+
 
  const top=add(doc,shell,'header','sikau-convo-hero');
  const copy=add(doc,top,'div','sikau-convo-hero-copy');
  add(doc,copy,'div','sikau-convo-kicker','ENGLISH SIKAU · REAL-LIFE PRACTICE');
  add(doc,copy,'h2','','Speak English for real life');
  add(doc,copy,'p','','अंग्रेजीमा वास्तविक जीवनका कुराकानी सिकौं');
- add(doc,copy,'small','','Choose a situation. Respond to real conversations. Learn step by step.');
+ add(doc,copy,'small','','Choose a situation. Practice longer conversations with follow-up questions and different paths.');
  const actions=add(doc,top,'div','sikau-convo-hero-actions');
  const surprise=add(doc,actions,'button','sikau-convo-surprise','🎲 Surprise scenario · नयाँ परिस्थिति');
  surprise.type='button';
@@ -634,7 +707,7 @@ window.enhanceCoachDashboard=function(doc){
  add(doc,searchBox,'span','','🔎');
  const searchInput=add(doc,searchBox,'input','','');searchInput.type='search';searchInput.placeholder='Search: hospital, restaurant, directions…';
  searchInput.setAttribute('aria-label','Search real life situations');
- add(doc,filters,'p','sikau-convo-variety-hint','28 situations · 3 different conversation sets per topic · Replaying starts new questions. · २८ विषय, हरेकपटक फरक प्रश्न।');
+ add(doc,filters,'p','sikau-convo-variety-hint','28 topics · 8–10 speaking turns · Changing questions and practice paths. · लामो कुराकानी र नयाँ प्रश्नहरू।');
  const cards=add(doc,browser,'div','sikau-convo-cards');
  const footer=add(doc,browser,'p','sikau-convo-list-note','Guided bilingual conversations. Writing mode checks key phrases; use Ask AI Coach for deeper grammar feedback. · लेख्ने अभ्यासमा मुख्य शब्द जाँचिन्छ। विस्तृत सुधारका लागि AI Coach प्रयोग गर्नुहोस्।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
@@ -663,7 +736,7 @@ window.enhanceCoachDashboard=function(doc){
    const body=add(doc,b,'span','sikau-convo-situation-main');
    add(doc,body,'strong','',s.title);
    add(doc,body,'small','',s.ne);
-   add(doc,b,'span','sikau-convo-situation-meta',s.level+' · 3 varied rounds');
+   add(doc,b,'span','sikau-convo-situation-meta',s.level+' · 8–10 turns · varied paths');
    b.addEventListener('click',()=>start(s));
   }
  }
@@ -671,7 +744,10 @@ window.enhanceCoachDashboard=function(doc){
   index=0;attempts=0;successful=0;finished=false;choices=[];choiceError='';typedError='';reveal=false;
  }
  function start(scene){
-  lastId=scene.id;active=coachNextConversation(scene);resetStage();
+  lastId=scene.id;
+  recentTopics=recentTopics.filter(id=>id!==scene.id).concat(scene.id).slice(-8);
+  try{doc.defaultView.localStorage.setItem(topicHistoryStorage,JSON.stringify(recentTopics))}catch(_){}
+  active=coachNextConversation(scene);resetStage();
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
   renderStage();stage.scrollIntoView?.({behavior:'smooth',block:'start'});
@@ -694,7 +770,7 @@ window.enhanceCoachDashboard=function(doc){
   const meta=add(doc,head,'div','sikau-convo-stage-meta');
   add(doc,meta,'strong','',active.emoji+' '+active.title);
   if(showNepali)add(doc,meta,'small','',active.ne+' · '+active.place);
-  add(doc,meta,'small','sikau-convo-round-label','Practice set '+(active.coachRound+1)+' / '+active.coachTotalRounds+' · नयाँ प्रश्नहरू');
+  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+' · '+active.steps.length+' turns');
   if(finished){
    const done=add(doc,stage,'div','sikau-convo-complete');
    add(doc,done,'div','sikau-convo-complete-icon','🏆');
@@ -810,7 +886,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.addEventListener('input',()=>{search=searchInput.value;drawCards();});
 
  surprise.addEventListener('click',()=>{
-  const options=scenarios.filter(s=>s.id!==lastId);
+  const options=scenarios.filter(s=>s.id!==lastId&&!recentTopics.includes(s.id));
   const list=options.length?options:scenarios;
   start(list[Math.floor(Math.random()*list.length)]);
  });
