@@ -588,15 +588,15 @@ function coachReplyVariations(value){
  }
  if(/^yes[,.!?]?\s*/i.test(a)){
   const rest=a.replace(/^yes[,.!?]?\s*/i,'');
-  if(rest){add('Yes. '+rest.charAt(0).toUpperCase()+rest.slice(1));
-   add("Yes, that's right. "+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  if(rest){add('Yes, of course. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add('Absolutely. '+rest.charAt(0).toUpperCase()+rest.slice(1));}
   else {add('Yes, certainly.');add('Yes, absolutely.');}
   return Array.from(forms);
  }
  if(/^no[,.!?]?\s*/i.test(a)){
   const rest=a.replace(/^no[,.!?]?\s*/i,'');
-  if(rest){add('No. '+rest.charAt(0).toUpperCase()+rest.slice(1));
-   add('Actually, no. '+rest.charAt(0).toUpperCase()+rest.slice(1));}
+  if(rest){add('Actually, no. '+rest.charAt(0).toUpperCase()+rest.slice(1));
+   add("I'm afraid not. "+rest.charAt(0).toUpperCase()+rest.slice(1));}
   else{add('No, thank you.');add('Not this time, thank you.');}
   return Array.from(forms);
  }
@@ -613,17 +613,17 @@ function coachReplyVariations(value){
  ];
  for(const [pattern,replacement] of replacements)if(pattern.test(a))add(a.replace(pattern,replacement));
  if(/^I(?:\s|')/i.test(a)&&a.length>=12)
-  add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
+  add('Well, '+a);
  if(/^Could you |^Can you /i.test(a))
   add(a.replace(/^(?:Could|Can) you /i,'Would you please '));
  if(/^I'd like |^I would like |^I want /i.test(a))
-  add('If possible, '+a.charAt(0).toLowerCase()+a.slice(1));
+  add('If possible, '+a);
  if(!/^well,|^thank|^thanks|^sure/i.test(a)&&a.length>=18)
-  add('To clarify, '+a.charAt(0).toLowerCase()+a.slice(1));
+  add('To clarify, '+a);
  // For rare short phrases there may not be a direct grammatical rewrite.
  // Distinct, polite context does not change the learner's underlying fact.
- if(forms.size<3)add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
- if(forms.size<3)add('To be clear, '+a.charAt(0).toLowerCase()+a.slice(1));
+ if(forms.size<3)add('Well, '+a);
+ if(forms.size<3)add('To be clear, '+a);
  return Array.from(forms).slice(0,3);
 }
 function coachEquivalentReply(sentence){
