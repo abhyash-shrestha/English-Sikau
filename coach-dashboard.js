@@ -1144,7 +1144,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  add(doc,searchBox,'span','','🔎');
  const searchInput=add(doc,searchBox,'input','','');searchInput.type='search';searchInput.placeholder='Search: hospital, restaurant, directions…';
  searchInput.setAttribute('aria-label','Search real life situations');
- add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · Short or long conversations based on your choices · English + नेपाली.');
+ add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const resumeHost=add(doc,browser,'div','sikau-convo-resume-host');resumeHost.hidden=true;
  const cards=add(doc,browser,'div','sikau-convo-cards');
  const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
@@ -1174,7 +1174,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    const body=add(doc,b,'span','sikau-convo-situation-main');
    add(doc,body,'strong','',s.title);
    add(doc,body,'small','',s.ne);
-   add(doc,b,'span','sikau-convo-situation-meta',s.level+' · Flexible conversation · real dialogue'');
+   add(doc,b,'span','sikau-convo-situation-meta',s.level+' · 12+ turns · real dialogue');
    b.addEventListener('click',()=>start(s));
   }
  }
@@ -1219,7 +1219,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   const meta=add(doc,head,'div','sikau-convo-stage-meta');
   add(doc,meta,'strong','',active.emoji+' '+active.title);
   if(showNepali)add(doc,meta,'small','',active.ne+' · '+active.place);
-  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+' · Finish whenever your situation is resolved');
+  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+(active.isBranchingStore?' · Choices shape the story':' · '+active.steps.length+' turns'));
   if(finished){
    const done=add(doc,stage,'div','sikau-convo-complete');
    add(doc,done,'div','sikau-convo-complete-icon','🏆');
@@ -1253,12 +1253,11 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    const addFact=(value,label)=>{if(value)tags.push(label)};
    addFact(state.intent==='refund','💵 Refund requested');
    addFact(state.intent==='exchange','🔁 Exchange requested');
-   addFact(state.intent==='keep','🛍️ Finished shopping');
+   addFact(state.intent==='keep','🛍️ Keep the shirt');
    addFact(state.receipt==='missing','🧾 No receipt');
    addFact(state.receipt==='paper','🧾 Paper receipt');
    addFact(state.receipt==='digital','📱 Digital receipt');
-   addFact(state.item,'🛍️ '+({shirt:'Shirt',pants:'Pants',shoes:'Shoes',jacket:'Jacket',dress:'Dress',items:'Multiple items'}[state.item]||'Clothing'));
-  addFact(state.condition==='worn','👕 Worn outside');
+   addFact(state.condition==='worn','👕 Worn outside');
    addFact(state.condition==='no-tags','🏷️ Tags removed');
    addFact(state.source==='online','🌐 Online order');
    addFact(state.source==='gift','🎁 Gift');
@@ -1271,7 +1270,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    }
   }
   const progress=add(doc,stage,'div','sikau-convo-progress');
-  add(doc,progress,'span','', 'Turn '+(index+1)+' · Continue or finish naturally · संवाद');
+  add(doc,progress,'span','',active.isBranchingStore?'Turn '+(index+1)+' · Your choices shape the story':'Turn '+(index+1)+' / '+active.steps.length+' · संवाद');
   const track=add(doc,progress,'div','sikau-convo-track');
   const fill=add(doc,track,'div','sikau-convo-track-fill');fill.style.width=(active.isBranchingStore?Math.min(94,(index+1)*9):((index+1)/active.steps.length*100))+'%';
 
@@ -1378,19 +1377,11 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    }
    showResult(pendingChoice);
   }
-  if(!active.isBranchingStore&&index>=1&&!pendingChoice){
-   const finishNow=add(doc,feedback,'button','sikau-convo-secondary','👋 That is all, thank you · यति नै हो, धन्यवाद');
-   finishNow.type='button';finishNow.addEventListener('click',()=>{
-    dialogueHistory[index]={reply:'That is all for now. Thank you for your help.',
-     learnerNe:'अहिलेलाई यति नै हो। मद्दतका लागि धन्यवाद।',kind:'guided'};
-    successful++;finished=true;coachDrafts?.remove();renderStage();
-   });
-  }
   const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
   skip.type='button';if(active.isBranchingStore)skip.hidden=true;else skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
-  add(doc,note,'p','',active.isBranchingStore?'Your choices affect the next question. You can finish when you have enough information. · तपाईंको छनोटअनुसार संवाद बदलिन्छ।':'Practice aloud and finish whenever you have the answer you need. · आवश्यक जानकारी पाएपछि संवाद टुङ्ग्याउनुहोस्।');
+  add(doc,note,'p','',active.isBranchingStore?'Your choices change the next question. A manager may review an exception, but approval is never guaranteed. · तपाईंको रोजाइले अर्को प्रश्न बदल्छ।':'Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
   // Show the newest question without requiring learners to scroll through all
   // earlier chat messages. Keep every previous bubble available above.
   stage.appendChild(fullPreview);

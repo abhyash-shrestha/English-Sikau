@@ -6,65 +6,25 @@
 (function(){
 'use strict';
 const opt=(en,ne,next,patch={})=>({value:en,ne,next,patch,correct:true});
-// Only introduce the garment once the learner chooses it. Never assume a shirt.
-const garments={
- shirt:{en:'shirt',ne:'कमिज',plural:false},
- pants:{en:'pants',ne:'पाइन्ट',plural:true},
- shoes:{en:'shoes',ne:'जुत्ता',plural:true},
- jacket:{en:'jacket',ne:'ज्याकेट',plural:false},
- dress:{en:'dress',ne:'ड्रेस',plural:false},
- items:{en:'items',ne:'सामानहरू',plural:true}
-};
-function withGarment(value,state,nepali=false){
- const garment=garments[state.item];
- if(!garment||state.item==='shirt'||typeof value!=='string')return value;
- if(nepali)return value.replace(/कमिज/g,garment.ne);
- const plural=garment.plural, label=garment.en;
- return value
-  .replace(/Was this shirt purchased/g,plural?'Were these '+label+' purchased':'Was this '+label+' purchased')
-  .replace(/this shirt/gi,plural?'these '+label:'this '+label)
-  .replace(/the shirt/gi,'the '+label)
-  .replace(/a different shirt/gi,plural?'different '+label:'a different '+label)
-  .replace(/shirt/gi,label)
-  .replace(/has been worn/g,plural?'have been worn':'has been worn')
-  .replace(/tried it on/g,plural?'tried them on':'tried it on')
-  .replace(/keep it for now/g,plural?'keep them for now':'keep it for now');
-}
 function step(id,state){
  const row=(npc,npcNe,options,speaker="Store assistant",emoji="🛍️")=>{
-  if(options.length<2)throw Error("A story step needs at least two responses");
-  // The shopper can change their mind or finish early; no minimum turn count.
-  if(!['opening','item','close'].includes(id)){
-   options=[...options,opt("I've got the information I need. I'll decide later, thanks.",
-     "चाहिएको जानकारी पाएँ। पछि निर्णय गर्छु, धन्यवाद।","end",{intent:"keep"})];
-  }
-  const shown=options.map(item=>({...item,
-   value:withGarment(item.value,state),ne:withGarment(item.ne,state,true)}));
-  return {nodeId:id,npc:withGarment(npc,state),npcNe:withGarment(npcNe,state,true),
-   speaker,speakerEmoji:emoji,storeOptions:shown,
-   answer:shown[0].value,answerNe:shown[0].ne,
+  if(options.length!==3)throw Error("Every Coach story step needs three responses");
+  return {nodeId:id,npc,npcNe,speaker,speakerEmoji:emoji,storeOptions:options,
+   answer:options[0].value,answerNe:options[0].ne,
    hint:"Every choice is valid. Choose what is true for your situation.",
    goal:"Choose a real-life answer · आफूलाई मिल्ने उत्तर छान्नुहोस्।"};
  };
  switch(id){
- case "opening":return row("Hello! Welcome in. How can I help you today?",
-  "नमस्ते! स्वागत छ। आज म तपाईंलाई कसरी मद्दत गर्न सक्छु?",[
-  opt("I'd like to return something I bought.","मैले किनेको सामान फिर्ता गर्न चाहन्छु।","item",{intent:"refund"}),
-  opt("I'd like to exchange something I bought.","मैले किनेको सामान साट्न चाहन्छु।","item",{intent:"exchange"}),
-  opt("Could you explain your return policy first?","पहिले सामान फिर्ता गर्ने नियम बुझाइदिनुहुन्छ?","policy",{intent:"information"})]);
- case "item":return row("Of course. What would you like help with?",
-  "अवश्य। तपाईंलाई कुन सामानको बारेमा मद्दत चाहिएको हो?",[
-  opt("It's a shirt.","यो कमिज हो।","reason",{item:"shirt"}),
-  opt("It's a pair of pants.","यो पाइन्ट हो।","reason",{item:"pants"}),
-  opt("It's a pair of shoes.","यो एक जोर जुत्ता हो।","reason",{item:"shoes"}),
-  opt("It's a jacket.","यो ज्याकेट हो।","reason",{item:"jacket"}),
-  opt("It's a dress.","यो ड्रेस हो।","reason",{item:"dress"}),
-  opt("I have several clothing items.","मसँग धेरै कपडाका सामान छन्।","reason",{item:"items"})]);
+ case "opening":return row("Hello! How can I help you with this shirt today?",
+  "नमस्ते! आज यो कमिजबारे कसरी मद्दत गरूँ?",[
+  opt("I'd like to ask for a refund.","म पैसा फिर्ता माग्न चाहन्छु।","reason",{intent:"refund"}),
+  opt("I'd like to exchange this shirt.","म यो कमिज साट्न चाहन्छु।","reason",{intent:"exchange"}),
+  opt("I'm not sure I want to return it. Could you explain the policy?","फिर्ता गर्ने कि नगर्ने निश्चित छैन। नियम बुझाइदिनुहुन्छ?","policy",{intent:"information"})]);
  case "policy":return row("Of course. Eligibility depends on the purchase date, proof of purchase and item condition. What would you like to do?",
   "अवश्य। फिर्ता मिल्ने कुरा मिति, प्रमाण र सामानको अवस्थामा भर पर्छ। तपाईं के गर्न चाहनुहुन्छ?",[
-  opt("I'd like to see whether I can get my money back.","पैसा फिर्ता पाइन्छ कि बुझ्न चाहन्छु।","item",{intent:"refund"}),
-  opt("I'd prefer to exchange it for another size.","म अर्को साइजसँग साट्न चाहन्छु।","item",{intent:"exchange"}),
-  opt("Thanks. I'm only asking about the policy today.","धन्यवाद। आज नियमबारे मात्र सोधेको हुँ।","end",{intent:"keep"})]);
+  opt("I'd like to see whether I can get my money back.","पैसा फिर्ता पाइन्छ कि बुझ्न चाहन्छु।","reason",{intent:"refund"}),
+  opt("I'd prefer to exchange it for another size.","म अर्को साइजसँग साट्न चाहन्छु।","reason",{intent:"exchange"}),
+  opt("Thanks. I'll keep the shirt for now.","धन्यवाद। अहिलेलाई कमिज राख्छु।","end",{intent:"keep"})]);
  case "reason":return row(state.intent==="exchange"?
    "I can check exchange options. Why would you like a different shirt?":
    "I can look into your request. Why would you like to bring the shirt back?",
