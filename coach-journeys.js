@@ -363,7 +363,10 @@ function build(node,state,config){
   travelHelp.has(scene)?alternateService.travel:
   categories[cat]||categories.Everyday;
  const isIssue=shoppingHelp.has(scene)||foodHelp.has(scene)||travelHelp.has(scene);
- const descriptor=detail[0].replace(/[.!?]+$/,'').toLowerCase(),target=path[0].replace(/[.!?]+$/,'').toLowerCase();
+ const record=window.sikauNewTopicRows?.find(row=>row[0]===scene);
+ const focus=record?.[7]?.split(';')?.[state.path]||detail[0].replace(/[.!?]+$/,'');
+ const descriptor=focus.replace(/[.!?]+$/,'').toLowerCase();
+ const target=record?record[2].toLowerCase():path[0].replace(/[.!?]+$/,'').toLowerCase();
  const prices=purchase[scene],commerce=buyable.has(scene)&&state.path!==2;
  const legacy=window.sikauLegacyFollowups?.[scene]?.[state.path]||null;
  const commercial=cashCats.has(cat)&&!isIssue,participatory=["Everyday","Family"].includes(cat);
@@ -378,7 +381,7 @@ function build(node,state,config){
   (state.offer==="basic"?Math.round(prices[2]*0.7/100)*100:prices[state.offer!=="budget"?1:2]).toLocaleString("en-US")+" हो, वास्तविक बजार मूल्य होइन।";
  if(node==='review'){
   if(legacy)return r(node,
-    path[5]+" You mentioned: “"+detail[0]+".” What would you like to check next?",
+    path[5]+" You said: “"+detail[0]+"” What would you like to check next?",
     path[6]+" तपाईंले “"+detail[1]+"” भन्नुभयो। अब के बुझ्ने?",[
      option(legacy[0],legacy[1],"proposal",{priority:"specific"}),
      option("Could you explain the requirements or conditions?","आवश्यकता वा सर्त बुझाइदिनुहुन्छ?","requirements",{}),
@@ -386,7 +389,7 @@ function build(node,state,config){
      option("Thanks, that's enough information for now.","धन्यवाद, अहिलेलाई जानकारी पुग्यो।","closing",{})
     ]);
   return r(node,
-   "You mentioned “"+detail[0]+".” "+set.intro[0],
+   "You mentioned "+focus+". "+set.intro[0],
    "तपाईंलाई "+detail[1]+" भन्ने बुझेँ। "+set.intro[1],[
     ...set.priorities.map(p=>option(p[0],p[1],"proposal",{priority:p[2],offer:p[2]==="budget"?"budget":"premium"})),
     option("I'd rather explore a different option.","बरु अर्को विकल्प हेर्न चाहन्छु।","alternative",{offer:state.offer==="budget"?"basic":"budget"}),
@@ -402,8 +405,8 @@ function build(node,state,config){
    ]);
   const name=state.priority==="budget"?"price":state.priority==="quality"?"quality":state.priority||"needs";
   return r(node,
-   "Since you mentioned "+descriptor+" and prioritised "+name+", "+set.proposal[0]+quote(),
-   "तपाईंले "+detail[1]+" र आफ्नो प्राथमिकता बताउनुभयो। "+set.proposal[1]+quoteNe(),[
+   "You mentioned "+focus+". Your priority is "+name+". "+set.proposal[0]+quote(),
+   "तपाईंले "+detail[1]+" भन्नुभयो। तपाईंको प्राथमिकता "+name+" हो। "+set.proposal[1]+quoteNe(),[
     option(commercial?"That sounds good. What should we confirm first?":"That sounds reasonable. What is the next step?",
       commercial?"राम्रो लाग्यो। पहिले के पुष्टि गर्ने?":"ठीक लाग्यो। अर्को कदम के हो?","verify",{}),
     option(commercial?"It's too expensive or doesn't suit me. Is there an alternative?":
