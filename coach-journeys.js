@@ -303,89 +303,133 @@ const categoryOf=(scene)=>window.sikauMoreTopics?.find(t=>t.id===scene)?.categor
 const cashCats=new Set(["Shopping","Food & Drink"]);
 const noMoney=new Set(["Healthcare","Work","Technology","Money","Education","Everyday","Family","Community"]);
 function phone(node,state,config){
- const path=config[1][state.path]||config[1][0],detail=path[4][state.detail||0]||path[4][0];
- const buying=state.path!==2;
- if(!buying)return null; // pre-owned phone help uses the service-specific engine.
- if(node==='review'){
-  return r(node,
-   "I see: "+detail[0].replace(/[.?!]+$/,'').toLowerCase()+". How about battery life and your budget? Should I show you a higher-end phone or a more affordable one?",
-   "तपाईंलाई "+detail[1]+" महत्त्वपूर्ण रहेछ। ब्याट्री र बजेट कस्तो छ? महँगो वा सस्तो फोन देखाऊँ?",[
-    option("A strong camera and long battery life matter. Show me your recommendation.","राम्रो क्यामेरा र लामो ब्याट्री चाहिन्छ। फोन सिफारिस गर्नुहोस्।","phone-pitch",{offer:"premium",priority:"camera-battery"}),
-    option("My budget is around NPR 50,000.","मेरो बजेट करिब रु. ५०,००० छ।","phone-pitch",{offer:"budget",priority:"budget"}),
-    option("Camera is important, but I'd like to compare both prices.","क्यामेरा महत्त्वपूर्ण छ, तर दुवै मूल्य तुलना गर्छु।","phone-pitch",{offer:"premium",priority:"compare"}),
-    option("I only wanted advice. Thanks!","मलाई सुझाव मात्र चाहिएको थियो। धन्यवाद।","closing",{})
+  const path=config[1][state.path]||config[1][0],detail=path[4][state.detail||0]||path[4][0];
+  if(state.path===2)return null; // Existing-phone support stays in the service journey.
+  const offers={
+   premium:{model:"iPhone 17 Pro Max",base:100000,sizes:[["256 GB",0],["512 GB",20000],["1 TB",45000]]},
+   budget:{model:"Samsung Galaxy S24",base:50000,sizes:[["128 GB",0],["256 GB",7000],["512 GB",14000]]},
+   basic:{model:"an entry-level smartphone",base:35000,sizes:[["128 GB",0],["256 GB",5000]]}
+  };
+  const offer=state.offer==="budget"?"budget":state.offer==="basic"?"basic":"premium";
+  const selected=offers[offer],model=selected.model;
+  const storage=selected.sizes.find(s=>s[0]===state.storage)||selected.sizes[0];
+  const storageExtra=storage[1],caseFee=state.accessories==="case"||state.accessories==="both"?1500:0;
+  const chargerFee=state.accessories==="charger"||state.accessories==="both"?2000:0;
+  const total=selected.base+storageExtra+caseFee+chargerFee;
+  const money=n=>"NPR "+n.toLocaleString("en-US");
+  const rupees=n=>"रु. "+n.toLocaleString("en-US");
+  const description=model+" ("+storage[0]+")"+(state.color?", "+state.color:"");
+  const resetOffer=next=>({offer:next,storage:null,color:null,accessories:null,variant:null,payment:null});
+  const accessoryText=state.accessories==="both"?"a case and charger":state.accessories==="case"?"a case":state.accessories==="charger"?"a charger":"no extras";
+  const accessoryNe=state.accessories==="both"?"कभर र चार्जर":state.accessories==="case"?"कभर":state.accessories==="charger"?"चार्जर":"थप सामान छैन";
+  if(node==="review")return r(node,
+   "I see that "+detail[0].replace(/[.?!]+$/,"").toLowerCase()+" matters to you. What about battery life and your budget? Shall I show you a premium phone or an affordable one?",
+   "तपाईंलाई "+detail[1]+" महत्त्वपूर्ण रहेछ। ब्याट्री र बजेट कस्तो छ? महँगो कि सस्तो फोन देखाऊँ?",[
+    option("I care about the camera and battery. Show me a premium phone.","क्यामेरा र ब्याट्री राम्रो चाहिन्छ। राम्रो फोन देखाउनुहोस्।","phone-pitch",resetOffer("premium")),
+    option("My budget is about NPR 50,000.","मेरो बजेट करिब रु. ५०,००० छ।","phone-pitch",resetOffer("budget")),
+    option("I'd like to compare both prices first.","पहिले दुवैको मूल्य तुलना गर्न चाहन्छु।","phone-pitch",resetOffer("premium")),
+    option("I'm only looking today, thank you.","अहिले हेर्न मात्र आएको हुँ, धन्यवाद।","closing",{})
    ]);
- }
- const premium=state.offer!=="budget"&&state.offer!=="basic";
- const model=premium?"iPhone 17 Pro Max":state.offer==="basic"?"an entry-level smartphone":"Samsung Galaxy S24";
- const price=premium?100000:state.offer==="basic"?35000:50000;
- const money="NPR "+price.toLocaleString("en-US");
- if(node==='phone-pitch'||node==='phone-budget'){
-  return r(node,
-   "I'd recommend the "+model+" for "+money+". Would you like to compare its features or go with this one?",
-   "म "+model+" सिफारिस गर्छु। यसको मूल्य रु. "+price.toLocaleString("en-US")+" हो। विशेषता तुलना गर्ने कि यही लिने?",[
-    option(state.offer==="basic"?"This is still above my budget. I'd rather wait.":"That's too expensive. Do you have a cheaper phone?",
-    state.offer==="basic"?"यो अझै बजेटभन्दा महँगो छ। पछि आउँछु।":"त्यो धेरै महँगो छ। सस्तो फोन छ?",
-    state.offer==="basic"?"closing":"phone-pitch",{offer:premium?"budget":"basic",priority:"budget"}),
-    option("Could I compare the camera and battery first?","पहिले क्यामेरा र ब्याट्री तुलना गर्न सक्छु?","phone-demo",{}),
-    option("That price works for me. Can we discuss the color and storage?","मूल्य ठीक लाग्यो। रङ र स्टोरेजबारे कुरा गरौँ?","phone-options",{}),
-    option("I'm not ready to buy. Thanks.","अहिले किन्न तयार छैन। धन्यवाद।","closing",{})
+  if(node==="phone-pitch"||node==="phone-budget")return r(node,
+   "I'd recommend the "+model+". The "+selected.sizes[0][0]+" version is "+money(selected.base)+". Does that suit your budget?",
+   "म "+model+" सिफारिस गर्छु। "+selected.sizes[0][0]+" को मूल्य "+rupees(selected.base)+" हो। बजेट मिल्छ?",[
+    option(offer==="basic"?"It's still too expensive. I'll come back later.":"That's too expensive. Do you have anything cheaper?",
+      offer==="basic"?"अझै महँगो छ। पछि आउँछु।":"अलि महँगो भयो। सस्तो फोन छ?",offer==="basic"?"closing":"phone-pitch",resetOffer(offer==="premium"?"budget":"basic")),
+    option("Can I compare the camera and battery first?","पहिले क्यामेरा र ब्याट्री तुलना गर्न सक्छु?","phone-demo",{}),
+    option("That price is okay. What storage and colors do you have?","मूल्य ठीक छ। कुन स्टोरेज र रङ छन्?","phone-options",{}),
+    option("Thanks, I don't want to buy today.","धन्यवाद, आज किन्न चाहन्नँ।","closing",{})
    ]);
- }
- if(node==='phone-demo')return r(node,
-  "Good question. We'd compare sample photos, battery use, storage and warranty terms on the actual models. Demo availability isn't guaranteed. Would you like to continue with this phone or see a cheaper one?",
-  "राम्रो प्रश्न। वास्तविक मोडेलमा फोटो, ब्याट्री, स्टोरेज र वारेन्टी तुलना गरौँ। डेमो उपलब्धताको ग्यारेन्टी छैन। यही फोन कि सस्तो विकल्प?",[
-   option("I'll choose this phone if the specifications suit me.","विशेषता मिले यही फोन छान्छु।","phone-options",{}),
-   option("Please show me the more affordable option.","सस्तो विकल्प देखाइदिनुहोस्।","phone-pitch",{offer:"budget"}),
-   option("Does the warranty cover accidental damage?","दुर्घटनाको क्षति वारेन्टीमा पर्छ?","phone-warranty",{}),
-   option("I'll think about it and come back later.","सोचेर पछि आउँछु।","closing",{})
-  ]);
- if(node==='phone-warranty')return r(node,
-  "Manufacturer defects and accidental damage often have different coverage. We'll read the official warranty and optional protection terms before you decide.",
-  "उत्पादन त्रुटि र दुर्घटनाले भएको क्षतिमा फरक वारेन्टी नियम हुन सक्छ। निर्णयअघि आधिकारिक सर्त हेरौँ।",[
-   option("That makes sense. Let's choose the phone.","बुझेँ। फोन छानौँ।","phone-options",{}),
-   option("Could we check a cheaper model instead?","बरु सस्तो मोडेल हेर्ने?","phone-pitch",{offer:"budget"}),
-   option("I'd rather wait for now.","अहिलेलाई पर्खन्छु।","closing",{})
-  ]);
- if(node==='phone-options')return r(node,
-  "Great. We'll verify the chosen "+model+"'s actual storage, color, stock and final price before a purchase. What would you like to do?",
-  "राम्रो। किन्नुअघि "+model+" को वास्तविक स्टोरेज, रङ, स्टक र अन्तिम मूल्य पुष्टि गरौँ। के गर्ने?",[
-   option("I'd like the standard storage if it's available.","उपलब्ध भए सामान्य स्टोरेज चाहिन्छ।","phone-checkout",{variant:"standard"}),
-   option("Could I see a different color or storage size?","अर्को रङ वा स्टोरेज हेर्न सक्छु?","phone-checkout",{variant:"different"}),
-   option("Do I need a charger or case too?","चार्जर वा कभर पनि चाहिन्छ?","phone-accessory",{}),
-   option("Actually, I want to reconsider the price.","बरु मूल्य फेरि सोच्न चाहन्छु।","phone-pitch",{offer:"budget"})
-  ]);
- if(node==='phone-accessory')return r(node,
-  "Cases and chargers vary by model. We'd verify compatibility and add-on prices rather than assume accessories are included. Would you like them?",
-  "कभर र चार्जर फोनअनुसार फरक हुन्छ। साथमा आउँछ भनेर अनुमान नगरी मिल्छ कि र मूल्य जाँचौँ। चाहनुहुन्छ?",[
-   option("Just the phone, please.","फोन मात्र दिनुहोस्।","phone-checkout",{accessories:"none"}),
-   option("Please include a compatible case if it's affordable.","सस्तो भए मिल्ने कभर थप्नुहोस्।","phone-checkout",{accessories:"case"}),
-   option("I'd rather compare another phone.","अर्को फोन तुलना गर्छु।","phone-pitch",{offer:"budget"})
-  ]);
- if(node==='phone-checkout')return r(node,
-  "The "+model+" costs "+money+" before any extras. Would you like to pay with cash or a card?",
-  "तपाईंले छान्नुभएको "+model+" को मूल्य रु. "+price.toLocaleString("en-US")+" हो। नगद कि कार्डले तिर्नुहुन्छ?",[
-   option("I'll pay with cash.","नगद तिर्छु।","phone-finish",{payment:"cash"}),
-   option("Can I pay with a credit or debit card?","क्रेडिट वा डेबिट कार्डले तिर्न मिल्छ?","phone-finish",{payment:"card"}),
-   option("Is a QR or digital payment option available?","क्यूआर वा डिजिटल भुक्तानी मिल्छ?","phone-finish",{payment:"digital"}),
-   option("I changed my mind. I won't buy it today.","मन बदलेँ। आज किन्दिनँ।","closing",{payment:"none"})
-  ]);
- if(node==='phone-finish'){
-  const method={cash:"cash",card:"a bank card",digital:"a QR/digital method"}[state.payment]||"your preferred method";
-  return r(node,
-   "Great choice! You've chosen "+model+" and you're paying with "+method+". Here's your receipt. Thank you for shopping with us!",
-   "राम्रो छनोट! तपाईंले "+model+" छान्नुभयो र "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"आफ्नो रोजाइको माध्यम")+" बाट भुक्तानी गर्नुभयो। यो तपाईंको रसिद। आउनुभएकोमा धन्यवाद!",[
-    option("Thank you. Could I have the receipt?","धन्यवाद। रसिद दिनुहुन्छ?","phone-receipt",{}),
+  if(node==="phone-demo")return r(node,
+   "Let's compare the camera, battery, storage and warranty. Which would you like to do next?",
+   "क्यामेरा, ब्याट्री, स्टोरेज र वारेन्टी तुलना गरौँ। अब के गर्न चाहनुहुन्छ?",[
+    option("This model sounds good. Show me the storage options.","यो फोन ठीक लाग्यो। स्टोरेज देखाउनुहोस्।","phone-storage",{}),
+    option("Could you show me a more affordable model?","सस्तो फोन पनि देखाउनुहोस्।","phone-pitch",resetOffer("budget")),
+    option("What does the warranty cover?","वारेन्टीमा के के पर्छ?","phone-warranty",{}),
+    option("I'll think about it. Thank you.","सोचेर निर्णय गर्छु। धन्यवाद।","closing",{})
+   ]);
+  if(node==="phone-warranty")return r(node,
+   "The standard warranty usually covers manufacturing faults, not accidental damage. Would you like to choose storage or compare another phone?",
+   "सामान्य वारेन्टीमा प्रायः उत्पादन त्रुटि समेटिन्छ, दुर्घटनाको क्षति होइन। स्टोरेज छान्ने कि अर्को फोन हेर्ने?",[
+    option("Let's look at the storage options.","स्टोरेजका विकल्प हेरौँ।","phone-storage",{}),
+    option("Show me the cheaper model, please.","सस्तो फोन देखाउनुहोस्।","phone-pitch",resetOffer("budget")),
+    option("I'd rather wait for now.","अहिलेलाई पर्खन्छु।","closing",{})
+   ]);
+  if(node==="phone-options")return r(node,
+   "For the "+model+", the "+selected.sizes[0][0]+" version starts at "+money(selected.base)+". More storage costs extra, but changing the color doesn't. What would you prefer?",
+   model+" को "+selected.sizes[0][0]+" मूल्य "+rupees(selected.base)+" बाट सुरु हुन्छ। बढी स्टोरेजको थप मूल्य छ, तर रङ बदल्दा छैन। के चाहनुहुन्छ?",[
+    option("The standard "+selected.sizes[0][0]+" is enough for me.","सामान्य "+selected.sizes[0][0]+" नै पुग्छ।","phone-quote",{storage:selected.sizes[0][0],variant:null}),
+    option("I'd like more storage. How much would it cost?","मलाई बढी स्टोरेज चाहिन्छ। कति पर्छ?","phone-storage",{}),
+    option("Could I choose a different color?","अर्को रङ छान्न सक्छु?","phone-color",{}),
+    option("Do you have a case or charger?","कभर वा चार्जर छ?","phone-accessory",{}),
+    option("Actually, could you show me a cheaper phone?","बरु सस्तो फोन देखाउनुहोस्।","phone-pitch",resetOffer("budget"))
+   ]);
+  if(node==="phone-storage")return r(node,
+   "Of course! The "+model+" comes in these storage options. More storage changes the price. Which one works for you?",
+   "अवश्य! "+model+" का यी स्टोरेज विकल्प छन्। बढी स्टोरेजमा मूल्य बढ्छ। कुन चाहनुहुन्छ?",
+   [...selected.sizes.map(s=>option(
+      "I'd like "+s[0]+" for "+money(selected.base+s[1])+".",
+      "मलाई "+s[0]+" चाहिन्छ, मूल्य "+rupees(selected.base+s[1])+"।",
+      "phone-quote",{storage:s[0],variant:null})),
+    option("That's too much. Can we compare a cheaper phone?","धेरै महँगो भयो। सस्तो फोन तुलना गरौँ।","phone-pitch",resetOffer("budget"))
+   ]);
+  if(node==="phone-color")return r(node,
+   "Sure! You can choose a color without changing the price. Which color do you prefer?",
+   "अवश्य! रङ परिवर्तन गर्दा मूल्य उस्तै हुन्छ। कुन रङ मन पर्छ?",[
+    option("Black, please.","कालो रङ दिनुहोस्।","phone-quote",{color:"Black"}),
+    option("Blue, please.","निलो रङ दिनुहोस्।","phone-quote",{color:"Blue"}),
+    option("Silver, please.","चाँदी रङ दिनुहोस्।","phone-quote",{color:"Silver"}),
+    option("I'd rather choose the storage first.","बरु पहिले स्टोरेज छान्छु।","phone-storage",{})
+   ]);
+  if(node==="phone-accessory")return r(node,
+   "A case would add "+money(1500)+" and a charger "+money(2000)+". You can also buy just the phone. What would you like?",
+   "कभरको थप "+rupees(1500)+" र चार्जरको थप "+rupees(2000)+" पर्छ। फोन मात्र पनि किन्न सक्नुहुन्छ। के चाहनुहुन्छ?",[
+    option("Just the phone, please.","फोन मात्र दिनुहोस्।","phone-quote",{accessories:"none"}),
+    option("Please add a case.","कभर पनि थप्नुहोस्।","phone-quote",{accessories:"case"}),
+    option("Please add a charger.","चार्जर पनि थप्नुहोस्।","phone-quote",{accessories:"charger"}),
+    option("I'd like both the case and charger.","कभर र चार्जर दुवै चाहिन्छ।","phone-quote",{accessories:"both"})
+   ]);
+  if(node==="phone-quote")return r(node,
+   "Let's check your choice: "+description+" — phone "+money(selected.base)+
+     (storageExtra?", extra storage +"+money(storageExtra):"")+
+     (caseFee?", case +"+money(caseFee):"")+
+     (chargerFee?", charger +"+money(chargerFee):"")+
+     ". Total: "+money(total)+". Is that okay?",
+   "तपाईंको छनोट: "+description+" — फोन "+rupees(selected.base)+
+     (storageExtra?", बढी स्टोरेज +"+rupees(storageExtra):"")+
+     (caseFee?", कभर +"+rupees(caseFee):"")+
+     (chargerFee?", चार्जर +"+rupees(chargerFee):"")+
+     "। जम्मा "+rupees(total)+"। यो मूल्य ठीक छ?",[
+    option("Yes, that works for me. Let's pay.","ठीक छ, अब पैसा तिर्छु।","phone-checkout",{variant:null}),
+    option("That's more than I want to spend. Show me the standard storage.","मेरो बजेटभन्दा बढी भयो। सामान्य स्टोरेज देखाउनुहोस्।",storage[0]===selected.sizes[0][0]?"phone-options":"phone-quote",{storage:selected.sizes[0][0],accessories:"none",variant:null}),
+    option("Can we change the storage or color?","स्टोरेज वा रङ परिवर्तन गर्न सक्छौँ?","phone-options",{}),
+    option("I'll think about it and come back later.","सोचेर पछि आउँछु।","closing",{})
+   ]);
+  // Old saved conversations may have chosen "different" without specifying
+  // storage. Ask for the actual capacity instead of reusing the base price.
+  if(node==="phone-checkout"&&state.variant==="different"&&!state.storage)return phone("phone-storage",state,config);
+  if(node==="phone-checkout")return r(node,
+   "Your "+description+" with "+accessoryText+" comes to "+money(total)+". How would you like to pay — cash, card or QR?",
+   "तपाईंको "+description+" र "+accessoryNe+" गरी जम्मा "+rupees(total)+" भयो। नगद, कार्ड वा क्यूआरबाट तिर्नुहुन्छ?",[
+    option("I'll pay in cash.","नगद तिर्छु।","phone-finish",{payment:"cash"}),
+    option("I'll pay by debit or credit card.","डेबिट वा क्रेडिट कार्डले तिर्छु।","phone-finish",{payment:"card"}),
+    option("Can I pay by QR or digital wallet?","क्यूआर वा डिजिटल वालेटबाट तिर्न मिल्छ?","phone-finish",{payment:"digital"}),
+    option("Actually, I'm not ready to buy.","अहिले किन्न तयार छैन।","closing",{payment:"none"})
+   ]);
+  if(node==="phone-finish")return r(node,
+   "Thank you! Payment by "+({cash:"cash",card:"card",digital:"QR"}[state.payment]||"your chosen method")+
+   " is complete. Your "+description+" with "+accessoryText+" totals "+money(total)+". Here's your receipt!",
+   "धन्यवाद! "+({cash:"नगद",card:"कार्ड",digital:"क्यूआर"}[state.payment]||"तपाईंको माध्यम")+
+   " बाट भुक्तानी भयो। "+description+" र "+accessoryNe+" को जम्मा "+rupees(total)+"। यो रसिद लिनुहोस्!",[
+    option("Thank you. Can I keep the receipt?","धन्यवाद। रसिद लिन सक्छु?","phone-receipt",{}),
     option("Thanks for your help. Goodbye!","मद्दतका लागि धन्यवाद। बिदा!","end",{})
    ]);
- }
- if(node==='phone-receipt')return r(node,
-  "Of course! Here's your receipt with the phone model, amount and return information. Have a great day!",
-  "अवश्य। यो तपाईंको रसिद। फोनको मोडेल, रकम र फिर्ताका सर्त यहाँ छन्। शुभ दिन!",[
-   option("Thanks! Have a nice day.","धन्यवाद! शुभ दिन।","end",{}),
-   option("Can I ask one more question?","अझ एउटा प्रश्न सोध्न सक्छु?","phone-warranty",{})
-  ]);
- return null;
+  if(node==="phone-receipt")return r(node,
+   "Of course. Your receipt shows "+description+", "+money(total)+" and the return policy. Have a great day!",
+   "अवश्य। रसिदमा "+description+", "+rupees(total)+" र फिर्ताका नियम छन्। शुभ दिन!",[
+    option("Thanks! Have a nice day.","धन्यवाद! शुभ दिन।","end",{}),
+    option("One more question about the warranty?","वारेन्टीबारे अर्को प्रश्न सोधूँ?","phone-warranty",{})
+   ]);
+  return null;
 }
 function build(node,state,config){
  const scene=state.scene,path=config[1][state.path]||config[1][0],detail=path[4][state.detail??0]||path[4][0];
