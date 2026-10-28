@@ -72,7 +72,7 @@ test('adaptive drafts keep the chosen path, and Visa integration remains present
   assert.equal(d.read().storyState.path,1);
   assert.equal(d.read().storyState.detail,2);
   assert.match(source('coach-dashboard.js'),/installVisaSidebar\(doc,shell,visaController\)/);
-  assert.match(source('index.html'),/coach-adaptive-story\\.js\\?v=20261028-meaningful-chat-r7/);
+  assert.match(source('index.html'),/coach-adaptive-story\.js\?v=20261028-meaningful-chat-r7/);
 });
 
 
