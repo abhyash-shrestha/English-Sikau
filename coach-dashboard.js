@@ -846,7 +846,7 @@ window.enhanceCoachDashboard=function(doc){
  searchInput.setAttribute('aria-label','Search real life situations');
  add(doc,filters,'p','sikau-convo-variety-hint','28 real-life topics · 12+ conversation turns · English + नेपाली · More realistic replay paths.');
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const footer=add(doc,browser,'p','sikau-convo-list-note','Practice real-life English by choosing the response that fits the conversation. Wrong choices are explained, and each lesson has Nepali support. · कुराकानीमा मिल्ने उत्तर छानेर अभ्यास गर्नुहोस्।');
+ const footer=add(doc,browser,'p','sikau-convo-list-note','Practice real-life English by choosing the response that fits the conversation. Wrong choices show clear feedback, and each lesson has Nepali support. · कुराकानीमा मिल्ने उत्तर छानेर अभ्यास गर्नुहोस्।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
  function filtered(){
@@ -971,8 +971,7 @@ window.enhanceCoachDashboard=function(doc){
   add(doc,feedback,'div','sikau-convo-label','👆 Choose your response · सही उत्तर छान्नुहोस्');
   const result=add(doc,feedback,'div','sikau-convo-feedback');
   result.setAttribute('role','status');result.setAttribute('aria-live','polite');
-  let resolved=false;
-  function showResult(success,model,custom){
+  function showResult(success){
    result.replaceChildren();result.className='sikau-convo-feedback '+(success?'success':'warning');
    const header=add(doc,result,'strong','',success?'✅ Good response! · राम्रो उत्तर':'❌ This answer does not fit · यो उत्तर मिलेन');
    add(doc,result,'p','',success?step.answer:'This reply does not answer the question. Choose an answer that fits this conversation.');
@@ -1002,8 +1001,9 @@ window.enhanceCoachDashboard=function(doc){
       showResult(false);
      }
     });
-   }  feedback.appendChild(result);
-  const skip=add(doc,feedback,'button','sikau-convo-skip','Show example & skip · उदाहरण हेरेर अर्को →');
+   }
+  feedback.appendChild(result);
+  const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
   skip.type='button';skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','🌱 Useful language');
