@@ -1093,3 +1093,13 @@ html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option
 html[data-sikau-theme="dark"] .sikau-convo .sikau-convo-option.sikau-chat-option.is-selected .sikau-chat-option-copy small{
  color:#ffdaed!important;
 }
+
+/* Decision-driven store role-play: visible remembered facts, no account storage. */
+.sikau-store-facts{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0 5px;align-items:center}
+.sikau-store-fact{display:inline-flex;align-items:center;min-height:29px;padding:6px 10px;
+ background:#fff5fb;color:#8b205e;border:1px solid #f6d4e9;border-radius:999px;
+ font-size:11px;font-weight:750;line-height:1.2}
+html[data-sikau-theme="dark"] .sikau-store-fact{
+ background:#4d2c49;color:#ffe1f1;border-color:#87536f
+}
+@media(max-width:560px){.sikau-store-facts{gap:5px}.sikau-store-fact{font-size:10px;padding:5px 8px}}
