@@ -563,6 +563,38 @@ function coachShuffleOptions(items){
  return copy;
 }
 
+
+/* At least one genuine alternate storyline in each of the 28 subjects.
+ * Each branch has its own translated follow-up; scripted practice only.
+ * All other turns provide equivalent natural phrasings (not fake wrong answers).
+ */
+const coachSceneAlternateChoices={"buy-phone":{"trigger":"Would you like to hold the phone?","alternatives":[{"value":"Not yet. Could you tell me how heavy it is?","ne":"अहिले होइन। कति भारी छ बताउनुहुन्छ?","followup":["Of course. Would you also like to compare its size with another model?","अवश्य। अर्को मोडलसँग आकार पनि तुलना गर्न चाहनुहुन्छ?","Yes, please show me the smaller model.","हो, सानो मोडल पनि देखाउनुहोस्।"]}]},"directions":{"trigger":"Which entrance are you looking for?","alternatives":[{"value":"I need the accessible side entrance.","ne":"मलाई सजिलै छिर्न मिल्ने छेउको प्रवेशद्वार चाहिन्छ।","followup":["The side entrance is nearby. Would you like step-free directions?","छेउको प्रवेशद्वार नजिकै छ। सिँढी नभएको बाटो बताऊँ?","Yes, a step-free route would be helpful.","हो, सिँढी नभएको बाटो उपयोगी हुन्छ।"]}]},"call-hospital":{"trigger":"Are you an existing patient?","alternatives":[{"value":"No, this would be my first visit.","ne":"होइन, यो मेरो पहिलो भेट हुनेछ।","followup":["Welcome. Would you like me to explain the new-patient registration process?","स्वागत छ। नयाँ बिरामीको दर्ता प्रक्रिया बुझाऊँ?","Yes, please explain the first steps.","हो, सुरुको प्रक्रिया बुझाउनुहोस्।"]}]},"hospital-checkin":{"trigger":"Did you find the correct reception desk?","alternatives":[{"value":"No, I am not sure this is the right desk.","ne":"होइन, यही सही काउन्टर हो कि थाहा छैन।","followup":["No problem. Would you like me to check which department you need?","चिन्ता नगर्नुहोस्। कुन विभाग चाहिन्छ जाँच गरूँ?","Yes, please help me find the right department.","हो, सही विभाग भेट्टाउन मद्दत गर्नुहोस्।"]}]},"restaurant":{"trigger":"Would you like a table by the window?","alternatives":[{"value":"Could we have a quiet table away from the door instead?","ne":"सट्टामा ढोकाबाट टाढाको शान्त टेबल दिनुहुन्छ?","followup":["Certainly. Would a table toward the back work for you?","अवश्य। पछाडितिरको टेबल ठीक हुन्छ?","Yes, that would be lovely. Thank you.","हो, त्यो राम्रो हुन्छ। धन्यवाद।"]}]},"groceries":{"trigger":"Do you have a shopping list today?","alternatives":[{"value":"No, I am just looking for ingredients for dinner.","ne":"होइन, म बेलुकीको खानाका सामग्री हेर्दै छु।","followup":["I can help. Are you looking for vegetables or something else first?","म मद्दत गर्न सक्छु। पहिले तरकारी चाहिएको हो कि अरू केही?","Could you show me the vegetable section?","तरकारी भएको ठाउँ देखाउनुहुन्छ?"]}]},"pharmacy":{"trigger":"Are you picking up a prescription today?","alternatives":[{"value":"Yes, I am here to collect a refill.","ne":"हो, म औषधि फेरि लिन आएको हुँ।","followup":["Of course. Would you like us to check if the refill is ready?","अवश्य। औषधि तयार छ कि जाँच गरौँ?","Yes, please check whether it is ready.","हो, तयार छ कि जाँच गर्नुहोस्।"]}]},"coffee":{"trigger":"Are you ordering for yourself?","alternatives":[{"value":"No, I am ordering drinks for two people.","ne":"होइन, म दुई जनाका लागि पेय अर्डर गर्दै छु।","followup":["Thanks for letting me know. Would you like both drinks in the same size?","जानकारीका लागि धन्यवाद। दुवै पेय एउटै साइजमा चाहिन्छ?","Yes, the same size would be great.","हो, एउटै साइज ठीक हुन्छ।"]}]},"interview":{"trigger":"What interested you in this position?","alternatives":[{"value":"I enjoy learning how technology works and helping people.","ne":"मलाई प्रविधि सिक्न र मानिसलाई मद्दत गर्न मन पर्छ।","followup":["That is useful. Could you share an example of helping someone?","त्यो उपयोगी छ। कसैलाई मद्दत गरेको उदाहरण दिनुहुन्छ?","Yes, I helped a customer solve a phone problem.","हो, मैले ग्राहकको फोनको समस्या समाधान गर्न मद्दत गरेँ।"]}]},"work-shift":{"trigger":"Could you check the delivery list?","alternatives":[{"value":"Yes, but may I count the boxes before I confirm it?","ne":"हो, तर पुष्टि गर्नुअघि बाकस गन्न सक्छु?","followup":["Good idea. Can you tell me if the quantities match afterward?","राम्रो विचार। त्यसपछि संख्या मिल्यो कि बताउनुहुन्छ?","Yes, I will report any missing items.","हो, कम सामान भए जानकारी दिन्छु।"]}]},"take-bus":{"trigger":"Are you waiting for the downtown bus?","alternatives":[{"value":"No, I am waiting for the bus to the airport.","ne":"होइन, म विमानस्थल जाने बस पर्खिरहेको छु।","followup":["This stop serves different routes. Would you like help checking the airport bus?","यहाँ विभिन्न रुटका बस आउँछन्। विमानस्थल जाने बस जाँचौँ?","Yes, please help me check the route.","हो, रुट जाँच्न मद्दत गर्नुहोस्।"]}]},"hotel":{"trigger":"How many nights will you stay?","alternatives":[{"value":"I will be staying for just one night.","ne":"म एक रात मात्र बस्नेछु।","followup":["Thank you. Would you like to know tomorrow's checkout time?","धन्यवाद। भोलिको चेकआउट समय जान्न चाहनुहुन्छ?","Yes, what time should I check out?","हो, कति बजे चेकआउट गर्नुपर्छ?"]}]},"airport":{"trigger":"Are you checking in for your flight?","alternatives":[{"value":"I need to check in, but I cannot find the counter.","ne":"मलाई चेकइन गर्नुछ, तर काउन्टर भेटेको छैन।","followup":["I can help. Would you like directions to the airline counter?","म मद्दत गर्छु। एयरलाइन्स काउन्टरको बाटो चाहिन्छ?","Yes, please tell me where it is.","हो, त्यो कहाँ छ बताउनुहोस्।"]}]},"bank":{"trigger":"What brings you to the branch today?","alternatives":[{"value":"I have a question about the monthly account fee.","ne":"मलाई खाताको मासिक शुल्कबारे प्रश्न छ।","followup":["I can explain the fees. Would you like us to review the recent charge first?","म शुल्क बुझाउन सक्छु। पहिले हालको शुल्क जाँचौँ?","Yes, please explain that charge.","हो, त्यो शुल्क बुझाउनुहोस्।"]}]},"phone-repair":{"trigger":"When did you first notice the problem?","alternatives":[{"value":"The screen started freezing after the phone fell.","ne":"फोन खसेपछि स्क्रिन अड्किन थाल्यो।","followup":["I see. Does it freeze in every app or just one?","बुझेँ। सबै एपमा अड्किन्छ कि एउटामा मात्र?","It happens in several apps.","धेरै एपमा यस्तो हुन्छ।"]}]},"new-friend":{"trigger":"Is this your first time at this event?","alternatives":[{"value":"No, I came here once last year.","ne":"होइन, गत वर्ष पनि एकपटक आएको थिएँ।","followup":["Welcome back! Did you enjoy the event last year?","फेरि स्वागत छ! गत वर्षको कार्यक्रम रमाइलो लागेको थियो?","Yes, I met some friendly people.","हो, केही मिलनसार मानिस भेटेको थिएँ।"]}]},"school-help":{"trigger":"What part of the lesson is difficult?","alternatives":[{"value":"I understand the sentences, but I am confused about verb tenses.","ne":"म वाक्य बुझ्छु, तर क्रियाको कालमा अलमल हुन्छ।","followup":["Let's work on that. Would you like to compare past and present tense?","त्यसैमा अभ्यास गरौँ। भूत र वर्तमान काल तुलना गर्ने?","Yes, an example would help.","हो, उदाहरणले मद्दत गर्छ।"]}]},"rent-home":{"trigger":"What is your preferred move-in date?","alternatives":[{"value":"I can move in as soon as the apartment is available.","ne":"घर खाली हुनासाथ सर्न सक्छु।","followup":["Understood. Would you like to discuss the earliest possible move-in date?","बुझेँ। सबैभन्दा चाँडो सर्न सकिने मितिबारे कुरा गर्ने?","Yes, please tell me the earliest date.","हो, सबैभन्दा चाँडो मिति बताउनुहोस्।"]}]},"home-internet":{"trigger":"How many people use the internet at home?","alternatives":[{"value":"Four people use it for work and school.","ne":"घरमा चार जनाले काम र पढाइका लागि इन्टरनेट चलाउँछन्।","followup":["Thanks. Do several people make video calls at the same time?","धन्यवाद। धेरै जनाले एकै समयमा भिडियो कल गर्छन्?","Yes, that happens often in our home.","हो, हाम्रो घरमा त्यो प्रायः हुन्छ।"]}]},"delivery-help":{"trigger":"What item are you waiting for?","alternatives":[{"value":"I am waiting for a winter jacket.","ne":"म जाडोको ज्याकेट पर्खिरहेको छु।","followup":["Thanks. Was the jacket part of one order or several packages?","धन्यवाद। त्यो ज्याकेट एउटै अर्डरको हो कि धेरै प्याकेजको?","It was part of one order.","त्यो एउटै अर्डरको भाग थियो।"]}]},"dental-office":{"trigger":"Is this your first visit to our office?","alternatives":[{"value":"No, I visited this dental office last year.","ne":"होइन, म गत वर्ष यो दन्त क्लिनिक आएको थिएँ।","followup":["Welcome back. Would you like us to check your previous appointment information?","फेरि स्वागत छ। अघिल्लो भेटको विवरण जाँचौँ?","Yes, please check the previous record.","हो, अघिल्लो विवरण जाँच्नुहोस्।"]}]},"parent-meeting":{"trigger":"How has your child been doing at home?","alternatives":[{"value":"My child enjoys math but needs extra help with reading.","ne":"मेरो बच्चालाई गणित मन पर्छ, तर पढाइमा थप मद्दत चाहिन्छ।","followup":["Thank you. Would you like some easy reading practice ideas for home?","धन्यवाद। घरमा पढ्ने सजिला अभ्यासका सुझाव चाहिन्छ?","Yes, please recommend some activities.","हो, केही अभ्यास सुझाउनुहोस्।"]}]},"shift-request":{"trigger":"Which day do you need off?","alternatives":[{"value":"Could I take next Monday off instead of Friday?","ne":"शुक्रबारको सट्टा अर्को सोमबार बिदा लिन सक्छु?","followup":["I can review Monday. Is this for a personal appointment?","सोमबारको कुरा जाँच्न सक्छु। के व्यक्तिगत भेटका लागि हो?","Yes, I have an appointment that day.","हो, त्यो दिन मेरो भेट छ।"]}]},"card-lost":{"trigger":"When did you notice your card was missing?","alternatives":[{"value":"I realized it was gone last night.","ne":"हिजो राति कार्ड हराएको थाहा पाएँ।","followup":["Thank you. Have you noticed any account activity since last night?","धन्यवाद। हिजो रातिदेखि खातामा कुनै कारोबार देख्नुभयो?","I have not checked yet. I will review it.","अहिलेसम्म जाँचेको छैन। अब जाँच्छु।"]}]},"send-mail":{"trigger":"Where are you sending this package?","alternatives":[{"value":"I am sending it to my friend in India.","ne":"म यो प्याकेज भारतमा साथीलाई पठाउँदै छु।","followup":["Thanks. Would you like to compare the available international shipping services?","धन्यवाद। अन्तर्राष्ट्रिय ढुवानी विकल्प तुलना गर्ने?","Yes, please show me the available options.","हो, उपलब्ध विकल्प देखाउनुहोस्।"]}]},"car-repair":{"trigger":"What seems to be wrong with your car?","alternatives":[{"value":"The brakes squeal when I slow down.","ne":"गति घटाउँदा ब्रेकबाट चर्को आवाज आउँछ।","followup":["Thank you. Is the sound worse when the brakes are cold?","धन्यवाद। ब्रेक चिसो हुँदा आवाज बढी आउँछ?","Yes, I notice it early in the morning.","हो, बिहान त्यो बढी सुनिन्छ।"]}]},"library":{"trigger":"Are you looking for fiction or nonfiction?","alternatives":[{"value":"I would prefer a short nonfiction book about nature.","ne":"मलाई प्रकृतिबारे छोटो गैरकाल्पनिक किताब चाहिन्छ।","followup":["Nice choice. Would you like a book with pictures or mostly text?","राम्रो छनोट। चित्रसहितको किताब चाहिन्छ कि लेख मात्रै भएको?","A book with pictures would help me understand.","चित्रसहितको किताब भए बुझ्न सजिलो हुन्छ।"]}]}};
+function coachFollowUpStep(details){
+ if(!Array.isArray(details)||details.length!==4)return null;
+ return coachOfflineStep(...details);
+}
+function coachReplyVariations(value){
+ const a=String(value||'').trim();
+ const forms=new Set([a]);
+ const replacements=[
+  [/^I'd like /i,'I would like '],[/^I would like /i,"I'd like "],
+  [/^Could you /i,'Can you '],[/^Can you /i,'Could you '],
+  [/^Could I /i,'May I '],[/^May I /i,'Could I '],
+  [/^I'm /i,'I am '],[/^I've /i,'I have '],[/^I'll /i,'I will '],
+  [/^I don't /i,'I do not '],[/^I can't /i,'I cannot '],
+  [/^It's /i,'It is '],[/^That's /i,'That is '],
+  [/^Thanks,/i,'Thank you,'],[/^Thank you,/i,'Thanks,'],
+  [/^Yes, /i,'Yes, certainly. '],[/^No, /i,'No, actually. ']
+ ];
+ for(const [pattern,replace] of replacements){
+  if(pattern.test(a))forms.add(a.replace(pattern,replace));
+ }
+ // Conversation fillers provide neutral alternatives without inventing facts.
+ if(!/^well[, ]/i.test(a))forms.add('Well, '+a.charAt(0).toLowerCase()+a.slice(1));
+ if(!/^to be clear[, ]/i.test(a))forms.add('To clarify, '+a.charAt(0).toLowerCase()+a.slice(1));
+ return Array.from(forms).filter(x=>x.trim().length>1);
+}
+
 function coachEquivalentReply(sentence){
  const value=String(sentence||'').trim();
  const changes=[
@@ -586,50 +618,76 @@ function coachEquivalentReply(sentence){
 
 function coachReplyOptions(step,scene){
  const line=normalize(step.npc),sceneId=scene?.id;
- const choice=(value,ne,branch)=>({value,ne,correct:true,branch:branch||null});
+ const choice=(value,ne,branch=null,followup=null)=>({
+  value,ne,correct:true,branch,followup
+ });
+ // These situations really do have different possible outcomes: model the
+ // consequences instead of pretending one predetermined answer is correct.
  if(sceneId==='return-shirt'){
-  if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line)){
+  if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I only tried it on at home.","हो, मैले घरमा लगाएर मात्र हेरेको थिएँ।"),
     choice("Yes, it is still unworn and the tags are attached.","हो, यो अझै नलगाइएको छ र ट्याग पनि छ।"),
-    choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn"),
-    {value:"I bought this shirt last Saturday.",correct:false}
+    choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn")
    ])};
-  }
-  if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line)){
+  if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I have the receipt right here.","हो, रसिद यहीँ छ।"),
     choice("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।"),
-    choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing"),
-    {value:"Could I try a different color?",correct:false}
+    choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing")
    ])};
-  }
-  if(/\b(?:damaged|wrong size)\b/.test(line)){
+  if(/\b(?:damaged|wrong size)\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("The size doesn't fit me.","यो साइज मलाई मिल्दैन।"),
     choice("The stitching is damaged.","यसको सिलाइ बिग्रेको छ।","damaged"),
-    {value:"Yes, I still have the receipt.",correct:false}
+    choice("I received the wrong color.","मैले फरक रङ पाएँ।",null,
+      ["I'm sorry. Would you like to check the color you originally ordered?","माफ गर्नुहोस्। सुरुमा मागेको रङ जाँच्ने?",
+       "Yes, I ordered a blue shirt.","हो, मैले नीलो कमिज मागेको थिएँ।"])
    ])};
-  }
-  if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line)){
+  if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line))
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("I'd prefer a refund, please.","म पैसा फिर्ता चाहन्छु।"),
     choice("I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।","exchange"),
-    {value:"I purchased it last Friday.",correct:false}
+    choice("Could you explain both options before I decide?","निर्णय गर्नुअघि दुवै विकल्प बुझाइदिनुहुन्छ?",null,
+     ["Of course. Would you like me to start with the exchange policy?","अवश्य। पहिले साट्ने नियम बताऊँ?",
+      "Yes, please explain the exchange policy first.","हो, कृपया पहिले साट्ने नियम बुझाउनुहोस्।"])
    ])};
-  }
+  if(/\bwas it bought online or in our store\b/.test(line))
+   return {multi:true,branching:true,options:coachShuffleOptions([
+    choice("I bought it in this store.","मैले यही पसलमा किनेको हुँ।",null,
+      ["Thanks. Do you remember which branch you visited?","धन्यवाद। कुन शाखामा किन्नुभएको थियो थाहा छ?",
+       "I bought it at the downtown branch.","मैले सहरको मुख्य शाखामा किनेको थिएँ।"]),
+    choice("I ordered it online.","मैले अनलाइन अर्डर गरेको थिएँ।",null,
+      ["I understand. Can you find your order confirmation email?","बुझेँ। अर्डर पुष्टि इमेल भेट्टाउन सक्नुहुन्छ?",
+       "Yes, let me check my inbox.","हो, इमेलको इनबक्स हेर्छु।"]),
+    choice("It was a gift, so I am not sure where it was bought.","यो उपहार थियो, कहाँ किनिएको हो थाहा छैन।",null,
+      ["No problem. Can you ask the person who gave it to you for a gift receipt?","ठीक छ। उपहार दिने व्यक्तिसँग रसिद माग्न सक्नुहुन्छ?",
+       "Yes, I can ask them about the receipt.","हो, रसिदबारे उहाँलाई सोध्न सक्छु।"])
+   ])};
+  if(/\bwhen did you purchase this shirt\b/.test(line))
+   return {multi:true,branching:false,options:coachShuffleOptions([
+    choice("I bought it last weekend.","मैले गएको सप्ताहन्त किनेको हुँ।"),
+    choice("I bought it yesterday.","मैले हिजो किनेको हुँ।"),
+    choice("I purchased it two weeks ago.","मैले दुई हप्ताअघि किनेको हुँ।")
+   ])};
  }
- // Safe paraphrases preserve the original meaning. Different facts or
- // opposite yes/no responses are offered only when a real next path exists.
- const sameMeaning=coachEquivalentReply(step.answer);
- const valid=[choice(step.answer,step.answerNe)];
- if(sameMeaning&&normalize(sameMeaning)!==normalize(step.answer))
-  valid.push(choice(sameMeaning,step.answerNe));
- return {multi:valid.length>1,branching:false,options:coachShuffleOptions([
-  ...valid,{value:step.bad1,correct:false},{value:step.bad2,correct:false}
- ])};
+ const special=coachSceneAlternateChoices[sceneId];
+ const trigger=special&&normalize(special.trigger);
+ if(trigger&&line.includes(trigger)){
+  const base=choice(step.answer,step.answerNe);
+  const alternatives=special.alternatives.map(v=>choice(v.value,v.ne,null,v.followup));
+  const equivalent=coachReplyVariations(step.answer)
+   .find(v=>normalize(v)!==normalize(step.answer));
+  if(equivalent)alternatives.push(choice(equivalent,step.answerNe));
+  return {multi:true,branching:true,options:coachShuffleOptions([base,...alternatives].slice(0,3))};
+ }
+ // Default: three *real*, meaning-preserving ways of saying the same thing.
+ // Never invent a false statement or a nonsensical distractor. The next
+ // question stays scripted because the underlying meaning did not change.
+ const variants=coachReplyVariations(step.answer);
+ const options=variants.slice(0,3).map(v=>choice(v,step.answerNe));
+ return {multi:true,branching:false,options:coachShuffleOptions(options)};
 }
-
 function shuffledChoices(step){
  const values=[{value:step.answer,correct:true},{value:step.bad1,correct:false},{value:step.bad2,correct:false}];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
