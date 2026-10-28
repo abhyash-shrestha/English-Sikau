@@ -993,6 +993,41 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  doc.getElementById('sikauCoachSide')?.remove();
  const shell=el(doc,'section','sikau-convo');shell.id='sikauCoachConversations';
  oldHero.parentElement.insertBefore(shell,oldHero);
+
+ // The parent app supplies the first name from its verified signed-in user.
+ // Never mutate the global scenarios: another learner might sign in later.
+ const signedInFirstName=typeof _firstName==='string'?
+  _firstName.trim().split(/\s+/u)[0].replace(/[<>\u0000-\u001f]/g,'').slice(0,32):'';
+ const coachLearnerName=signedInFirstName||'Learner';
+ const introText=text=>{
+  if(typeof text!=='string')return text;
+  return text.replace(/\bSita\b/gi,coachLearnerName)
+   .replace(/सीता/g,coachLearnerName)
+   .replace(/नाम काल्पनिक राख्न सकिन्छ।/g,'आफ्नै नाम प्रयोग गर्नुहोस्।')
+   .replace(/आफ्नो नाम काल्पनिक राखेर परिचय दिनुहोस्।/g,'आफ्नै नाम प्रयोग गरेर परिचय दिनुहोस्।');
+ };
+ const personalizeCoachStep=step=>{
+  if(!step||typeof step!=='object')return step;
+  const updated={...step};
+  for(const key of ['npc','npcNe','answer','answerNe','after','goal','hint'])
+   if(typeof updated[key]==='string')updated[key]=introText(updated[key]);
+  // A name requested in a hotel or café should also use this learner's
+  // signed-in first name, not a generic 'under my name' placeholder.
+  if(/may i have your booking name\?/i.test(updated.npc||'')){
+   updated.answer='The booking is under '+coachLearnerName+'.';
+   updated.answerNe='बुकिङ '+coachLearnerName+' को नाममा छ।';
+  }
+  if(/should we call your name when it.s ready\?/i.test(updated.npc||'')){
+   updated.answer='Yes, please call '+coachLearnerName+' when it is ready.';
+   updated.answerNe='हो, तयार भएपछि '+coachLearnerName+' भनेर बोलाउनुहोस्।';
+  }
+  if(Array.isArray(step.accept))updated.accept=step.accept.map(introText);
+  if(Array.isArray(step.storeOptions))
+   updated.storeOptions=step.storeOptions.map(item=>({
+    ...item,value:introText(item.value),ne:introText(item.ne)
+   }));
+  return updated;
+ };
  let dialogueHistory=[];
  let pendingChoice=null;
  let active=null,index=0,category='All',search='',mode='choose',showNepali=true,attempts=0,successful=0,finished=false,choices=[],choiceError='',typedError='',reveal=false;
@@ -1008,17 +1043,20 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   const scene=scenarios.find(x=>x.id===saved.sceneId);
   if(!scene)return;
   const state=Object.assign(Object.create(null),saved.storeState||{});
-  active={...scene,coachOriginal:scene,steps:saved.steps,
+  active={...scene,coachOriginal:scene,steps:saved.steps.map(personalizeCoachStep),
    coachPracticeNumber:Number.isSafeInteger(saved.practiceNumber)?saved.practiceNumber:1,
    coachRound:Number.isSafeInteger(saved.coachRound)?saved.coachRound:0,
    coachStyle:typeof saved.coachStyle==='string'?saved.coachStyle.slice(0,100):'Conversation',
    isBranchingStore:!!saved.isBranchingStore,storeState:state,
    storeCompleted:!!saved.storeCompleted};
-  index=saved.index;dialogueHistory=saved.history.slice();
+  index=saved.index;dialogueHistory=saved.history.map(entry=>entry&&({
+   ...entry,reply:introText(entry.reply),learnerNe:introText(entry.learnerNe),
+   answerNe:introText(entry.answerNe)
+  }));
   attempts=Number.isSafeInteger(saved.attempts)?saved.attempts:0;
   successful=Number.isSafeInteger(saved.successful)?saved.successful:0;
   pendingChoice=saved.pendingChoice&&typeof saved.pendingChoice.value==='string'?
-   {value:saved.pendingChoice.value,ne:String(saved.pendingChoice.ne||'')}:null;
+   {value:introText(saved.pendingChoice.value),ne:introText(String(saved.pendingChoice.ne||''))}:null;
   finished=false;choices=[];reveal=false;choiceError='';typedError='';
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
@@ -1148,7 +1186,9 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   lastId=scene.id;
   recentTopics=recentTopics.filter(id=>id!==scene.id).concat(scene.id).slice(-8);
   try{doc.defaultView.localStorage.setItem(topicHistoryStorage,JSON.stringify(recentTopics))}catch(_){}
-  active=coachNextConversation(scene);resetStage();
+  active=coachNextConversation(scene);
+  active.steps=active.steps.map(personalizeCoachStep);
+  resetStage();
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
   saveDraft();renderStage();stage.scrollIntoView?.({behavior:'smooth',block:'start'});
@@ -1191,7 +1231,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
    const readAll=add(doc,buttons,'button','sikau-convo-secondary','📖 Read full conversation · पूरा संवाद');readAll.type='button';
-   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',(line.speaker||active.partner)+': '+line.npc);add(doc,pair,'p','','You: '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
+   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',(line.speaker||active.partner)+': '+line.npc);add(doc,pair,'p','',coachLearnerName+': '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
    const another=add(doc,buttons,'button','sikau-convo-secondary','Explore more situations · थप विषय');another.type='button';another.addEventListener('click',back);
    return;
   }
@@ -1242,7 +1282,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   transcript.setAttribute('aria-label','Current and previous conversation messages');
   const chatHead=add(doc,transcript,'div','sikau-chat-top');
   add(doc,chatHead,'div','sikau-chat-top-scene',active.emoji+' '+active.place);
-  add(doc,chatHead,'span','sikau-chat-top-pill','● Practice conversation · कुराकानी अभ्यास');
+  add(doc,chatHead,'span','sikau-chat-top-pill','🙋 '+coachLearnerName+' · तपाईं');
   function bubble(who,english,ne,speaker,emoji){
    const wrapper=add(doc,transcript,'div','sikau-chat-message '+who);
    const avatar=add(doc,wrapper,'span','sikau-chat-avatar',who.startsWith('other')?(emoji||active.emoji):'🙋');
@@ -1253,12 +1293,12 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    if(showNepali&&ne)add(doc,body,'small','',ne);
    return body;
   }
-  if(index===0)add(doc,transcript,'p','sikau-chat-start','🌟 Your story begins here. Pick a reply to keep the chat going!');
+  if(index===0)add(doc,transcript,'p','sikau-chat-start','🌟 You are '+coachLearnerName+' in this conversation. Pick a reply to begin! · आफ्नो नामबाट अभ्यास सुरु गर्नुहोस्।');
   for(let i=0;i<index;i++){
    const prior=active.steps[i],history=dialogueHistory[i]||{};
    bubble('other',prior.npc,prior.npcNe,prior.speaker||active.partner,prior.speakerEmoji);
    const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?history.answerNe||prior.answerNe:'');
-   bubble('learner',history.reply||prior.answer,translated,'You · तपाईं');
+   bubble('learner',history.reply||prior.answer,translated,'You · '+coachLearnerName+' · तपाईं');
   }
   const latest=bubble('other current',step.npc,step.npcNe,(step.speaker||active.partner)+' · Now',step.speakerEmoji);
   const hear=add(doc,latest,'button','sikau-convo-hear','🔊 Listen · सुन्नुहोस्');
