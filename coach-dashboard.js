@@ -587,14 +587,13 @@ function coachEquivalentReply(sentence){
 function coachReplyOptions(step,scene){
  const line=normalize(step.npc),sceneId=scene?.id;
  const choice=(value,ne,branch)=>({value,ne,correct:true,branch:branch||null});
- const wrong={value:step.bad1||"My favorite color is blue.",correct:false};
  if(sceneId==='return-shirt'){
   if(/\bshirt\b/.test(line)&&/\bunworn\b/.test(line)){
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("Yes, I only tried it on at home.","हो, मैले घरमा लगाएर मात्र हेरेको थिएँ।"),
     choice("Yes, it is still unworn and the tags are attached.","हो, यो अझै नलगाइएको छ र ट्याग पनि छ।"),
     choice("No, I wore it outside once.","होइन, मैले बाहिर एकपटक लगाइसकेको छु।","worn"),
-    wrong
+    {value:"I bought this shirt last Saturday.",correct:false}
    ])};
   }
   if(/\breceipt\b/.test(line)&&/\b(?:have|still|bring)\b/.test(line)){
@@ -602,21 +601,21 @@ function coachReplyOptions(step,scene){
     choice("Yes, I have the receipt right here.","हो, रसिद यहीँ छ।"),
     choice("I have a digital receipt on my phone.","फोनमा डिजिटल रसिद छ।"),
     choice("No, I don't have the receipt anymore.","होइन, मसँग अब रसिद छैन।","receipt_missing"),
-    wrong
+    {value:"Could I try a different color?",correct:false}
    ])};
   }
   if(/\b(?:damaged|wrong size)\b/.test(line)){
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("The size doesn't fit me.","यो साइज मलाई मिल्दैन।"),
     choice("The stitching is damaged.","यसको सिलाइ बिग्रेको छ।","damaged"),
-    wrong
+    {value:"Yes, I still have the receipt.",correct:false}
    ])};
   }
   if(/\brefund\b/.test(line)&&/\bexchange\b/.test(line)){
    return {multi:true,branching:true,options:coachShuffleOptions([
     choice("I'd prefer a refund, please.","म पैसा फिर्ता चाहन्छु।"),
     choice("I'd like to exchange it for a larger size.","म ठूलो साइजसँग साट्न चाहन्छु।","exchange"),
-    wrong
+    {value:"I purchased it last Friday.",correct:false}
    ])};
   }
  }
