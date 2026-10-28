@@ -920,7 +920,7 @@ window.enhanceCoachDashboard=function(doc){
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
    const readAll=add(doc,buttons,'button','sikau-convo-secondary','📖 Read full conversation · पूरा संवाद');readAll.type='button';
-   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const line of active.steps){const pair=add(doc,transcript,'div','sikau-convo-full-pair');add(doc,pair,'strong','',active.partner+': '+line.npc);add(doc,pair,'p','', 'You: '+line.answer);if(showNepali)add(doc,pair,'small','',line.npcNe+' / '+line.answerNe);}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
+   readAll.addEventListener('click',()=>{const transcript=add(doc,done,'div','sikau-convo-full-dialogue');transcript.replaceChildren();for(const [turn,line] of active.steps.entries()){const pair=add(doc,transcript,'div','sikau-convo-full-pair'),student=dialogueHistory[turn];add(doc,pair,'strong','',active.partner+': '+line.npc);add(doc,pair,'p','','You: '+(student?.reply||line.answer));if(student?.corrected&&normalize(student.corrected)!==normalize(student.reply))add(doc,pair,'small','','Suggested: '+student.corrected);if(showNepali)add(doc,pair,'small','',line.npcNe+(student?.learnerNe?' / '+student.learnerNe:student?'':' / '+line.answerNe));}readAll.disabled=true;transcript.scrollIntoView?.({behavior:'smooth',block:'nearest'});});
    const another=add(doc,buttons,'button','sikau-convo-secondary','Explore more situations · थप विषय');another.type='button';another.addEventListener('click',back);
    return;
   }
@@ -954,6 +954,7 @@ window.enhanceCoachDashboard=function(doc){
    add(doc,learnerLine,'p','',history.reply||prior.answer);
    const translated=history.learnerNe||((history.kind==='guided'||history.kind==='example')?prior.answerNe:'');
    if(showNepali&&translated)add(doc,learnerLine,'small','',translated);
+   if(history.corrected&&normalize(history.corrected)!==normalize(history.reply))add(doc,learnerLine,'small','','Suggested: '+history.corrected);
   }
   const cols=add(doc,stage,'div','sikau-convo-session');
   const situ=add(doc,cols,'div','sikau-convo-dialogue');
@@ -1054,7 +1055,7 @@ window.enhanceCoachDashboard=function(doc){
       'Limited offline practice: full grammar checking and flexible replies require the private AI service.');
     if(!review.accepted)return;
     successful++;
-    dialogueHistory[index]={reply:value,learnerNe:review.learner_ne||'',kind:review.mode};
+    dialogueHistory[index]={reply:value,corrected:review.corrected||'',learnerNe:review.learner_ne||'',kind:review.mode};
     if(review.next&&index+1<active.steps.length){
      active.steps[index+1]={...step,...review.next,goal:review.next.goal||step.goal};
      active.steps[index].after=review.next.npc;
