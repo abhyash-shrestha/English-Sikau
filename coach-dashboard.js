@@ -1091,9 +1091,12 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   pendingChoice=saved.pendingChoice&&typeof saved.pendingChoice.value==='string'?
    {value:introText(saved.pendingChoice.value),ne:introText(String(saved.pendingChoice.ne||''))}:null;
   finished=false;choices=[];reveal=false;choiceError='';typedError='';
-  // Update only the CURRENT unanswered question from old saved clothing
-  // conversations; keep all previous chat messages and answers unchanged.
-  const upgraded=active.isBranchingStore&&window.sikauStoreStory?.reconcile?.(active,index,pendingChoice);
+  // Refresh the current prompt after dialogue updates, never erase past chat.
+  // A previously selected answer stays unchanged on resume.
+  const upgraded=active.isBranchingStore?
+   window.sikauStoreStory?.reconcile?.(active,index,pendingChoice):
+   active.isBranchingStory?
+   window.sikauAdaptiveStory?.reconcile?.(active,index,pendingChoice):false;
   if(upgraded)saveDraft();
   browser.hidden=true;stage.hidden=false;
   shell.classList.add('sikau-convo-learning');
