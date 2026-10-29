@@ -132,10 +132,34 @@
    return block;
   }
   function translate(message){
-   // Only exact authored pairs are shown. Never attach a mismatched
-   // generic Nepali translation to a specific English learner choice.
    const pairs=window.sikauCoachV4Translations||{};
-   return Object.prototype.hasOwnProperty.call(pairs,message)?pairs[message]:'';
+   if(Object.prototype.hasOwnProperty.call(pairs,message))return pairs[message];
+   // Expanded Coach topic catalog already includes bilingual counterparts.
+   // A first-turn paraphrase is used ONLY when it shares key topic words;
+   // unrelated translations are never applied to later V4 responses.
+   const approved=api?.topics?.[chosenIndex];
+   const original=(window.sikauMoreTopics||[]).find(x=>x.id===scene.id);
+   const config=original?.config;
+   if(!approved||!config)return '';
+   if(message===approved.hello)return config[0]?.[1]||'';
+   function words(value){
+    const stop=new Set(['i','a','an','the','me','my','you','your','would','like',
+     'could','please','help','with','about','have','need','want','am','is','are',
+     'this','that','do','can','to','for','in','of','on','and','today','looking']);
+    return [...new Set(String(value).toLowerCase().match(/[a-z]+/g)||[])]
+     .filter(w=>w.length>2&&!stop.has(w)).map(w=>w.endsWith('s')?w.slice(0,-1):w);
+   }
+   for(let i=0;i<3;i++){
+    const candidate=approved.routes?.[i]?.say;
+    if(message!==candidate)continue;
+    const old=config[1]?.[i];
+    if(!old?.[1])return '';
+    const left=words(message),right=words(old[0]);
+    if(!left.length||!right.length)return '';
+    const intersection=left.filter(w=>right.includes(w)).length;
+    return intersection>=1&&intersection/Math.min(left.length,right.length)>=.3?old[1]:'';
+   }
+   return '';
   }
   function render(){
    if(!isCurrent())return;
