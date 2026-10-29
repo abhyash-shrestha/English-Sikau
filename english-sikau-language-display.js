@@ -84,6 +84,20 @@
   // Roman modes must wrap within mobile cards/buttons rather than overlap.
   'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) :is(.sikau-chat-message-body,.sikau-chat-option-copy,.sikau-convo-situation,.sikau-convo-stage,.sikau-ui-intro-copy,.sikau-home-intro,.sikau-festival-preview,.sikau-future-festival,.sikau-visa-main,.content,.nav,.sikau-convo){min-width:0!important;overflow-wrap:anywhere!important}',
   'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) :is(.sikau-convo-situation,.sikau-chat-option,.sikau-festival-preview,.sikau-ui-intro){height:auto!important}',
+  // Compact navigation has fixed-width touch targets. Never squeeze 2–3 labels
+  // into one nav button; full language display remains in lesson content.
+  '@media(max-width:767px){',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav :is(.sikau-nav-word small,.sikau-home-nav-label small,.sikau-visa-nav-word small,.roman,.sikau-lang-roman,.sikau-lang-ne){display:none!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav .sikau-lang-token{display:none!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav button{min-width:0!important;overflow:hidden!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav :is(.sikau-nav-word,.sikau-home-nav-label,.sikau-visa-nav-word){min-width:0!important;max-width:100%!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav :is(.sikau-nav-word strong,.sikau-home-nav-label strong,.sikau-visa-nav-word strong){white-space:normal!important;overflow-wrap:normal!important;text-align:center!important;line-height:1.12!important}',
+  // Classroom label cannot hold the original Nepali plus two Roman copies
+  // beside language controls. Its full accessible name is preserved separately.
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom{font-size:0!important;white-space:nowrap!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;line-height:1!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom > *{display:none!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom::after{content:attr(data-sikau-compact-classroom)!important;display:inline!important;font:800 12px/1.2 system-ui,sans-serif!important;white-space:nowrap!important;letter-spacing:normal!important}',
+  '}',
   // Respect native bilingual controls without hiding unrelated English text.
   'html[data-sikau-display-language="en"] .i18n-sub{display:none!important}',
   'html[data-sikau-display-language="en-ne"] .i18n-sub .roman{display:none!important}',
@@ -165,6 +179,28 @@
    if(changed)n.replaceWith(frag);
   }
  }
+ function synchronizeCompactControls(){
+  // This badge is a display-only classroom shortcut inserted by the trusted
+  // parent. Its original children, click handlers and text are not replaced.
+  const classroom=d.querySelector('.app-header .sikau-personal-classroom');
+  if(!classroom)return;
+  let source=classroom.dataset.sikauClassroomSource;
+  if(!source){
+   source=(classroom.textContent||'').replace(/\s+/g,' ').trim();
+   classroom.dataset.sikauClassroomSource=source;
+  }
+  const leading=source.split(/[·•|]/,1)[0].replace(/^[\s🔐📚]+/u,'').trim();
+  const first=(leading||'Learner').slice(0,30);
+  const visible=mode==='en-roman'?'🔐 '+first+' · Mero kaksha':
+   mode==='all'?'🔐 '+first+' · Class':mode==='en'?'🔐 '+first+' · My class':'';
+  if(classroom.dataset.sikauCompactClassroom!==visible)
+   classroom.dataset.sikauCompactClassroom=visible;
+  // Exact, natural full names are available to VoiceOver on the compact badge.
+  if(mode==='en-roman'||mode==='all'){
+   const label=first+' — My classroom, मेरो कक्षा, Mero kaksha';
+   if(classroom.getAttribute('aria-label')!==label)classroom.setAttribute('aria-label',label);
+  }
+ }
  function updateAccessibility(){
   const roman=mode==='en-roman',all=mode==='all';
   for(const token of d.querySelectorAll('.sikau-lang-token')){
@@ -205,6 +241,7 @@
     decorate(target);
     decorateAttributes(target.nodeType===Node.TEXT_NODE?target.parentElement:target);
    }
+   synchronizeCompactControls();
    if(changed)updateAccessibility();
    else{
     // Newly inserted tokens must match the current screen-reader language.
