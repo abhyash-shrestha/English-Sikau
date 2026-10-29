@@ -617,7 +617,21 @@
   localizedLabel('#back-topics,#undo,#switch-goal,#restart,#restart-bottom,#pager-prev,#pager-next',el=>originalText(el).replace(/^[^\p{L}\p{N}]+/u,'').replace(/[^\p{L}\p{N}]+$/u,'').trim());
   localizedLabel('#category-filters .category-chip',el=>originalText(el));
   localizedLabel('#topic-grid .no-results');
-  localizedLabel('#chat-transcript .speaker');
+  // Personalize only the learner's speaker label. Never translate or
+  // romanize the student's own first name; it comes from the verified
+  // frame in the same authenticated parent, not from the conversation text.
+  const firstName=String(window.frameElement?.dataset?.sikauStudentFirstName||'')
+   .trim().split(/\s+/u)[0].replace(/[<>]/g,'').slice(0,32)||'Learner';
+  for(const speaker of document.querySelectorAll('#chat-transcript .speaker')){
+   const original=originalText(speaker);
+   if(!original)continue;
+   if(speaker.closest('.message-row.by-you')){
+    display(speaker,original,{
+     ne:firstName+' · विद्यार्थी',
+     roman:firstName+' · Bidhyarthi'
+    });
+   }else display(speaker,original);
+  }
   for(const bubble of document.querySelectorAll('#chat-transcript .bubble')){
    const text=originalText(bubble);
    if(text)display(bubble,text);
