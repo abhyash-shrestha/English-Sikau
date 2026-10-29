@@ -94,9 +94,9 @@
   'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes.nav :is(.sikau-nav-word strong,.sikau-home-nav-label strong,.sikau-visa-nav-word strong){white-space:normal!important;overflow-wrap:normal!important;text-align:center!important;line-height:1.12!important}',
   // Classroom label cannot hold the original Nepali plus two Roman copies
   // beside language controls. Its full accessible name is preserved separately.
-  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom{font-size:0!important;white-space:nowrap!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;line-height:1!important}',
-  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom > *{display:none!important}',
-  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .app-header .sikau-personal-classroom::after{content:attr(data-sikau-compact-classroom)!important;display:inline!important;font:800 12px/1.2 system-ui,sans-serif!important;white-space:nowrap!important;letter-spacing:normal!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .sikau-personal-classroom{font-size:0!important;white-space:nowrap!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;line-height:1!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .sikau-personal-classroom > *{display:none!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) .sikau-personal-classroom::after{content:attr(data-sikau-compact-classroom)!important;display:inline!important;font:800 12px/1.2 system-ui,sans-serif!important;white-space:nowrap!important;letter-spacing:normal!important}',
   '}',
   // Respect native bilingual controls without hiding unrelated English text.
   'html[data-sikau-display-language="en"] .i18n-sub{display:none!important}',
@@ -182,7 +182,7 @@
  function synchronizeCompactControls(){
   // This badge is a display-only classroom shortcut inserted by the trusted
   // parent. Its original children, click handlers and text are not replaced.
-  const classroom=d.querySelector('.app-header .sikau-personal-classroom');
+  const classroom=d.querySelector('.sikau-personal-classroom');
   if(!classroom)return;
   let source=classroom.dataset.sikauClassroomSource;
   if(!source){
