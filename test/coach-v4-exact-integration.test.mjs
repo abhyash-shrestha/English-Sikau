@@ -133,10 +133,16 @@ test('Visa Interview can still open its native Ask AI Coach form',()=>{
  assert.match(original,/enhanceVisaInterviewCoach\(doc,shell,ask\)/);
  assert.match(original,/installVisaSidebar\(doc,shell,visaController\)/);
 });
-test('Dark mode is synced through the V4 internal mode instead of a temporary CSS override',()=>{
+test('Coach dark mode follows the authenticated app and preserves the V4 render state',()=>{
  const bridge=read('coach-v4-bridge.js');
- assert.match(bridge,/getElementById\('theme-toggle'\)\?\.click\(\)/);
- assert.doesNotMatch(bridge,/document\.documentElement\.dataset\.theme=next\.theme/);
+ assert.match(bridge,/function readCoachTheme\(/);
+ assert.match(bridge,/window\.top\.document\.documentElement/);
+ assert.match(bridge,/function applyCoachTheme\(/);
+ assert.match(bridge,/SikauPreview\?\.setTheme/);
+ assert.match(bridge,/attributeFilter:\['data-sikau-theme','data-theme'\]/);
+ assert.doesNotMatch(bridge,/getElementById\('theme-toggle'\)\?\.click\(\)/);
+ assert.match(html,/setTheme:\(theme\)=>\{/);
+ assert.match(html,/document\.documentElement\.dataset\.theme=wanted\?'dark':'light'/);
 });
 
 test('The review feedback section is absent from all 175 conversations',()=>{
@@ -258,4 +264,22 @@ test('Hide unnecessary practice disclaimer in all 175 topic pages',()=>{
  assert.doesNotMatch(html,/Practice preview only · No purchases, medical appointments/,
   'Unnecessary preview disclaimer still appears at the bottom');
  assert.doesNotMatch(html,/<p class="footnote">/);
+});
+
+test('All sidebar tabs including Coach can be dragged on desktop and reordered on touch/keyboard',()=>{
+ const src=read('sidebar-unified.js'),css=read('sidebar-unified.css');
+ assert.match(src,/const SELECTOR='button\[data-t\],button\.sikau-home-nav,button\.sikau-visa-nav'/);
+ assert.match(src,/const nativeDrag=!!win\.matchMedia\?\./);
+ assert.match(src,/b\.draggable=nativeDrag/);
+ assert.match(src,/doc\.addEventListener\('dragstart'/);
+ assert.match(src,/doc\.addEventListener\('dragover'/);
+ assert.match(src,/doc\.addEventListener\('drop'/);
+ assert.match(src,/doc\.addEventListener\('dragend'/);
+ assert.match(src,/applyDrop\(htmlDrag,e\.clientX,e\.clientY\)/);
+ assert.match(src,/if\(move\(nav,moving,target,before\)\)persist\(\)/);
+ assert.match(src,/saveWrite|safeWrite\(win,STORAGE,saved\)/);
+ assert.match(src,/const touchStart=e=>/);
+ assert.match(src,/Alt\+ArrowUp Alt\+ArrowDown/);
+ assert.match(css,/sikau-nav-dragging/);
+ assert.match(css,/sikau-nav-drop-target/);
 });
