@@ -61,5 +61,5 @@ test('script load order and U.S. Visa Interview code remain correct',()=>{
   assert.ok(next>pos,'Incorrect script order '+file);pos=next;
  }
  assert.match(read('coach-dashboard.js'),/installVisaSidebar\(doc,shell,visaController\)/);
- assert.match(read('coach-dashboard.js'),/visibleLimit=24/);
+ assert.match(read('coach-dashboard.js'),/window.sikauCoachPagination.paginate\(filtered\(\),currentPage\)/);
 });

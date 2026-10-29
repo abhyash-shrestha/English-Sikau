@@ -1128,22 +1128,68 @@ html[data-sikau-theme="dark"] .sikau-convo-resume-copy small{color:#c4d3e9}
  .sikau-convo-resume-actions button{font-size:12px;min-width:0;padding:9px 6px}
 }
 
-/* 175-topic library: compact swipeable category filters and progressive listing. */
+/* 175-topic library: compact swipeable category filters and numbered pages. */
 .sikau-convo-topics{
  display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
  scrollbar-width:thin;padding:2px 2px 9px;
  -webkit-overflow-scrolling:touch;
 }
 .sikau-convo-topics .sikau-convo-topic{flex:0 0 auto;white-space:nowrap}
-.sikau-convo-load-more{
- display:block;margin:12px auto 18px;min-height:46px;
- padding:10px 20px;border-radius:12px;
- font-weight:750;
+/* Seven simple pages for the full 175-topic catalog; no accumulating cards. */
+.sikau-convo-pagination{
+ display:grid;justify-items:center;gap:11px;
+ margin:20px auto 16px;max-width:720px;min-width:0
 }
-.sikau-convo-load-more[hidden]{display:none!important}
+.sikau-convo-pagination[hidden]{display:none!important}
+.sikau-convo-page-summary{
+ margin:0;text-align:center;color:#61728d;line-height:1.4;
+ font-size:12px;font-weight:700
+}
+.sikau-convo-page-controls{
+ display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+ gap:9px;align-items:center;width:100%;min-width:0
+}
+.sikau-convo-page-numbers{
+ display:flex;gap:7px;justify-content:center;align-items:center;
+ min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;
+ scrollbar-width:thin;padding:4px 2px;scrollbar-gutter:stable;
+ -webkit-overflow-scrolling:touch
+}
+.sikau-convo-page-number,.sikau-convo-page-nav{
+ border:1px solid #dce3ee;background:#f8faff;color:#32496c;
+ border-radius:11px;min-height:43px;font-size:13px;
+ font-weight:800;cursor:pointer;transition:background .16s,border-color .16s;
+}
+.sikau-convo-page-number{flex:0 0 43px;min-width:43px}
+.sikau-convo-page-nav{padding:9px 12px;white-space:nowrap}
+.sikau-convo-page-number:hover:not(:disabled),
+.sikau-convo-page-nav:hover:not(:disabled){background:#fceaf2;border-color:#ec9cbe}
+.sikau-convo-page-number[aria-current="page"]{
+ background:#e90062!important;border-color:#e90062!important;color:#fff!important
+}
+.sikau-convo-page-number:focus-visible,.sikau-convo-page-nav:focus-visible{
+ outline:3px solid #ff94b9;outline-offset:2px
+}
+.sikau-convo-page-nav:disabled{opacity:.46;cursor:default}
+.sikau-convo-cards{scroll-margin-top:90px}
+html[data-sikau-theme="dark"] .sikau-convo-page-summary{color:#d4dcf0!important}
+html[data-sikau-theme="dark"] :is(.sikau-convo-page-number,.sikau-convo-page-nav){
+ background:#2d3950!important;color:#f2eeff!important;border-color:#566581!important
+}
+html[data-sikau-theme="dark"] .sikau-convo-page-number[aria-current="page"]{
+ background:#cc1b67!important;border-color:#cc1b67!important;color:#fff!important
+}
 @media(max-width:600px){
  .sikau-convo-topics{margin-inline:-7px;padding-inline:7px}
- .sikau-convo-load-more{width:100%}
+ .sikau-convo-pagination{width:100%;gap:9px;margin:16px auto 12px}
+ .sikau-convo-page-controls{gap:5px}
+ .sikau-convo-page-numbers{gap:5px;justify-content:flex-start}
+ .sikau-convo-page-number{min-width:37px;flex-basis:37px;min-height:40px}
+ .sikau-convo-page-nav{min-height:40px;padding:8px;font-size:11px}
+}
+@media(max-width:360px){
+ .sikau-convo-page-number{min-width:34px;flex-basis:34px}
+ .sikau-convo-page-nav{padding:7px 6px;font-size:10px}
 }
 
 
