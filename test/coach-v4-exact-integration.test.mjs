@@ -151,3 +151,29 @@ test('The review feedback section is absent from all 175 conversations',()=>{
  const choices=runPreview();
  assert.equal(choices.topics.length,175);
 });
+
+
+test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
+ const mobile=html.match(/@media\(max-width:620px\)\{[^\n]*\.transcript\{([^}]+)\}/);
+ assert.ok(mobile,'Mobile chat-history CSS is missing');
+ const rules=mobile[1];
+ assert.match(rules,/max-height:min\(42vh,350px\)/);
+ assert.match(rules,/overflow-y:auto/);
+ assert.match(rules,/overscroll-behavior-y:contain/);
+ assert.match(rules,/-webkit-overflow-scrolling:touch/);
+ assert.doesNotMatch(rules,/max-height:none|overflow:visible/);
+ assert.match(html,/id="chat-transcript" class="transcript" role="log" tabindex="0"/);
+ assert.match(html,/id="choices-wrap" class="choice-area"/);
+ assert.ok(html.indexOf('id="chat-transcript"')<html.indexOf('id="choices-wrap"'));
+ assert.match(html,/scrollTop=\$\('chat-transcript'\)\.scrollHeight/);
+});
+
+test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
+ const mount=read('coach-v4-mount.js');
+ const app=read('index.html');
+ assert.match(mount,/source\.searchParams\.set\('v','20261029-scrollable-chat-r3'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261029-scrollable-chat-r3/);
+ assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
+ assert.match(mount,/getElementById\('langPref'\)/);
+ assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
+});
