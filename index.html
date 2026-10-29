@@ -1670,7 +1670,7 @@ window.sikauNeuralSpeech=async function({text,lang,gender}){
  try{output=JSON.parse(result?.responseBody||'{}')}
  catch(_){throw Error('Natural speech response unavailable')}
  if(result?.responseStatusCode!==200||output?.status!=='ok'||
-    output?.mime!=='audio/mpeg'||typeof output?.audioBase64!=='string'||
+    !['audio/mpeg','audio/wav'].includes(output?.mime)||typeof output?.audioBase64!=='string'||
     output.audioBase64.length>1900000||output.audioBase64.length<30)
   throw Error(output?.message||'Natural speech unavailable');
  return {audioBase64:output.audioBase64,mime:output.mime,voice:output.voice};
