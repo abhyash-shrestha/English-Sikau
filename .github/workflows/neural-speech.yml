@@ -1,0 +1,39 @@
+name: Neural speech regression tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'functions/neural-speech/**'
+      - 'nepali-voice-bridge.js'
+      - 'reading-dashboard.js'
+      - 'translate-studio-v4.js'
+      - 'test/neural-speech-function.test.mjs'
+      - 'test/nepali-voice-bridge.test.mjs'
+      - '.github/workflows/neural-speech.yml'
+  pull_request:
+    paths:
+      - 'functions/neural-speech/**'
+      - 'nepali-voice-bridge.js'
+      - 'reading-dashboard.js'
+      - 'translate-studio-v4.js'
+      - 'test/neural-speech-function.test.mjs'
+      - 'test/nepali-voice-bridge.test.mjs'
+jobs:
+  speech:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate neural speech code syntax
+        run: |
+          node --check functions/neural-speech/src/main.js
+          node --check nepali-voice-bridge.js
+          node --check reading-dashboard.js
+          node --check translate-studio-v4.js
+      - name: Run isolated tests (no external speech requests or secrets)
+        run: node --test test/neural-speech-function.test.mjs test/nepali-voice-bridge.test.mjs
