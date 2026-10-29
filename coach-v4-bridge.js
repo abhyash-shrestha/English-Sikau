@@ -495,7 +495,10 @@
     const backoff=Math.min(90000,6000*Math.pow(2,Math.min(failures-1,4)));
     coolUntil=Date.now()+backoff;
     // Revisit a failed line later, not forever and not in a retry loop.
-    retryAfter.set(english,Date.now()+Math.max(60000,backoff));
+    const revisit=Math.max(60000,backoff);
+    retryAfter.set(english,Date.now()+revisit);
+    // A topic left open can recover without forcing the learner to restart.
+    setTimeout(()=>{if(mode!=='en')schedule();},revisit+100);
     schedule();
    }).finally(()=>{
     pending.delete(english);processing--;
@@ -562,6 +565,7 @@
   localizedLabel('#chat-role,#chat-counter,#chat-step,#chat-goal,#choice-title,#total-counter,#page-summary,#topic-browser .sectiontitle,#topic-browser .sectionhint,#chat-view .kicker,#topic-browser .resultline span,#topic-browser .footnote,#chat-view .progressline span,#goal-status > span,#complete-actions strong,#complete-actions p');
   localizedLabel('#back-topics,#undo,#switch-goal,#restart,#restart-bottom,#pager-prev,#pager-next',el=>originalText(el).replace(/^[^\p{L}\p{N}]+/u,'').replace(/[^\p{L}\p{N}]+$/u,'').trim());
   localizedLabel('#category-filters .category-chip',el=>originalText(el));
+  localizedLabel('#topic-grid .no-results');
   localizedLabel('#chat-transcript .speaker');
   for(const bubble of document.querySelectorAll('#chat-transcript .bubble')){
    const text=originalText(bubble);
