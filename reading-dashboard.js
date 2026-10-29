@@ -4,7 +4,7 @@
 const url=new URL('./reading-dashboard.css?v=20261021-dark-contrast-r1',document.baseURI).href;
  // Load the shared voice selector once in the authenticated lesson, so
  // both Reading's native player and Translate's Listen button see it.
- const voiceBridge=new URL('./nepali-voice-bridge.js?v=20261029-ne-male-r3',document.baseURI).href;
+ const voiceBridge=new URL('./nepali-voice-bridge.js?v=20261029-male-provider-r4',document.baseURI).href;
  let voiceScriptLoading=null;
  function ensureVoiceBridge(d){
   if(typeof window.enhanceNepaliSpeechVoices==='function'){
