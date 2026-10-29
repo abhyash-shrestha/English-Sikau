@@ -363,51 +363,144 @@
    return out;
   });
  }
- const storageKey='sikau-v4-ne-dialogue-cache-v1';
+
+ const sectionNames={
+  'All':'सबै','Shopping':'किनमेल','Healthcare':'स्वास्थ्य सेवा',
+  'Food & Drink':'खाना र पेय पदार्थ','Travel':'यात्रा','Work':'काम',
+  'Services':'सेवाहरू','Everyday':'दैनिक जीवन','Home':'घर',
+  'Education':'शिक्षा','Technology':'प्रविधि','Money':'पैसा',
+  'Community':'समुदाय','Family':'परिवार',
+  'Returns associate':'सामान फिर्ता लिने कर्मचारी',
+  'Phone salesperson':'मोबाइल विक्रेता','Sales assistant':'बिक्री सहायक',
+  'Barista':'कफी बनाउने कर्मचारी','Store assistant':'पसल कर्मचारी',
+  'Customer service agent':'ग्राहक सेवा प्रतिनिधि',
+  'You · Learner':'तपाईं · विद्यार्थी',
+  'Conversation completed':'कुराकानी पूरा भयो',
+  'Conversation':'कुराकानी',
+  'Choose your starting situation':'सुरु गर्ने परिस्थिति छान्नुहोस्',
+  'Real-life details':'वास्तविक जीवनका विवरण',
+  'Deciding next steps':'अर्को कदम तय गर्दै'
+ };
+ for(const [english,ne] of Object.entries(sectionNames))staticNe.set(english,ne);
+ const storageKey='sikau-v4-ne-dialogue-cache-v2';
  let cacheEntries=[];
  try{cacheEntries=JSON.parse(localStorage.getItem(storageKey)||'[]');}catch(_){}
- const translated=new Map(Array.isArray(cacheEntries)?cacheEntries.filter(x=>Array.isArray(x)&&x.length===2):[]);
- const pending=new Set(),jobs=[];let processing=0,failures=0,saveTimer=0;
+ // Only prewritten scenario text may enter this cache. It contains no user
+ // account data. Keep enough entries for 175 scenarios instead of 450 lines.
+ const translated=new Map(Array.isArray(cacheEntries)?
+  cacheEntries.filter(x=>Array.isArray(x)&&x.length===2&&
+   typeof x[0]==='string'&&typeof x[1]==='string'&&/[\u0900-\u097f]/.test(x[1])):[]);
+ const pending=new Set(),retryAfter=new Map(),jobs=[];
+ let processing=0,failures=0,saveTimer=0,retryTimer=0;
+ let coolUntil=0;
  function persist(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
-   try{localStorage.setItem(storageKey,JSON.stringify(Array.from(translated).slice(-450)))}catch(_){}
+   try{
+    const items=Array.from(translated).slice(-5500);
+    const payload=JSON.stringify(items);
+    if(payload.length<3200000)localStorage.setItem(storageKey,payload);
+    else localStorage.setItem(storageKey,JSON.stringify(items.slice(-2000)));
+   }catch(_){}
   },900);
  }
- async function remoteNe(english){
-  // Only public, prewritten practice script sentences are translated.
-  // Never send account identifiers, typed learner content, or lesson progress.
+ function localNe(english){
+  const direct=staticNe.get(english);
+  if(direct)return direct;
+  // Dynamic UI values should not consume machine translation requests.
+  let match=/^Topic (\d+) of 175$/.exec(english);
+  if(match)return '१७५ मध्ये विषय '+match[1];
+  match=/^Turn (\d+) · (.*)$/.exec(english);
+  if(match)return 'पालो '+match[1]+' · '+(staticNe.get(match[2])||match[2]);
+  match=/^(\d+) topic-specific conversations$/.exec(english);
+  if(match)return match[1]+' विषयअनुसारका कुराकानीहरू';
+  match=/^(\d+) matching situations$/.exec(english);
+  if(match)return match[1]+' मिल्दो परिस्थितिहरू';
+  match=/^Showing (\d+)–(\d+) of (\d+) · Page (\d+) of (\d+)$/.exec(english);
+  if(match)return match[1]+' देखि '+match[2]+' सम्म, कुल '+match[3]+' · पृष्ठ '+match[4]+'/'+match[5];
+  match=/^(.+?) · (Shopping|Healthcare|Food & Drink|Travel|Work|Services|Everyday|Home|Education|Technology|Money|Community|Family)$/.exec(english);
+  if(match&&staticNe.has(match[1]))return staticNe.get(match[1])+' · '+staticNe.get(match[2]);
+  if(english==='No matching situations')return 'मिल्दो परिस्थिति भेटिएन';
+  return '';
+ }
+ function validTranslation(value){
+  return typeof value==='string'&&/[\u0900-\u097f]/.test(value)&&
+   !/MYMEMORY WARNING|QUOTA EXCEEDED|TRANSLATION FAILED/i.test(value);
+ }
+ async function translateWithGoogle(english){
   const url='https://translate.googleapis.com/translate_a/single?'+new URLSearchParams({
    client:'gtx',sl:'en',tl:'ne',dt:'t',q:english
-  }).toString();
+  });
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),7500);
+  const timer=setTimeout(()=>controller.abort(),4500);
   try{
-   const result=await fetch(url,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
-   if(!result.ok)throw Error('Translation unavailable');
-   const data=await result.json();
-   const value=Array.isArray(data?.[0])?data[0].map(part=>String(part?.[0]||'')).join('').trim():'';
-   if(!/[\u0900-\u097f]/.test(value))throw Error('No Nepali translation');
-   return value;
+   const response=await fetch(url,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
+   if(!response.ok)throw Error('Google translation HTTP '+response.status);
+   const json=await response.json();
+   const result=Array.isArray(json?.[0])?json[0].map(x=>String(x?.[0]||'')).join('').trim():'';
+   if(!validTranslation(result))throw Error('No usable Nepali response');
+   return result;
   }finally{clearTimeout(timer);}
  }
+ async function translateWithMyMemory(english){
+  // Public, keyless fallback has a small shared daily quota and a strict
+  // 500-byte input limit. Do not send arbitrary learner-written messages.
+  if(new TextEncoder().encode(english).length>480)throw Error('Too long for fallback');
+  const url='https://api.mymemory.translated.net/get?'+new URLSearchParams({
+   q:english,langpair:'en|ne'
+  });
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),6000);
+  try{
+   const response=await fetch(url,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
+   if(!response.ok)throw Error('MyMemory HTTP '+response.status);
+   const json=await response.json();
+   const result=String(json?.responseData?.translatedText||'').trim();
+   if(Number(json?.responseStatus)!==200||!validTranslation(result))throw Error('Fallback unavailable');
+   return result;
+  }finally{clearTimeout(timer);}
+ }
+ async function remoteNe(english){
+  // The script provides these public practice phrases, not learner input.
+  // Try the default free endpoint, then an independent free fallback.
+  try{return await translateWithGoogle(english)}
+  catch(_){return await translateWithMyMemory(english)}
+ }
  function workQueue(){
-  while(processing<3&&jobs.length&&failures<4){
-   const source=jobs.shift();processing++;
-   remoteNe(source).then(ne=>{
-    translated.set(source,ne);persist();schedule();
-   }).catch(()=>{failures++;schedule();}).finally(()=>{
-    pending.delete(source);processing--;workQueue();
+  if(Date.now()<coolUntil){
+   if(!retryTimer)retryTimer=setTimeout(()=>{retryTimer=0;workQueue()},Math.max(300,coolUntil-Date.now()));
+   return;
+  }
+  while(processing<2&&jobs.length){
+   const english=jobs.shift();
+   processing++;
+   remoteNe(english).then(ne=>{
+    failures=0;retryAfter.delete(english);
+    translated.set(english,ne);
+    persist();
+    schedule();
+   }).catch(()=>{
+    failures=Math.min(failures+1,8);
+    const backoff=Math.min(90000,6000*Math.pow(2,Math.min(failures-1,4)));
+    coolUntil=Date.now()+backoff;
+    // Revisit a failed line later, not forever and not in a retry loop.
+    retryAfter.set(english,Date.now()+Math.max(60000,backoff));
+    schedule();
+   }).finally(()=>{
+    pending.delete(english);processing--;
+    workQueue();
    });
   }
-  if(failures>=4){jobs.length=0;pending.clear();}
  }
- function neFor(source){
-  if(staticNe.has(source))return staticNe.get(source);
-  if(translated.has(source))return translated.get(source);
-  if(failures>=4||source.length<2||source.length>650)return '';
-  if(!pending.has(source)){
-   pending.add(source);jobs.push(source);workQueue();
+ function neFor(english){
+  const fixed=localNe(english);
+  if(fixed)return fixed;
+  if(translated.has(english))return translated.get(english);
+  if(english.length<2||english.length>650)return '';
+  if(!pending.has(english)&&Date.now()>=(retryAfter.get(english)||0)){
+   pending.add(english);
+   jobs.push(english);
+   workQueue();
   }
   return '';
  }
@@ -478,11 +571,11 @@
    note=document.createElement('p');note.id='sikauV4ModeNote';note.className='sikau-v4-mode-note';
    document.querySelector('#topic-browser .filterbar')?.insertAdjacentElement('afterend',note);
   }
-  const message=mode==='en'?'':failures>=4?
-   'Live Nepali translation is temporarily unavailable. Your English conversation and saved choices still work.':
-   mode==='en-ne'?'English + नेपाली: English is preserved; Nepali appears below each line. Some translations are automatic.':
-   mode==='en-roman'?'English + Roman Nepali: Roman Nepali appears below each line. Some translations are automatic.':
-   'English + नेपाली + Roman: all three versions appear together. Some translations are automatic.';
+  const message=mode==='en'?'':(failures>0&&Date.now()<coolUntil)?
+   'Translation service is temporarily limited. All 175 topics remain available in English; Nepali and Roman Nepali lines will reappear when translation is available.':
+   mode==='en-ne'?'English + नेपाली · All 175 topics · English with Nepali help; dialogue may use automatic translation.':
+   mode==='en-roman'?'English + Roman Nepali · All 175 topics · English with Roman Nepali help.':
+   'English + नेपाली + Roman · All 175 topics · English, Nepali and Roman Nepali together.';
   if(note.textContent!==message)note.textContent=message;
   note.hidden=mode==='en';
  }
