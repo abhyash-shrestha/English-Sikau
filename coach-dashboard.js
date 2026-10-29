@@ -1049,6 +1049,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    }));
   return updated;
  };
+ let v4Controller=null;
  let dialogueHistory=[];
  let pendingChoice=null;
  let active=null,index=0,category='All',search='',mode='choose',showNepali=true,attempts=0,successful=0,finished=false,choices=[],choiceError='',typedError='',reveal=false;
@@ -1105,6 +1106,23 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  }
  function showSavedConversation(){
   resumeHost.replaceChildren();
+  const v4Draft=window.sikauCoachV4?.readSaved?.(doc,verifiedStudentId);
+  const v4Scene=v4Draft&&scenarios.find(x=>x.id===v4Draft.sceneId&&x.title===v4Draft.title);
+  if(v4Scene){
+   resumeHost.hidden=false;
+   const row=add(doc,resumeHost,'div','sikau-convo-resume-card');
+   const copy=add(doc,row,'div','sikau-convo-resume-copy');
+   add(doc,copy,'strong','','💾 Saved conversation · अघिल्लो कुराकानी');
+   add(doc,copy,'p','',v4Scene.emoji+' '+v4Scene.title+' · Your V4 answers are saved for this account.');
+   const actions=add(doc,row,'div','sikau-convo-resume-actions');
+   const resume=add(doc,actions,'button','sikau-convo-primary','▶ Resume · जारी राख्नुहोस्');
+   resume.type='button';resume.addEventListener('click',()=>start(v4Scene,{resume:true}));
+   const restart=add(doc,actions,'button','sikau-convo-secondary','↻ Start over · फेरि सुरु');
+   restart.type='button';restart.addEventListener('click',()=>{
+    window.sikauCoachV4?.forget?.(doc,verifiedStudentId);start(v4Scene);
+   });
+   return;
+  }
   const saved=coachDrafts?.read();
   if(!saved){resumeHost.hidden=true;return}
   resumeHost.hidden=false;
@@ -1273,10 +1291,22 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   dialogueHistory=[];
   index=0;attempts=0;successful=0;finished=false;pendingChoice=null;choices=[];choiceError='';typedError='';reveal=false;
  }
- function start(scene){
+ function start(scene,options={}){
   lastId=scene.id;
   recentTopics=recentTopics.filter(id=>id!==scene.id).concat(scene.id).slice(-8);
   try{doc.defaultView.localStorage.setItem(topicHistoryStorage,JSON.stringify(recentTopics))}catch(_){}
+  v4Controller?.destroy();v4Controller=null;
+  if(window.sikauCoachV4?.mount){
+   active=null;resetStage();
+   browser.hidden=true;stage.hidden=false;
+   shell.classList.add('sikau-convo-learning');
+   v4Controller=window.sikauCoachV4.mount({
+    doc,stage,scene,userId:verifiedStudentId,firstName:coachLearnerName,
+    onBack:back,resume:options.resume===true
+   });
+   stage.scrollIntoView?.({behavior:'smooth',block:'start'});
+   return;
+  }
   active=coachNextConversation(scene);
   active.steps=active.steps.map(personalizeCoachStep);
   resetStage();
@@ -1285,6 +1315,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   saveDraft();renderStage();stage.scrollIntoView?.({behavior:'smooth',block:'start'});
  }
  function back(){
+  v4Controller?.destroy();v4Controller=null;
   active=null;stage.hidden=true;browser.hidden=false;shell.classList.remove('sikau-convo-learning');
   drawCards();showSavedConversation();
  }
