@@ -995,6 +995,10 @@ const state={route:-1,stage:0,ended:false,messages:[],facts:[],extraCount:0,outc
 let undoStack=[];
 let pendingFeedback='';
 const learnerToken=(new URLSearchParams(location.hash.slice(1))).get('uid')||''; const storeKey='english-sikau-175-preview-context-v4:'+(/^[A-Za-z0-9_-]{6,128}$/.test(learnerToken)?learnerToken:'standalone');
+// The authenticated parent sets this on the verified iframe before loading.
+// Only the display label changes: conversation state and saved choices do not.
+const learnerFirstName=String(window.frameElement?.dataset?.sikauStudentFirstName||'').trim()
+ .split(/\s+/u)[0].replace(/[<>]/g,'').slice(0,32)||'Learner';
 function esc(str){return String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function current(){return activeIndex===null?null:topicsAll[activeIndex]}
 function route(){return current()?.routes[state.route]}
@@ -1607,7 +1611,7 @@ function renderBrowser(){let list=filtered(),pages=Math.max(1,Math.ceil(list.len
  $('category-filters').innerHTML=countCategories().map(({category,count})=>`<button class="category-chip${activeFilter===category?' is-current':''}" data-category="${esc(category)}" type="button" aria-pressed="${activeFilter===category}">${esc(category)} <span>${count}</span></button>`).join('');
 }
 function renderChat(){if(activeIndex===null)return;let t=current();$('chat-title').textContent=t.emoji+' '+t.title;$('chat-role').textContent=t.role+' · '+t.category;$('chat-counter').textContent=`Topic ${activeIndex+1} of 175`;$('chat-step').textContent=state.ended?'Conversation completed':state.route<0?'Choose your starting situation':`Turn ${state.messages.filter(m=>m.role==='you').length+1} · ${state.stage===3?'Real-life details':state.stage>=6?'Deciding next steps':'Conversation'}`;$('chat-goal').textContent=route()?.say||'Choose how you want this conversation to begin';$('goal-status').hidden=state.route<0;
- $('chat-transcript').innerHTML=state.messages.map(m=>`<div class="message-row ${m.role==='you'?'by-you':'by-them'}">${m.role==='npc'?`<div class="chat-avatar" aria-hidden="true">${esc(t.emoji)}</div>`:''}<div class="bubble"><div class="speaker">${m.role==='you'?'You · Learner':esc(t.role)}</div>${esc(m.text)}</div></div>`).join('');
+ $('chat-transcript').innerHTML=state.messages.map(m=>`<div class="message-row ${m.role==='you'?'by-you':'by-them'}">${m.role==='npc'?`<div class="chat-avatar" aria-hidden="true">${esc(t.emoji)}</div>`:''}<div class="bubble"><div class="speaker">${m.role==='you'?esc(learnerFirstName)+' · Learner':esc(t.role)}</div>${esc(m.text)}</div></div>`).join('');
  const opts=stageOptions();$('choice-title').textContent=state.ended?'Conversation complete · '+(state.outcome||'Finished'):state.route<0?'What would you like to say?':'Choose what you would naturally say next';$('chat-choices').innerHTML=opts.map((v,i)=>`<button type="button" class="answer-button" data-answer="${i}"><span>${esc(v.label)}</span><span aria-hidden="true">›</span></button>`).join('');$('complete-actions').hidden=!state.ended;$('choices-wrap').hidden=state.ended;$('undo').disabled=!undoStack.length;$('switch-goal').hidden=state.route<0||state.ended;
  $('chat-transcript').scrollTop=$('chat-transcript').scrollHeight;
 }
