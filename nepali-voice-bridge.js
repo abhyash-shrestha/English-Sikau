@@ -150,6 +150,65 @@
   const genders={tr:null,rd:null};
   const lastGenderControl={tr:null,rd:null};
   let active='tr',notice=null,noticeScope=null;
+
+  // Shared neural playback: use the SAME provider audio on Safari,
+  // Chrome, Edge, macOS, iOS and Windows when the owner activates it.
+  // AudioContext is resumed synchronously from the user's actual click;
+  // iOS may reject MP3 playback after an asynchronous network callback
+  // unless the audio context has already been unlocked in that gesture.
+  let neuralContext=null,neuralSource=null,neuralSerial=0;
+  const hasNeural=()=>{
+   try{return view.parent?.sikauNeuralSpeechConfigured===true&&
+      typeof view.parent?.sikauNeuralSpeech==='function'}
+   catch(_){return false}
+  };
+  function prepareNeural(){
+   if(!hasNeural())return;
+   try{
+    const Constructor=view.AudioContext||view.webkitAudioContext;
+    if(!Constructor)return;
+    if(!neuralContext)neuralContext=new Constructor();
+    if(neuralContext.state!=='running')void neuralContext.resume();
+   }catch(_){}
+  }
+  function stopNeural(){
+   neuralSerial++;
+   if(neuralSource){try{neuralSource.stop()}catch(_){}neuralSource=null;}
+  }
+  async function playNeural(utterance,scope){
+   const ticket=++neuralSerial;
+   const lang=isNepali(utterance)?'ne-NP':'en-US';
+   const gender=currentGender(scope)==='male'?'male':'female';
+   const text=String(utterance?.text||'').trim();
+   if(!text||text.length>550){
+    status(scope,'Please select a shorter sentence to listen with natural speech.');
+    return;
+   }
+   try{
+    // The parent uses the signed-in Appwrite session and a private
+    // authenticated function; no Azure key reaches the learner's browser.
+    const result=await view.parent.sikauNeuralSpeech({text,lang,gender});
+    if(ticket!==neuralSerial)return;
+    if(!neuralContext)throw Error('Audio playback needs a user gesture');
+    const binary=view.atob(result.audioBase64);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    const buffer=await neuralContext.decodeAudioData(bytes.buffer);
+    if(ticket!==neuralSerial)return;
+    if(neuralContext.state!=='running')await neuralContext.resume();
+    if(ticket!==neuralSerial)return;
+    neuralSource=neuralContext.createBufferSource();
+    neuralSource.buffer=buffer;
+    neuralSource.connect(neuralContext.destination);
+    neuralSource.onended=()=>{if(ticket===neuralSerial)neuralSource=null};
+    neuralSource.start(0);
+    status(scope,'');
+   }catch(_){
+    if(ticket===neuralSerial)
+     status(scope,'Natural voice unavailable. Please retry. Your device voice has not been substituted. · प्राकृतिक आवाज उपलब्ध छैन।');
+   }
+  }
+
   function status(scope,message){
    const root=d.getElementById(scope==='rd'?'rd':'tr');
    if(!root)return;
@@ -191,6 +250,8 @@
    // Always stop the previous person's voice when switching female ↔ male.
    // Switching while a sentence plays must never finish in the old voice.
    try{synth.cancel()}catch(_){};
+   stopNeural();
+   if(hasNeural()){prepareNeural();status(scope,'Natural neural voice selected · प्राकृतिक आवाज छानियो।');return;}
    if(gender==='male'){
     const found=firstMale(synth);
     if(found)status(scope,'Nepali male voice: '+found.name+' · नेपाली पुरुष आवाज उपलब्ध छ।');
@@ -224,6 +285,14 @@
   function routedSpeak(utterance){
    if(!utterance)return speakOriginal(utterance);
    const lang=String(utterance.lang||'').replace('_','-').toLowerCase();
+   // Once configured, the function supplies real neural MP3 for every
+   // language/gender. Do not queue the robotic browser fallback.
+   if(hasNeural()&&(isNepali(utterance)||/^en(?:-|$)/.test(lang))){
+    stopNeural();
+    prepareNeural();
+    void playNeural(utterance,active);
+    return;
+   }
    if(!isNepali(utterance)){
     if(/^en(?:-|$)/.test(lang)){
      const high=bestEnglish(synth,utterance);
@@ -273,6 +342,8 @@
    const scope=matchesScope(root);
    if(!scope)return;
    active=scope;
+   // Capture-phase click handler runs during an actual user gesture.
+   prepareNeural();
    let control=e.target?.closest?.('button,label,input,select,[role="radio"],[role="button"]');
    if(!control)return;
    const gender=controlGender(control);
@@ -301,7 +372,7 @@
     if(!text||!view.SpeechSynthesisUtterance)return false;
     const utterance=new view.SpeechSynthesisUtterance(String(text));
     utterance.lang='ne-NP';
-    if(currentGender(active)==='male'&&!firstMale(synth)){
+    if(currentGender(active)==='male'&&!firstMale(synth)&&!hasNeural()){
      sayUnavailable(active);return false;
     }
     synth.cancel();
@@ -309,6 +380,7 @@
     return true;
    },
    maleSelected:scope=>currentGender(scope)==='male',
+   naturalSpeechAvailable:hasNeural,
    patched
   };
   return true;
