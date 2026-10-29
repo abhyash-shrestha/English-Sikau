@@ -146,7 +146,7 @@
    if(!p||p.closest(skip))continue;
    const raw=n.nodeValue||'';
    if(!hasNe.test(raw))continue;
-   const parts=raw.split(/([\u0900-\u097f]+(?:[ \t\u00a0]+[\u0900-\u097f]+)*)/g);
+   const parts=raw.split(/([\u0900-\u0963\u0966-\u097f]+(?:[ \t\u00a0]+[\u0900-\u0963\u0966-\u097f]+)*(?:[।॥])?)/g);
    if(parts.length<=1)continue;
    const frag=d.createDocumentFragment();
    let changed=false;
