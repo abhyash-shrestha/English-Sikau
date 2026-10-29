@@ -31,8 +31,32 @@
  '@media(max-width:620px){html.sikau-v4-in-lesson #root{padding:0 1px 10px!important} html.sikau-v4-in-lesson .chat-header{border-radius:15px 15px 0 0} html.sikau-v4-in-lesson .panel{padding:11px}}'
  ].join('\n');
  document.head.appendChild(style);
- let mode='en',titles=Object.create(null),queued=false,lastHeight=0;
+ let mode='en-ne',titles=Object.create(null),queued=false,lastHeight=0;
  const modes=new Set(['en','en-ne','en-roman','all']);
+ // The V4 page is a same-origin iframe nested inside the verified lesson
+ // srcdoc. Read the SAME selector as the rest of English Sikau; message
+ // delivery is an enhancement, not a prerequisite for language display.
+ function readLessonMode(){
+  try{
+   const parentDoc=window.parent.document;
+   const control=parentDoc.getElementById('langPref');
+   if(control&&modes.has(control.value))return control.value;
+   const fromRoot=parentDoc.documentElement?.dataset?.sikauDisplayLanguage;
+   if(modes.has(fromRoot))return fromRoot;
+  }catch(_){}
+  try{
+   const saved=localStorage.getItem('sikau_lang_pref');
+   if(modes.has(saved))return saved;
+  }catch(_){}
+  return 'en-ne';
+ }
+ function syncLessonMode(){
+  const selected=readLessonMode();
+  if(mode===selected)return false;
+  mode=selected;
+  return true;
+ }
+ mode=readLessonMode();
  function subtitle(t){
   if(!t||mode==='en')return '';
   if(mode==='en-ne')return t.ne||'';
@@ -291,14 +315,18 @@
   window.parent.postMessage({type:'sikau-v4-height',height},'*');
  }
  function schedule(){
+  syncLessonMode();
   if(queued)return;
   queued=true;
-  requestAnimationFrame(()=>{queued=false;decorate();measure();});
+  requestAnimationFrame(()=>{queued=false;syncLessonMode();decorate();measure();});
  }
  window.addEventListener('message',event=>{
   if(event.source!==window.parent||event.data?.type!=='sikau-v4-config')return;
   const next=event.data;
-  mode=modes.has(next.mode)?next.mode:'en';
+  // Parent's actual selector wins over an older queued postMessage.
+  // If the selector is not available, use the validated message value.
+  mode=readLessonMode();
+  if(!modes.has(mode)&&modes.has(next.mode))mode=next.mode;
   titles=next.titles&&typeof next.titles==='object'?next.titles:Object.create(null);
   // V4 owns an internal dark-mode state. Toggle its own control when the
   // parent theme changes so the next V4 render cannot reset the selection.
@@ -308,6 +336,17 @@
   }
   schedule();
  });
+ // Listen directly to the language selector in the real lesson frame.
+ // This also works if the configuration postMessage fired before V4 loaded.
+ try{
+  const parentDoc=window.parent.document;
+  parentDoc.getElementById('langPref')?.addEventListener('change',schedule);
+  parentDoc.getElementById('langPref')?.addEventListener('input',schedule);
+  new MutationObserver(()=>{if(syncLessonMode())schedule();})
+   .observe(parentDoc.documentElement,{
+    attributes:true,attributeFilter:['data-sikau-display-language']
+   });
+ }catch(_){}
  new MutationObserver(schedule).observe(document.body,{childList:true,characterData:true,subtree:true});
  if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(document.getElementById('root')||document.body);
  window.addEventListener('resize',schedule);
