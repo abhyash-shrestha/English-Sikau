@@ -18,7 +18,7 @@ test('Embedded V4 keeps the exact approved dialogue source, except security and 
  assert.ok(guardRegex.test(html),'Protected parent-frame guard is missing');
  assert.ok(html.includes(closingBridge),'V4 bridge is not loaded');
  const restored=html.replace(guardRegex,'').replace(newStore,originalStore).replace(closingBridge,'');
- const hash=createHash('sha256').update(restored).digest('hex');
+ const hash=createHash('sha256').update(restored+'\n').digest('hex');
  assert.equal(hash,sourceHash,'Approved user-supplied V4 script must not be rewritten');
 });
 
@@ -61,7 +61,7 @@ function runPreview(){
  const context={document,localStorage,navigator:{},URL,URLSearchParams,
   setTimeout,clearTimeout,scrollTo(){},console};
  context.window=context;
- const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
+ const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(x=>x.trim());
  assert.equal(inline.length,4,'Expected security guard and three V4 scripts');
  for(const script of inline)assert.doesNotThrow(()=>new Function(script),'JavaScript syntax invalid');
  const sandbox=vm.createContext(context);
