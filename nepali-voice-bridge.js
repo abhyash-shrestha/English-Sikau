@@ -406,6 +406,22 @@
    voiceChoiceReport:()=>voiceChoiceReport(synth),voiceQuality,bestEnglish:lang=>bestEnglish(synth,{lang}),
    firstMale:()=>firstMale(synth),
    select:chooseGender,available:()=>!!firstMale(synth),
+   // Explicit route bypasses the non-writable speechSynthesis.speak monkey
+   // patch on some Safari builds. Only the iPhone Translate player calls
+   // this new method; the working Windows playback stays unchanged.
+   speakText:(text,lang='ne-NP',scope='tr')=>{
+    if(scope==='tr'||scope==='rd')active=scope;
+    if(!text||!view.SpeechSynthesisUtterance||!['en-US','ne-NP'].includes(lang))return false;
+    if(lang==='ne-NP'&&currentGender(active)==='male'&&!firstMale(synth)&&!hasNeural()){
+     sayUnavailable(active);return false;
+    }
+    const utterance=new view.SpeechSynthesisUtterance(String(text));
+    utterance.lang=lang;
+    synth.cancel();
+    stopNeural();
+    routedSpeak(utterance);
+    return true;
+   },
    speakNepali:(text,scope='tr')=>{
     if(scope==='tr'||scope==='rd')active=scope;
     if(!text||!view.SpeechSynthesisUtterance)return false;
