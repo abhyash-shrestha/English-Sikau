@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url);
 const read=file=>fs.readFileSync(new URL(file,root),'utf8');
 const scripts=['coach-v4-authored.js','coach-v4-expanded.js',
@@ -115,4 +116,17 @@ test('V4 is enabled only when learner selects English on the actual language con
  assert.match(source,/doc\.getElementById\('langPref'\)\?\.value/);
  assert.match(source,/languageMode==='en'&&window\.sikauV4Story/);
  assert.doesNotMatch(source,/const languageMode=doc\.documentElement\?\.getAttribute/);
+});
+
+test('Source dialogue matches the exact uploaded and approved V4 reference file',()=>{
+ const hash=value=>createHash('sha256').update(value).digest('hex');
+ const authored=read('coach-v4-authored.js');
+ const one=authored.slice(authored.indexOf('const B='),authored.indexOf('\nwindow.sikauV4CoreTopics=topics;'));
+ assert.equal(hash(one),'cd8b675091269970d05110391874e5bbe15be33f6357ce3dc1f230cf5b7e8514');
+ const expanded=read('coach-v4-expanded.js');
+ const two=expanded.slice(expanded.indexOf('(function(){'),expanded.lastIndexOf('})();')+5);
+ assert.equal(hash(two),'362f0015ad3daea508d2384f590640cfa4c408496ec4723b646bfd054c3071b6');
+ const decisions=read('coach-v4-decisions.js');
+ const three=decisions.slice(decisions.indexOf('const topicDecisions='),decisions.indexOf('\nwindow.sikauV4Data='));
+ assert.equal(hash(three),'61fad3ff5250b4c36a952fd5ffbbb9e8789de1ef1e063d1259ddfcdf69b76e4c');
 });
