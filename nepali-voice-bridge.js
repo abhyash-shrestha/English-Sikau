@@ -175,37 +175,71 @@
    neuralSerial++;
    if(neuralSource){try{neuralSource.stop()}catch(_){}neuralSource=null;}
   }
+  function splitSpeechText(raw,max=400){
+   const text=String(raw||'').trim();
+   const result=[];
+   let remaining=text;
+   while(remaining){
+    if(remaining.length<=max){result.push(remaining);break;}
+    const head=remaining.slice(0,max+1);
+    // Prefer Nepali danda, English sentence punctuation, then whitespace.
+    let cut=-1;
+    for(let i=0;i<head.length-1;i++){
+     const c=head[i];
+     if('.!?।॥'.includes(c)&&/\s/.test(head[i+1])&&i>max*0.42)cut=i+1;
+    }
+    if(cut<1){
+     for(let i=1;i<head.length;i++)if(/\s/.test(head[i]))cut=i;
+    }
+    if(cut<max*0.35)cut=max;
+    const chunk=remaining.slice(0,cut).trim();
+    if(chunk)result.push(chunk);
+    remaining=remaining.slice(cut).trim();
+   }
+   return result;
+  }
   async function playNeural(utterance,scope){
    const ticket=++neuralSerial;
    const lang=isNepali(utterance)?'ne-NP':'en-US';
    const gender=currentGender(scope)==='male'?'male':'female';
-   const text=String(utterance?.text||'').trim();
-   if(!text||text.length>550){
-    status(scope,'Please select a shorter sentence to listen with natural speech.');
+   const phrase=String(utterance?.text||'').trim();
+   const chunks=splitSpeechText(phrase);
+   if(!phrase||phrase.length>2800||chunks.length>8){
+    status(scope,'This passage is too long for one listening session. Try a shorter paragraph.');
     return;
    }
    try{
-    // The parent uses the signed-in Appwrite session and a private
-    // authenticated function; no Azure key reaches the learner's browser.
-    const result=await view.parent.sikauNeuralSpeech({text,lang,gender});
-    if(ticket!==neuralSerial)return;
-    if(!neuralContext)throw Error('Audio playback needs a user gesture');
-    const binary=view.atob(result.audioBase64);
-    const bytes=new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-    const buffer=await neuralContext.decodeAudioData(bytes.buffer);
-    if(ticket!==neuralSerial)return;
-    if(neuralContext.state!=='running')await neuralContext.resume();
-    if(ticket!==neuralSerial)return;
-    neuralSource=neuralContext.createBufferSource();
-    neuralSource.buffer=buffer;
-    neuralSource.connect(neuralContext.destination);
-    neuralSource.onended=()=>{if(ticket===neuralSerial)neuralSource=null};
-    neuralSource.start(0);
+    // Request the next segment while the current segment is playing to
+    // avoid long unnatural gaps between full Reading paragraphs.
+    const fetchChunk=chunk=>view.parent.sikauNeuralSpeech({text:chunk,lang,gender});
+    let next=fetchChunk(chunks[0]);
+    for(let i=0;i<chunks.length;i++){
+     const result=await next;
+     if(ticket!==neuralSerial)return;
+     if(i+1<chunks.length)next=fetchChunk(chunks[i+1]);
+     if(!neuralContext)throw Error('Audio playback needs a user gesture');
+     const binary=view.atob(result.audioBase64);
+     const bytes=new Uint8Array(binary.length);
+     for(let j=0;j<binary.length;j++)bytes[j]=binary.charCodeAt(j);
+     const buffer=await neuralContext.decodeAudioData(bytes.buffer);
+     if(ticket!==neuralSerial)return;
+     if(neuralContext.state!=='running')await neuralContext.resume();
+     if(ticket!==neuralSerial)return;
+     await new Promise(resolve=>{
+      const source=neuralContext.createBufferSource();
+      neuralSource=source;
+      source.buffer=buffer;
+      source.connect(neuralContext.destination);
+      source.onended=resolve;
+      source.start(0);
+     });
+     if(ticket!==neuralSerial)return;
+     neuralSource=null;
+    }
     status(scope,'');
    }catch(_){
     if(ticket===neuralSerial)
-     status(scope,'Natural voice unavailable. Please retry. Your device voice has not been substituted. · प्राकृतिक आवाज उपलब्ध छैन।');
+     status(scope,'Natural audio unavailable. Retry once the speech service is connected. · प्राकृतिक आवाज उपलब्ध छैन।');
    }
   }
 
