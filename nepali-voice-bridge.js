@@ -110,6 +110,9 @@
    (String(v.lang||'').toLowerCase().replace('_','-')===locale?18:0);
   const sorted=voices.slice().sort((a,b)=>rank(b)-rank(a));
   const preferred=sorted[0];
+  // A list containing only known synthetic/novelty voices is not an
+  // improvement. Leave the browser's original choice untouched.
+  if(voiceQuality(preferred)<0)return null;
   // Do not replace an explicitly chosen good voice from the original
   // lesson with a different accent just because the name looks promising.
   if(utterance?.voice&&voices.includes(utterance.voice)&&
