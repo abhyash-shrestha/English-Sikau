@@ -83,3 +83,45 @@ test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(translate,/__sikauNepaliVoice\?\.speakNepali/);
  assert.match(translate,/if\(outputLanguage==='ne-NP'/);
 });
+
+
+test('Clicking Male after Female switches to a true Nepali male voice, then back',()=>{
+ const {win,synth,speaks,events}=mock([hemkala,sagar]);
+ const root={closest:()=>root};
+ function button(label,gender){
+  return {
+   tagName:'BUTTON',value:gender,id:'gender-'+gender,textContent:label,
+   getAttribute(key){return key==='data-gender'?gender:null},
+   closest(selector){
+    if(selector==='#tr,#rd,#learn')return root;
+    if(selector==='button,label,input,select,[role="radio"],[role="button"]')return this;
+    return null;
+   }
+  };
+ }
+ // The synthetic root resolves to Translate for both clicks.
+ root.closest=(selector)=>selector==='#tr'?root:null;
+ const female=button('Female · महिला','female'),male=button('Male · पुरुष','male');
+ events.click({target:female});
+ synth.speak({lang:'ne-NP',text:'नमस्ते'});
+ events.click({target:male});
+ synth.speak({lang:'ne-NP',text:'नमस्ते'});
+ events.click({target:female});
+ synth.speak({lang:'ne-NP',text:'नमस्ते'});
+ assert.equal(speaks.length,3);
+ assert.equal(speaks[0].voice,'');
+ assert.equal(speaks[1].voice,sagar.name);
+ assert.equal(speaks[2].voice,'');
+ assert.equal(win.__sikauNepaliVoice.maleSelected('tr'),false);
+});
+
+test('Native control attributes are checked before misleading parent labels',()=>{
+ const {win}=mock([hemkala,sagar]);
+ const control={
+  tagName:'BUTTON',value:'male',
+  textContent:'Female · महिला / Male · पुरुष',
+  getAttribute:key=>key==='data-gender'?'male':null,
+  matches:()=>false
+ };
+ assert.equal(win.__sikauNepaliVoice.controlGender(control),'male');
+});
