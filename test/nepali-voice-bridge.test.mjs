@@ -125,3 +125,25 @@ test('Native control attributes are checked before misleading parent labels',()=
  };
  assert.equal(win.__sikauNepaliVoice.controlGender(control),'male');
 });
+
+
+test('Choose native male voice from same provider as Hemkala when it exists',()=>{
+ const googleMale={lang:'ne-NP',name:'Google Nepali Male'};
+ const {win}=mock([googleMale,hemkala,sagar]);
+ const report=win.__sikauNepaliVoice.voiceReport();
+ assert.equal(report.identifiedFemale,hemkala.name);
+ assert.equal(report.male,sagar.name);
+ assert.equal(report.available.length,3);
+});
+
+test('Do not classify a female Nepali voice as male',()=>{
+ const {win}=mock([hemkala,{lang:'ne-NP',name:'Nepali Female'}]);
+ assert.equal(win.__sikauNepaliVoice.available(),false);
+ assert.equal(win.__sikauNepaliVoice.voiceReport().male,null);
+});
+
+test('Recognize clearly labeled Nepali male voices from other browser providers',()=>{
+ const {win}=mock([{lang:'ne-NP',name:'Google Nepali Male'}]);
+ assert.equal(win.__sikauNepaliVoice.available(),true);
+ assert.equal(win.__sikauNepaliVoice.voiceReport().male,'Google Nepali Male');
+});
