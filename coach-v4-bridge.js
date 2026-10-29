@@ -67,6 +67,40 @@
   return true;
  }
  mode=readLessonMode();
+ // The authenticated app's dark/light preference is authoritative.
+ // The standalone V4 preview's saved theme must never override it.
+ function readCoachTheme(){
+  try{
+   const topRoot=window.top.document.documentElement;
+   if(topRoot?.dataset?.sikauTheme==='dark'||topRoot?.dataset?.sikauTheme==='light')
+    return topRoot.dataset.sikauTheme;
+   if(topRoot?.dataset?.theme==='dark'||topRoot?.dataset?.theme==='light')
+    return topRoot.dataset.theme;
+  }catch(_){}
+  try{
+   const root=window.parent.document.documentElement;
+   if(root?.dataset?.sikauTheme==='dark'||root?.dataset?.sikauTheme==='light')
+    return root.dataset.sikauTheme;
+   if(root?.dataset?.theme==='dark'||root?.dataset?.theme==='light')
+    return root.dataset.theme;
+  }catch(_){}
+  try{
+   const pref=localStorage.getItem('english-sikau-theme-v1');
+   if(pref==='dark'||pref==='light')return pref;
+  }catch(_){}
+  return 'light';
+ }
+ function applyCoachTheme(){
+  const selected=readCoachTheme();
+  // Update the V4 engine's internal state, not CSS alone: a normal render()
+  // would otherwise immediately repaint Coach with its stale theme.
+  if(typeof window.SikauPreview?.setTheme==='function')
+   window.SikauPreview.setTheme(selected);
+  else document.documentElement.dataset.theme=selected;
+  document.documentElement.dataset.sikauTheme=selected;
+  document.documentElement.style.colorScheme=selected;
+ }
+ applyCoachTheme();
  try{
   const localTitles=window.parent.__sikauCoachV4Translations;
   if(localTitles&&typeof localTitles==='object')titles=localTitles;
@@ -628,7 +662,7 @@
   syncLessonMode();
   if(queued)return;
   queued=true;
-  requestAnimationFrame(()=>{queued=false;syncLessonMode();decorate();measure();});
+  requestAnimationFrame(()=>{queued=false;syncLessonMode();applyCoachTheme();decorate();measure();});
  }
  window.addEventListener('message',event=>{
   if(event.source!==window.parent||event.data?.type!=='sikau-v4-config')return;
@@ -638,12 +672,9 @@
   mode=readLessonMode();
   if(!modes.has(mode)&&modes.has(next.mode))mode=next.mode;
   if(next.titles&&typeof next.titles==='object'&&Object.keys(next.titles).length)titles=next.titles;
-  // V4 owns an internal dark-mode state. Toggle its own control when the
-  // parent theme changes so the next V4 render cannot reset the selection.
-  const desired=next.theme==='dark'?'dark':'light';
-  if(document.documentElement.dataset.theme!==desired){
-   document.getElementById('theme-toggle')?.click();
-  }
+  // Do not toggle V4's private theme on every configuration message.
+  // The main authenticated English Sikau theme wins, including after refresh.
+  applyCoachTheme();
   schedule();
  });
  // Listen directly to the language selector in the real lesson frame.
@@ -656,6 +687,18 @@
    .observe(parentDoc.documentElement,{
     attributes:true,attributeFilter:['data-sikau-display-language']
    });
+ }catch(_){}
+ // Observe both the verified wrapper and lesson root: changing the moon
+ // toggle in either header immediately updates Coach without a reload.
+ try{
+  new MutationObserver(schedule).observe(window.top.document.documentElement,{
+   attributes:true,attributeFilter:['data-sikau-theme','data-theme']
+  });
+ }catch(_){}
+ try{
+  new MutationObserver(schedule).observe(window.parent.document.documentElement,{
+   attributes:true,attributeFilter:['data-sikau-theme','data-theme']
+  });
  }catch(_){}
  new MutationObserver(schedule).observe(document.body,{childList:true,characterData:true,subtree:true});
  if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(document.getElementById('root')||document.body);
