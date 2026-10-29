@@ -47,7 +47,7 @@ test('Correctly selects neural female/male for Nepali and English',async()=>{
   const calls=[];mockFetch(calls);
   const {res,result}=response();
   await speak({req:request('A & B <C>',lang,gender),res});
-  assert.equal(result.status,undefined); // res.json status is omitted for HTTP 200
+  assert.equal(result.status,200);
   assert.equal(result.data.status,'ok');
   assert.equal(result.data.voice,expected);
   assert.equal(result.data.mime,'audio/mpeg');
