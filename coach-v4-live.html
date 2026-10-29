@@ -1628,4 +1628,4 @@ function initialize(){bind();try{const saved=JSON.parse(localStorage.getItem(sto
 initialize();
 window.SikauPreview={authoring:topicDecisions,topics:topicsAll,view:()=>({activeIndex,activeFilter,page,state:JSON.parse(JSON.stringify(state))}),selectTopic:openTopic,reset:restart,choose:(i)=>{const options=stageOptions();options[i]?.fn()},getChoices:()=>stageOptions().map(x=>x.label),back:goBack,setTheme:(theme)=>{const wanted=theme==='dark';if(dark!==wanted){dark=wanted;save();}document.documentElement.dataset.theme=wanted?'dark':'light';const control=$('theme-toggle'),label=wanted?'☀️ Light mode':'🌙 Dark mode';if(control&&control.textContent!==label)control.textContent=label;}};
 })();
-</script><script src="./coach-v4-bridge.js?v=20261029-coach-layout-r5"></script></body></html>
+</script><script src="./coach-v4-bridge.js?v=20261029-theme-sync-r6"></script></body></html>
