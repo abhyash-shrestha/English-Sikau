@@ -87,7 +87,12 @@
   const next=event.data;
   mode=modes.has(next.mode)?next.mode:'en';
   titles=next.titles&&typeof next.titles==='object'?next.titles:Object.create(null);
-  document.documentElement.dataset.theme=next.theme==='dark'?'dark':'light';
+  // V4 owns an internal dark-mode state. Toggle its own control when the
+  // parent theme changes so the next V4 render cannot reset the selection.
+  const desired=next.theme==='dark'?'dark':'light';
+  if(document.documentElement.dataset.theme!==desired){
+   document.getElementById('theme-toggle')?.click();
+  }
   schedule();
  });
  new MutationObserver(schedule).observe(document.body,{childList:true,characterData:true,subtree:true});
