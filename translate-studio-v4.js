@@ -274,9 +274,16 @@ window.enhanceTranslationDashboard=function(d){
   const txt=resultText(),v=d.defaultView;
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
   if(!v.speechSynthesis||!v.SpeechSynthesisUtterance){notice.textContent='Audio is unavailable in this browser. · आवाज उपलब्ध छैन।';return}
+  const outputLanguage=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
+  // The signed-in lesson's Nepali voice bridge enforces true male
+  // selection when requested. Female stays on the existing voice path.
+  if(outputLanguage==='ne-NP'&&v.__sikauNepaliVoice?.speakNepali){
+   v.__sikauNepaliVoice.speakNepali(txt,'tr');
+   return;
+  }
   v.speechSynthesis.cancel();
   const utterance=new v.SpeechSynthesisUtterance(txt);
-  utterance.lang=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
+  utterance.lang=outputLanguage;
   v.speechSynthesis.speak(utterance);
  });
  save.addEventListener('click',()=>{
