@@ -161,7 +161,7 @@
       guide.message+" Would you like to ask a follow-up, consider a different option, or continue with your request?",
       guide.messageNe+" थप प्रश्न, अर्को विकल्प वा आफ्नो अनुरोध अघि बढाउन चाहनुहुन्छ?",[
         option("Could you explain that a little more?","त्यो अलि थप बुझाउनुहुन्छ?","proposal",{}),
-        option("Could we discuss "+alternative[0].replace(/[.!?]+$/,'').toLowerCase()+" instead?","बरु "+alternative[1]+" बारे कुरा गरौँ?","alternative",{}),
+        option("Could we explore a different part of this request?","यस अनुरोधको अर्को पक्षबारे कुरा गरौँ?","alternative",{}),
         option("I'd like to work out the next step, please.","अबको कदम बुझ्न चाहन्छु।","verify",{}),
         option("Thanks, that's all I needed for now.","धन्यवाद, अहिलेलाई यति नै चाहिएको थियो।","closing",{})
       ]);
@@ -174,8 +174,8 @@
         option("Thank you. I'd like to think about it.","धन्यवाद। म यसबारे सोच्न चाहन्छु।","closing",{})
       ]);
     if(node==='alternative')return make(node,
-      "Certainly. Another possibility is "+q(alternative[0])+". Would you prefer to explore that or stay with your original request?",
-      "अवश्य। अर्को विकल्प "+q(alternative[1])+" हो। यो हेर्ने कि पहिलेको अनुरोधमा रहने?",[
+      "Of course. "+(path[7]?.[nextIndex]?.[0]||"We can look at another relevant detail.")+" Would you like to explore that, or stay with your original question?",
+      "अवश्य। "+(path[7]?.[nextIndex]?.[1]||"अर्को सम्बन्धित कुरा पनि हेर्न सक्छौँ।")+" यो हेर्ने कि पहिलेको प्रश्नमै रहने?",[
         option("Yes, let's talk about that instead.","हुन्छ, त्यसैबारे कुरा गरौँ।","review",{detail:nextIndex,need:""}),
         option("I'd rather stay with my original request.","बरु पहिलेको अनुरोधमै रहन्छु।","proposal",{}),
         option("Can you explain what we should check first?","पहिले के जाँच्नुपर्छ बताउनुहुन्छ?","requirements",{}),
