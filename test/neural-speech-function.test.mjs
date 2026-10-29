@@ -112,3 +112,69 @@ test('Free-tier Gemini neural TTS path returns valid WAV, with no API key leakag
   else process.env.SPEECH_PROVIDER=oldProvider;
  }
 });
+
+
+test('Gemini 3.8 sends exact transcript with separate natural delivery metadata and no spoken instructions',async()=>{
+ const beforeKey=process.env.GEMINI_API_KEY,beforeProvider=process.env.SPEECH_PROVIDER,beforeModel=process.env.GEMINI_TTS_MODEL;
+ process.env.GEMINI_API_KEY='non-production-test-key';
+ process.env.SPEECH_PROVIDER='gemini';
+ delete process.env.GEMINI_TTS_MODEL;
+ const pcm=Buffer.from([1,0,2,0]);
+ const wav=Buffer.alloc(44+pcm.length);
+ wav.write('RIFF',0);wav.writeUInt32LE(36+pcm.length,4);
+ wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);
+ wav.writeUInt16LE(1,22);wav.writeUInt32LE(24000,24);wav.writeUInt32LE(48000,28);
+ wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);
+ wav.write('data',36);wav.writeUInt32LE(pcm.length,40);pcm.copy(wav,44);
+ try{
+  const requests=[];
+  globalThis.fetch=async(url,options)=>{
+   requests.push({url:String(url),options});
+   if(String(url).endsWith('/account'))return userResponse;
+   return {ok:true,json:async()=>({candidates:[{content:{parts:[{
+    inlineData:{mimeType:'audio/wav',data:wav.toString('base64')}
+   }]}}]})};
+  };
+  const {res,result}=response();
+  await speak({req:request('म आज काठमाडौँ जाँदैछु।','ne-NP','female'),res});
+  assert.equal(result.status,200);
+  assert.equal(result.data.voice,'Kore');
+  assert.equal(result.data.model,'gemini-3.8-flash-tts');
+  const output=Buffer.from(result.data.audioBase64,'base64');
+  assert.deepEqual(output,wav,'Do not wrap Gemini WAV data in another WAV header');
+  assert.match(requests[1].url,/gemini-3\.8-flash-tts:generateContent/);
+  const input=JSON.parse(requests[1].options.body);
+  assert.equal(input.contents[0].parts[0].text,'म आज काठमाडौँ जाँदैछु।');
+  assert.match(input.contents[0].parts[0].speech_metadata.style,/Nepal/);
+  assert.equal(input.generationConfig.speechConfig.voiceConfig.voice,'Kore');
+ }finally{
+  if(beforeKey===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=beforeKey;
+  if(beforeProvider===undefined)delete process.env.SPEECH_PROVIDER;else process.env.SPEECH_PROVIDER=beforeProvider;
+  if(beforeModel===undefined)delete process.env.GEMINI_TTS_MODEL;else process.env.GEMINI_TTS_MODEL=beforeModel;
+ }
+});
+
+test('Gemini unsupported model environment setting cannot select an arbitrary URL or model',async()=>{
+ const beforeModel=process.env.GEMINI_TTS_MODEL,beforeProvider=process.env.SPEECH_PROVIDER,beforeKey=process.env.GEMINI_API_KEY;
+ process.env.GEMINI_TTS_MODEL='../../unsafe';
+ process.env.SPEECH_PROVIDER='gemini';
+ process.env.GEMINI_API_KEY='non-production-test-key';
+ try{
+  const calls=[];
+  globalThis.fetch=async(url,options)=>{
+   calls.push(String(url));
+   if(String(url).endsWith('/account'))return userResponse;
+   return {ok:true,json:async()=>({candidates:[{content:{parts:[{
+    inlineData:{mimeType:'audio/L16;rate=24000',data:Buffer.from([1,0,2,0]).toString('base64')}
+   }]}}]})};
+  };
+  const {res,result}=response();
+  await speak({req:request('Hello.','en-US','male'),res});
+  assert.equal(result.status,200);
+  assert.match(calls[1],/gemini-3\.8-flash-tts:generateContent/);
+ }finally{
+  if(beforeModel===undefined)delete process.env.GEMINI_TTS_MODEL;else process.env.GEMINI_TTS_MODEL=beforeModel;
+  if(beforeProvider===undefined)delete process.env.SPEECH_PROVIDER;else process.env.SPEECH_PROVIDER=beforeProvider;
+  if(beforeKey===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=beforeKey;
+ }
+});
