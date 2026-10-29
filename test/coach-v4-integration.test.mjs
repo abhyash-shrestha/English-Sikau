@@ -76,7 +76,7 @@ test('V4 adapter retains native design, privacy, and all language modes',()=>{
 });
 test('untranslated V4 script is not mislabeled as matching Nepali',()=>{
  const adapter=read('coach-v4-adapter.js'),translations=read('coach-v4-translations.js');
- assert.match(adapter,/Only exact authored pairs are shown/);
+ assert.match(adapter,/unrelated translations are never applied to later V4 responses/);
  assert.match(translations,/translations\[en\.trim\(\)\]=ne\.trim\(\)/);
  assert.match(translations,/sikauMoreTopics/);
  assert.match(translations,/English-to-Nepali display pairs/);
