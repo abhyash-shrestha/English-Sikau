@@ -20,6 +20,24 @@
   if(/(?:\bmale\b|\bman\b|पुरुष|पुरूष)/i.test(label))return 'male';
   return null;
  };
+ // Read the clicked option itself, not a parent whose text may contain
+ // both "Female" and "Male" (which previously biased detection to Female).
+ const controlGender=control=>{
+  if(!control)return null;
+  const option=control.tagName==='SELECT'?control.options?.[control.selectedIndex]:null;
+  const data=[
+   control.getAttribute?.('data-gender'),control.getAttribute?.('data-voice-gender'),
+   control.getAttribute?.('data-sex'),control.getAttribute?.('data-voice'),
+   control.getAttribute?.('data-speaker'),control.getAttribute?.('value'),
+   control.value,control.id,control.name,
+   option?.value,option?.textContent
+  ].filter(Boolean);
+  for(const raw of data){
+   const gender=genderOf(raw);
+   if(gender)return gender;
+  }
+  return genderOf(option?String(option.textContent||''):voiceLabel(control));
+ };
  const isNepali=(utterance)=>{
   const lang=String(utterance?.lang||'').toLowerCase().replace('_','-');
   return lang==='ne'||lang.startsWith('ne-')||
@@ -69,6 +87,9 @@
   function chooseGender(scope,gender){
    if(!scope||!gender)return;
    active=scope;genders[scope]=gender;
+   // Always stop the previous person's voice when switching female ↔ male.
+   // Switching while a sentence plays must never finish in the old voice.
+   try{synth.cancel()}catch(_){};
    if(gender==='male'){
     if(firstMale(synth))status(scope,'Nepali male voice available: Sagar · नेपाली पुरुष आवाज उपलब्ध छ।');
     else sayUnavailable(scope);
@@ -86,12 +107,14 @@
      const option=control.options?.[control.selectedIndex];
      label=String(option?.textContent||'')+' '+String(option?.value||'');
     }
-    const gender=genderOf(label);
+    const gender=controlGender(control);
     if(gender)return gender;
    }
    return null;
   };
   function currentGender(scope){
+   // Prefer an explicit click/change in this session. Read native selected
+   // controls as a fallback when the protected lesson restores its UI state.
    return genders[scope]||selectedGender(scope);
   }
   const rawSpeak=synth.speak;
@@ -101,7 +124,7 @@
    const scope=active;
    if(currentGender(scope)!=='male')return speakOriginal(utterance);
    const voice=firstMale(synth);
-   if(!voice){sayUnavailable(scope);return;}
+   if(!voice){try{synth.cancel()}catch(_){}sayUnavailable(scope);return;}
    utterance.voice=voice;
    utterance.lang=voice.lang||'ne-NP';
    // Neutral pitch/rate avoids the robotic low-pitch female workaround.
@@ -136,13 +159,11 @@
    active=scope;
    let control=e.target?.closest?.('button,label,input,select,[role="radio"],[role="button"]');
    if(!control)return;
-   const option=control.tagName==='SELECT'?control.options?.[control.selectedIndex]:null;
-   const gender=genderOf((option?.textContent||'')+' '+(option?.value||'')+
-    (option?'':voiceLabel(control)));
+   const gender=controlGender(control);
    if(gender)chooseGender(scope,gender);
    else {
     const current=selectedGender(scope);
-    if(current)genders[scope]=current;
+    if(current&&current!==genders[scope])chooseGender(scope,current);
    }
   }
   d.addEventListener('click',scan,true);
@@ -155,7 +176,7 @@
   });
   view.__sikauNepaliVoiceInstalled=true;
   view.__sikauNepaliVoice={
-   isAuthenticMale,genderOf,firstMale:()=>firstMale(synth),
+   isAuthenticMale,genderOf,controlGender,firstMale:()=>firstMale(synth),
    select:chooseGender,available:()=>!!firstMale(synth),
    speakNepali:(text,scope='tr')=>{
     if(scope==='tr'||scope==='rd')active=scope;
