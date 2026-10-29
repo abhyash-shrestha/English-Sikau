@@ -76,3 +76,39 @@ test('Rejects oversized requests without calling Azure',async()=>{
  assert.equal(result.status,400);
  assert.equal(calls.length,1);
 });
+
+
+test('Free-tier Gemini neural TTS path returns valid WAV, with no API key leakage',async()=>{
+ const oldGemini=process.env.GEMINI_API_KEY,oldProvider=process.env.SPEECH_PROVIDER;
+ process.env.GEMINI_API_KEY='gemini-test-secret';
+ process.env.SPEECH_PROVIDER='gemini';
+ try{
+  const calls=[];
+  globalThis.fetch=async(url,options)=>{
+   calls.push({url:String(url),options});
+   if(String(url).endsWith('/account'))return userResponse;
+   return {ok:true,json:async()=>({candidates:[{content:{parts:[{
+    inlineData:{mimeType:'audio/L16;rate=24000',data:Buffer.from([1,0,2,0,3,0,4,0]).toString('base64')}
+   }]}}]})};
+  };
+  const {res,result}=response();
+  await speak({req:request('नमस्कार','ne-NP','male'),res});
+  assert.equal(result.status,200);
+  assert.equal(result.data.mime,'audio/wav');
+  assert.equal(result.data.voice,'Charon');
+  assert.equal(result.data.engine,'gemini-neural');
+  const file=Buffer.from(result.data.audioBase64,'base64');
+  assert.equal(file.toString('ascii',0,4),'RIFF');
+  assert.equal(file.toString('ascii',8,12),'WAVE');
+  assert.equal(file.readUInt32LE(24),24000);
+  assert.equal(file.length,52);
+  assert.equal(calls.length,2);
+  assert.equal(calls[1].options.headers['x-goog-api-key'],'gemini-test-secret');
+  assert.ok(!JSON.stringify(result.data).includes('gemini-test-secret'));
+ }finally{
+  if(oldGemini===undefined)delete process.env.GEMINI_API_KEY;
+  else process.env.GEMINI_API_KEY=oldGemini;
+  if(oldProvider===undefined)delete process.env.SPEECH_PROVIDER;
+  else process.env.SPEECH_PROVIDER=oldProvider;
+ }
+});
