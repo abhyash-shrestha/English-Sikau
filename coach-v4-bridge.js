@@ -379,12 +379,23 @@
   'Conversation':'कुराकानी',
   'Choose your starting situation':'सुरु गर्ने परिस्थिति छान्नुहोस्',
   'Real-life details':'वास्तविक जीवनका विवरण',
-  'Deciding next steps':'अर्को कदम तय गर्दै'
+  'Deciding next steps':'अर्को कदम तय गर्दै',
+  'Choose what you\'d actually say':'तपाईं वास्तवमै के भन्न चाहनुहुन्छ?',
+  'Choose a card to start talking':'कुराकानी सुरु गर्न एउटा कार्ड छान्नुहोस्',
+  'Your request:':'तपाईंको अनुरोध:',
+  'Previous':'अघिल्लो',
+  'Next':'अर्को',
+  'Try another path':'अर्को तरिकाले अभ्यास गर्नुहोस्',
+  '✓ This conversation has reached an ending.':'यो कुराकानी यहाँ समाप्त भयो।',
+  'This conversation has reached an ending.':'यो कुराकानी यहाँ समाप्त भयो।',
+  'Try a different answer to see how the story changes, or choose another situation.':'अर्को उत्तर छानेर कुराकानी कसरी बदलिन्छ हेर्नुहोस् वा नयाँ परिस्थिति छान्नुहोस्।',
+  'Practice preview only · No purchases, medical appointments, account changes, or real reservations occur.':'यो अभ्यास मात्र हो। वास्तविक खरिद, भेटघाट, खाता परिवर्तन वा बुकिङ हुँदैन।',
+  '175 real-life situations':'१७५ वास्तविक जीवनका परिस्थितिहरू'
  };
  for(const [english,ne] of Object.entries(sectionNames))staticNe.set(english,ne);
  const storageKey='sikau-v4-ne-dialogue-cache-v2';
  let cacheEntries=[];
- try{cacheEntries=JSON.parse(localStorage.getItem(storageKey)||'[]');}catch(_){}
+ try{cacheEntries=JSON.parse(localStorage.getItem(storageKey)||localStorage.getItem('sikau-v4-ne-dialogue-cache-v1')||'[]');}catch(_){}
  // Only prewritten scenario text may enter this cache. It contains no user
  // account data. Keep enough entries for 175 scenarios instead of 450 lines.
  const translated=new Map(Array.isArray(cacheEntries)?
@@ -548,8 +559,8 @@
    const entry=titles[text];
    display(header,text,entry);
   }
-  localizedLabel('#chat-role,#chat-counter,#chat-step,#chat-goal,#choice-title,#total-counter,#page-summary,#topic-browser .sectiontitle,#topic-browser .sectionhint,#chat-view .kicker');
-  localizedLabel('#back-topics,#undo,#switch-goal,#restart,#restart-bottom',el=>originalText(el).replace(/^[^\p{L}\p{N}]+/u,'').trim());
+  localizedLabel('#chat-role,#chat-counter,#chat-step,#chat-goal,#choice-title,#total-counter,#page-summary,#topic-browser .sectiontitle,#topic-browser .sectionhint,#chat-view .kicker,#topic-browser .resultline span,#topic-browser .footnote,#chat-view .progressline span,#goal-status > span,#complete-actions strong,#complete-actions p');
+  localizedLabel('#back-topics,#undo,#switch-goal,#restart,#restart-bottom,#pager-prev,#pager-next',el=>originalText(el).replace(/^[^\p{L}\p{N}]+/u,'').replace(/[^\p{L}\p{N}]+$/u,'').trim());
   localizedLabel('#category-filters .category-chip',el=>originalText(el));
   localizedLabel('#chat-transcript .speaker');
   for(const bubble of document.querySelectorAll('#chat-transcript .bubble')){
