@@ -1,108 +1,264 @@
-/* English Sikau language display bridge; runs only in an authorized lesson iframe.
- * Presentation only: student answers, forms, scoring, and access are unchanged. */
+/* English Sikau · consistent learner display language.
+ * Works inside the authorized lesson iframe only. Never translates user input,
+ * changes answers/scoring, submits data, or touches payment/access state.
+ * Devanagari DOM text remains unchanged; Roman is CSS generated content.
+ */
 (function(){
  'use strict';
- const d=document,s=d.getElementById('langPref'),h=d.documentElement;
- if(!s||h.dataset.sikauLangBridge==='1')return;
- h.dataset.sikauLangBridge='1';
+ const d=document,h=d.documentElement;
+ const select=d.getElementById('langPref');
+ if(!select||h.dataset.sikauLangBridge==='2')return;
+ h.dataset.sikauLangBridge='2';
  const modes=new Set(['en-ne','en-roman','all','en']);
- const names={'en-ne':'English + नेपाली','en-roman':'English + Roman Nepali',all:'English + नेपाली + Roman',en:'English only'};
- const C={क:'k',ख:'kh',ग:'g',घ:'gh',ङ:'ng',च:'ch',छ:'chh',ज:'j',झ:'jh',ञ:'n',ट:'t',ठ:'th',ड:'d',ढ:'dh',ण:'n',त:'t',थ:'th',द:'d',ध:'dh',न:'n',प:'p',फ:'f',ब:'b',भ:'bh',म:'m',य:'y',र:'r',ल:'l',व:'w',श:'sh',ष:'sh',स:'s',ह:'h'};
- const V={अ:'a',आ:'aa',इ:'i',ई:'i',उ:'u',ऊ:'u',ऋ:'ri',ए:'e',ऐ:'ai',ओ:'o',औ:'au'};
- const M={'ा':'a','ि':'i','ी':'i','ु':'u','ू':'u','े':'e','ै':'ai','ो':'o','ौ':'au','ृ':'ri'};
- const words={'मेरो':'mero','कक्षा':'kaksha','अभ्यास':'abhyash','कोच':'coach','नेपाली':'nepali','अंग्रेजी':'angreji','शब्दहरू':'shabdaharu','अनुवाद':'anuwad','लेखन':'lekhan','खेल':'khel','प्रगति':'pragati','बोल्ने':'bolne','अमेरिकी':'ameriki','भिसा':'visa','अन्तर्वार्ता':'antarbarta','हेर्नुहोस्':'hernuhos','पढ्न':'padhna'};
- function romanize(txt){return String(txt).replace(/[\u0900-\u097f]+/g,word=>{
-  if(words[word])return words[word];
-  let out='',chars=Array.from(word);
-  for(let i=0;i<chars.length;i++){
-   const c=chars[i],next=chars[i+1];
-   if(C[c]){out+=C[c];if(Object.prototype.hasOwnProperty.call(M,next)){out+=M[next];i++;}
-    else if(next==='्'){i++;}else if(next&&/[\u0900-\u097f]/.test(next))out+='a';}
-   else if(V[c])out+=V[c];else if(c==='ं'||c==='ँ')out+='n';
-   else if(c==='ः')out+='h';else if(c==='।')out+='.';
-   else if(c>='०'&&c<='९')out+=String(c.charCodeAt(0)-2406);
-   else if(!/[\u093c\u200c\u200d]/.test(c))out+=c;
-  }return out;
- });}
- const css=d.createElement('style');css.id='sikau-lang-bridge-style';
- css.textContent=[
- 'html[data-sikau-display-language="en"] .i18n-sub,html[data-sikau-display-language="en"] .sikau-lang-ne[data-en="yes"],html[data-sikau-display-language="en"] .sikau-lang-roman{display:none!important}',
- 'html[data-sikau-display-language="en-roman"] .sikau-lang-ne{display:none!important}',
- 'html[data-sikau-display-language="en-roman"] .i18n-sub>span:not(.roman){display:none!important}',
- 'html[data-sikau-display-language="en-ne"] .i18n-sub .roman{display:none!important}',
- 'html[data-sikau-display-language="en-ne"] .sikau-lang-roman{display:none!important}',
- 'html[data-sikau-display-language="en"] .sikau-lang-ne:not([data-en="yes"]){display:inline!important}',
- 'html[data-sikau-display-language="all"] .sikau-lang-ne,html[data-sikau-display-language="all"] .sikau-lang-roman{display:inline!important}',
- 'html[data-sikau-display-language="en-roman"] .sikau-lang-roman{display:inline!important}',
- 'html[data-sikau-display-language="en-ne"] .sikau-lang-ne{display:inline!important}',
- 'html[data-sikau-display-language="en"] .rm,html[data-sikau-display-language="en-ne"] .rm,html[data-sikau-display-language="en-roman"] .rm,html[data-sikau-display-language="all"] .rm{display:none!important}',
- '.sikau-lang-roman{font-size:.94em;font-style:italic;color:inherit;opacity:.9}',
- 'html[data-sikau-display-language="all"] .sikau-lang-roman:before{content:" ("}',
- 'html[data-sikau-display-language="all"] .sikau-lang-roman:after{content:")"}'
+ const names={
+  'en-ne':'English + नेपाली',
+  'en-roman':'English + Roman Nepali',
+  all:'English + नेपाली + Roman',
+  en:'English only'
+ };
+ const STORE='sikau_lang_pref';
+ const consonants={क:'k',ख:'kh',ग:'g',घ:'gh',ङ:'ng',च:'ch',छ:'chh',ज:'j',झ:'jh',ञ:'ny',ट:'t',ठ:'th',ड:'d',ढ:'dh',ण:'n',त:'t',थ:'th',द:'d',ध:'dh',न:'n',प:'p',फ:'ph',ब:'b',भ:'bh',म:'m',य:'y',र:'r',ल:'l',व:'w',श:'sh',ष:'sh',स:'s',ह:'h',क्ष:'ksh',ज्ञ:'gy'};
+ const vowels={अ:'a',आ:'aa',इ:'i',ई:'ee',उ:'u',ऊ:'oo',ऋ:'ri',ए:'e',ऐ:'ai',ओ:'o',औ:'au'};
+ const marks={'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॅ':'e','ॉ':'o'};
+ const dictionary={
+  'नमस्ते':'namaste','मेरो':'mero','हाम्रो':'hamro','कक्षा':'kaksha','अभ्यास':'abhyas',
+  'अंग्रेजी':'angreji','नेपाली':'nepali','शब्दहरू':'shabdaharu','अनुवाद':'anuwad',
+  'लेखन':'lekhan','खेल':'khel','प्रगति':'pragati','बोल्ने':'bolne','बोल्नुहोस्':'bolnuhos',
+  'पढ्नुहोस्':'padhnuhos','हेर्नुहोस्':'hernuhos','सिक्नुहोस्':'siknuhos','सिकौं':'sikaun',
+  'भाषा':'bhasha','अमेरिकी':'ameriki','भिसा':'visa','अन्तर्वार्ता':'antarbarta',
+  'मेरो':'mero','किताब':'kitab','पढ्ने':'padhne','सिकाइ':'sikai','चाडपर्व':'chadparva',
+  'महोत्सव':'mahotsav','तिहार':'tihar','छठ':'chhath','दशैं':'dashain','आगामी':'aagami',
+  'खोज्नुहोस्':'khojnuhos','आज':'aaja','भोलि':'bholi','तपाईंको':'tapainko','तपाईंलाई':'tapainlai',
+  'तपाईंले':'tapainle','तपाईं':'tapain','मलाई':'malai','म':'ma','तपाइँ':'tapain',
+  'नयाँ':'naya','वर्ष':'barsha','र':'ra','यो':'yo','के':'ke','छ':'chha','छन्':'chhan',
+  'हुन्छ':'hunchha','छैन':'chhaina','ठीक':'thik','धन्यवाद':'dhanyabad','स्वागत':'swagat',
+  'गर्नुहोस्':'garnuhos','गर्न':'garna','जानुहोस्':'januhos','सोध्नुहोस्':'sodhnuhos',
+  'उत्तर':'uttar','प्रश्न':'prashna','सही':'sahi','गलत':'galat','अर्को':'arko','पछाडि':'pachhadi',
+  'अगाडि':'agadi','फेरि':'pheri','सुरु':'suru','समाप्त':'samapta','अभ्यासहरू':'abhyasharu',
+  'साथी':'sathi','परिवार':'pariwar','शुभकामना':'shubhakamana','अधिक':'adhik',
+  'बुझ्नुहोस्':'bujhnuhos','थप':'thap','सजिलो':'sajilo','कठिन':'kathin',
+  'रकम':'rakam','मूल्य':'mulya','रुपैयाँ':'rupaiyan','कृपया':'kripaya',
+  'ट्याब':'tab','ट्याबहरू':'tabharu','विकल्प':'bikalpa','दुवै':'duwai',
+  'बोल्नु':'bolnu','अन्य':'anya','पहिलो':'pahilo','समय':'samaya','दिन':'din'
+ };
+ const hasNe=/[\u0900-\u097f]/;
+ const skip='script,style,noscript,template,svg,math,textarea,input,select,option,[contenteditable],[data-norz],.sikau-lang-token,.sikau-lang-roman,.roman,[lang="ne-Latn"]';
+ function romanize(part){
+  // Roman Nepali is a phonetic rendering of Nepali, not an English translation.
+  return String(part).replace(/[\u0900-\u097f]+/g,word=>{
+   if(dictionary[word])return dictionary[word];
+   let out='';
+   const chars=Array.from(word);
+   for(let i=0;i<chars.length;i++){
+    const ch=chars[i],next=chars[i+1];
+    if(ch==='क'&&next==='्'&&chars[i+2]==='ष'){out+='ksh';i+=2;continue;}
+    if(ch==='ज'&&next==='्'&&chars[i+2]==='ञ'){out+='gy';i+=2;continue;}
+    if(Object.hasOwn(consonants,ch)){
+     out+=consonants[ch];
+     if(Object.hasOwn(marks,next)){out+=marks[next];i++;}
+     else if(next==='्'){i++;}
+     else if(next&&hasNe.test(next)&&!/[ंँः]/.test(next))out+='a';
+     else if(!next)out+='a';
+    }else if(Object.hasOwn(vowels,ch))out+=vowels[ch];
+    else if(ch==='ं'||ch==='ँ')out+='n';
+    else if(ch==='ः')out+='h';
+    else if(ch==='।')out+='.';
+    else if(ch==='॥')out+='..';
+    else if(ch>='०'&&ch<='९')out+=String(ch.charCodeAt(0)-2406);
+    else if(ch==='्'||ch==='़'||ch==='\u200c'||ch==='\u200d'){}
+    else if(Object.hasOwn(marks,ch))out+=marks[ch];
+    else out+=ch;
+   }
+   return out;
+  });
+ }
+ const sheet=d.createElement('style');
+ sheet.id='sikau-lang-bridge-style';
+ sheet.textContent=[
+  // Every Devanagari token uses the original textContent in the DOM. Its
+  // visible Roman form comes from an attribute/pseudo-element only.
+  'html[data-sikau-display-language="en"] .sikau-lang-token{display:none!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-token{font-size:0!important;letter-spacing:0!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-token::after{content:attr(data-sikau-roman)!important;font-size:var(--sikau-roman-size,14px)!important;font-family:inherit!important;letter-spacing:normal!important;line-height:normal!important;white-space:pre-wrap!important}',
+  'html[data-sikau-display-language="all"] .sikau-lang-token::after{content:" (" attr(data-sikau-roman) ")"!important;font-size:.93em!important;letter-spacing:normal!important;white-space:pre-wrap!important}',
+  // Respect native bilingual controls without hiding unrelated English text.
+  'html[data-sikau-display-language="en"] .i18n-sub{display:none!important}',
+  'html[data-sikau-display-language="en-ne"] .i18n-sub .roman{display:none!important}',
+  'html[data-sikau-display-language="en-roman"] .i18n-sub:has(.roman) > span:not(.roman){display:none!important}',
+  'html[data-sikau-display-language="all"] .i18n-sub:has(.roman) .sikau-lang-token::after{content:none!important}',
+  'html[data-sikau-display-language="en"] .sikau-lang-roman,html[data-sikau-display-language="en-ne"] .sikau-lang-roman{display:none!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-ne{display:none!important}',
+  'html[data-sikau-display-language="en"] .sikau-lang-ne{display:none!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-roman,html[data-sikau-display-language="all"] .sikau-lang-roman{display:inline!important}',
+  'html[data-sikau-display-language="en-ne"] .i18n-sub .rm,html[data-sikau-display-language="en"] .i18n-sub .rm{display:none!important}',
+  // The Reading tab uses CSS-generated text, which a DOM text walker cannot see.
+  'html[data-sikau-display-language="en"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en"] #learn .sikau-see-nepali::after{content:"See Nepali"!important}',
+  'html[data-sikau-display-language="en-roman"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en-roman"] #learn .sikau-see-nepali::after{content:"See Nepali\\A Nepali hernuhos"!important}',
+  'html[data-sikau-display-language="all"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="all"] #learn .sikau-see-nepali::after{content:"See Nepali\\A नेपाली हेर्नुहोस् (Nepali hernuhos)"!important}'
  ].join('\n');
- d.head.appendChild(css);
- const exclude='script,style,noscript,input,textarea,select,option,[contenteditable],[data-norz],.sikau-lang-ne,.sikau-lang-roman,.rm,.roman,.i18n-sub,.wd,.course-options,#courseQuiz,#qz,#storyQuizBox,.sikau-quiz-option';
- const validRegion='.app-header,.nav,.content,#tr,#rd,#learn,#words,#hw,#sp,#game,#pg,#coach,.sikau-convo,.sikau-visa-main,.sikau-home-nav,.sikau-visa-nav';
- let observer=null,busy=false,pending=false;
- function decorate(){
-  const walker=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT),nodes=[];let n;
-  while((n=walker.nextNode())&&nodes.length<1100){
-   if(!/[\u0900-\u097f]/.test(n.nodeValue||''))continue;
-   const p=n.parentElement;
-   if(!p||p.closest(exclude)||!p.closest(validRegion))continue;
-   const btn=p.closest('button,[role="button"],a[href]');
-   if(btn&&!p.matches('small'))continue;
-   const t=n.nodeValue||'';if(t.length>450||!t.trim())continue;
+ d.head.appendChild(sheet);
+ const attributes=['placeholder','title','aria-label','alt'];
+ const originalAttributes=new WeakMap();
+ function visibleAttribute(original,selected){
+  if(!hasNe.test(original)||selected==='en-ne')return original;
+  if(selected==='en-roman')return romanize(original);
+  if(selected==='all')return original+' ('+romanize(original)+')';
+  return original.replace(/[\u0900-\u097f]+/g,'')
+   .replace(/\s*[·।|/]\s*(?=$)/g,'').replace(/\s{2,}/g,' ').trim();
+ }
+ function decorateAttributes(root){
+  if(!root)return;
+  const elements=[];
+  if(root.nodeType===Node.ELEMENT_NODE)elements.push(root);
+  if(root.querySelectorAll)elements.push(...root.querySelectorAll('[placeholder],[title],[aria-label],[alt]'));
+  for(const el of elements){
+   if(el===select||el.closest?.('script,style,template,[contenteditable]'))continue;
+   let originals=originalAttributes.get(el);
+   if(!originals){originals=new Map();originalAttributes.set(el,originals);}
+   for(const name of attributes){
+    if(!el.hasAttribute?.(name))continue;
+    const current=el.getAttribute(name)||'';
+    if(!originals.has(name)){
+     if(!hasNe.test(current))continue;
+     originals.set(name,current);
+    }
+    const original=originals.get(name);
+    const visible=visibleAttribute(original,mode);
+    if(current!==visible)el.setAttribute(name,visible);
+   }
+  }
+ }
+ let observer=null,scheduled=false,dirty=new Set(),mode='',lastNotified='';
+ function decorate(root){
+  if(!root)return;
+  const walker=d.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
+  if(root.nodeType===Node.TEXT_NODE&&hasNe.test(root.nodeValue||''))nodes.push(root);
+  let n;
+  while((n=walker.nextNode())){
+   if(!hasNe.test(n.nodeValue||''))continue;
    nodes.push(n);
   }
   for(const n of nodes){
-   if(!n.parentElement)continue;
    const p=n.parentElement;
-   const hasEn=/[A-Za-z]/.test(p.textContent||'')||
-    !!p.closest('.sikau-nav-word,.sikau-home-nav-label,.sikau-visa-nav-word');
-   const parts=(n.nodeValue||'').split(/([\u0900-\u097f][\u0900-\u097f\s।,!?‍‌-]*)/g);
-   if(parts.length<2)continue;
+   if(!p||p.closest(skip))continue;
+   const raw=n.nodeValue||'';
+   if(!hasNe.test(raw))continue;
+   const parts=raw.split(/([\u0900-\u097f]+)/g);
+   if(parts.length<=1)continue;
    const frag=d.createDocumentFragment();
+   let changed=false;
    for(const part of parts){
     if(!part)continue;
-    if(!/[\u0900-\u097f]/.test(part)){frag.appendChild(d.createTextNode(part));continue;}
-    const ne=d.createElement('span'),roman=d.createElement('span');
-    ne.className='sikau-lang-ne';ne.dataset.en=hasEn?'yes':'no';ne.textContent=part;
-    ne.setAttribute('data-norz','');
-    roman.className='sikau-lang-roman';roman.textContent=romanize(part);roman.lang='ne-Latn';
-    roman.setAttribute('data-norz','');roman.setAttribute('aria-hidden','true');
-    frag.append(ne,roman);
-   }n.replaceWith(frag);
+    if(!hasNe.test(part)){frag.appendChild(d.createTextNode(part));continue;}
+    const token=d.createElement('span');
+    token.className='sikau-lang-token';
+    token.textContent=part;
+    token.dataset.sikauRoman=romanize(part);
+    token.lang='ne';
+    token.style.setProperty('--sikau-roman-size',
+      d.defaultView?.getComputedStyle?.(p)?.fontSize||'14px');
+    frag.appendChild(token);changed=true;
+   }
+   if(changed)n.replaceWith(frag);
   }
  }
- function paint(){
-  if(busy)return;busy=true;observer?.disconnect();
+ function updateAccessibility(){
+  const roman=mode==='en-roman',all=mode==='all';
+  for(const token of d.querySelectorAll('.sikau-lang-token')){
+   if(roman){
+    token.setAttribute('role','text');
+    token.setAttribute('aria-label',token.dataset.sikauRoman||'');
+    token.lang='ne-Latn';
+   }else{
+    token.removeAttribute('role');token.removeAttribute('aria-label');
+    token.lang='ne';
+   }
+  }
+  for(const token of d.querySelectorAll('.sikau-lang-roman')){
+   token.setAttribute('aria-hidden',mode==='en-roman'||all?'false':'true');
+  }
+ }
+ function apply(){
+  scheduled=false;
+  observer?.disconnect();
+  const next=modes.has(select.value)?select.value:'en-ne';
+  const changed=next!==mode;
+  mode=next;
+  h.dataset.sikauDisplayLanguage=next;
+  select.title='Display language · '+names[next];
+  select.setAttribute('aria-label','Display language: '+names[next]);
+  if(next!==lastNotified){
+   lastNotified=next;
+   // Only a display preference (no account/lesson data) crosses the srcdoc boundary.
+   try{d.defaultView?.parent?.postMessage?.({type:'sikau-display-language',mode:next},'*')}catch(_){}
+  }
   try{
-   const mode=modes.has(s.value)?s.value:'en-ne';
-   h.dataset.sikauDisplayLanguage=mode;
-   // In Roman-only mode the Roman text, not the hidden Devanagari copy,
-   // must remain accessible to assistive technology.
-   for(const node of d.querySelectorAll('.sikau-lang-roman'))
-    node.setAttribute('aria-hidden',mode==='en-roman'?'false':'true');
-   s.title='Display language · '+names[mode];
-   s.setAttribute('aria-label','Display language: '+names[mode]);
-   decorate();
-   for(const node of d.querySelectorAll('.sikau-lang-roman'))
-    node.setAttribute('aria-hidden',mode==='en-roman'?'false':'true');
+   if(changed||!dirty.size){
+    decorate(d.body);
+    decorateAttributes(d.body);
+   }else for(const root of dirty){
+    const target=root?.isConnected?root:root?.parentElement?.isConnected?root.parentElement:null;
+    if(!target)continue;
+    decorate(target);
+    decorateAttributes(target.nodeType===Node.TEXT_NODE?target.parentElement:target);
+   }
+   if(changed)updateAccessibility();
+   else{
+    // Newly inserted tokens must match the current screen-reader language.
+    if(next==='en-roman'||next==='all')
+     for(const token of d.querySelectorAll('.sikau-lang-token:not([data-sikau-a11y])')){
+      if(next==='en-roman'){
+       token.setAttribute('role','text');token.setAttribute('aria-label',token.dataset.sikauRoman||'');
+       token.lang='ne-Latn';
+      }
+      token.dataset.sikauA11y='1';
+     }
+   }
   }finally{
-   busy=false;observer?.observe(d.body,{subtree:true,childList:true,characterData:true});
+   dirty.clear();
+   observer?.observe(d.body,{childList:true,characterData:true,attributes:true,attributeFilter:attributes,subtree:true});
   }
  }
- function schedule(){
-  if(pending)return;pending=true;
-  requestAnimationFrame(()=>{pending=false;paint()});
+ function queue(root){
+  if(root)dirty.add(root);
+  if(scheduled)return;
+  scheduled=true;
+  (d.defaultView?.requestAnimationFrame||((fn)=>setTimeout(fn,0)))(apply);
  }
- s.addEventListener('change',()=>{try{localStorage.setItem('sikau_lang_pref',s.value)}catch(_){}schedule()});
- d.addEventListener('click',event=>{
-  if(event.target?.closest?.('.nav button,.sikau-home-nav,.sikau-visa-nav'))schedule();
+ // Native lesson handlers run first, then this presentation sync on the frame.
+ select.addEventListener('input',()=>queue(d.body));
+ select.addEventListener('change',()=>{
+  if(modes.has(select.value)){
+   try{d.defaultView?.localStorage?.setItem(STORE,select.value)}catch(_){}
+  }
+  queue(d.body);
+ });
+ d.addEventListener('click',e=>{
+  if(e.target?.closest?.('.nav button,.sikau-home-nav,.sikau-visa-nav'))queue(d.body);
  },true);
- observer=new MutationObserver(schedule);
- if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',paint,{once:true});
- else paint();
- window.__sikauLanguageDisplay={apply:schedule,getMode:()=>s.value};
+ observer=new MutationObserver(records=>{
+  for(const record of records){
+   if(record.type==='characterData')dirty.add(record.target.parentElement||record.target);
+   if(record.type==='attributes'){
+    const el=record.target,key=record.attributeName;
+    const originals=originalAttributes.get(el);
+    if(originals?.has(key))originals.set(key,el.getAttribute(key)||'');
+    dirty.add(el);
+   }
+   for(const n of record.addedNodes||[]){
+    if(n.nodeType===Node.TEXT_NODE||n.nodeType===Node.ELEMENT_NODE)dirty.add(n);
+   }
+  }
+  if(dirty.size)queue();
+ });
+ try{
+  const stored=d.defaultView?.localStorage?.getItem(STORE);
+  if(modes.has(stored)&&stored!==select.value){
+   select.value=stored;
+   select.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+ }catch(_){}
+ if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',()=>queue(d.body),{once:true});
+ else queue(d.body);
+ window.__sikauLanguageDisplay={apply:()=>queue(d.body),getMode:()=>select.value,romanize};
 })();

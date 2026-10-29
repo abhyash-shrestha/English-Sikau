@@ -1374,6 +1374,7 @@ function sikauThemeButtons(){
   button.innerHTML=dark?'☀️ <span class="sikau-theme-word">Light · उज्यालो</span>':
     '🌙 <span class="sikau-theme-word">Dark · अँध्यारो</span>';
  }
+ try{window.__sikauRenderSecureHeaderLanguage?.(sikauCurrentDisplayLanguage());}catch(_){}
 }
 function sikauApplyLessonTheme(doc){
  if(!doc?.head||!doc.documentElement)return;
@@ -1683,13 +1684,87 @@ function studentFirstName(){
   const first=String(raw).trim().split(/\s+/u)[0]||'Learner';
   return first.replace(/[<>]/g,'').slice(0,32)||'Learner';
 }
+function sikauCurrentDisplayLanguage(){
+ try{const value=localStorage.getItem('sikau_lang_pref');
+  return ['en-ne','en-roman','all','en'].includes(value)?value:'en-ne';
+ }catch(_){return 'en-ne'}
+}
+function sikauApplyOuterDisplayLanguage(selected){
+ if(!openedAccess||!user)return;
+ const mode=['en-ne','en-roman','all','en'].includes(selected)?selected:'en-ne';
+ const first=studentFirstName();
+ const greetings={
+  'en-ne':'Welcome back 👋 नमस्ते, '+first+' 🙏',
+  'en-roman':'Welcome back 👋 Namaste, '+first+' 🙏',
+  all:'Welcome back 👋 नमस्ते (Namaste), '+first+' 🙏',
+  en:'Welcome back 👋 '+first
+ };
+ const progress={
+  'en-ne':'⭐ My progress · मेरो प्रगति',
+  'en-roman':'⭐ My progress · Mero pragati',
+  all:'⭐ My progress · मेरो प्रगति (Mero pragati)',
+  en:'⭐ My progress'
+ };
+ const signout={
+  'en-ne':'Sign out · लगआउट ',
+  'en-roman':'Sign out · Lagaaut ',
+  all:'Sign out · लगआउट (Lagaaut) ',
+  en:'Sign out '
+ };
+ const greeting=$('studentTopGreeting');
+ if(greeting)greeting.textContent=greetings[mode];
+ const progressButton=$('cloudStoryToggle');
+ if(progressButton)progressButton.textContent=progress[mode];
+ const progressPanel=$('cloudStoryProgress');
+ if(progressPanel){
+  const title=progressPanel.querySelector('.cloud-story-info strong');
+  const note=progressPanel.querySelector('.cloud-story-info small');
+  const refresh=$('cloudStoryRefresh');
+  const labels={
+   'en-ne':['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।','↻ Refresh · ताजा गर्नुहोस्'],
+   'en-roman':['☁️ Verified chapter progress · Pramanit adhyaya pragati','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · Taja garnuhos'],
+   all:['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति (Pramanit adhyaya pragati)','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · ताजा गर्नुहोस् (Taja garnuhos)'],
+   en:['☁️ Verified chapter progress','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh']
+  }[mode];
+  if(title)title.textContent=labels[0];
+  if(note)note.textContent=labels[1];
+  if(refresh)refresh.textContent=labels[2];
+ }
+ const exit=$('exit');
+ if(exit&&exit.firstChild?.nodeType===Node.TEXT_NODE)exit.firstChild.nodeValue=signout[mode];
+ const ref=$('studentMembershipReference');
+ if(ref){
+  const base='Membership ✅ Lifetime · Account reference: '+accountReference(user);
+  ref.textContent=mode==='en-ne'?base+' · सदस्यता पुष्टि':
+    mode==='en-roman'?base+' · Sadasyata pushti':
+    mode==='all'?base+' · सदस्यता पुष्टि (Sadasyata pushti)':base;
+ }
+ const theme=$('sikauThemeProtected');
+ if(theme){
+  const dark=sikauTheme==='dark',en=dark?'Light':'Dark';
+  const ne=dark?'उज्यालो':'अँध्यारो',roman=dark?'Ujyalo':'Andhyaro';
+  const word=theme.querySelector('.sikau-theme-word');
+  if(word)word.textContent=mode==='en-ne'?en+' · '+ne:
+    mode==='en-roman'?en+' · '+roman:
+    mode==='all'?en+' · '+ne+' ('+roman+')':en;
+  theme.setAttribute('aria-label',(dark?'Switch to light mode':'Switch to dark mode')+
+   (mode==='en-ne'?' · '+ne:mode==='en-roman'?' · '+roman+' mode':
+    mode==='all'?' · '+ne+' ('+roman+')':''));
+ }
+}
+window.addEventListener('message',event=>{
+ const frame=$('lessonFrame');
+ if(!frame||event.source!==frame.contentWindow)return;
+ if(event.data?.type!=='sikau-display-language')return;
+ if(!['en-ne','en-roman','all','en'].includes(event.data.mode))return;
+ sikauApplyOuterDisplayLanguage(event.data.mode);
+});
+window.__sikauRenderSecureHeaderLanguage=sikauApplyOuterDisplayLanguage;
 function updateStudentWelcome(){
-  if(!openedAccess||!user)return;
-  const first=studentFirstName();
-  const greeting=$('studentTopGreeting');
-  if(greeting)greeting.textContent='Welcome back 👋 नमस्ते, '+first+' 🙏';
-  const ref=$('studentMembershipReference');
-  if(ref)ref.textContent='Membership ✅ Lifetime · Account reference: '+accountReference(user)+' · सदस्यता पुष्टि';
+ if(!openedAccess||!user)return;
+ const ref=$('studentMembershipReference');
+ if(ref)ref.textContent='Membership ✅ Lifetime · Account reference: '+accountReference(user)+' · सदस्यता पुष्टि';
+ sikauApplyOuterDisplayLanguage(sikauCurrentDisplayLanguage());
 }
 
 
@@ -3093,7 +3168,7 @@ async function openFile(token='',isTrial=false){
     const qualityInstalled=qualityEntry.test(repairedHtml);
     const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>lightningTimingPatch+'\n'+writingQualityPatch+'\n'+m):repairedHtml;
     if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
-    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261021-r3',location.href).href;
+    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261028-all-languages-r4',location.href).href;
     const languageScriptTag='<scr'+'ipt src="'+languageScriptUrl+'"></scr'+'ipt>';
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):
