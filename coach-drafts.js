@@ -49,7 +49,7 @@
         !(state.detail===null||Number.isInteger(state.detail)&&state.detail>=0&&state.detail<=2))
       throw Error('Invalid Coach story state');
      const extras=Object.create(null);
-     for(const key of ['priority','offer','payment','variant','accessories','decision','storage','color'])
+     for(const key of ['priority','offer','payment','variant','accessories','decision','storage','color','need'])
       if(typeof state[key]==='string'&&state[key].length<=60)extras[key]=state[key];
      if(typeof state.paymentConfirmed==='boolean')extras.paymentConfirmed=state.paymentConfirmed;
      // Old versions did not store capacity/color in the story state.
@@ -85,7 +85,7 @@
     storyCompleted:!!a.storyCompleted,
     storyState:a.isBranchingStory?{
      scene:a.id,path:a.storyState?.path,detail:a.storyState?.detail,
-     ...Object.fromEntries(['priority','offer','payment','variant','accessories','decision','storage','color']
+     ...Object.fromEntries(['priority','offer','payment','variant','accessories','decision','storage','color','need']
       .filter(k=>typeof a.storyState?.[k]==='string'&&a.storyState[k].length<=60)
       .map(k=>[k,a.storyState[k]])),
      ...(typeof a.storyState?.paymentConfirmed==='boolean'?{paymentConfirmed:a.storyState.paymentConfirmed}:{})
