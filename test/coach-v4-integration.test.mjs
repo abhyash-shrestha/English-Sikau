@@ -43,7 +43,7 @@ test('all 175 approved V4 scenes map to the existing 175 Coach cards',()=>{
 });
 test('approved V4 engine retains topic-specific reaction branches',()=>{
  const topics=makeTopics();
- for(const name of ['Return clothing','Buy a phone','Order at a café','At the bank',
+ for(const name of ['Return clothing','Buy a phone','Order at a café','At a bank',
   'Missing online delivery','Talk in a long-distance relationship','Report a suspicious message']){
   assert.ok(topics.includes(name),name);
  }
