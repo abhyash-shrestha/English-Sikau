@@ -75,6 +75,61 @@
   const female=identifiedFemale(voices),provider=providerOf(female);
   return males.find(v=>provider&&providerOf(v)===provider)||males[0]||null;
  }
+
+ // Web Speech voices are operating-system/browser assets. On Apple the
+ // list may contain only standard voices, even if an enhanced system
+ // voice was downloaded; do not claim the native voice can be installed
+ // or that the app can synthesize unavailable neural speech.
+ const englishVoices=synth=>{
+  try{return Array.from(synth?.getVoices?.()||[]).filter(v=>
+   /^en(?:-|$)/i.test(String(v?.lang||'').replace('_','-')));
+  }catch(_){return[];}
+ };
+ const voiceQuality=voice=>{
+  const name=String(voice?.name||''),uri=String(voice?.voiceURI||'');
+  const full=(name+' '+uri).toLowerCase();
+  let score=0;
+  if(/natural|neural|premium/.test(full))score+=115;
+  if(/enhanced|high.quality|high quality/.test(full))score+=70;
+  if(/(?:microsoft|azure)/.test(full))score+=20;
+  if(/google/.test(full))score+=12;
+  if(/siri/.test(full))score+=26;
+  if(/(?:ava|jenny|aria|andrew|emma|guy|christopher|brian|ryan|sonia|libby|steffan|sagar|hemkala)/i.test(name))score+=38;
+  if(/(?:samantha|alex|allison|daniel|karen|moira|serena|oliver)/i.test(name))score+=12;
+  if(/(?:compact|eloquence|espeak|robot|novelty|bad news|good news|whisper|bells|boing|bubbles|cellos|zarvox|fred)/i.test(name))score-=180;
+  // A default should not win over a genuinely better named voice.
+  if(voice?.default)score+=5;
+  return score;
+ };
+ function bestEnglish(synth,utterance){
+  const voices=englishVoices(synth);
+  if(!voices.length)return null;
+  const requested=String(utterance?.lang||'en-US').toLowerCase().replace('_','-');
+  const locale=requested.match(/^en(?:-[a-z]{2})?/)?.[0]||'en-us';
+  const rank=v=>voiceQuality(v)+
+   (String(v.lang||'').toLowerCase().replace('_','-')===locale?18:0);
+  const sorted=voices.slice().sort((a,b)=>rank(b)-rank(a));
+  const preferred=sorted[0];
+  // Do not replace an explicitly chosen good voice from the original
+  // lesson with a different accent just because the name looks promising.
+  if(utterance?.voice&&voices.includes(utterance.voice)&&
+     rank(utterance.voice)>=rank(preferred)-25)return utterance.voice;
+  return preferred;
+ }
+ function bestNepaliFemale(synth){
+  const voices=nepaliVoices(synth);
+  const clearlyFemale=voices.filter(v=>
+   /(?:^|[^a-z])hemkala(?:[^a-z]|$)|(?:^|[^a-z])female(?:[^a-z]|$)|महिला/i.test(String(v.name||'')));
+  if(!clearlyFemale.length)return null;
+  return clearlyFemale.slice().sort((a,b)=>voiceQuality(b)-voiceQuality(a))[0];
+ }
+ function voiceChoiceReport(synth){
+  const en=bestEnglish(synth,{lang:'en-US'});
+  const nep=bestNepaliFemale(synth);
+  return {english:en?.name||null,nepaliFemale:nep?.name||null,
+   nepaliMale:firstMale(synth)?.name||null};
+ }
+
  const voiceReport=synth=>{
   const voices=nepaliVoices(synth);
   return {
@@ -164,14 +219,28 @@
   const rawSpeak=synth.speak;
   const speakOriginal=utterance=>rawSpeak.call(synth,utterance);
   function routedSpeak(utterance){
-   if(!utterance||!isNepali(utterance))return speakOriginal(utterance);
+   if(!utterance)return speakOriginal(utterance);
+   const lang=String(utterance.lang||'').replace('_','-').toLowerCase();
+   if(!isNepali(utterance)){
+    if(/^en(?:-|$)/.test(lang)){
+     const high=bestEnglish(synth,utterance);
+     if(high){utterance.voice=high;utterance.lang=high.lang||utterance.lang;}
+    }
+    return speakOriginal(utterance);
+   }
    const scope=active;
-   if(currentGender(scope)!=='male')return speakOriginal(utterance);
+   if(currentGender(scope)!=='male'){
+    // If the browser exposes an explicitly named female Nepali neural
+    // voice, use it rather than a poor-quality default; otherwise retain
+    // existing female playback (especially important for Apple).
+    const better=bestNepaliFemale(synth);
+    if(better){utterance.voice=better;utterance.lang=better.lang||'ne-NP';}
+    return speakOriginal(utterance);
+   }
    const voice=firstMale(synth);
    if(!voice){try{synth.cancel()}catch(_){}sayUnavailable(scope);return;}
    utterance.voice=voice;
    utterance.lang=voice.lang||'ne-NP';
-   // Neutral pitch/rate avoids the robotic low-pitch female workaround.
    utterance.pitch=1;
    utterance.rate=0.98;
    status(scope,'');
@@ -221,6 +290,7 @@
   view.__sikauNepaliVoiceInstalled=true;
   view.__sikauNepaliVoice={
    isAuthenticMale,genderOf,controlGender,voiceReport:()=>voiceReport(synth),
+   voiceChoiceReport:()=>voiceChoiceReport(synth),voiceQuality,bestEnglish:lang=>bestEnglish(synth,{lang}),
    firstMale:()=>firstMale(synth),
    select:chooseGender,available:()=>!!firstMale(synth),
    speakNepali:(text,scope='tr')=>{
