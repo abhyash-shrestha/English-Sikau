@@ -174,8 +174,8 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261029-all175-language-r4'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261029-all175-language-r4/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261029-coach-layout-r5'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261029-coach-layout-r5/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
@@ -213,4 +213,49 @@ test('Shared language bridge covers all V4 message types and retries temporarily
  assert.doesNotMatch(bridge,/failures>=4/,'Translation must not permanently disable itself');
  const mount=read('coach-v4-mount.js');
  assert.match(mount,/sikauCoachV4Translations/);
+});
+
+
+test('Coach pagination stays flexible in English, Nepali, and Roman Nepali',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ assert.match(bridge,/\.pager-controls\{display:grid!important;grid-template-columns:/,
+  'Pager must allocate independent Previous, number strip, and Next columns');
+ assert.match(bridge,/\.pager-controls \.page-nav\{display:flex;flex-direction:column;/,
+  'Previous and Next labels need separate rows');
+ assert.match(bridge,/\.pager-controls \.page-nav\{[^\n]*height:auto!important;/,
+  'Translated labels must be allowed to increase button height');
+ assert.match(bridge,/\.pager-controls \.page-numbers\{[^\n]*overflow-x:auto;/,
+  'Page numbers must scroll instead of colliding with navigation');
+ assert.match(bridge,/\.pager-controls \.page-nav \.sikau-v4-local\{font-size:10px!important;/);
+});
+
+test('Translated Coach answers use normal text styling, not the pink arrow styling',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ assert.match(html,/\.answer-button > span:last-child\{font-size:23px;color:var\(--pink\)\}/,
+  'The original CSS selector must target the direct arrow child only');
+ assert.doesNotMatch(html,/\.answer-button span:last-child\{font-size:23px/,
+  'The old descendant selector made every translated answer 23px');
+ assert.match(bridge,/\.answer-button \.sikau-v4-local>span\{display:block;font-size:inherit!important;/);
+ assert.match(bridge,/\.answer-button \.sikau-v4-local\{display:block;font-size:12px!important;/);
+});
+
+test('Roman Nepali starts with a capital and capitalizes the next sentence',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ const match=bridge.match(/function capitalizeRomanSentences\(value\)\{[\s\S]*?\n \}/);
+ assert.ok(match,'Capitalization helper missing');
+ const cap=vm.runInNewContext('('+match[0]+')');
+ assert.equal(cap('bankma kurakani. tapaiko uttarle kurakani badalchha.'),
+  'Bankma kurakani. Tapaiko uttarle kurakani badalchha.');
+ assert.equal(cap('mero namaste! tapaiko kura? thik chha.'),
+  'Mero namaste! Tapaiko kura? Thik chha.');
+ assert.equal(cap('1 dekhi 25 samma. prishtha 1/7'),
+  '1 Dekhi 25 samma. Prishtha 1/7');
+ assert.match(bridge,/capitalizeRomanSentences\(override\?\.roman\|\|romanize\(ne\)\)/,
+  'Roman translation supplied by the original lesson must also be capitalized');
+});
+
+test('Hide unnecessary practice disclaimer in all 175 topic pages',()=>{
+ assert.doesNotMatch(html,/Practice preview only · No purchases, medical appointments/,
+  'Unnecessary preview disclaimer still appears at the bottom');
+ assert.doesNotMatch(html,/<p class="footnote">/);
 });
