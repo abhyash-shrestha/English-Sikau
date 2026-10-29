@@ -39,8 +39,7 @@
    style.textContent=[
     '#sikauCoachV4Mount{display:block;width:100%;min-width:0;margin:0;padding:0;background:transparent}',
     '#sikauCoachV4Frame{display:block;width:100%;min-width:0;max-width:100%;border:0;border-radius:16px;background:transparent;overflow:hidden}',
-    '.sikau-convo-board:has(#sikauCoachV4Mount) .coach-top,.sikau-convo-board:has(#sikauCoachV4Mount) .coach-plan{display:none!important}',
-    '.sikau-convo-board:has(#sikauCoachV4Mount) .coach-ask{display:none!important}',
+    '.sikau-convo-board:has(#sikauCoachV4Mount) .coach-top{display:none!important}',
     '@media(max-width:620px){#sikauCoachV4Frame{border-radius:11px}#sikauCoachV4Mount{padding:0}}'
    ].join('\n');
    doc.head.appendChild(style);
