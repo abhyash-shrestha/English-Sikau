@@ -57,6 +57,45 @@ function allowed(user){
  bucket.count++;
  return true;
 }
+// Google AI Studio provides a key-based Gemini TTS API, with a limited
+// free tier for eligible models/accounts. Keys remain server-side.
+// Gemini 2.5 TTS returns headerless 16-bit PCM (24kHz mono).
+function wavFromPcm(pcm){
+ if(!pcm.length||pcm.length%2||pcm.length>1300000)throw Error('Invalid PCM');
+ const wav=Buffer.allocUnsafe(44+pcm.length);
+ wav.write('RIFF',0);wav.writeUInt32LE(36+pcm.length,4);
+ wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);
+ wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);
+ wav.writeUInt32LE(24000,24);wav.writeUInt32LE(48000,28);
+ wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);
+ wav.write('data',36);wav.writeUInt32LE(pcm.length,40);
+ pcm.copy(wav,44);
+ return wav;
+}
+async function geminiAudio(text,lang,gender,key){
+ const name=gender==='male'?'Charon':'Kore';
+ const direction=lang==='ne-NP'?
+  'Speak only in clear, natural Nepali as spoken in Nepal (not Hindi), in a warm human voice. Read these exact words without extra commentary: ':
+  'Speak the following exact English words naturally, warmly and clearly, with no commentary: ';
+ const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent',{
+  method:'POST',
+  headers:{'x-goog-api-key':key,'Content-Type':'application/json'},
+  body:JSON.stringify({
+   contents:[{parts:[{text:direction+'“'+text+'”'}]}],
+   generationConfig:{responseModalities:['AUDIO'],
+    speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:name}}}}
+  }),
+  signal:AbortSignal.timeout(18000)
+ });
+ if(!response.ok)throw Error(response.status===429?'rate-limit':'provider-unavailable');
+ const json=await response.json();
+ const block=json?.candidates?.[0]?.content?.parts?.find(part=>
+  part.inlineData?.data)?.inlineData;
+ if(typeof block?.data!=='string')throw Error('No audio');
+ const bytes=Buffer.from(block.data,'base64');
+ const wav=wavFromPcm(bytes);
+ return {mime:'audio/wav',voice:name,audioBase64:wav.toString('base64'),engine:'gemini-neural'};
+}
 export default async function({req,res}){
  const reply=(payload,code=200)=>res.json(payload,code,{
   'Cache-Control':'no-store','Pragma':'no-cache'
@@ -77,8 +116,18 @@ export default async function({req,res}){
    !text||text.length>550||Buffer.byteLength(text,'utf8')>2200)
   return reply({status:'error',message:'Invalid speech input'},400);
  if(!allowed(user))return reply({status:'unavailable',message:'Too many speech requests; try again shortly'},429);
+ const geminiKey=process.env.GEMINI_API_KEY;
  const key=process.env.AZURE_SPEECH_KEY;
  const region=String(process.env.AZURE_SPEECH_REGION||'').trim().toLowerCase();
+ const provider=String(process.env.SPEECH_PROVIDER||'').trim().toLowerCase();
+ // Prefer owner-selected provider, then an existing Azure Speech resource,
+ // then Gemini AI Studio's free-tier-capable TTS endpoint.
+ const useGemini=provider==='gemini'||(!key&&!!geminiKey);
+ if(useGemini&&geminiKey){
+  try{return reply({status:'ok',...(await geminiAudio(text,lang,gender,geminiKey))})}
+  catch(_){return reply({status:'unavailable',message:
+   'Natural speech provider unavailable or free request allowance reached'},503)}
+ }
  if(!key||!/^[a-z0-9]{2,20}$/.test(region))
   return reply({status:'unavailable',message:'Natural speech is not configured'},503);
  const name=VOICES[lang][gender];
