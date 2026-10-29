@@ -1225,3 +1225,28 @@ html[data-sikau-theme="dark"] .sikau-convo-page-number[aria-current="page"]{
  #coach .sikau-chat-top{gap:5px!important}
  #coach .sikau-chat-top-pill{white-space:normal!important}
 }
+
+
+/* Approved 175-topic V4 dialogue inside the existing Coach visual design. */
+.sikau-v4-head{row-gap:9px}
+.sikau-v4-chat{min-width:0}
+.sikau-v4-chat .sikau-chat-message-body{min-width:0;overflow-wrap:anywhere}
+.sikau-v4-chat .sikau-v4-line{margin:5px 0 0;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.sikau-v4-ne,.sikau-v4-roman{display:block;margin-top:5px;line-height:1.55;overflow-wrap:anywhere}
+.sikau-v4-ne{color:#52688c}.sikau-v4-roman{color:#627495;font-style:normal}
+.sikau-v4-chat .sikau-chat-option-copy{display:flex;flex-direction:column;gap:3px;min-width:0;overflow-wrap:anywhere}
+.sikau-v4-chat .sikau-chat-option-copy .sikau-v4-line{margin:0}
+.sikau-v4-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.sikau-v4-actions button{min-height:42px}
+.sikau-v4-actions button:disabled{opacity:.5;cursor:default}
+.sikau-v4-finished{display:block;font-size:16px;margin-bottom:8px}
+html[data-sikau-theme="dark"] .sikau-v4-ne,
+html[data-sikau-theme="dark"] .sikau-v4-roman{color:#d2d9ef}
+@media(max-width:767px){
+ .sikau-v4-head{align-items:flex-start}
+ .sikau-v4-chat .sikau-convo-transcript{max-height:none;overflow:visible}
+ .sikau-v4-chat .sikau-chat-message-body{max-width:100%}
+ .sikau-v4-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sikau-v4-actions button{min-width:0;white-space:normal;line-height:1.4}
+ .sikau-v4-chat .sikau-convo-option{min-height:50px}
+}
