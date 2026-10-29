@@ -190,3 +190,33 @@ test('Keep original Nepali female output if no positively identified better voic
  assert.equal(speaks.length,1);
  assert.equal(speaks[0].voice,'');
 });
+
+
+test('iPhone direct speech API works without replacing native synthesis.speak',()=>{
+ const voice={name:'Samantha',lang:'en-US'};
+ const {win,speaks}=mock([voice]);
+ const player=win.__sikauNepaliVoice;
+ assert.equal(typeof player.speakText,'function');
+ assert.equal(player.speakText('Hello from iPhone','en-US','tr'),true);
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].text,'Hello from iPhone');
+ assert.equal(speaks[0].voice,'Samantha');
+});
+
+test('iPhone direct route preserves the existing Nepali female voice',()=>{
+ const {win,speaks}=mock([hemkala]);
+ const player=win.__sikauNepaliVoice;
+ player.select('tr','female');
+ assert.equal(player.speakText('नमस्कार','ne-NP','tr'),true);
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].voice,hemkala.name);
+});
+
+test('iPhone direct route never substitutes female voice for unavailable male Nepali',()=>{
+ const {win,speaks,sections}=mock([hemkala]);
+ const player=win.__sikauNepaliVoice;
+ player.select('tr','male');
+ assert.equal(player.speakText('नमस्कार','ne-NP','tr'),false);
+ assert.equal(speaks.length,0);
+ assert.match(sections.tr.last.textContent,/No male Nepali voice is available/);
+});
