@@ -36,7 +36,10 @@
      resolve(engine);
     }catch(error){reject(error)}
    },{once:true});
-   iframe.addEventListener('error',()=>reject(Error('V4 conversation document failed to load')),{once:true});
+   iframe.addEventListener('error',()=>{
+    iframe=null;loadPromise=null;
+    reject(Error('V4 conversation document failed to load'));
+   },{once:true});
   });
   doc.body.appendChild(iframe);
   return loadPromise;
@@ -70,10 +73,13 @@
   }))}catch(_){}
  }
  function getMode(doc){
-  const w=doc.defaultView;
-  const x=w?.__sikauLanguageDisplay?.getMode?.()||
-   doc.documentElement?.dataset?.sikauDisplayLanguage||
-   w?.localStorage?.getItem('sikau_lang_pref')||'en-ne';
+  let x='en-ne';
+  try{
+   const w=doc.defaultView;
+   x=w?.__sikauLanguageDisplay?.getMode?.()||
+    doc.documentElement?.dataset?.sikauDisplayLanguage||
+    w?.localStorage?.getItem('sikau_lang_pref')||'en-ne';
+  }catch(_){}
   return ['en','en-ne','en-roman','all'].includes(x)?x:'en-ne';
  }
  const labels={
@@ -114,9 +120,14 @@
    const block=text(doc,container,'p','sikau-v4-line',en);
    if(ne&&mode!=='en'){
     const roman=doc.defaultView?.__sikauLanguageDisplay?.romanize?.(ne)||'';
-    if(mode==='en-ne'||mode==='all')text(doc,container,'small','sikau-v4-ne',ne);
-    if((mode==='en-roman'||mode==='all')&&roman)
-     text(doc,container,'small','sikau-v4-roman',roman);
+    if(mode==='en-ne'||mode==='all'){
+     const original=text(doc,container,'small','sikau-v4-ne',ne);
+     original.setAttribute('data-norz','true');
+    }
+    if((mode==='en-roman'||mode==='all')&&roman){
+     const latin=text(doc,container,'small','sikau-v4-roman',roman);
+     latin.setAttribute('data-norz','true');
+    }
    }
    return block;
   }
@@ -141,7 +152,13 @@
    });
    const meta=text(doc,head,'div','sikau-convo-stage-meta','');
    text(doc,meta,'strong','',scene.emoji+' '+scene.title);
-   if(mode!=='en')text(doc,meta,'small','',scene.ne);
+   if(mode!=='en'){
+    const latin=doc.defaultView?.__sikauLanguageDisplay?.romanize?.(scene.ne)||'';
+    const localName=mode==='en-ne'?scene.ne:mode==='en-roman'?(latin||scene.ne):
+     scene.ne+(latin?' · '+latin:'');
+    const titleNe=text(doc,meta,'small','',localName);
+    titleNe.setAttribute('data-norz','true');
+   }
    const speech=api?.view?.()?.state;
    if(!api||!speech){
     text(doc,stage,'p','sikau-convo-list-note',label('loading'));return;
@@ -153,7 +170,16 @@
    transcript.setAttribute('role','region');
    transcript.setAttribute('aria-label','Conversation history');
    const top=text(doc,transcript,'div','sikau-chat-top','');
-   text(doc,top,'div','sikau-chat-top-scene',scene.emoji+' '+scene.place);
+   const placeBits=String(scene.place||'').split(' · ');
+   const placeEn=placeBits[0]||'';
+   const placeNe=placeBits.slice(1).join(' · ');
+   const placeRoman=placeNe?doc.defaultView?.__sikauLanguageDisplay?.romanize?.(placeNe)||'':'';
+   const displayPlace=mode==='en'?placeEn:
+    mode==='en-roman'?placeEn+(placeRoman?' · '+placeRoman:''):
+    mode==='all'?placeEn+(placeNe?' · '+placeNe:'')+(placeRoman?' ('+placeRoman+')':''):
+    placeEn+(placeNe?' · '+placeNe:'');
+   const placeNode=text(doc,top,'div','sikau-chat-top-scene',scene.emoji+' '+displayPlace);
+   placeNode.setAttribute('data-norz','true');
    text(doc,top,'span','sikau-chat-top-pill',firstName||labels.en.you);
    previous.forEach((message,i)=>{
     if(!message||typeof message.text!=='string')return;
