@@ -41,6 +41,19 @@
      (d.isBranchingStore&&d.sceneId!=='return-shirt')||
      (d.pendingChoice&&typeof d.pendingChoice.value!=='string'))throw Error('Invalid Coach draft');
     d.storeState=cleanState(d.storeState);
+    if(d.isBranchingV4){
+     const state=d.v4State;
+     if(!state||typeof state!=='object'||!Number.isInteger(state.route)||
+       state.route< -1||state.route>2||!Number.isInteger(state.stage)||
+       state.stage<0||state.stage>40||!Array.isArray(state.messages)||
+       state.messages.length>120||!state.messages.every(x=>
+        x&&['npc','you'].includes(x.role)&&typeof x.text==='string'&&x.text.length<=5000)||
+       !Array.isArray(state.facts)||state.facts.length>100||
+       (state.cafe&&typeof state.cafe!=='object'))throw Error('Invalid V4 state');
+     // Drafts contain conversation text only. Reject prototypes or unexpected
+     // nested data before retaining the snapshot.
+     if(JSON.stringify(state).length>70000)throw Error('Oversized V4 state');
+    }
     if(d.isBranchingStory){
      if(d.sceneId==='return-shirt')throw Error('Incorrect Coach story type');
      const state=d.storyState;
@@ -83,6 +96,9 @@
     storeCompleted:!!a.storeCompleted,storeState:cleanState(a.storeState),
     isBranchingStory:!!a.isBranchingStory,
     storyCompleted:!!a.storyCompleted,
+    isBranchingV4:!!a.isBranchingV4,
+    v4Completed:!!a.v4Completed,
+    v4State:a.isBranchingV4?a.v4State:null,
     storyState:a.isBranchingStory?{
      scene:a.id,path:a.storyState?.path,detail:a.storyState?.detail,
      ...Object.fromEntries(['priority','offer','payment','variant','accessories','decision','storage','color','need']
