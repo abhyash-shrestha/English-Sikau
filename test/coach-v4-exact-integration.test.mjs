@@ -185,8 +185,8 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261029-theme-sync-r6'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261029-theme-sync-r6/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261029-student-name-r7'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261029-student-name-r7/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
