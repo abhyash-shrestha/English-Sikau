@@ -58,7 +58,7 @@ function runPreview(){
   getItem:key=>store.get(key)||null,
   setItem:(key,value)=>store.set(key,value)
  };
- const context={document,localStorage,navigator:{},URL,URLSearchParams,
+ const context={document,localStorage,navigator:{},location:{hash:'#uid=teststudent123'},URL,URLSearchParams,
   setTimeout,clearTimeout,scrollTo(){},console};
  context.window=context;
  const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(x=>x.trim());
