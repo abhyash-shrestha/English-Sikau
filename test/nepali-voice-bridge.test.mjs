@@ -147,3 +147,46 @@ test('Recognize clearly labeled Nepali male voices from other browser providers'
  assert.equal(win.__sikauNepaliVoice.available(),true);
  assert.equal(win.__sikauNepaliVoice.voiceReport().male,'Google Nepali Male');
 });
+
+
+test('Windows chooses a natural English voice over its robotic fallback',()=>{
+ const natural={name:'Microsoft Ava Online (Natural)',lang:'en-US'};
+ const fred={name:'Fred',lang:'en-US'};
+ const {win,synth,speaks}=mock([fred,natural]);
+ synth.speak({lang:'en-US',text:'Hello, how are you?',voice:null});
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].voice,natural.name);
+ assert.equal(win.__sikauNepaliVoice.voiceChoiceReport().english,natural.name);
+});
+
+test('Apple prefers human-like English voice instead of Fred',()=>{
+ const fred={name:'Fred',lang:'en-US'};
+ const samantha={name:'Samantha',lang:'en-US'};
+ const {synth,speaks}=mock([fred,samantha]);
+ synth.speak({lang:'en-US',text:'Read the next sentence',voice:null});
+ assert.equal(speaks[0].voice,'Samantha');
+});
+
+test('When Apple exposes only a novelty voice, preserve browser default',()=>{
+ const fred={name:'Fred',lang:'en-US'};
+ const {synth,speaks}=mock([fred]);
+ synth.speak({lang:'en-US',text:'Reading practice',voice:null});
+ assert.equal(speaks[0].voice,'');
+});
+
+test('Use Hemkala natural Nepali female if browser exposes her explicitly',()=>{
+ const nepaliGeneric={name:'Nepali Standard',lang:'ne-NP'};
+ const {win,synth,speaks}=mock([nepaliGeneric,hemkala]);
+ win.__sikauNepaliVoice.select('tr','female');
+ synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
+ assert.equal(speaks[0].voice,hemkala.name);
+});
+
+test('Keep original Nepali female output if no positively identified better voice exists',()=>{
+ const generic={name:'Nepali Standard',lang:'ne-NP'};
+ const {win,synth,speaks}=mock([generic]);
+ win.__sikauNepaliVoice.select('rd','female');
+ synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].voice,'');
+});
