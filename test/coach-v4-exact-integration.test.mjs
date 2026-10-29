@@ -10,13 +10,13 @@ const html=read('coach-v4-live.html');
 const originalConversationDataHash='ff89a5a06d89a055b5498a6c57628988c7bee4af8aa796f77bc3b57fd4fbee3c';
 const originalStore="const storeKey='english-sikau-175-preview-context-v4';";
 const newStore="const learnerToken=(new URLSearchParams(location.hash.slice(1))).get('uid')||''; const storeKey='english-sikau-175-preview-context-v4:'+(/^[A-Za-z0-9_-]{6,128}$/.test(learnerToken)?learnerToken:'standalone');";
-const closingBridge='<script src="./coach-v4-bridge.js?v=20261029-exact-v4-r1"></script>';
+const closingBridgePattern=/<script src="\.\/coach-v4-bridge\.js\?v=20261029-[^"]+"><\/script>/;
 const guardRegex=/<script>\/\* The paid lesson loads only inside its authenticated parent frame\. \*\/[\s\S]*?<\/script>/;
 
 test('Removing the review panel does not modify the approved 175-topic dialogue data',()=>{
  assert.ok(html.includes(newStore),'Per-user draft storage is missing');
  assert.ok(guardRegex.test(html),'Protected parent-frame guard is missing');
- assert.ok(html.includes(closingBridge),'V4 bridge is not loaded');
+ assert.match(html,closingBridgePattern,'V4 bridge is not loaded');
  const start=html.indexOf('const B='),end=html.indexOf('const learnerToken=',start);
  assert.ok(start>0&&end>start,'V4 conversation definitions must be intact');
  const hash=createHash('sha256').update(html.slice(start,end)).digest('hex');
@@ -117,8 +117,11 @@ test('All four selected language modes remain recognized without changing V4 ans
   assert.ok(mount.includes("'"+name+"'"),'Missing mode '+name+' in mount');
   assert.ok(bridge.includes("'"+name+"'"),'Missing mode '+name+' in bridge');
  }
- assert.match(bridge,/Roman Nepali topic names/);
- assert.match(bridge,/V4 conversation lines are currently in English/);
+ assert.match(bridge,/const topicTitleNe=/);
+ assert.match(bridge,/getElementById\('langPref'\)/);
+ assert.match(bridge,/sikau-v4-ne-dialogue-cache-v2/);
+ assert.match(bridge,/#chat-transcript \.bubble/);
+ assert.match(bridge,/#chat-choices \.answer-button/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren\(/);
 });
 
@@ -171,9 +174,43 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261029-scrollable-chat-r3'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261029-scrollable-chat-r3/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261029-all175-language-r4'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261029-all175-language-r4/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
+});
+
+
+test('Offline glossary has a stable Nepali title for every one of the 175 V4 topics',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ const match=bridge.match(/const topicTitleNe=(\{[\s\S]*?\});/);
+ assert.ok(match,'Full offline topic-title map is missing');
+ const map=JSON.parse(match[1]);
+ const preview=runPreview();
+ assert.equal(Object.keys(map).length,175);
+ for(const topic of preview.topics){
+  assert.ok(typeof map[topic.title]==='string',topic.title+' is missing');
+  assert.match(map[topic.title],/[\u0900-\u097f]/,topic.title+' is not translated');
+ }
+ assert.equal(preview.topics.length,175);
+});
+
+test('Shared language bridge covers all V4 message types and retries temporarily failed translations',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ for(const path of [
+  '#topic-grid .topic-card','#chat-transcript .bubble',
+  '#chat-choices .answer-button','#chat-title','#chat-role',
+  '#category-filters .category-chip','#complete-actions p'
+ ]){
+  assert.ok(bridge.includes(path),'Coach multilingual coverage missing: '+path);
+ }
+ assert.match(bridge,/function readLessonMode\(/);
+ assert.match(bridge,/function syncLessonMode\(/);
+ assert.match(bridge,/translateWithMyMemory/);
+ assert.match(bridge,/translateWithGoogle/);
+ assert.match(bridge,/retryAfter/);
+ assert.doesNotMatch(bridge,/failures>=4/,'Translation must not permanently disable itself');
+ const mount=read('coach-v4-mount.js');
+ assert.match(mount,/sikauCoachV4Translations/);
 });
