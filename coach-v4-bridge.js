@@ -23,7 +23,17 @@
  'html.sikau-v4-in-lesson :is(.topic-card,.bubble,.answer-button){overflow-wrap:anywhere}',
  'html.sikau-v4-in-lesson .sikau-v4-local{display:block;max-width:100%;margin-top:5px;font-size:clamp(11px,.9em,14px);font-weight:600;line-height:1.5;color:var(--muted);white-space:normal;overflow-wrap:anywhere;min-width:0}',
  'html.sikau-v4-in-lesson .sikau-v4-local>span{display:block;overflow-wrap:anywhere}',
- 'html.sikau-v4-in-lesson .answer-button .sikau-v4-local{font-size:12px;text-align:left}',
+ 'html.sikau-v4-in-lesson .answer-button > span:first-child{display:block;min-width:0;flex:1 1 auto;font-size:13px!important;color:var(--ink)!important;font-weight:400;line-height:1.45}',
+ 'html.sikau-v4-in-lesson .answer-button > span:last-child{flex:0 0 auto;font-size:23px;color:var(--pink)}',
+ 'html.sikau-v4-in-lesson .answer-button .sikau-v4-local{display:block;font-size:12px!important;color:var(--muted)!important;font-weight:600!important;line-height:1.48!important;text-align:left;margin-top:6px}',
+ 'html.sikau-v4-in-lesson .answer-button .sikau-v4-local>span{display:block;font-size:inherit!important;font-weight:inherit!important;line-height:inherit!important;color:inherit!important;letter-spacing:normal!important}',
+ 'html.sikau-v4-in-lesson .pager-controls{display:grid!important;grid-template-columns:minmax(76px,auto) minmax(0,1fr) minmax(76px,auto);align-items:stretch;gap:8px;width:min(100%,575px);max-width:100%;margin-inline:auto}',
+ 'html.sikau-v4-in-lesson .pager-controls .page-numbers{display:flex!important;min-width:0;width:100%;max-width:100%;align-items:center;justify-content:safe center;gap:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scroll-behavior:smooth;padding:3px 1px}',
+ 'html.sikau-v4-in-lesson .pager-controls .page-number{flex:0 0 auto;align-self:center}',
+ 'html.sikau-v4-in-lesson .pager-controls .page-nav{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:100%;min-width:0;min-height:54px;height:auto!important;padding:7px 8px;white-space:nowrap;text-align:center;line-height:1.25}',
+ 'html.sikau-v4-in-lesson .pager-controls .page-nav .sikau-v4-local{font-size:10px!important;font-weight:650!important;line-height:1.3!important;margin:2px 0 0;white-space:normal;max-width:100%;color:var(--muted)}',
+ 'html.sikau-v4-in-lesson .pager-controls .page-nav:disabled .sikau-v4-local{opacity:.85}',
+ '@media(max-width:440px){html.sikau-v4-in-lesson .pager-controls{grid-template-columns:minmax(70px,auto) minmax(0,1fr) minmax(70px,auto);gap:4px}html.sikau-v4-in-lesson .pager-controls .page-nav{font-size:11px;padding:6px 4px;min-height:52px}html.sikau-v4-in-lesson .pager-controls .page-numbers{gap:4px}}',
  'html.sikau-v4-in-lesson .bubble .sikau-v4-local{font-size:12px}',
  'html.sikau-v4-in-lesson .chat-header .sikau-v4-local{color:#f6dbea}',
  'html.sikau-v4-in-lesson .topic-card .sikau-v4-local{font-size:11px}',
@@ -339,7 +349,7 @@
  const vowel={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au'};
  const matra={'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au'};
  function romanize(input){
-  return String(input).replace(/[\u0900-\u097f]+/g,word=>{
+  const transliterated=String(input).replace(/[\u0900-\u097f]+/g,word=>{
    if(romanWords[word])return romanWords[word];
    const letters=Array.from(word);let out='';
    for(let i=0;i<letters.length;i++){
@@ -362,6 +372,13 @@
    }
    return out;
   });
+  return capitalizeRomanSentences(transliterated);
+ }
+ function capitalizeRomanSentences(value){
+  // Capitalize the first word and the first word after sentence-ending punctuation.
+  // Do not change names such as Abhyash or already-capitalized Nepali terms.
+  return String(value||'').replace(/(^[^A-Za-z]*|[.!?।॥]+[ \t]*|[\r\n]+[ \t]*)([a-z])/g,
+    (_,boundary,letter)=>boundary+letter.toUpperCase());
  }
 
  const sectionNames={
@@ -528,7 +545,7 @@
   if(mode==='en'||!english){node?.remove();return;}
   const ne=override?.ne||neFor(english);
   if(!ne){node?.remove();return;}
-  const roman=override?.roman||romanize(ne);
+  const roman=capitalizeRomanSentences(override?.roman||romanize(ne));
   const parts=mode==='en-ne'?[['ne',ne]]:mode==='en-roman'?[['ne-Latn',roman]]:[['ne',ne],['ne-Latn',roman]];
   if(!node){node=document.createElement('span');node.className='sikau-v4-local';el.appendChild(node);}
   const html=parts.map(pair=>'<span lang="'+pair[0]+'">'+escapeHtml(pair[1])+'</span>').join('');
