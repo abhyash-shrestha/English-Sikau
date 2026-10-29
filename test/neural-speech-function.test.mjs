@@ -79,9 +79,10 @@ test('Rejects oversized requests without calling Azure',async()=>{
 
 
 test('Free-tier Gemini neural TTS path returns valid WAV, with no API key leakage',async()=>{
- const oldGemini=process.env.GEMINI_API_KEY,oldProvider=process.env.SPEECH_PROVIDER;
+ const oldGemini=process.env.GEMINI_API_KEY,oldProvider=process.env.SPEECH_PROVIDER,oldModel=process.env.GEMINI_TTS_MODEL;
  process.env.GEMINI_API_KEY='gemini-test-secret';
  process.env.SPEECH_PROVIDER='gemini';
+ process.env.GEMINI_TTS_MODEL='gemini-2.5-flash-preview-tts';
  try{
   const calls=[];
   globalThis.fetch=async(url,options)=>{
@@ -110,6 +111,8 @@ test('Free-tier Gemini neural TTS path returns valid WAV, with no API key leakag
   else process.env.GEMINI_API_KEY=oldGemini;
   if(oldProvider===undefined)delete process.env.SPEECH_PROVIDER;
   else process.env.SPEECH_PROVIDER=oldProvider;
+  if(oldModel===undefined)delete process.env.GEMINI_TTS_MODEL;
+  else process.env.GEMINI_TTS_MODEL=oldModel;
  }
 });
 
@@ -131,9 +134,9 @@ test('Gemini 3.8 sends exact transcript with separate natural delivery metadata 
   globalThis.fetch=async(url,options)=>{
    requests.push({url:String(url),options});
    if(String(url).endsWith('/account'))return userResponse;
-   return {ok:true,json:async()=>({candidates:[{content:{parts:[{
-    inlineData:{mimeType:'audio/wav',data:wav.toString('base64')}
-   }]}}]})};
+   return {ok:true,json:async()=>({steps:[{type:'model_output',content:[{
+    type:'audio',mime_type:'audio/wav',data:wav.toString('base64')
+   }]}]})};
   };
   const {res,result}=response();
   await speak({req:request('म आज काठमाडौँ जाँदैछु।','ne-NP','female'),res});
@@ -142,11 +145,12 @@ test('Gemini 3.8 sends exact transcript with separate natural delivery metadata 
   assert.equal(result.data.model,'gemini-3.8-flash-tts');
   const output=Buffer.from(result.data.audioBase64,'base64');
   assert.deepEqual(output,wav,'Do not wrap Gemini WAV data in another WAV header');
-  assert.match(requests[1].url,/gemini-3\.8-flash-tts:generateContent/);
+  assert.match(requests[1].url,/\/v1beta\/interactions$/);
   const input=JSON.parse(requests[1].options.body);
-  assert.equal(input.contents[0].parts[0].text,'म आज काठमाडौँ जाँदैछु।');
-  assert.match(input.contents[0].parts[0].speech_metadata.style,/Nepal/);
-  assert.equal(input.generationConfig.speechConfig.voiceConfig.voice,'Kore');
+  assert.equal(input.model,'gemini-3.8-flash-tts');
+  assert.equal(input.input[0].content[0].text,'म आज काठमाडौँ जाँदैछु।');
+  assert.match(input.input[0].content[0].annotations[0].style,/Nepal/);
+  assert.equal(input.generation_config.speech_config[0].voice,'Kore');
  }finally{
   if(beforeKey===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=beforeKey;
   if(beforeProvider===undefined)delete process.env.SPEECH_PROVIDER;else process.env.SPEECH_PROVIDER=beforeProvider;
@@ -164,14 +168,22 @@ test('Gemini unsupported model environment setting cannot select an arbitrary UR
   globalThis.fetch=async(url,options)=>{
    calls.push(String(url));
    if(String(url).endsWith('/account'))return userResponse;
-   return {ok:true,json:async()=>({candidates:[{content:{parts:[{
-    inlineData:{mimeType:'audio/L16;rate=24000',data:Buffer.from([1,0,2,0]).toString('base64')}
-   }]}}]})};
+   return {ok:true,json:async()=>({steps:[{type:'model_output',content:[{
+    type:'audio',mime_type:'audio/wav',data:(()=>{
+      const data=Buffer.alloc(48);data.write('RIFF',0);data.writeUInt32LE(40,4);
+      data.write('WAVEfmt ',8);data.writeUInt32LE(16,16);
+      data.writeUInt16LE(1,20);data.writeUInt16LE(1,22);
+      data.writeUInt32LE(24000,24);data.writeUInt32LE(48000,28);
+      data.writeUInt16LE(2,32);data.writeUInt16LE(16,34);
+      data.write('data',36);data.writeUInt32LE(4,40);
+      return data.toString('base64');
+     })()
+   }]}]})};
   };
   const {res,result}=response();
   await speak({req:request('Hello.','en-US','male'),res});
   assert.equal(result.status,200);
-  assert.match(calls[1],/gemini-3\.8-flash-tts:generateContent/);
+  assert.match(calls[1],/\/v1beta\/interactions$/);
  }finally{
   if(beforeModel===undefined)delete process.env.GEMINI_TTS_MODEL;else process.env.GEMINI_TTS_MODEL=beforeModel;
   if(beforeProvider===undefined)delete process.env.SPEECH_PROVIDER;else process.env.SPEECH_PROVIDER=beforeProvider;
