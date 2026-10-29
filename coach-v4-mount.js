@@ -84,7 +84,11 @@
    const mode=['en','en-ne','en-roman','all'].includes(control)?control:
      (doc.defaultView?.__sikauLanguageDisplay?.getMode?.()||'en');
    const root=doc.documentElement;
-   const theme=root.dataset.sikauTheme==='dark'||root.getAttribute('data-theme')==='dark'?'dark':'light';
+   // The signed-in parent window is the source of truth for theme. The
+   // protected lesson may still be initializing its own data-theme value.
+   const parentMode=document.documentElement.dataset.sikauTheme;
+   const theme=['dark','light'].includes(parentMode)?parentMode:
+    root.dataset.sikauTheme==='dark'||root.getAttribute('data-theme')==='dark'?'dark':'light';
    frame.contentWindow.postMessage({
     type:'sikau-v4-config',mode,theme,titles:buildTitles()
    },'*');
@@ -113,6 +117,12 @@
    observer.observe(doc.documentElement,{
     attributes:true,attributeFilter:['data-sikau-theme','data-theme','data-sikau-display-language']
    });
+   // A main-header theme change must notify an already open Coach frame.
+   try{
+    new MutationObserver(sendConfiguration).observe(document.documentElement,{
+     attributes:true,attributeFilter:['data-sikau-theme','data-theme']
+    });
+   }catch(_){}
   }
  };
 })();
