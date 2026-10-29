@@ -70,3 +70,49 @@ test('Native app retains layout and keeps V4 off in untranslated language modes'
  assert.match(dash,/window\.sikauV4Story\.choose\(active,item,index\)/);
  assert.doesNotMatch(dash,/iframe.*sikauV4|replaceChildren\(.*sikauV4/);
 });
+
+test('Native café reproduces the reviewed V4 words and honors a change of mind',()=>{
+ const api=load().sikauV4Story;
+ const a=api.start({id:'coffee',title:'Order at a café'});
+ assert.equal(a.steps[0].npc,'Hi! Welcome to our café. What can I make for you today?');
+ assert.equal(a.steps[0].storeOptions[0].value,'I would like a coffee, please.');
+ function pick(label){
+  const current=a.steps.at(-1),item=current.storeOptions.find(x=>x.value===label);
+  assert.ok(item,'Missing expected V4 answer: '+label);
+  api.choose(a,item,a.steps.length-1);
+ }
+ pick('I would like a coffee, please.');
+ assert.equal(a.steps.at(-1).npc,'Of course. Do you prefer a hot coffee or something iced?');
+ pick('A small hot latte, please.');
+ assert.equal(a.steps.at(-1).npc,'Sure. Would you like regular milk or a different kind?');
+ pick('Regular milk and no extra sugar, please.');
+ assert.match(a.steps.at(-1).npc,/Got it: small hot latte/);
+ pick('To go, please.');
+ assert.match(a.steps.at(-1).npc,/takeaway/);
+ pick('Actually, I do not want to order anymore.');
+ assert.match(a.steps.at(-1).npc,/Nothing has been prepared or charged/);
+ assert.equal(a.v4Completed,false,'The source still allows a natural goodbye');
+ assert.equal(a.v4State.cafe.canceled,true);
+ const candidates=a.steps.at(-1).storeOptions.map(o=>o.value);
+ assert.ok(candidates.some(x=>/thank|goodbye|have a good/i.test(x)),
+  'Café cancellation must lead to a natural closing, not payment');
+});
+test('The source café final response is visible without fake additional options',()=>{
+ const api=load().sikauV4Story,a=api.start({id:'coffee',title:'Order at a café'});
+ let turn=0;
+ while(!a.v4Completed&&turn++<22){
+  const item=a.steps.at(-1).storeOptions[0];
+  assert.ok(item);
+  api.choose(a,item,a.steps.length-1);
+ }
+ assert.ok(a.v4Completed,'Café interaction never finished');
+ assert.ok(a.v4FinalReply,'The terminal NPC message disappeared');
+ assert.ok(!a.steps.at(-1).storeOptions.some(x=>x.next==='v4-close'),
+  'Added goodbye answer not present in the V4 preview');
+});
+test('V4 is enabled only when learner selects English on the actual language control',()=>{
+ const source=read('coach-dashboard.js');
+ assert.match(source,/doc\.getElementById\('langPref'\)\?\.value/);
+ assert.match(source,/languageMode==='en'&&window\.sikauV4Story/);
+ assert.doesNotMatch(source,/const languageMode=doc\.documentElement\?\.getAttribute/);
+});
