@@ -1081,7 +1081,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    coachStyle:typeof saved.coachStyle==='string'?saved.coachStyle.slice(0,100):'Conversation',
    isBranchingStore:!!saved.isBranchingStore,storeState:state,
    isBranchingV4:!!saved.isBranchingV4,v4State:saved.v4State||null,
-   v4Completed:!!saved.v4Completed,
+   v4Completed:!!saved.v4Completed,v4FinalReply:saved.v4FinalReply||'',
    storeCompleted:!!saved.storeCompleted,
    isBranchingStory:!!saved.isBranchingStory,storyState:saved.storyState||{scene:scene.id,path:0,detail:null},
    storyCompleted:!!saved.storyCompleted};
@@ -1157,8 +1157,12 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   // Reviewed V4 dialogue is currently enabled in English-only mode.
   // Keep the established bilingual engine for the other three modes until
   // the reviewed V4 lines have accurate Nepali translations.
-  const languageMode=doc.documentElement?.getAttribute('data-sikau-display-language')||
-   doc.defaultView?.__sikauLanguageDisplay?.getMode?.()||'en-ne';
+  // The actual preference control inside the lesson frame is authoritative;
+  // the HTML data attribute may not have been populated on first Coach open.
+  const selectMode=doc.getElementById('langPref')?.value;
+  const languageMode=['en','en-ne','en-roman','all'].includes(selectMode)?
+   selectMode:(doc.defaultView?.__sikauLanguageDisplay?.getMode?.()||
+    doc.documentElement?.getAttribute('data-sikau-display-language')||'en-ne');
   if(languageMode==='en'&&window.sikauV4Story){
    const story=window.sikauV4Story.start(original);
    if(story){story.coachPracticeNumber=practiceNumber+1;return story;}
@@ -1327,6 +1331,8 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    const done=add(doc,stage,'div','sikau-convo-complete');
    add(doc,done,'div','sikau-convo-complete-icon','🏆');
    add(doc,done,'h3','','You finished the conversation!');
+   if(active.isBranchingV4&&active.v4FinalReply)
+    add(doc,done,'p','sikau-convo-final-reply',(active.partner||'Conversation partner')+': '+active.v4FinalReply);
    add(doc,done,'p','','तपाईंले वास्तविक जीवनको कुराकानी अभ्यास पूरा गर्नुभयो।');
    add(doc,done,'p','',active.steps.length+' turns practiced · '+successful+' guided responses completed');
    if(active.isBranchingV4||active.isBranchingStore||active.isBranchingStory)add(doc,done,'p','','Your choices shaped this conversation. · तपाईंको उत्तरले यो कथा परिवर्तन गर्‍यो।');
@@ -1427,6 +1433,8 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    add(doc,result,'strong','','💬 Good choice! · राम्रो छनोट');
    add(doc,result,'p','','You chose: '+item.value);
    if(showNepali)add(doc,result,'small','',item.ne);
+   if(active.isBranchingV4&&active.v4Completed&&active.v4FinalReply)
+    add(doc,result,'p','sikau-convo-final-reply',(active.partner||'Conversation partner')+': '+active.v4FinalReply);
    if(item.branch||item.followup)add(doc,result,'small','','Your next chat message will reflect this choice. · अबको कुराकानी यसैअनुसार अघि बढ्नेछ।');
    const next=add(doc,result,'button','sikau-convo-primary',
     ((active.isBranchingV4&&active.v4Completed)||(active.isBranchingStore&&active.storeCompleted)||(active.isBranchingStory&&active.storyCompleted)||(!active.isBranchingV4&&!active.isBranchingStore&&!active.isBranchingStory&&index===active.steps.length-1))?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
