@@ -211,11 +211,16 @@
    try{
     // Request the next segment while the current segment is playing to
     // avoid long unnatural gaps between full Reading paragraphs.
-    const fetchChunk=chunk=>view.parent.sikauNeuralSpeech({text:chunk,lang,gender});
+    const fetchChunk=async chunk=>{
+     try{return {ok:true,result:await view.parent.sikauNeuralSpeech({text:chunk,lang,gender})};}
+     catch(error){return {ok:false,error};}
+    };
     let next=fetchChunk(chunks[0]);
     for(let i=0;i<chunks.length;i++){
-     const result=await next;
+     const response=await next;
      if(ticket!==neuralSerial)return;
+     if(!response.ok)throw response.error;
+     const result=response.result;
      if(i+1<chunks.length)next=fetchChunk(chunks[i+1]);
      if(!neuralContext)throw Error('Audio playback needs a user gesture');
      const binary=view.atob(result.audioBase64);
@@ -225,13 +230,13 @@
      if(ticket!==neuralSerial)return;
      if(neuralContext.state!=='running')await neuralContext.resume();
      if(ticket!==neuralSerial)return;
-     await new Promise(resolve=>{
+     await new Promise((resolve,reject)=>{
       const source=neuralContext.createBufferSource();
       neuralSource=source;
       source.buffer=buffer;
       source.connect(neuralContext.destination);
       source.onended=resolve;
-      source.start(0);
+      try{source.start(0)}catch(error){reject(error)}
      });
      if(ticket!==neuralSerial)return;
      neuralSource=null;
