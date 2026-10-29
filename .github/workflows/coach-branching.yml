@@ -5,6 +5,7 @@ on:
       - 'coach-*.js'
       - 'test/coach-*.test.mjs'
       - 'index.html'
+      - 'coach-v4-approved-lab.html'
       - 'coach-dashboard.css'
       - '.github/workflows/coach-branching.yml'
 jobs:
@@ -26,5 +27,7 @@ jobs:
           node --check coach-drafts.js
           node --check coach-pagination.js
           node --check coach-dashboard.js
+          node --check coach-v4-adapter.js
+          node --check coach-v4-translations.js
       - name: Run context and topic regression tests
-        run: node --test test/coach-context-paths.test.mjs test/coach-context-first.test.mjs test/coach-expanded-topics.test.mjs test/coach-pagination.test.mjs
+        run: node --test test/coach-context-paths.test.mjs test/coach-context-first.test.mjs test/coach-expanded-topics.test.mjs test/coach-pagination.test.mjs test/coach-v4-integration.test.mjs
