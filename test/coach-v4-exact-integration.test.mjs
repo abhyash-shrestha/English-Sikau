@@ -17,7 +17,7 @@ test('Removing the review panel does not modify the approved 175-topic dialogue 
  assert.ok(html.includes(newStore),'Per-user draft storage is missing');
  assert.ok(guardRegex.test(html),'Protected parent-frame guard is missing');
  assert.ok(html.includes(closingBridge),'V4 bridge is not loaded');
- const start=html.indexOf('const B='),end=html.indexOf('const storeKey=',start);
+ const start=html.indexOf('const B='),end=html.indexOf('const learnerToken=',start);
  assert.ok(start>0&&end>start,'V4 conversation definitions must be intact');
  const hash=createHash('sha256').update(html.slice(start,end)).digest('hex');
  assert.equal(hash,originalConversationDataHash,'Original V4 questions, choices, and branching rules must be identical');
