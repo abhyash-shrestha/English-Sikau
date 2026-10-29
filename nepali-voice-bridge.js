@@ -63,9 +63,8 @@
    notice=label;noticeScope=scope;
   }
   function sayUnavailable(scope){
-   status(scope,'A genuine Nepali male voice is not available in this browser. '+
-    'The female voice was not used. A dedicated Nepali male speech service (such as Sagar) is required. '+
-    '· वास्तविक नेपाली पुरुष आवाज यहाँ उपलब्ध छैन। महिला आवाज बजाइएको छैन।');
+   status(scope,'Male Nepali voice unavailable on this device. Female was not substituted. '+
+    '· नेपाली पुरुष आवाज उपलब्ध छैन। महिला आवाज बजाइएको छैन।');
   }
   function chooseGender(scope,gender){
    if(!scope||!gender)return;
@@ -85,7 +84,7 @@
     let label=voiceLabel(control);
     if(control.tagName==='SELECT'){
      const option=control.options?.[control.selectedIndex];
-     label+=' '+(option?.textContent||'');
+     label=String(option?.textContent||'')+' '+String(option?.value||'');
     }
     const gender=genderOf(label);
     if(gender)return gender;
@@ -137,7 +136,9 @@
    active=scope;
    let control=e.target?.closest?.('button,label,input,select,[role="radio"],[role="button"]');
    if(!control)return;
-   const gender=genderOf(voiceLabel(control));
+   const option=control.tagName==='SELECT'?control.options?.[control.selectedIndex]:null;
+   const gender=genderOf((option?.textContent||'')+' '+(option?.value||'')+
+    (option?'':voiceLabel(control)));
    if(gender)chooseGender(scope,gender);
    else {
     const current=selectedGender(scope);
