@@ -57,6 +57,10 @@
   return true;
  }
  mode=readLessonMode();
+ try{
+  const localTitles=window.parent.__sikauCoachV4Translations;
+  if(localTitles&&typeof localTitles==='object')titles=localTitles;
+ }catch(_){}
  function subtitle(t){
   if(!t||mode==='en')return '';
   if(mode==='en-ne')return t.ne||'';
@@ -327,7 +331,7 @@
   // If the selector is not available, use the validated message value.
   mode=readLessonMode();
   if(!modes.has(mode)&&modes.has(next.mode))mode=next.mode;
-  titles=next.titles&&typeof next.titles==='object'?next.titles:Object.create(null);
+  if(next.titles&&typeof next.titles==='object'&&Object.keys(next.titles).length)titles=next.titles;
   // V4 owns an internal dark-mode state. Toggle its own control when the
   // parent theme changes so the next V4 render cannot reset the selection.
   const desired=next.theme==='dark'?'dark':'light';
