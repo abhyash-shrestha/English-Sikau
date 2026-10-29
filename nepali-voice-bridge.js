@@ -44,17 +44,46 @@
    /[\u0900-\u097f]/.test(String(utterance?.text||''))&&
    !/^(?:hi|mr|sa)(?:-|$)/.test(lang);
  };
- const isAuthenticMale=voice=>{
-  const lang=String(voice?.lang||'').toLowerCase().replace('_','-');
-  const name=String(voice?.name||'');
-  // The platform API has no gender field: only well-identified Nepali
-  // male voices qualify. "Sagar" is the native Nepali male neural voice.
-  return (lang==='ne'||lang.startsWith('ne-'))&&/(?:^|[^a-z])sagar(?:[^a-z]|$)/i.test(name);
+ // Web Speech does not provide a standardized gender property, so use
+ // only positively identified male Nepali voices. Do not infer gender from
+ // pitch, an arbitrary voice-list position, or an unrelated Hindi voice.
+ const nepaliVoices=synth=>{
+  try{return Array.from(synth?.getVoices?.()||[]).filter(v=>
+   /^(?:ne|ne-np)(?:-|$)/i.test(String(v?.lang||'').replace('_','-')));
+  }catch(_){return[];}
  };
+ const providerOf=voice=>{
+  const name=String(voice?.name||'');
+  if(/microsoft|azure|sagar|hemkala/i.test(name))return 'Microsoft';
+  if(/google/i.test(name))return 'Google';
+  if(/apple|siri|samantha/i.test(name))return 'Apple';
+  if(/samsung/i.test(name))return 'Samsung';
+  return '';
+ };
+ const isAuthenticMale=voice=>{
+  if(!nepaliVoices({getVoices:()=>[voice]}).length)return false;
+  const name=String(voice?.name||'');
+  return /(?:^|[^a-z])sagar(?:[^a-z]|$)/i.test(name)||
+    /(?:^|[^a-z])male(?:[^a-z]|$)/i.test(name)||
+    /पुरुष|पुरूष/.test(name)||
+    voice?.gender==='Male';
+ };
+ const identifiedFemale=voices=>voices.find(v=>
+  /(?:^|[^a-z])hemkala(?:[^a-z]|$)|(?:^|[^a-z])female(?:[^a-z]|$)|महिला/i.test(String(v.name||'')));
  function firstMale(synth){
-  try{return Array.from(synth.getVoices?.()||[]).find(isAuthenticMale)||null;}
-  catch(_){return null;}
+  const voices=nepaliVoices(synth),males=voices.filter(isAuthenticMale);
+  const female=identifiedFemale(voices),provider=providerOf(female);
+  return males.find(v=>provider&&providerOf(v)===provider)||males[0]||null;
  }
+ const voiceReport=synth=>{
+  const voices=nepaliVoices(synth);
+  return {
+   available:voices.map(v=>({name:String(v.name||'Unnamed voice'),lang:String(v.lang||'ne-NP'),
+    provider:providerOf(v)||'Browser/device',identifiedMale:isAuthenticMale(v)})),
+   identifiedFemale:identifiedFemale(voices)?.name||null,
+   male:firstMale(synth)?.name||null
+  };
+ };
  function install(d){
   if(!d?.body||!d.defaultView)return false;
   const view=d.defaultView,synth=view.speechSynthesis;
@@ -90,8 +119,13 @@
    notice=label;noticeScope=scope;
   }
   function sayUnavailable(scope){
-   status(scope,'Male Nepali voice unavailable on this device. Female was not substituted. '+
-    '· नेपाली पुरुष आवाज उपलब्ध छैन। महिला आवाज बजाइएको छैन।');
+   const info=voiceReport(synth);
+   const names=info.available.slice(0,3).map(v=>v.name).join(', ');
+   status(scope,'No male Nepali voice is available in this browser. '+
+    (names?'Detected: '+names+'. ':'No Nepali voices reported. ')+
+    'The female voice cannot be converted into a native male voice. '+
+    'Microsoft Sagar requires a speech provider connection when not installed. '+
+    '· नेपाली पुरुष आवाज यस ब्राउजरमा छैन।');
   }
   function chooseGender(scope,gender){
    if(!scope||!gender)return;
@@ -100,7 +134,8 @@
    // Switching while a sentence plays must never finish in the old voice.
    try{synth.cancel()}catch(_){};
    if(gender==='male'){
-    if(firstMale(synth))status(scope,'Nepali male voice available: Sagar · नेपाली पुरुष आवाज उपलब्ध छ।');
+    const found=firstMale(synth);
+    if(found)status(scope,'Nepali male voice: '+found.name+' · नेपाली पुरुष आवाज उपलब्ध छ।');
     else sayUnavailable(scope);
    }else status(scope,'');
   }
@@ -179,13 +214,14 @@
   d.addEventListener('change',scan,true);
   if(typeof synth.addEventListener==='function')synth.addEventListener('voiceschanged',()=>{
    for(const scope of ['tr','rd'])if(genders[scope]==='male'){
-    if(firstMale(synth))status(scope,'Nepali male voice available: Sagar · नेपाली पुरुष आवाज उपलब्ध छ।');
+    if(firstMale(synth))status(scope,'Nepali male voice: '+firstMale(synth).name+' · नेपाली पुरुष आवाज उपलब्ध छ।');
     else sayUnavailable(scope);
    }
   });
   view.__sikauNepaliVoiceInstalled=true;
   view.__sikauNepaliVoice={
-   isAuthenticMale,genderOf,controlGender,firstMale:()=>firstMale(synth),
+   isAuthenticMale,genderOf,controlGender,voiceReport:()=>voiceReport(synth),
+   firstMale:()=>firstMale(synth),
    select:chooseGender,available:()=>!!firstMale(synth),
    speakNepali:(text,scope='tr')=>{
     if(scope==='tr'||scope==='rd')active=scope;
