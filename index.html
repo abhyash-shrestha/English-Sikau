@@ -3168,7 +3168,7 @@ async function openFile(token='',isTrial=false){
     const qualityInstalled=qualityEntry.test(repairedHtml);
     const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>lightningTimingPatch+'\n'+writingQualityPatch+'\n'+m):repairedHtml;
     if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
-    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261028-all-languages-r4',location.href).href;
+    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261029-roman-spacing-r5',location.href).href;
     const languageScriptTag='<scr'+'ipt src="'+languageScriptUrl+'"></scr'+'ipt>';
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):

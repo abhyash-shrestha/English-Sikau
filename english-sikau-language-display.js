@@ -21,7 +21,7 @@
  const vowels={अ:'a',आ:'aa',इ:'i',ई:'ee',उ:'u',ऊ:'oo',ऋ:'ri',ए:'e',ऐ:'ai',ओ:'o',औ:'au'};
  const marks={'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॅ':'e','ॉ':'o'};
  const dictionary={
-  'नमस्ते':'namaste','मेरो':'mero','हाम्रो':'hamro','कक्षा':'kaksha','अभ्यास':'abhyas',
+  'नमस्ते':'namaste','मेरो':'mero','हाम्रो':'hamro','कक्षा':'kaksha','अभ्यास':'Abhyash',
   'अंग्रेजी':'angreji','नेपाली':'nepali','शब्दहरू':'shabdaharu','अनुवाद':'anuwad',
   'लेखन':'lekhan','खेल':'khel','प्रगति':'pragati','बोल्ने':'bolne','बोल्नुहोस्':'bolnuhos',
   'पढ्नुहोस्':'padhnuhos','हेर्नुहोस्':'hernuhos','सिक्नुहोस्':'siknuhos','सिकौं':'sikaun',
@@ -34,7 +34,7 @@
   'हुन्छ':'hunchha','छैन':'chhaina','ठीक':'thik','धन्यवाद':'dhanyabad','स्वागत':'swagat',
   'गर्नुहोस्':'garnuhos','गर्न':'garna','जानुहोस्':'januhos','सोध्नुहोस्':'sodhnuhos',
   'उत्तर':'uttar','प्रश्न':'prashna','सही':'sahi','गलत':'galat','अर्को':'arko','पछाडि':'pachhadi',
-  'अगाडि':'agadi','फेरि':'pheri','सुरु':'suru','समाप्त':'samapta','अभ्यासहरू':'abhyasharu',
+  'अगाडि':'agadi','फेरि':'pheri','सुरु':'suru','समाप्त':'samapta','अभ्यासहरू':'Abhyashharu',
   'साथी':'sathi','परिवार':'pariwar','शुभकामना':'shubhakamana','अधिक':'adhik',
   'बुझ्नुहोस्':'bujhnuhos','थप':'thap','सजिलो':'sajilo','कठिन':'kathin',
   'रकम':'rakam','मूल्य':'mulya','रुपैयाँ':'rupaiyan','कृपया':'kripaya',
@@ -45,7 +45,7 @@
  const skip='script,style,noscript,template,svg,math,textarea,input,select,option,[contenteditable],[data-norz],.sikau-lang-token,.sikau-lang-roman,.roman,[lang="ne-Latn"]';
  function romanize(part){
   // Roman Nepali is a phonetic rendering of Nepali, not an English translation.
-  return String(part).replace(/[\u0900-\u097f]+/g,word=>{
+  return String(part).replace(/[\u0900-\u0963\u0966-\u097f]+|[।॥]/g,word=>{
    if(dictionary[word])return dictionary[word];
    let out='';
    const chars=Array.from(word);
@@ -78,9 +78,12 @@
   // Every Devanagari token uses the original textContent in the DOM. Its
   // visible Roman form comes from an attribute/pseudo-element only.
   'html[data-sikau-display-language="en"] .sikau-lang-token{display:none!important}',
-  'html[data-sikau-display-language="en-roman"] .sikau-lang-token{font-size:0!important;letter-spacing:0!important}',
-  'html[data-sikau-display-language="en-roman"] .sikau-lang-token::after{content:attr(data-sikau-roman)!important;font-size:var(--sikau-roman-size,14px)!important;font-family:inherit!important;letter-spacing:normal!important;line-height:normal!important;white-space:pre-wrap!important}',
-  'html[data-sikau-display-language="all"] .sikau-lang-token::after{content:" (" attr(data-sikau-roman) ")"!important;font-size:.93em!important;letter-spacing:normal!important;white-space:pre-wrap!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-token{font-size:0!important;line-height:0!important;letter-spacing:0!important;white-space:normal!important;vertical-align:baseline!important}',
+  'html[data-sikau-display-language="en-roman"] .sikau-lang-token::after{content:attr(data-sikau-roman)!important;display:inline!important;font-size:var(--sikau-roman-size,14px)!important;font-family:inherit!important;letter-spacing:normal!important;line-height:1.45!important;vertical-align:baseline!important;white-space:normal!important;overflow-wrap:anywhere!important}',
+  'html[data-sikau-display-language="all"] .sikau-lang-token::after{content:" · " attr(data-sikau-roman)!important;display:inline!important;font-size:clamp(11px,.82em,17px)!important;font-family:inherit!important;line-height:1.4!important;letter-spacing:normal!important;white-space:normal!important;overflow-wrap:anywhere!important;vertical-align:baseline!important}',
+  // Roman modes must wrap within mobile cards/buttons rather than overlap.
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) :is(.sikau-chat-message-body,.sikau-chat-option-copy,.sikau-convo-situation,.sikau-convo-stage,.sikau-ui-intro-copy,.sikau-home-intro,.sikau-festival-preview,.sikau-future-festival,.sikau-visa-main,.content,.nav,.sikau-convo){min-width:0!important;overflow-wrap:anywhere!important}',
+  'html:is([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) :is(.sikau-convo-situation,.sikau-chat-option,.sikau-festival-preview,.sikau-ui-intro){height:auto!important}',
   // Respect native bilingual controls without hiding unrelated English text.
   'html[data-sikau-display-language="en"] .i18n-sub{display:none!important}',
   'html[data-sikau-display-language="en-ne"] .i18n-sub .roman{display:none!important}',
@@ -143,7 +146,7 @@
    if(!p||p.closest(skip))continue;
    const raw=n.nodeValue||'';
    if(!hasNe.test(raw))continue;
-   const parts=raw.split(/([\u0900-\u097f]+)/g);
+   const parts=raw.split(/([\u0900-\u0963\u0966-\u097f]+(?:[ \t\u00a0]+[\u0900-\u0963\u0966-\u097f]+)*(?:[।॥])?)/g);
    if(parts.length<=1)continue;
    const frag=d.createDocumentFragment();
    let changed=false;
