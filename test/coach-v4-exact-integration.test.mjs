@@ -139,6 +139,10 @@ test('Coach dark mode follows the authenticated app and preserves the V4 render 
  assert.match(bridge,/window\.top\.document\.documentElement/);
  assert.match(bridge,/function applyCoachTheme\(/);
  assert.match(bridge,/SikauPreview\?\.setTheme/);
+ const mount=read('coach-v4-mount.js');
+ assert.match(mount,/const parentMode=document\.documentElement\.dataset\.sikauTheme/);
+ assert.match(mount,/MutationObserver\(sendConfiguration\)\.observe\(document\.documentElement/);
+ assert.match(bridge,/applyCoachTheme\(\)/);
  assert.match(bridge,/attributeFilter:\['data-sikau-theme','data-theme'\]/);
  assert.doesNotMatch(bridge,/getElementById\('theme-toggle'\)\?\.click\(\)/);
  assert.match(html,/setTheme:\(theme\)=>\{/);
@@ -180,8 +184,8 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261029-coach-layout-r5'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261029-coach-layout-r5/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261029-theme-sync-r6'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261029-theme-sync-r6/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
@@ -282,4 +286,14 @@ test('All sidebar tabs including Coach can be dragged on desktop and reordered o
  assert.match(src,/Alt\+ArrowUp Alt\+ArrowDown/);
  assert.match(css,/sikau-nav-dragging/);
  assert.match(css,/sikau-nav-drop-target/);
+});
+
+test('Desktop Coach drag uses native HTML5 drop and keeps touch reordering',()=>{
+ const src=read('sidebar-unified.js'),index=read('index.html');
+ assert.match(index,/sidebar-unified\.js\?v=20261029-desktop-tab-drag-r2/);
+ assert.match(src,/doc\.addEventListener\('dragstart'/);
+ assert.match(src,/e\.dataTransfer\.setData\('text\/plain','sikau-tab:'\+id\(b\)\)/);
+ assert.match(src,/applyDrop\(htmlDrag,e\.clientX,e\.clientY\)/);
+ assert.doesNotMatch(src,/b\.draggable=false;b\.removeAttribute\('draggable'\)/);
+ assert.match(src,/const touchStart=e=>/);
 });
