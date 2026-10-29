@@ -64,7 +64,8 @@ function runPreview(){
  const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
  assert.equal(inline.length,4,'Expected security guard and three V4 scripts');
  for(const script of inline)assert.doesNotThrow(()=>new Function(script),'JavaScript syntax invalid');
- for(const script of inline.slice(1))vm.runInNewContext(script,context,{timeout:25000});
+ const sandbox=vm.createContext(context);
+ for(const script of inline.slice(1))vm.runInContext(script,sandbox,{timeout:25000});
  return context.window.SikauPreview;
 }
 
