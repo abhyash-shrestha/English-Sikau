@@ -72,30 +72,59 @@ function wavFromPcm(pcm){
  pcm.copy(wav,44);
  return wav;
 }
+const GEMINI_TTS_MODELS=Object.freeze(new Set([
+ 'gemini-3.8-flash-tts',
+ 'gemini-3.8-flash-lite-tts',
+ 'gemini-2.5-flash-preview-tts'
+]));
 async function geminiAudio(text,lang,gender,key){
+ // Verified Google Gemini TTS doc: Gemini 3.8 returns a complete RIFF WAV
+ // for a unary generateContent request. The older 2.5 model instead
+ // returns headerless 24kHz/16-bit PCM in some responses.
  const name=gender==='male'?'Charon':'Kore';
- const direction=lang==='ne-NP'?
-  'Speak only in clear, natural Nepali as spoken in Nepal (not Hindi), in a warm human voice. Read these exact words without extra commentary: ':
-  'Speak the following exact English words naturally, warmly and clearly, with no commentary: ';
- const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent',{
+ const requested=String(process.env.GEMINI_TTS_MODEL||'gemini-3.8-flash-tts');
+ const model=GEMINI_TTS_MODELS.has(requested)?requested:'gemini-3.8-flash-tts';
+ const modern=model.startsWith('gemini-3.8-');
+ const style=lang==='ne-NP'
+  ?'Speak naturally in Nepali as a person from Nepal would. Conversational, friendly, warm, with smooth sentence rhythm and gentle pauses. Enunciate clearly, without a Hindi accent.'
+  :'Warm, natural conversational American English for an English learner. Expressive but not exaggerated. Clear consonants, relaxed pacing and appropriate emphasis.';
+ const part=modern?{text,speech_metadata:{style}}:{
+  text:(lang==='ne-NP'?'Speak natural Nepali from Nepal. ':'Speak natural English. ')+
+   'Read exactly this sentence without adding words: '+text
+ };
+ const voiceConfig=modern?{voice:name}:{prebuiltVoiceConfig:{voiceName:name}};
+ const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
   method:'POST',
   headers:{'x-goog-api-key':key,'Content-Type':'application/json'},
   body:JSON.stringify({
-   contents:[{parts:[{text:direction+'“'+text+'”'}]}],
-   generationConfig:{responseModalities:['AUDIO'],
-    speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:name}}}}
+   contents:[{role:'user',parts:[part]}],
+   generationConfig:{
+    responseModalities:['AUDIO'],
+    speechConfig:{voiceConfig}
+   }
   }),
-  signal:AbortSignal.timeout(18000)
+  signal:AbortSignal.timeout(20000)
  });
  if(!response.ok)throw Error(response.status===429?'rate-limit':'provider-unavailable');
  const json=await response.json();
  const block=json?.candidates?.[0]?.content?.parts?.find(part=>
-  part.inlineData?.data)?.inlineData;
- if(typeof block?.data!=='string')throw Error('No audio');
+  typeof part?.inlineData?.data==='string')?.inlineData;
+ if(typeof block?.data!=='string')throw Error('No audio data');
  const bytes=Buffer.from(block.data,'base64');
- const wav=wavFromPcm(bytes);
- return {mime:'audio/wav',voice:name,audioBase64:wav.toString('base64'),engine:'gemini-neural'};
+ const hasWavHeader=bytes.length>=44&&
+  bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WAVE';
+ const format=String(block.mimeType||'').toLowerCase();
+ if(format.includes('wav')&&!hasWavHeader)throw Error('Malformed WAV');
+ if(modern&&!hasWavHeader&&format&&!format.includes('pcm')&&!format.includes('l16'))
+  throw Error('Unrecognized audio format');
+ // Accept actual RIFF WAV unmodified to avoid double-header corruption,
+ // a common reason AI-generated audio is distorted or cannot play.
+ const wav=hasWavHeader?bytes:wavFromPcm(bytes);
+ if(wav.length<48||wav.length>1400000)throw Error('Audio too large');
+ return {mime:'audio/wav',voice:name,model,engine:'gemini-neural',
+  audioBase64:wav.toString('base64')};
 }
+
 export default async function({req,res}){
  const reply=(payload,code=200)=>res.json(payload,code,{
   'Cache-Control':'no-store','Pragma':'no-cache'
