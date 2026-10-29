@@ -57,11 +57,16 @@
    nav.classList.add('sikau-unified-sidebar');
    let saved=safeRead(win,STORAGE);
    let useLegacy=!Array.isArray(saved);
-   let suppressClick=false,drag=null,touchDrag=null,drop=null,frame=0,longPress=0;
+   let suppressClick=false,drag=null,touchDrag=null,htmlDrag=null,drop=null,frame=0,longPress=0;
    const update=()=>{
+     // Desktop native HTML drag is important for Coach and the other real
+     // tab buttons. Touch still uses the existing deliberate long-press sorter.
+     const nativeDrag=!!win.matchMedia?.('(min-width:768px) and (hover:hover)')?.matches;
      for(const b of tabs(nav)){
        b.classList.add('sikau-nav-unified');
-       b.draggable=false;b.removeAttribute('draggable');
+       b.draggable=nativeDrag;
+       if(nativeDrag)b.setAttribute('draggable','true');
+       else b.removeAttribute('draggable');
        b.setAttribute('aria-keyshortcuts','Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
        if(!b.hasAttribute('type'))b.type='button';
      }
@@ -102,7 +107,8 @@
      drop?.classList.remove('sikau-nav-drop-target');drop=null;
      drag?.button?.classList.remove('sikau-nav-dragging');
      touchDrag?.button?.classList.remove('sikau-nav-dragging');
-     drag=null;touchDrag=null;
+     htmlDrag?.classList.remove('sikau-nav-dragging');
+     drag=null;touchDrag=null;htmlDrag=null;
    };
    const highlight=(moving,x,y)=>{
      moving.classList.add('sikau-nav-dragging');
@@ -192,8 +198,35 @@
    doc.addEventListener('touchmove',touchMove,{capture:true,passive:false});
    doc.addEventListener('touchend',touchEnd,true);
    doc.addEventListener('touchcancel',clear,true);
-   nav.addEventListener('dragstart',e=>{
-     if(lookup(e)){e.preventDefault();e.stopImmediatePropagation();}
+   // Handle native desktop drag before the legacy lesson sorter can cancel
+   // the event. Only the original tab button is ever moved (never cloned).
+   doc.addEventListener('dragstart',e=>{
+     const b=lookup(e);
+     if(!b||!b.draggable)return;
+     clear();htmlDrag=b;
+     b.classList.add('sikau-nav-dragging');
+     try{
+       e.dataTransfer.effectAllowed='move';
+       e.dataTransfer.setData('text/plain','sikau-tab:'+id(b));
+     }catch(_){}
+     e.stopImmediatePropagation();
+   },true);
+   doc.addEventListener('dragover',e=>{
+     if(!htmlDrag)return;
+     if(e.cancelable)e.preventDefault();
+     if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+     highlight(htmlDrag,e.clientX,e.clientY);
+     e.stopImmediatePropagation();
+   },true);
+   doc.addEventListener('drop',e=>{
+     if(!htmlDrag)return;
+     if(e.cancelable)e.preventDefault();
+     e.stopImmediatePropagation();
+     applyDrop(htmlDrag,e.clientX,e.clientY);
+     clear();
+   },true);
+   doc.addEventListener('dragend',()=>{
+     if(htmlDrag)clear();
    },true);
    nav.addEventListener('click',e=>{
      if(!suppressClick||!lookup(e))return;
