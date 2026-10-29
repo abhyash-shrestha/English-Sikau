@@ -196,9 +196,17 @@
   if(classroom.dataset.sikauCompactClassroom!==visible)
    classroom.dataset.sikauCompactClassroom=visible;
   // Exact, natural full names are available to VoiceOver on the compact badge.
+  if(classroom.dataset.sikauOriginalAriaSaved!=='1'){
+   classroom.dataset.sikauOriginalAriaSaved='1';
+   classroom.dataset.sikauOriginalAria=classroom.getAttribute('aria-label')||'';
+  }
   if(mode==='en-roman'||mode==='all'){
    const label=first+' — My classroom, मेरो कक्षा, Mero kaksha';
    if(classroom.getAttribute('aria-label')!==label)classroom.setAttribute('aria-label',label);
+  }else{
+   const original=classroom.dataset.sikauOriginalAria||'';
+   if(original&&classroom.getAttribute('aria-label')!==original)classroom.setAttribute('aria-label',original);
+   else if(!original&&classroom.hasAttribute('aria-label'))classroom.removeAttribute('aria-label');
   }
  }
  function updateAccessibility(){
