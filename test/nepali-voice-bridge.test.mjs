@@ -171,7 +171,7 @@ test('When Apple exposes only a novelty voice, preserve browser default',()=>{
  const fred={name:'Fred',lang:'en-US'};
  const {synth,speaks}=mock([fred]);
  synth.speak({lang:'en-US',text:'Reading practice',voice:null});
- assert.equal(speaks[0].voice,hemkala.name);
+ assert.equal(speaks[0].voice,'');
 });
 
 test('Use Hemkala natural Nepali female if browser exposes her explicitly',()=>{
@@ -188,5 +188,5 @@ test('Keep original Nepali female output if no positively identified better voic
  win.__sikauNepaliVoice.select('rd','female');
  synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
  assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,hemkala.name);
+ assert.equal(speaks[0].voice,'');
 });
