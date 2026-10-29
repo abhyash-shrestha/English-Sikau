@@ -45,7 +45,7 @@
  const skip='script,style,noscript,template,svg,math,textarea,input,select,option,[contenteditable],[data-norz],.sikau-lang-token,.sikau-lang-roman,.roman,[lang="ne-Latn"]';
  function romanize(part){
   // Roman Nepali is a phonetic rendering of Nepali, not an English translation.
-  return String(part).replace(/[\u0900-\u097f]+/g,word=>{
+  return String(part).replace(/[\u0900-\u0963\u0966-\u097f]+|[।॥]/g,word=>{
    if(dictionary[word])return dictionary[word];
    let out='';
    const chars=Array.from(word);
