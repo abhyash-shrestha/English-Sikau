@@ -26,5 +26,9 @@ jobs:
           node --check coach-drafts.js
           node --check coach-pagination.js
           node --check coach-dashboard.js
+          node --check coach-v4-authored.js
+          node --check coach-v4-expanded.js
+          node --check coach-v4-decisions.js
+          node --check coach-v4-runtime.js
       - name: Run context and topic regression tests
-        run: node --test test/coach-context-paths.test.mjs test/coach-context-first.test.mjs test/coach-expanded-topics.test.mjs test/coach-pagination.test.mjs
+        run: node --test test/coach-context-paths.test.mjs test/coach-context-first.test.mjs test/coach-expanded-topics.test.mjs test/coach-pagination.test.mjs test/coach-v4-native.test.mjs
