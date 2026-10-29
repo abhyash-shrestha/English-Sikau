@@ -61,6 +61,7 @@
   if(!synth||typeof synth.speak!=='function')return false;
   if(view.__sikauNepaliVoiceInstalled)return true;
   const genders={tr:null,rd:null};
+  const lastGenderControl={tr:null,rd:null};
   let active='tr',notice=null,noticeScope=null;
   function status(scope,message){
    const root=d.getElementById(scope==='rd'?'rd':'tr');
@@ -73,8 +74,16 @@
     label.style.cssText='font:600 12px/1.5 system-ui,sans-serif;color:var(--muted,#687389);'+
      'margin:8px 0;padding:8px 10px;border:1px solid var(--border,#d4d9e4);'+
      'border-radius:9px;background:var(--soft,transparent)';
-    const target=root.querySelector('.ttx-result-actions,.story-actions,.read-v2-reading,.content');
-    (target||root).appendChild(label);
+    // Keep availability feedback beside the voice switch, not at the
+    // bottom of a long reading story where the learner cannot see it.
+    const control=lastGenderControl[scope];
+    const parent=control?.closest?.('.voice-options,.voice-controls,.voice-select,.story-actions,.ttx-result-actions')
+     ||control?.parentElement;
+    if(parent&&root.contains?.(parent))parent.appendChild(label);
+    else{
+     const target=root.querySelector('.ttx-result-actions,.story-actions,.read-v2-reading,.content');
+     (target||root).appendChild(label);
+    }
    }
    label.textContent=message;
    label.hidden=!message;
@@ -160,7 +169,7 @@
    let control=e.target?.closest?.('button,label,input,select,[role="radio"],[role="button"]');
    if(!control)return;
    const gender=controlGender(control);
-   if(gender)chooseGender(scope,gender);
+   if(gender){lastGenderControl[scope]=control;chooseGender(scope,gender);}
    else {
     const current=selectedGender(scope);
     if(current&&current!==genders[scope])chooseGender(scope,current);
