@@ -75,6 +75,9 @@
    for(const item of window.sikauMoreTopics||[])add(item.title,item.ne);
    return translations;
   };
+  // Same-origin fallback: Coach V4 can access topic translations even
+  // when a configuration message is delayed or missed in mobile Safari.
+  try{doc.defaultView.__sikauCoachV4Translations=buildTitles();}catch(_){}
   const sendConfiguration=()=>{
    if(!frame.contentWindow)return;
    const control=doc.getElementById('langPref')?.value;
