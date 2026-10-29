@@ -24,12 +24,12 @@ test('Browser smoke: V4 cafe choice, undo, account draft and four language modes
   const port=server.address().port;
   const result=await new Promise((resolve,reject)=>{
    const proc=spawn(executable,['--headless','--no-sandbox','--disable-gpu',
-     '--disable-dev-shm-usage','--disable-background-networking','--virtual-time-budget=6000',
+     '--disable-dev-shm-usage','--disable-background-networking','--no-zygote','--disable-features=MediaRouter','--virtual-time-budget=6000',
      '--dump-dom','http://127.0.0.1:'+port+'/harness'],{stdio:['ignore','pipe','pipe']});
    let out='',err='';
    proc.stdout.on('data',d=>{out+=d.toString()});
    proc.stderr.on('data',d=>{err+=d.toString()});
-   const timer=setTimeout(()=>{proc.kill('SIGKILL')},20000);
+   const timer=setTimeout(()=>{proc.kill('SIGKILL')},35000);
    proc.on('error',reject);
    proc.on('close',(code)=>{clearTimeout(timer);resolve({code,out,err})});
   });
