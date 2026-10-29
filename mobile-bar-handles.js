@@ -5,7 +5,7 @@
  'use strict';
  const TOP_KEY='sikau-mobile-top-hidden-v1';
  const BOTTOM_KEY='sikau-mobile-bottom-hidden-v1';
- const SHEET_URL=new URL('./mobile-bar-handles.css?v=20261028-handles-r1',document.baseURI).href;
+ const SHEET_URL=new URL('./mobile-bar-handles.css?v=20261029-manual-only-r2',document.baseURI).href;
  function saved(key){
   try{return window.localStorage.getItem(key)==='1';}catch(_){return false;}
  }
@@ -52,27 +52,32 @@
  }
  function installBottom(doc){
   const nav=doc?.querySelector('#mobileModes.nav');
-  const html=doc?.documentElement;
-  const win=doc?.defaultView;
+  const html=doc?.documentElement,win=doc?.defaultView;
   if(!nav||!html||!win||!doc.body)return;
   stylesheet(doc);
   syncLessonTop(document.getElementById('protected')?.classList.contains('sikau-mobile-top-hidden'),doc);
-  let button=doc.getElementById('sikauMobileBottomHandle');
-  if(button&&button.__nav!==nav){button.remove();button=null;}
-  if(button)return;
-  button=doc.createElement('button');
+  let rail=doc.getElementById('sikauMobileBottomHandleRail');
+  if(rail?.__nav!==nav){rail?.remove();rail=null;}
+  if(rail)return;
+  // The control has its own opaque 36px row instead of covering the footer
+  // or floating above lesson content. Keep the existing nav DOM untouched.
+  rail=doc.createElement('div');
+  rail.id='sikauMobileBottomHandleRail';
+  rail.__nav=nav;
+  const button=doc.createElement('button');
   button.type='button';button.id='sikauMobileBottomHandle';
-  button.__nav=nav;
   button.setAttribute('aria-controls','mobileModes');
-  doc.body.appendChild(button);
+  rail.appendChild(button);
+  doc.body.appendChild(rail);
   const updatePosition=()=>{
    if(html.classList.contains('sikau-mobile-bottom-hidden'))return;
    if(!win.matchMedia?.('(max-width:767px)')?.matches)return;
    const rect=nav.getBoundingClientRect();
    if(!rect.height)return;
-   // Keep the tab handle on the real top edge, even if labels make the nav taller.
-   const offset=Math.max(0,Math.min(win.innerHeight-27,win.innerHeight-rect.top-9));
-   button.style.setProperty('--sikau-handle-bottom',offset+'px');
+   // Bottom of the rail meets the actual top of the tab bar on this phone.
+   // This is layout measurement only, never a scroll-hide trigger.
+   const offset=Math.max(0,Math.min(win.innerHeight-36,win.innerHeight-rect.top));
+   rail.style.setProperty('--sikau-handle-bottom',offset+'px');
   };
   const render=()=>{
    const hidden=html.classList.contains('sikau-mobile-bottom-hidden');
