@@ -71,11 +71,12 @@ test('Female and male UI labels are recognized separately',()=>{
  assert.equal(genderOf('Male · पुरुष'),'male');
  assert.equal(genderOf('महिला आवाज'),'female');
  assert.equal(genderOf('पुरुष आवाज'),'male');
- assert.equal(genderOf('I prefer shopping at a mall'),'null'==='null'?null:null);
+ assert.equal(genderOf('I prefer shopping at a mall'),null);
 });
 
 test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/reading-dashboard\.js\?v=20261029-ne-voice-r1/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261029-ne-male-r2/);
  assert.match(app,/translate-studio-v4\.js\?v=20261029-ne-voice-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
  assert.match(reading,/nepali-voice-bridge\.js\?v=20261029-ne-male-r1/);
