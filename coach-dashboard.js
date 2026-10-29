@@ -668,6 +668,7 @@ function coachEquivalentReply(sentence){
 }
 
 function coachReplyOptions(step,scene){
+ if(scene?.isBranchingV4&&window.sikauV4Story)return window.sikauV4Story.options(step);
  if(scene?.isBranchingStore&&window.sikauStoreStory)return window.sikauStoreStory.options(step);
  if(scene?.isBranchingStory&&window.sikauAdaptiveStory)return window.sikauAdaptiveStory.options(step);
  const line=normalize(step.npc),sceneId=scene?.id;
@@ -1069,7 +1070,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    !saved.history?.some(entry=>entry&&entry.reply);
   const oldClothing=saved.sceneId==='return-shirt'&&
    /how can i help you with this shirt today/i.test(saved.steps?.[0]?.npc||'');
-  const oldFixedTopic=saved.sceneId!=='return-shirt'&&!saved.isBranchingStory;
+  const oldFixedTopic=saved.sceneId!=='return-shirt'&&!saved.isBranchingStory&&!saved.isBranchingV4;
   if(untouched&&(oldClothing||oldFixedTopic)){
    coachDrafts?.remove();start(scene);return;
   }
@@ -1079,6 +1080,8 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    coachRound:Number.isSafeInteger(saved.coachRound)?saved.coachRound:0,
    coachStyle:typeof saved.coachStyle==='string'?saved.coachStyle.slice(0,100):'Conversation',
    isBranchingStore:!!saved.isBranchingStore,storeState:state,
+   isBranchingV4:!!saved.isBranchingV4,v4State:saved.v4State||null,
+   v4Completed:!!saved.v4Completed,
    storeCompleted:!!saved.storeCompleted,
    isBranchingStory:!!saved.isBranchingStory,storyState:saved.storyState||{scene:scene.id,path:0,detail:null},
    storyCompleted:!!saved.storyCompleted};
@@ -1151,6 +1154,15 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   const round=practiceNumber%rounds.length;
   coachRoundMemory[original.id]=practiceNumber;
   try{doc.defaultView.localStorage.setItem(coachRoundStorage,JSON.stringify(coachRoundMemory))}catch(_){}
+  // Reviewed V4 dialogue is currently enabled in English-only mode.
+  // Keep the established bilingual engine for the other three modes until
+  // the reviewed V4 lines have accurate Nepali translations.
+  const languageMode=doc.documentElement?.getAttribute('data-sikau-display-language')||
+   doc.defaultView?.__sikauLanguageDisplay?.getMode?.()||'en-ne';
+  if(languageMode==='en'&&window.sikauV4Story){
+   const story=window.sikauV4Story.start(original);
+   if(story){story.coachPracticeNumber=practiceNumber+1;return story;}
+  }
   if(original.id==='return-shirt'&&window.sikauStoreStory){
    const story=window.sikauStoreStory.start(original);
    story.coachPracticeNumber=practiceNumber+1;
@@ -1291,7 +1303,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  function goNext(){
   if(!active)return;
   if(!dialogueHistory[index])dialogueHistory[index]={reply:active.steps[index].answer,kind:'example'};
-  if((active.isBranchingStore&&active.storeCompleted)||(active.isBranchingStory&&active.storyCompleted)){finished=true;}else if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
+  if((active.isBranchingV4&&active.v4Completed)||(active.isBranchingStore&&active.storeCompleted)||(active.isBranchingStory&&active.storyCompleted)){finished=true;}else if(index>=active.steps.length-1){finished=true;}else{index++;choices=[];choiceError='';typedError='';reveal=false;}
   pendingChoice=null;
   if(finished)coachDrafts?.remove();else saveDraft();
   renderStage();
@@ -1310,14 +1322,14 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   const meta=add(doc,head,'div','sikau-convo-stage-meta');
   add(doc,meta,'strong','',active.emoji+' '+active.title);
   if(showNepali)add(doc,meta,'small','',active.ne+' · '+active.place);
-  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+((active.isBranchingStore||active.isBranchingStory)?' · Choices shape the conversation':' · Flexible practice'));
+  add(doc,meta,'small','sikau-convo-round-label','Practice #'+active.coachPracticeNumber+' · '+active.coachStyle+((active.isBranchingV4||active.isBranchingStore||active.isBranchingStory)?' · Choices shape the conversation':' · Flexible practice'));
   if(finished){
    const done=add(doc,stage,'div','sikau-convo-complete');
    add(doc,done,'div','sikau-convo-complete-icon','🏆');
    add(doc,done,'h3','','You finished the conversation!');
    add(doc,done,'p','','तपाईंले वास्तविक जीवनको कुराकानी अभ्यास पूरा गर्नुभयो।');
    add(doc,done,'p','',active.steps.length+' turns practiced · '+successful+' guided responses completed');
-   if(active.isBranchingStore||active.isBranchingStory)add(doc,done,'p','','Your choices shaped this conversation. · तपाईंको उत्तरले यो कथा परिवर्तन गर्‍यो।');
+   if(active.isBranchingV4||active.isBranchingStore||active.isBranchingStory)add(doc,done,'p','','Your choices shaped this conversation. · तपाईंको उत्तरले यो कथा परिवर्तन गर्‍यो।');
    add(doc,done,'small','','This is practice-only feedback; official learning XP and progress are unchanged.');
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
@@ -1417,7 +1429,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    if(showNepali)add(doc,result,'small','',item.ne);
    if(item.branch||item.followup)add(doc,result,'small','','Your next chat message will reflect this choice. · अबको कुराकानी यसैअनुसार अघि बढ्नेछ।');
    const next=add(doc,result,'button','sikau-convo-primary',
-    ((active.isBranchingStore&&active.storeCompleted)||(active.isBranchingStory&&active.storyCompleted)||(!active.isBranchingStore&&!active.isBranchingStory&&index===active.steps.length-1))?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
+    ((active.isBranchingV4&&active.v4Completed)||(active.isBranchingStore&&active.storeCompleted)||(active.isBranchingStory&&active.storyCompleted)||(!active.isBranchingV4&&!active.isBranchingStore&&!active.isBranchingStory&&index===active.steps.length-1))?'Finish story 🎉':'Continue the chat → · अर्को कुरा');
    next.type='button';next.addEventListener('click',goNext);
   }
   const options=add(doc,feedback,'div','sikau-convo-options');
@@ -1438,7 +1450,9 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
     b.classList.add('is-selected');
     b.querySelector('.sikau-chat-option-radio').textContent='✓';
     options.querySelectorAll('button').forEach(x=>x.disabled=true);
-    if(active.isBranchingStore&&window.sikauStoreStory){
+    if(active.isBranchingV4&&window.sikauV4Story){
+     window.sikauV4Story.choose(active,item,index);
+    }else if(active.isBranchingStore&&window.sikauStoreStory){
      window.sikauStoreStory.choose(active,item,index);
     }else if(active.isBranchingStory&&window.sikauAdaptiveStory){
      window.sikauAdaptiveStory.choose(active,item,index);
@@ -1475,7 +1489,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    showResult(pendingChoice);
   }
   const skip=add(doc,feedback,'button','sikau-convo-skip','Skip this turn · अर्को चरण →');
-  skip.type='button';if(active.isBranchingStore||active.isBranchingStory)skip.hidden=true;else skip.addEventListener('click',goNext);
+  skip.type='button';if(active.isBranchingV4||active.isBranchingStore||active.isBranchingStory)skip.hidden=true;else skip.addEventListener('click',goNext);
   const note=add(doc,feedback,'div','sikau-convo-tip');
   add(doc,note,'strong','','💡 Quick English tip · उपयोगी सल्लाह');
   add(doc,note,'p','',active.isBranchingStore?'The store needs to review its policy before promising a refund or exchange. You can finish whenever you have enough information. · नियम जाँचेपछि मात्र निर्णय हुन्छ।':active.isBranchingStory?'Choose what is true for you. Each answer changes the next question, and you can finish naturally. · आफूलाई मिल्ने उत्तर छान्नुहोस्।':'Every option is a valid reply. Practice saying your choice aloud. · आफ्नो उत्तर ठूलो स्वरमा बोल्ने अभ्यास गर्नुहोस्।');
