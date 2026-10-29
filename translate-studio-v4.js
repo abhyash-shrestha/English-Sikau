@@ -275,6 +275,14 @@ window.enhanceTranslationDashboard=function(d){
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
   if(!v.speechSynthesis||!v.SpeechSynthesisUtterance){notice.textContent='Audio is unavailable in this browser. · आवाज उपलब्ध छैन।';return}
   const outputLanguage=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
+  // iPhone Safari can prohibit replacing the Web Speech speak() method.
+  // Route explicitly through the same quality selector for BOTH languages,
+  // without changing the working Windows/desktop playback behavior.
+  const isIphone=/iPhone|iPod/i.test(v.navigator?.userAgent||'');
+  if(isIphone&&v.__sikauNepaliVoice?.speakText){
+   v.__sikauNepaliVoice.speakText(txt,outputLanguage,'tr');
+   return;
+  }
   // The signed-in lesson's Nepali voice bridge enforces true male
   // selection when requested. Female stays on the existing voice path.
   if(outputLanguage==='ne-NP'&&v.__sikauNepaliVoice?.speakNepali){
