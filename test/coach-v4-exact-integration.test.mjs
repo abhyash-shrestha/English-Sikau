@@ -7,19 +7,20 @@ import {createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url);
 const read=name=>fs.readFileSync(new URL(name,root),'utf8');
 const html=read('coach-v4-live.html');
-const sourceHash='dd1cc34b4eec163b978806d6b63cbb1f6a230283a17b978b8e56043470f510b0';
+const originalConversationDataHash='ff89a5a06d89a055b5498a6c57628988c7bee4af8aa796f77bc3b57fd4fbee3c';
 const originalStore="const storeKey='english-sikau-175-preview-context-v4';";
 const newStore="const learnerToken=(new URLSearchParams(location.hash.slice(1))).get('uid')||''; const storeKey='english-sikau-175-preview-context-v4:'+(/^[A-Za-z0-9_-]{6,128}$/.test(learnerToken)?learnerToken:'standalone');";
 const closingBridge='<script src="./coach-v4-bridge.js?v=20261029-exact-v4-r1"></script>';
 const guardRegex=/<script>\/\* The paid lesson loads only inside its authenticated parent frame\. \*\/[\s\S]*?<\/script>/;
 
-test('Embedded V4 keeps the exact approved dialogue source, except security and frame adapters',()=>{
+test('Removing the review panel does not modify the approved 175-topic dialogue data',()=>{
  assert.ok(html.includes(newStore),'Per-user draft storage is missing');
  assert.ok(guardRegex.test(html),'Protected parent-frame guard is missing');
  assert.ok(html.includes(closingBridge),'V4 bridge is not loaded');
- const restored=html.replace(guardRegex,'').replace(newStore,originalStore).replace(closingBridge,'');
- const hash=createHash('sha256').update(restored+'\n').digest('hex');
- assert.equal(hash,sourceHash,'Approved user-supplied V4 script must not be rewritten');
+ const start=html.indexOf('const B='),end=html.indexOf('const learnerToken=',start);
+ assert.ok(start>0&&end>start,'V4 conversation definitions must be intact');
+ const hash=createHash('sha256').update(html.slice(start,end)).digest('hex');
+ assert.equal(hash,originalConversationDataHash,'Original V4 questions, choices, and branching rules must be identical');
 });
 
 test('Embedded V4 blocks direct unauthenticated access and isolates saved sessions',()=>{
@@ -133,4 +134,20 @@ test('Dark mode is synced through the V4 internal mode instead of a temporary CS
  const bridge=read('coach-v4-bridge.js');
  assert.match(bridge,/getElementById\('theme-toggle'\)\?\.click\(\)/);
  assert.doesNotMatch(bridge,/document\.documentElement\.dataset\.theme=next\.theme/);
+});
+
+test('The review feedback section is absent from all 175 conversations',()=>{
+ for(const text of ['Something feels unnatural?', 'Copy conversation + suggestion',
+  'Save transcript as text','Write what should happen instead', 'id="copy-chat"',
+  'id="copy-notes"','id="export-chat"','id="feedback"','id="copystatus"',
+  'function copyFeedback()', 'function downloadTranscript()',
+  "$('feedback')", "$('copystatus')"]){
+  assert.equal(html.includes(text),false,'Removed review interface remains: '+text);
+ }
+ assert.equal(html.includes('id="complete-actions"'),true,'Conversation endings must remain');
+ assert.equal(html.includes('id="chat-transcript"'),true,'Conversation history must remain');
+ assert.equal(html.includes('id="switch-goal"'),true,'Change request must remain');
+ assert.equal(html.includes('id="undo"'),true,'Undo must remain');
+ const choices=runPreview();
+ assert.equal(choices.topics.length,175);
 });
