@@ -51,6 +51,12 @@
   const frame=doc.createElement('iframe');
   frame.id='sikauCoachV4Frame';
   frame.dataset.sikauStudent=verifiedStudentId;
+  // Pass only the verified learner's first name from the authenticated
+  // parent. This is presentation data, never an access-control token.
+  // Do not derive it from a URL parameter or another learner's saved chat.
+  const learnerFirstName=String(firstName||'').trim().split(/\s+/u)[0]
+   .replace(/[<>]/g,'').slice(0,32)||'Learner';
+  frame.dataset.sikauStudentFirstName=learnerFirstName;
   frame.setAttribute('title','English Sikau · 175 real-life conversations');
   frame.setAttribute('loading','eager');
   frame.setAttribute('referrerpolicy','same-origin');
