@@ -90,7 +90,11 @@
   'html[data-sikau-display-language="en-roman"] .sikau-lang-ne{display:none!important}',
   'html[data-sikau-display-language="en"] .sikau-lang-ne{display:none!important}',
   'html[data-sikau-display-language="en-roman"] .sikau-lang-roman,html[data-sikau-display-language="all"] .sikau-lang-roman{display:inline!important}',
-  'html[data-sikau-display-language="en-ne"] .i18n-sub .rm,html[data-sikau-display-language="en"] .i18n-sub .rm{display:none!important}'
+  'html[data-sikau-display-language="en-ne"] .i18n-sub .rm,html[data-sikau-display-language="en"] .i18n-sub .rm{display:none!important}',
+  // The Reading tab uses CSS-generated text, which a DOM text walker cannot see.
+  'html[data-sikau-display-language="en"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en"] #learn .sikau-see-nepali::after{content:"See Nepali"!important}',
+  'html[data-sikau-display-language="en-roman"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en-roman"] #learn .sikau-see-nepali::after{content:"See Nepali\\A Nepali hernuhos"!important}',
+  'html[data-sikau-display-language="all"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="all"] #learn .sikau-see-nepali::after{content:"See Nepali\\A नेपाली हेर्नुहोस् (Nepali hernuhos)"!important}'
  ].join('\n');
  d.head.appendChild(sheet);
  const attributes=['placeholder','title','aria-label','alt'];
