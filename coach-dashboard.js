@@ -1194,10 +1194,26 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  add(doc,filters,'p','sikau-convo-variety-hint',scenarios.length+' real-life topics · Choose a category or search · English + नेपाली · Conversations follow your choices.');
  const resumeHost=add(doc,browser,'div','sikau-convo-resume-host');resumeHost.hidden=true;
  const cards=add(doc,browser,'div','sikau-convo-cards');
- const more=add(doc,browser,'button','sikau-convo-secondary sikau-convo-load-more','Show more situations · थप विषय');
- more.type='button';more.hidden=true;
- let visibleLimit=24;
- more.addEventListener('click',()=>{visibleLimit+=24;drawCards();});
+ const pagination=add(doc,browser,'nav','sikau-convo-pagination');
+ pagination.setAttribute('aria-label','Real-life situation pages · विषयका पृष्ठहरू');
+ const pageSummary=add(doc,pagination,'p','sikau-convo-page-summary','');
+ pageSummary.setAttribute('role','status');
+ pageSummary.setAttribute('aria-live','polite');
+ const pageControls=add(doc,pagination,'div','sikau-convo-page-controls');
+ const prevPage=add(doc,pageControls,'button','sikau-convo-page-nav','← Previous');
+ prevPage.type='button';prevPage.setAttribute('aria-label','Previous page');
+ const pageNumbers=add(doc,pageControls,'div','sikau-convo-page-numbers');
+ const nextPage=add(doc,pageControls,'button','sikau-convo-page-nav','Next →');
+ nextPage.type='button';nextPage.setAttribute('aria-label','Next page');
+ let currentPage=1;
+ function changePage(to){
+  const next=window.sikauCoachPagination.paginate(filtered(),to).page;
+  if(next===currentPage)return;
+  currentPage=next;drawCards();
+  cards.scrollIntoView?.({behavior:'smooth',block:'start'});
+ }
+ prevPage.addEventListener('click',()=>changePage(currentPage-1));
+ nextPage.addEventListener('click',()=>changePage(currentPage+1));
  const footer=add(doc,browser,'p','sikau-convo-list-note','All answer options are meaningful English responses. Different choices can lead to different real-life follow-ups. · हरेक विकल्प सही सन्दर्भमा प्रयोग गर्न सकिन्छ।');
  const stage=add(doc,shell,'section','sikau-convo-stage');stage.hidden=true;
  const notice=add(doc,shell,'p','sikau-convo-global-status','');notice.setAttribute('role','status');
@@ -1211,18 +1227,20 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   for(const item of topics){
    const b=add(doc,topicsRow,'button','sikau-convo-topic'+(category===item?' active':''),item);
    b.type='button';b.setAttribute('aria-pressed',String(category===item));
-   b.addEventListener('click',()=>{category=item;visibleLimit=24;drawTopics();drawCards();});
+   b.addEventListener('click',()=>{category=item;currentPage=1;drawTopics();drawCards();});
   }
  }
  function drawCards(){
   cards.replaceChildren();
-  const shown=filtered();
-  if(!shown.length){
-   more.hidden=true;
+  const view=window.sikauCoachPagination.paginate(filtered(),currentPage);
+  currentPage=view.page;
+  pageNumbers.replaceChildren();
+  pagination.hidden=view.pages<=1||view.total===0;
+  if(!view.total){
    add(doc,cards,'p','sikau-convo-empty','No matching situation. Try a different topic. · अर्को विषय खोज्नुहोस्।');
    return;
   }
-  for(const s of shown.slice(0,visibleLimit)){
+  for(const s of view.items){
    const b=add(doc,cards,'button','sikau-convo-situation');b.type='button';
    b.setAttribute('aria-label',s.title+' · '+s.ne);
    add(doc,b,'span','sikau-convo-situation-icon',s.emoji);
@@ -1232,8 +1250,24 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    add(doc,b,'span','sikau-convo-situation-meta',s.level+' · Your choices guide the conversation');
    b.addEventListener('click',()=>start(s));
   }
-  more.hidden=shown.length<=visibleLimit;
-  if(!more.hidden)more.textContent='Show more situations · थप विषय ('+(shown.length-visibleLimit)+' left)';
+  pageSummary.textContent='Showing '+(view.start+1)+'–'+view.end+' of '+view.total+
+   ' topics · Page '+view.page+' of '+view.pages+' · पृष्ठ '+view.page;
+  prevPage.disabled=view.page===1;
+  nextPage.disabled=view.page===view.pages;
+  for(let number=1;number<=view.pages;number++){
+   const b=add(doc,pageNumbers,'button','sikau-convo-page-number',String(number));
+   b.type='button';
+   b.setAttribute('aria-label','Go to page '+number+' of '+view.pages);
+   if(number===view.page){
+    b.setAttribute('aria-current','page');
+    b.setAttribute('aria-label','Current page '+number+' of '+view.pages);
+   }
+   b.addEventListener('click',()=>changePage(number));
+  }
+  // Center the active page in the compact, horizontally scrollable mobile pager.
+  const selected=pageNumbers.querySelector('[aria-current="page"]');
+  if(selected)pageNumbers.scrollLeft=Math.max(0,selected.offsetLeft-pageNumbers.offsetLeft-
+   (pageNumbers.clientWidth-selected.clientWidth)/2);
  }
  function resetStage(){
   dialogueHistory=[];
@@ -1460,7 +1494,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
   });
 
  }
- searchInput.addEventListener('input',()=>{search=searchInput.value;visibleLimit=24;drawCards();});
+ searchInput.addEventListener('input',()=>{search=searchInput.value;currentPage=1;drawCards();});
 
  surprise.addEventListener('click',()=>{
   const options=scenarios.filter(s=>s.id!==lastId&&!recentTopics.includes(s.id));
