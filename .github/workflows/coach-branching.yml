@@ -1,0 +1,27 @@
+name: Coach branching tests
+on:
+  pull_request:
+    paths:
+      - 'coach-*.js'
+      - 'test/coach-*.test.mjs'
+      - 'index.html'
+      - '.github/workflows/coach-branching.yml'
+jobs:
+  coach:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Coach JavaScript syntax
+        run: |
+          node --check coach-context-paths.js
+          node --check coach-adaptive-story.js
+          node --check coach-topic-expansion.js
+          node --check coach-drafts.js
+      - name: Run context and topic regression tests
+        run: node --test test/coach-context-paths.test.mjs test/coach-context-first.test.mjs test/coach-expanded-topics.test.mjs

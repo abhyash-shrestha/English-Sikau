@@ -19,6 +19,8 @@ function build(node,state){
  // Keep original initial discovery, but hand off the remaining conversation
  // to a genuine scenario-aware journey: offers, changes, checks and closure.
  if(node!=='opening'&&node!=='detail'&&window.sikauCoachJourneys){
+  const contextual=window.sikauCoachContext?.build(node,state,config);
+  if(contextual)return contextual;
   const journey=window.sikauCoachJourneys.build(node,state,config);
   if(journey)return journey;
   // Already-saved old node IDs migrate to a contextual proposal.
