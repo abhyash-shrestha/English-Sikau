@@ -650,7 +650,19 @@ function choose(active,item,index){
  selected.fn();
  // Preserve the full branch state, including cancellation, changed requests and cafe specifics.
  store(active);
- if(active.steps.length>=48){active.v4Completed=true;return {finished:true};}
+ // In the source preview a completed purchase, cancellation, or goodbye
+ // finishes at this point. Do not invent another choice or lose the final reply.
+ if(isTerminal()){
+  active.v4Completed=true;
+  active.v4FinalReply=state.messages.slice().reverse().find(m=>m.role==='npc')?.text||'';
+  active.steps[index].after=active.v4FinalReply;
+  return {finished:true,closing:active.v4FinalReply};
+ }
+ if(active.steps.length>=48){
+  active.v4Completed=true;
+  active.v4FinalReply='The conversation has reached the practice limit.';
+  return {finished:true,closing:active.v4FinalReply};
+ }
  active.steps.push(nativeStep('v4-'+active.steps.length));
  active.steps[index].after=active.steps[index+1].npc;
  return {finished:false};
