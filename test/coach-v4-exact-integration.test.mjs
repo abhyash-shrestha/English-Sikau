@@ -32,7 +32,7 @@ test('Embedded V4 blocks direct unauthenticated access and isolates saved sessio
  assert.match(html,/storeKey='english-sikau-175-preview-context-v4:'\+/);
 });
 
-function runPreview(){
+function runPreview(firstName='',withElements=false){
  const elements=new Map();
  class E{
   constructor(id){this.id=id;this.textContent='';this.innerHTML='';this.value='';
@@ -60,6 +60,7 @@ function runPreview(){
   setItem:(key,value)=>store.set(key,value)
  };
  const context={document,localStorage,navigator:{},location:{hash:'#uid=teststudent123'},URL,URLSearchParams,
+  frameElement:{dataset:{sikauStudentFirstName:firstName}},
   setTimeout,clearTimeout,scrollTo(){},console};
  context.window=context;
  const inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(x=>x.trim());
@@ -67,7 +68,7 @@ function runPreview(){
  for(const script of inline)assert.doesNotThrow(()=>new Function(script),'JavaScript syntax invalid');
  const sandbox=vm.createContext(context);
  for(const script of inline.slice(1))vm.runInContext(script,sandbox,{timeout:25000});
- return context.window.SikauPreview;
+ return withElements?{api:context.window.SikauPreview,elements}:context.window.SikauPreview;
 }
 
 test('Original V4 UI engine includes all 175 unique, playable conversation topics',()=>{
@@ -296,4 +297,34 @@ test('Desktop Coach drag uses native HTML5 drop and keeps touch reordering',()=>
  assert.match(src,/applyDrop\(htmlDrag,e\.clientX,e\.clientY\)/);
  assert.doesNotMatch(src,/b\.draggable=false;b\.removeAttribute\('draggable'\)/);
  assert.match(src,/const touchStart=e=>/);
+});
+
+
+test('Coach chat displays each verified learner first name, not generic You, in all 175 topics',()=>{
+ const mount=read('coach-v4-mount.js');
+ const bridge=read('coach-v4-bridge.js');
+ assert.match(mount,/frame\.dataset\.sikauStudentFirstName=learnerFirstName/);
+ assert.match(html,/window\.frameElement\?\.dataset\?\.sikauStudentFirstName/);
+ assert.match(bridge,/window\.frameElement\?\.dataset\?\.sikauStudentFirstName/);
+ assert.match(bridge,/ne:firstName\+' · विद्यार्थी'/);
+ assert.match(bridge,/roman:firstName\+' · Bidhyarthi'/);
+ for(const firstName of ['Maya','Abhyash','Sita']){
+  const {api,elements}=runPreview(firstName,true);
+  for(let i=0;i<175;i++){
+   api.selectTopic(i);
+   api.choose(0);
+   const transcript=elements.get('chat-transcript').innerHTML;
+   assert.ok(transcript.includes('class="speaker">'+firstName+' · Learner</div>'),
+    'Missing logged-in first name '+firstName+' at topic '+(i+1));
+   assert.ok(!transcript.includes('class="speaker">You · Learner</div>'),
+    'Generic You label still shown at topic '+(i+1));
+  }
+ }
+});
+
+test('Coach learner name uses a neutral fallback when verified first name is absent',()=>{
+ const {api,elements}=runPreview('',true);
+ api.selectTopic(0);
+ api.choose(0);
+ assert.match(elements.get('chat-transcript').innerHTML,/class="speaker">Learner · Learner<\/div>/);
 });
