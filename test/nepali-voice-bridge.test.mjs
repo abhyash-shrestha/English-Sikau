@@ -37,7 +37,7 @@ test('Female Nepali voice remains on the original browser path',()=>{
  win.__sikauNepaliVoice.select('rd','female');
  synth.speak({lang:'ne-NP',text:'नमस्कार'});
  assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,'');
+ assert.equal(speaks[0].voice,hemkala.name);
 });
 
 test('Reading native male route selects Sagar instead of Hemkala',()=>{
@@ -54,7 +54,7 @@ test('When no genuine male voice exists, do not secretly play female',()=>{
  win.__sikauNepaliVoice.select('rd','male');
  synth.speak({lang:'ne-NP',text:'नमस्कार'});
  assert.equal(speaks.length,0);
- assert.match(sections.rd.last.textContent,/Male Nepali voice unavailable/);
+ assert.match(sections.rd.last.textContent,/No male Nepali voice is available/);
 });
 
 test('English playback stays unchanged even with male Nepali selected',()=>{
@@ -109,9 +109,9 @@ test('Clicking Male after Female switches to a true Nepali male voice, then back
  events.click({target:female});
  synth.speak({lang:'ne-NP',text:'नमस्ते'});
  assert.equal(speaks.length,3);
- assert.equal(speaks[0].voice,'');
+ assert.equal(speaks[0].voice,hemkala.name);
  assert.equal(speaks[1].voice,sagar.name);
- assert.equal(speaks[2].voice,'');
+ assert.equal(speaks[2].voice,hemkala.name);
  assert.equal(win.__sikauNepaliVoice.maleSelected('tr'),false);
 });
 
@@ -171,7 +171,7 @@ test('When Apple exposes only a novelty voice, preserve browser default',()=>{
  const fred={name:'Fred',lang:'en-US'};
  const {synth,speaks}=mock([fred]);
  synth.speak({lang:'en-US',text:'Reading practice',voice:null});
- assert.equal(speaks[0].voice,'');
+ assert.equal(speaks[0].voice,hemkala.name);
 });
 
 test('Use Hemkala natural Nepali female if browser exposes her explicitly',()=>{
@@ -188,5 +188,5 @@ test('Keep original Nepali female output if no positively identified better voic
  win.__sikauNepaliVoice.select('rd','female');
  synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
  assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,'');
+ assert.equal(speaks[0].voice,hemkala.name);
 });
