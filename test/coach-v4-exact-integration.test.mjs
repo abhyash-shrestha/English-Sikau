@@ -120,3 +120,17 @@ test('All four selected language modes remain recognized without changing V4 ans
  assert.match(bridge,/V4 conversation lines are currently in English/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren\(/);
 });
+
+test('Visa Interview can still open its native Ask AI Coach form',()=>{
+ const mount=read('coach-v4-mount.js');
+ assert.doesNotMatch(mount,/\.coach-ask\{display:none!important\}/);
+ assert.doesNotMatch(mount,/\.coach-plan\{display:none!important\}/);
+ const original=read('coach-dashboard.js');
+ assert.match(original,/enhanceVisaInterviewCoach\(doc,shell,ask\)/);
+ assert.match(original,/installVisaSidebar\(doc,shell,visaController\)/);
+});
+test('Dark mode is synced through the V4 internal mode instead of a temporary CSS override',()=>{
+ const bridge=read('coach-v4-bridge.js');
+ assert.match(bridge,/getElementById\('theme-toggle'\)\?\.click\(\)/);
+ assert.doesNotMatch(bridge,/document\.documentElement\.dataset\.theme=next\.theme/);
+});
