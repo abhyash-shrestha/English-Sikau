@@ -95,7 +95,7 @@ function install(doc,reader,accountId){
  const styleId='sikauFeaturedBookStyle';
  if(!doc.getElementById(styleId)){
   const link=make(doc,'link');link.id=styleId;link.rel='stylesheet';
-  link.href=new URL('./featured-bilingual-story.css?v=20261030-library-r3',document.baseURI).href;
+  link.href=new URL('./featured-bilingual-story.css?v=20261030-quiz-cards-r4',document.baseURI).href;
   doc.head.append(link);
  }
  const root=make(doc,'section','sikau-featured-book sikau-library-v2');
