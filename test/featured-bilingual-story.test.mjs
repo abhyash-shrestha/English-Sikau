@@ -57,8 +57,8 @@ test('Audio is language-specific and chapter unlocking requires 100%',()=>{
 });
 test('Reading loads featured book only inside the authenticated classroom',()=>{
  assert.match(index,/protected.*lessonFrame/s);
- assert.match(index,/bilingual-story-library\.js\?v=20261030-library-r3/);
- assert.match(index,/featured-bilingual-story\.js\?v=20261030-library-r3/);
+ assert.match(index,/bilingual-story-library\.js\?v=20261030-quick-reads-r4/);
+ assert.match(index,/featured-bilingual-story\.js\?v=20261030-quiz-cards-r4/);
  assert.match(dashboard,/enhanceFeaturedBilingualStory\?\.\(d,reader,accountId\)/);
  assert.match(styles,/@media\(max-width:700px\)/);
  assert.match(styles,/data-sikau-theme="dark"/);
@@ -87,12 +87,12 @@ test('Story Mode uses curated bookshelf, not the native generated story cards',(
  assert.match(styles,/sikau-story-shelf,.sikau-featured-reading/);
  const w={};
  vm.runInNewContext(data,{window:w,console},{timeout:2000});
- assert.equal(w.__sikauExtraStoryBooks.length,8);
+ assert.equal(w.__sikauExtraStoryBooks.length,12);
  const catalog=[book,...w.__sikauExtraStoryBooks];
- assert.equal(catalog.length,9);
- assert.equal(catalog.reduce((sum,item)=>sum+item.chapters.length,0),37);
+ assert.equal(catalog.length,13);
+ assert.equal(catalog.reduce((sum,item)=>sum+item.chapters.length,0),49);
  for(const item of catalog){
-  assert.ok(item.chapters.length>=4);
+  assert.ok(item.chapters.length>=3);
   for(const c of item.chapters){
    assert.ok(c.paragraphs.length>=2);
    assert.equal(c.questions.length,2);
@@ -107,4 +107,44 @@ test('Story Mode uses curated bookshelf, not the native generated story cards',(
    }
   }
  }
+});
+
+
+test('Four new short connected books are three chapters with usable bilingual quizzes',()=>{
+ const ctx={window:{}};
+ vm.runInNewContext(read('bilingual-story-library.js'),ctx,{timeout:2000});
+ const quick=ctx.window.__sikauExtraStoryBooks.filter(b=>b.chapters.length===3);
+ assert.equal(quick.length,4);
+ assert.deepEqual(Array.from(quick,b=>b.title),[
+  'The Last Bus Home','The Red Umbrella','The Midnight Bakery','The Secret Seed'
+ ]);
+ for(const story of quick){
+  assert.match(story.neTitle,/[\u0900-\u097F]/u);
+  for(const chapter of story.chapters){
+   assert.equal(chapter.paragraphs.length,2);
+   assert.equal(chapter.questions.length,2);
+   for(const [english,nepali] of chapter.paragraphs){
+    assert.ok(english.length>=60);
+    assert.match(nepali,/[\u0900-\u097F]/u);
+   }
+  }
+ }
+ assert.match(source,/categories=\['All','Quick Reads'/);
+ assert.match(source,/category==='Quick Reads'\?book\.chapters\.length>3/);
+ assert.match(source,/⚡ Quick read/);
+});
+
+test('Every quiz choice has an unmistakable custom selection indicator',()=>{
+ assert.match(source,/sikau-featured-radio/);
+ assert.match(source,/sikau-featured-choice-marker/);
+ assert.match(source,/sikau-featured-choice-state/);
+ assert.match(source,/✓ Selected · छानियो/);
+ assert.match(source,/updateAnswerCount\(\)/);
+ assert.match(source,/Tap ONE answer for each question/);
+ assert.match(source,/c\.questions\.some\(\(_q,i\)=>!Number\.isInteger\(answers\[i\]\)\)/);
+ assert.match(styles,/sikau-featured-option:has\(input:checked\)/);
+ assert.match(styles,/sikau-featured-option:focus-within/);
+ assert.match(styles,/sikau-featured-choice-marker/);
+ assert.match(styles,/data-sikau-theme="dark"/);
+ assert.match(source,/featured-bilingual-story\.css\?v=20261030-quiz-cards-r4/);
 });
