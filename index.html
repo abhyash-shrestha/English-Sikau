@@ -1154,7 +1154,6 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
     <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back 👋 नमस्ते 🙏</strong></div>
     <span id="sessionNote" class="student-access-tag"></span>
   </div>
-  <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">📖 Learning activity · मेरो सिकाइ</button>
   <div class="student-top-actions">
     <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v4 · checking</span>
     <button id="sikauThemeProtected" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
@@ -1162,7 +1161,6 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
   </div>
 </div>
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
-<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking completed chapters…</span><small>Review your finished lessons and keep learning · पूरा गरेका पाठहरू हेर्नुहोस्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-stories.js?v=20261024-r1"></script>
 <script src="./festival-dashboard-preview.js?v=20261024-stories-r1"></script>
@@ -1845,12 +1843,6 @@ function sikauApplyOuterDisplayLanguage(selected){
   all:'Welcome back 👋 नमस्ते (Namaste), '+first+' 🙏',
   en:'Welcome back 👋 '+first
  };
- const progress={
-  'en-ne':'📖 Learning activity · मेरो सिकाइ',
-  'en-roman':'📖 Learning activity · Mero sikai',
-  all:'📖 Learning activity · मेरो सिकाइ (Mero sikai)',
-  en:'📖 Learning activity'
- };
  const signout={
   'en-ne':'Sign out · लगआउट ',
   'en-roman':'Sign out · Lagaaut ',
@@ -1859,41 +1851,12 @@ function sikauApplyOuterDisplayLanguage(selected){
  };
  const greeting=$('studentTopGreeting');
  if(greeting)greeting.textContent=greetings[mode];
- const progressButton=$('cloudStoryToggle');
- if(progressButton){
-  const compact=window.matchMedia?.('(max-width:650px)')?.matches;
-  progressButton.textContent=compact?'📖 My learning':progress[mode];
-  progressButton.setAttribute('aria-label',progress[mode]);
-  progressButton.title=progress[mode];
- }
- const progressPanel=$('cloudStoryProgress');
- if(progressPanel){
-  const title=progressPanel.querySelector('.cloud-story-info strong');
-  const note=progressPanel.querySelector('.cloud-story-info small');
-  const refresh=$('cloudStoryRefresh');
-  const labels={
-   'en-ne':['📖 Completed chapters · पूरा गरेका अध्याय','Your completed lessons · पूरा गरेका पाठहरू','↻ Refresh · ताजा गर्नुहोस्'],
-   'en-roman':['📖 Completed chapters · Pura gareka adhyaya','Your completed lessons · Pura gareka pathharu','↻ Refresh · Taja garnuhos'],
-   all:['📖 Completed chapters · पूरा गरेका अध्याय (Pura gareka adhyaya)','Your completed lessons · पूरा गरेका पाठहरू (Pura gareka pathharu)','↻ Refresh · ताजा गर्नुहोस् (Taja garnuhos)'],
-   en:['📖 Completed chapters','Your completed lessons','↻ Refresh']
-  }[mode];
-  if(title)title.textContent=labels[0];
-  if(note)note.textContent=labels[1];
-  if(refresh)refresh.textContent=labels[2];
- }
  const exit=$('exit');
  if(exit&&exit.firstChild?.nodeType===Node.TEXT_NODE){
   const compact=window.matchMedia?.('(max-width:650px)')?.matches;
   exit.firstChild.nodeValue=compact?'Sign out ':signout[mode];
   exit.setAttribute('aria-label',signout[mode].trim());
   exit.title=signout[mode].trim();
- }
- const ref=$('studentMembershipReference');
- if(ref){
-  const base='Membership ✅ Lifetime · Account reference: '+accountReference(user);
-  ref.textContent=mode==='en-ne'?base+' · सदस्यता पुष्टि':
-    mode==='en-roman'?base+' · Sadasyata pushti':
-    mode==='all'?base+' · सदस्यता पुष्टि (Sadasyata pushti)':base;
  }
  const theme=$('sikauThemeProtected');
  if(theme){
@@ -1918,8 +1881,6 @@ window.addEventListener('message',event=>{
 window.__sikauRenderSecureHeaderLanguage=sikauApplyOuterDisplayLanguage;
 function updateStudentWelcome(){
  if(!openedAccess||!user)return;
- const ref=$('studentMembershipReference');
- if(ref)ref.textContent='Membership ✅ Lifetime · Account reference: '+accountReference(user)+' · सदस्यता पुष्टि';
  sikauApplyOuterDisplayLanguage(sikauCurrentDisplayLanguage());
 }
 window.addEventListener('resize',()=>{
@@ -3000,14 +2961,6 @@ function killLessons(){
   readNumber++;
   openedAccess=null;
   lessonOpening=false;
-  if($('cloudStoryProgress'))$('cloudStoryProgress').hidden=true;
-  if($('cloudStoryToggle')){
-    $('cloudStoryToggle').setAttribute('aria-expanded','false');
-    $('cloudStoryToggle').textContent='📖 Learning activity · मेरो सिकाइ';
-  }
-  if($('cloudStoryValues'))$('cloudStoryValues').textContent='Sign in to view verified progress.';
-  if($('studentMembershipReference'))$('studentMembershipReference').textContent='';
-  if($('cloudStoryRefresh'))$('cloudStoryRefresh').disabled=false;
   clearInterval(trialInterval);trialInterval=null;
   const frame=$('lessonFrame');
   frame.removeAttribute('srcdoc');
@@ -3352,7 +3305,6 @@ async function openFile(token='',isTrial=false){
     updateStudentWelcome();
     $('protected').classList.remove('hide');
     showMsg('✅ Private English Sikau lessons loaded securely.','ok');
-    void refreshCloudStoryProgress();
     if(kind==='trial'){
       clearInterval(trialInterval);
       trialInterval=setInterval(()=>{
@@ -3398,35 +3350,6 @@ window.__englishSikauReadVerifiedProgress = async function () {
 };
 
 
-
-/* Separate Appwrite pilot story progress: read-only, no local XP merging. */
-let cloudLoading=false;
-async function refreshCloudStoryProgress(){
-  const target=$('cloudStoryValues'),button=$('cloudStoryRefresh');
-  if(!target||!button||cloudLoading)return;
-  if(!user||!openedAccess||user.emailVerification!==true){
-    target.textContent='Available after authorized login.';return;
-  }
-  const id=user.$id,version=readNumber;
-  cloudLoading=true;button.disabled=true;target.textContent='Checking Appwrite… · जाँच्दैछ…';
-  try{
-    const p=await window.__englishSikauReadVerifiedProgress();
-    if(!user||user.$id!==id||readNumber!==version||!openedAccess)return;
-    target.textContent='📖 '+p.chapters+' completed chapters · पूरा गरेका अध्याय';
-  }catch(err){
-    if(user&&user.$id===id&&readNumber===version&&openedAccess)
-      target.textContent='Completed chapter information is temporarily unavailable. Your lessons are unchanged.';
-  }finally{cloudLoading=false;button.disabled=false}
-}
-$('cloudStoryRefresh').addEventListener('click',()=>{void refreshCloudStoryProgress()});
-$('cloudStoryToggle').addEventListener('click',()=>{
-  const panel=$('cloudStoryProgress'),toggle=$('cloudStoryToggle');
-  const open=panel.hidden;
-  panel.hidden=!open;
-  toggle.setAttribute('aria-expanded',String(open));
-  toggle.textContent=open?'✕ Hide activity · सिकाइ बन्द':'📖 Learning activity · मेरो सिकाइ';
-  if(open)void refreshCloudStoryProgress();
-});
 
 async function trialCheck(){
   if(!user||paid(user)||!trialFunctionReady())return;
