@@ -52,6 +52,10 @@ function build(available,{withNative=true}={}){
   getElementById(key){return roots[key]||null;},
   addEventListener(name,fn){listener[name]=fn;}
  };
+ // Simulate a document-wide scan, including controls mounted inside tabs.
+ // Special floating-banner tests override this with their own fake DOM.
+ doc.body.querySelectorAll=selector=>
+  selector.startsWith('.voice-options')?[]:Object.values(roots).flatMap(root=>root.controls||[]);
  const originalNative=[];
  const win={
   speechSynthesis:synth,
