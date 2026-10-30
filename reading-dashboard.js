@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261030-clean-toolbar-r8',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261030-balanced-practice-r9',document.baseURI).href;
 // The shared audio bridge is loaded once by the authenticated wrapper.
  // No per-tab script injections, duplicate speech handlers, or race conditions.
 
@@ -175,6 +175,8 @@ window.enhanceReadingDashboard=function(d,accountId){
  installReadingRepairs(d,box,accountId);
  if(!d.getElementById('sikauReadStyle')){const link=mk(d,'link');link.id='sikauReadStyle';link.rel='stylesheet';link.href=url;d.head.append(link);}
  rd.classList.add('sikau-read-v2','sikau-read-exact');
+ // Balance the original New reading / topic / easier / harder controls.
+ window.enhanceReadActionRow?.(d);
  if(!content.querySelector('.read-v2-hero')){
    const hero=mk(d,'section','read-v2-hero');
    const copy=mk(d,'div','read-v2-copy');
