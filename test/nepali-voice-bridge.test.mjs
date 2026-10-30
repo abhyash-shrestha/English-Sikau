@@ -3,354 +3,172 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const bridge=fs.readFileSync(new URL('../nepali-voice-bridge.js',import.meta.url),'utf8');
-const reading=fs.readFileSync(new URL('../reading-dashboard.js',import.meta.url),'utf8');
-const translate=fs.readFileSync(new URL('../translate-studio-v4.js',import.meta.url),'utf8');
-const app=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-function mock(voices){
- const speaks=[],events={};
+const read=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
+const bridge=read('nepali-voice-bridge.js');
+const app=read('index.html');
+const translate=read('translate-studio-v4.js');
+const words=read('words-studio.js');
+const reading=read('reading-dashboard.js');
+const voices={
+ us:{name:'Microsoft Ava Online (Natural)',lang:'en-US'},
+ usLow:{name:'Google US English',lang:'en-US'},
+ uk:{name:'Daniel',lang:'en-GB'},
+ india:{name:'Google English India',lang:'en-IN'},
+ nepali:{name:'Microsoft Hemkala Online (Natural)',lang:'ne-NP'},
+ nepaliAndroid:{name:'Google नेपाली',lang:'ne-NP'},
+ hindi:{name:'Google हिन्दी Hindi India',lang:'hi-IN'}
+};
+
+function build(available,{withNative=true}={}){
+ const spoken=[],cancelled=[],nodes=[];
  const synth={
-  getVoices(){return voices;},
-  speak(utterance){speaks.push({text:utterance.text,voice:utterance.voice?.name||'',lang:utterance.lang,utterance});},
-  cancel(){},addEventListener(){}
+  getVoices:()=>available,
+  speak(utterance){spoken.push(utterance);return undefined;},
+  cancel(){cancelled.push(true)},
+  addEventListener(){}
  };
- const sections=Object.fromEntries(['tr','rd'].map(key=>[key,{
-  last:null,appendChild(node){this.last=node;},
-  querySelector(selector){
-   return selector==='.sikau-nepali-voice-status'&&
-     this.last?.className==='sikau-nepali-voice-status'?this.last:null;
-  },querySelectorAll(){return[]}
- }]));
- const win={speechSynthesis:synth,SpeechSynthesisUtterance:class {constructor(text){this.text=text;this.lang='';this.voice=null;}}};
- const doc={body:{},defaultView:win,
-  getElementById:key=>sections[key],
-  createElement:()=>({className:'',style:{},children:[],appendChild(node){this.children.push(node);},setAttribute(){},textContent:''}),
-  addEventListener:(key,callback)=>{events[key]=callback}
+ const make=tag=>({
+  tagName:tag.toUpperCase(),className:'',style:{display:'',cssText:''},
+  attrs:{},hidden:false,
+  setAttribute(key,value){this.attrs[key]=value;},
+  getAttribute(key){return this.attrs[key]??null;},
+  matches(){return false},
+  appendChild(child){this.child=child;},
+  querySelector(){return null},
+  querySelectorAll(){return[]},
+  closest(){return null}
+ });
+ const root=()=>({
+  ...make('section'),children:[],hidden:false,
+  querySelector(selector){return selector==='.sikau-simple-voice-status'?
+   this.children.find(n=>n.className==='sikau-simple-voice-status')||null:null;},
+  querySelectorAll(selector){return this.controls||[]},
+  appendChild(element){this.children.push(element)}
+ });
+ const roots={tr:root(),rd:root(),words:root(),sp:root()};
+ const listener={};
+ const doc={body:make('body'),defaultView:null,
+  createElement(tag){const node=make(tag);nodes.push(node);return node;},
+  getElementById(key){return roots[key]||null;},
+  addEventListener(name,fn){listener[name]=fn;}
  };
- const sandbox={window:win,console};
- vm.runInNewContext(bridge,vm.createContext(sandbox),{timeout:2000});
- assert.equal(win.enhanceNepaliSpeechVoices(doc),true);
- return {win,synth,speaks,sections,events};
+ const originalNative=[];
+ const win={
+  speechSynthesis:synth,
+  SpeechSynthesisUtterance:class{
+   constructor(text){this.text=text;this.lang='';this.voice=null;this.pitch=1;this.rate=1;}
+  },
+  MutationObserver:class{observe(){}},
+  requestAnimationFrame(fn){fn();},
+  setTimeout(fn){fn();},
+  ...(withNative?{speak(text,rate,lang){originalNative.push([text,rate,lang]);}}:{})
+ };
+ doc.defaultView=win;
+ vm.runInNewContext(bridge,vm.createContext({window:win,console}),{timeout:1500});
+ assert.equal(win.enhanceUnifiedSpeech(doc),true);
+ return {win,doc,synth,roots,spoken,cancelled,originalNative,nodes};
 }
-const hemkala={lang:'ne-NP',name:'Microsoft Hemkala Online (Natural)'};
-const sagar={lang:'ne-NP',name:'Microsoft Sagar Online (Natural)'};
 
-test('Female Nepali voice remains on the original browser path',()=>{
- const {win,speaks,synth}=mock([hemkala,sagar]);
- win.__sikauNepaliVoice.select('rd','female');
- synth.speak({lang:'ne-NP',text:'नमस्कार'});
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,hemkala.name);
+test('one voice per language, prioritizes natural US English and authentic Nepal Nepali',()=>{
+ const {win,spoken}=build([voices.uk,voices.india,voices.hindi,voices.usLow,voices.us,voices.nepali]);
+ assert.equal(win.__sikauNepaliVoice.speakText('Hello learner!','en-US','tr'),true);
+ assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार, तपाईंलाई कस्तो छ?','ne-NP','rd'),true);
+ assert.deepEqual(spoken.map(v=>v.voice?.name),[voices.us.name,voices.nepali.name]);
+ assert.deepEqual(spoken.map(v=>v.lang),['en-US','ne-NP']);
+ assert.deepEqual(spoken.map(v=>v.pitch),[1,1]);
 });
 
-test('Reading native male route selects Sagar instead of Hemkala',()=>{
- const {win,speaks,synth}=mock([hemkala,sagar]);
- win.__sikauNepaliVoice.select('rd','male');
- synth.speak({lang:'ne-NP',text:'नमस्कार'});
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,sagar.name);
- assert.equal(speaks[0].lang,'ne-NP');
+test('English requested as en, en-GB or en-IN is ALWAYS spoken in American voice',()=>{
+ const {win,spoken}=build([voices.uk,voices.india,voices.usLow]);
+ win.__sikauNepaliVoice.speakText('Nice to meet you!','en','words');
+ win.__sikauNepaliVoice.speakText('Please take a seat','en-GB','rd');
+ win.__sikauNepaliVoice.speakText('Have a nice day','en-IN','tr');
+ assert.deepEqual(spoken.map(v=>v.voice?.name),[voices.usLow.name,voices.usLow.name,voices.usLow.name]);
+ assert.deepEqual(spoken.map(v=>v.lang),['en-US','en-US','en-US']);
 });
 
-test('When no genuine male voice exists, do not secretly play female',()=>{
- const {win,speaks,synth,sections}=mock([hemkala]);
- win.__sikauNepaliVoice.select('rd','male');
- synth.speak({lang:'ne-NP',text:'नमस्कार'});
- assert.equal(speaks.length,0);
- assert.match(sections.rd.last.textContent,/No male Nepali voice is available/);
+test('no US-English installed: never silently use British/Indian English',()=>{
+ const {win,roots,spoken}=build([voices.uk,voices.india,voices.nepali]);
+ assert.equal(win.__sikauNepaliVoice.speakText('Welcome','en-US','tr'),false);
+ assert.equal(spoken.length,0);
+ assert.match(roots.tr.children[0].textContent,/US-English voice is unavailable/);
 });
 
-test('English must not silently switch to another gender when Male is selected',()=>{
- const {win,speaks,synth,sections}=mock([sagar]);
- win.__sikauNepaliVoice.select('tr','male');
- synth.speak({lang:'en-US',text:'Hello!'});
- assert.deepEqual(speaks.map(x=>x.text),[]);
- assert.match(sections.tr.last.textContent,/No male English voice is available/);
+test('Galaxy A03s with Hindi but no Nepali voice stays silent with installation advice',()=>{
+ const {win,roots,spoken}=build([voices.hindi,voices.usLow]);
+ assert.equal(win.__sikauNepaliVoice.speakText('नेपाल सुन्दर छ।','ne-NP','tr'),false);
+ assert.equal(spoken.length,0);
+ assert.match(roots.tr.children[0].textContent,/Nepali \(Nepal\) voice is unavailable/);
+ assert.match(roots.tr.children[0].textContent,/Hindi is not substituted/);
 });
 
-test('Female and male UI labels are recognized separately',()=>{
- const {win}=mock([hemkala,sagar]);
- const {genderOf}=win.__sikauNepaliVoice;
- assert.equal(genderOf('Female · महिला'),'female');
- assert.equal(genderOf('Male · पुरुष'),'male');
- assert.equal(genderOf('महिला आवाज'),'female');
- assert.equal(genderOf('पुरुष आवाज'),'male');
- assert.equal(genderOf('I prefer shopping at a mall'),null);
+test('Android ne-NP voice works even when it has no gender tag',()=>{
+ const {win,spoken}=build([voices.nepaliAndroid,voices.hindi]);
+ assert.equal(win.__sikauNepaliVoice.speakNepali('नमस्ते','rd'),true);
+ assert.equal(spoken[0].voice.name,voices.nepaliAndroid.name);
 });
 
-test('Both protected tabs actually install and use the voice guard',()=>{
- assert.match(app,/reading-dashboard\.js\?v=20261030-voice-gender-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-galaxy-a03s-r3/);
- assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
+test('native Reading speechSynthesis requests use same voices through unified bridge',()=>{
+ const {win,synth,spoken}=build([voices.us,voices.nepali]);
+ const u=new win.SpeechSynthesisUtterance('Please read the sentence');
+ u.lang='en-GB';
+ synth.speak(u);
+ const ne=new win.SpeechSynthesisUtterance('यो एउटा कथा हो।');
+ ne.lang='ne-NP';
+ synth.speak(ne);
+ assert.deepEqual(spoken.map(v=>v.voice.name),[voices.us.name,voices.nepali.name]);
+ assert.equal(spoken[0].lang,'en-US');
+});
+
+test('native global speak(text,rate,lang) uses same audio instead of double playing',()=>{
+ const {win,originalNative,spoken}=build([voices.us,voices.nepali]);
+ win.speak('Practice these words',0.88,'en');
+ win.speak('नयाँ किताब',0.88,'ne');
+ assert.equal(originalNative.length,0);
+ assert.deepEqual(spoken.map(v=>v.voice.name),[voices.us.name,voices.nepali.name]);
+});
+
+test('Hindi explicitly marked hi-IN remains untouched; not relabeled Nepali',()=>{
+ const {win,synth,spoken}=build([voices.us,voices.nepali]);
+ const u=new win.SpeechSynthesisUtterance('नमस्ते');
+ u.lang='hi-IN';
+ synth.speak(u);
+ assert.equal(spoken[0].lang,'hi-IN');
+ assert.equal(spoken[0].voice,null);
+});
+
+test('gender choice buttons disappear without hiding lesson buttons',()=>{
+ const {win,roots}=build([voices.us,voices.nepali]);
+ function control(text){
+  return {textContent:text,style:{display:''},attrs:{},
+   setAttribute(k,v){this.attrs[k]=v;},getAttribute(){return null;},
+   matches(){return false},closest(){return null;},hidden:false};
+ }
+ const male=control('Male'),female=control('Female'),listen=control('🔊 Listen'),topic=control('Male doctors');
+ roots.tr.controls=[male,female,listen,topic];
+ win.__sikauNepaliVoice.removeGenderControls();
+ assert.equal(male.hidden,true);
+ assert.equal(female.hidden,true);
+ assert.equal(listen.hidden,false);
+ assert.equal(topic.hidden,false);
+});
+
+test('voice failure is reported without using Hindi or other voices',()=>{
+ const {win,roots,spoken}=build([voices.us,voices.nepali]);
+ win.__sikauNepaliVoice.speakText('बोल्नुहोस्','ne-NP','rd');
+ spoken[0].onerror({error:'language-unavailable'});
+ assert.match(roots.rd.children[0].textContent,/Audio could not play/);
+ assert.equal(spoken.length,1);
+});
+
+test('Translate, Words and Reading load identical shared engine across devices',()=>{
+ assert.match(app,/translate-studio-v4\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/reading-dashboard\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/words-studio\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/uiStep\('one bilingual speech player',\(\)=>window\.enhanceUnifiedSpeech\?\.\(doc\)\)/);
+ assert.match(translate,/__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
+ assert.match(words,/__sikauNepaliVoice\.speakText\(text,locale,'words'\)/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
- assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-galaxy-a03s-r3/);
- assert.match(translate,/__sikauNepaliVoice\.speakText/);
- assert.match(translate,/const outputLanguage=nativeDirection\(sec\)==='ne'\?'en-US':'ne-NP'/);
-});
-
-
-test('Clicking Male after Female switches to a true Nepali male voice, then back',()=>{
- const {win,synth,speaks,events}=mock([hemkala,sagar]);
- const root={closest:()=>root};
- function button(label,gender){
-  return {
-   tagName:'BUTTON',value:gender,id:'gender-'+gender,textContent:label,
-   getAttribute(key){return key==='data-gender'?gender:null},
-   closest(selector){
-    if(selector==='#tr,#rd,#learn')return root;
-    if(selector==='button,label,input,select,[role="radio"],[role="button"]')return this;
-    return null;
-   }
-  };
- }
- // The synthetic root resolves to Translate for both clicks.
- root.closest=(selector)=>selector==='#tr'?root:null;
- const female=button('Female · महिला','female'),male=button('Male · पुरुष','male');
- events.click({target:female});
- synth.speak({lang:'ne-NP',text:'नमस्ते'});
- events.click({target:male});
- synth.speak({lang:'ne-NP',text:'नमस्ते'});
- events.click({target:female});
- synth.speak({lang:'ne-NP',text:'नमस्ते'});
- assert.equal(speaks.length,3);
- assert.equal(speaks[0].voice,hemkala.name);
- assert.equal(speaks[1].voice,sagar.name);
- assert.equal(speaks[2].voice,hemkala.name);
- assert.equal(win.__sikauNepaliVoice.maleSelected('tr'),false);
-});
-
-test('Native control attributes are checked before misleading parent labels',()=>{
- const {win}=mock([hemkala,sagar]);
- const control={
-  tagName:'BUTTON',value:'male',
-  textContent:'Female · महिला / Male · पुरुष',
-  getAttribute:key=>key==='data-gender'?'male':null,
-  matches:()=>false
- };
- assert.equal(win.__sikauNepaliVoice.controlGender(control),'male');
-});
-
-
-test('Choose native male voice from same provider as Hemkala when it exists',()=>{
- const googleMale={lang:'ne-NP',name:'Google Nepali Male'};
- const {win}=mock([googleMale,hemkala,sagar]);
- const report=win.__sikauNepaliVoice.voiceReport();
- assert.equal(report.identifiedFemale,hemkala.name);
- assert.equal(report.male,sagar.name);
- assert.equal(report.available.length,3);
-});
-
-test('Do not classify a female Nepali voice as male',()=>{
- const {win}=mock([hemkala,{lang:'ne-NP',name:'Nepali Female'}]);
- assert.equal(win.__sikauNepaliVoice.available(),false);
- assert.equal(win.__sikauNepaliVoice.voiceReport().male,null);
-});
-
-test('Recognize clearly labeled Nepali male voices from other browser providers',()=>{
- const {win}=mock([{lang:'ne-NP',name:'Google Nepali Male'}]);
- assert.equal(win.__sikauNepaliVoice.available(),true);
- assert.equal(win.__sikauNepaliVoice.voiceReport().male,'Google Nepali Male');
-});
-
-
-test('Windows chooses a natural English voice over its robotic fallback',()=>{
- const natural={name:'Microsoft Ava Online (Natural)',lang:'en-US'};
- const fred={name:'Fred',lang:'en-US'};
- const {win,synth,speaks}=mock([fred,natural]);
- synth.speak({lang:'en-US',text:'Hello, how are you?',voice:null});
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,natural.name);
- assert.equal(win.__sikauNepaliVoice.voiceChoiceReport().english,natural.name);
-});
-
-test('Apple prefers human-like English voice instead of Fred',()=>{
- const fred={name:'Fred',lang:'en-US'};
- const samantha={name:'Samantha',lang:'en-US'};
- const {synth,speaks}=mock([fred,samantha]);
- synth.speak({lang:'en-US',text:'Read the next sentence',voice:null});
- assert.equal(speaks[0].voice,'Samantha');
-});
-
-test('When Apple exposes only a novelty voice, preserve browser default',()=>{
- const fred={name:'Fred',lang:'en-US'};
- const {synth,speaks}=mock([fred]);
- synth.speak({lang:'en-US',text:'Reading practice',voice:null});
- assert.equal(speaks[0].voice,'');
-});
-
-test('Use Hemkala natural Nepali female if browser exposes her explicitly',()=>{
- const nepaliGeneric={name:'Nepali Standard',lang:'ne-NP'};
- const {win,synth,speaks}=mock([nepaliGeneric,hemkala]);
- win.__sikauNepaliVoice.select('tr','female');
- synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
- assert.equal(speaks[0].voice,hemkala.name);
-});
-
-test('Do not pretend a gender-unknown Nepali voice is female',()=>{
- const generic={name:'Nepali Standard',lang:'ne-NP'};
- const {win,synth,speaks,sections}=mock([generic]);
- win.__sikauNepaliVoice.select('rd','female');
- synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
- assert.equal(speaks.length,0);
- assert.match(sections.rd.last.textContent,/No female Nepali voice is available/);
-});
-
-
-test('iPhone direct speech API works without replacing native synthesis.speak',()=>{
- const voice={name:'Samantha',lang:'en-US'};
- const {win,speaks}=mock([voice]);
- const player=win.__sikauNepaliVoice;
- assert.equal(typeof player.speakText,'function');
- assert.equal(player.speakText('Hello from iPhone','en-US','tr'),true);
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].text,'Hello from iPhone');
- assert.equal(speaks[0].voice,'Samantha');
-});
-
-test('iPhone direct route preserves the existing Nepali female voice',()=>{
- const {win,speaks}=mock([hemkala]);
- const player=win.__sikauNepaliVoice;
- player.select('tr','female');
- assert.equal(player.speakText('नमस्कार','ne-NP','tr'),true);
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,hemkala.name);
-});
-
-test('iPhone direct route never substitutes female voice for unavailable male Nepali',()=>{
- const {win,speaks,sections}=mock([hemkala]);
- const player=win.__sikauNepaliVoice;
- player.select('tr','male');
- assert.equal(player.speakText('नमस्कार','ne-NP','tr'),false);
- assert.equal(speaks.length,0);
- assert.match(sections.tr.last.textContent,/No male Nepali voice is available/);
-});
-
-test('English Male/Female actually changes voice on Windows and Apple with named voices',()=>{
- const ava={lang:'en-US',name:'Microsoft Ava Online (Natural)'};
- const andrew={lang:'en-US',name:'Microsoft Andrew Online (Natural)'};
- const samantha={lang:'en-US',name:'Samantha'};
- const daniel={lang:'en-GB',name:'Daniel'};
- for(const voices of [[ava,andrew],[samantha,daniel]]){
-  const {win,synth,speaks}=mock(voices);
-  win.__sikauNepaliVoice.select('tr','female');
-  synth.speak({lang:'en-US',text:'Hello, I am a woman'});
-  win.__sikauNepaliVoice.select('tr','male');
-  synth.speak({lang:'en-US',text:'Hello, I am a man'});
-  assert.equal(speaks.length,2);
-  assert.equal(win.__sikauNepaliVoice.englishGender(voices.find(v=>v.name===speaks[0].voice)),'female');
-  assert.equal(win.__sikauNepaliVoice.englishGender(voices.find(v=>v.name===speaks[1].voice)),'male');
- }
-});
-
-test('English Male must never silently use a female voice if male is not installed',()=>{
- const {win,synth,speaks,sections}=mock([{name:'Samantha',lang:'en-US'}]);
- win.__sikauNepaliVoice.select('tr','male');
- synth.speak({lang:'en-US',text:'A new sentence'});
- assert.equal(speaks.length,0);
- assert.match(sections.tr.last.textContent,/No male English voice is available/);
-});
-
-test('No Nepali language voice means no Hindi or English fallback on Android',()=>{
- const {win,synth,speaks,sections}=mock([
-  {name:'Google Hindi India',lang:'hi-IN'},
-  {name:'Google US English',lang:'en-US'}
- ]);
- win.__sikauNepaliVoice.select('tr','female');
- assert.equal(win.__sikauNepaliVoice.speakText('नमस्ते, नेपाल!','ne-NP','tr'),false);
- synth.speak({lang:'ne-NP',text:'नेपाल सुन्दर छ।'});
- assert.equal(speaks.length,0);
- assert.match(sections.tr.last.textContent,/No female Nepali voice is available/);
-});
-
-test('Translate explicitly calls verified voice routing on every device, not only iPhone',()=>{
- assert.match(translate,/v\.__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
- assert.doesNotMatch(translate,/const isIphone=/);
- assert.match(translate,/Selected voice unavailable on this device/);
-});
-
-test('Android gender-unknown Nepali voice can be explicitly played without using Hindi',()=>{
- const androidNepali={name:'Google नेपाली',lang:'ne-NP'};
- const {win,synth,speaks,sections}=mock([
-  {name:'Google हिन्दी',lang:'hi-IN'},androidNepali
- ]);
- const player=win.__sikauNepaliVoice;
- player.select('tr','female');
- assert.equal(player.speakText('नेपालमा स्वागत छ','ne-NP','tr'),false);
- assert.equal(speaks.length,0);
- const button=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-use-device');
- assert.ok(button,'Offers optional device Nepali voice when gender is unknown');
- assert.match(button.textContent,/gender not verified/i);
- button.onclick();
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].text,'नेपालमा स्वागत छ');
- assert.equal(speaks[0].voice,'Google नेपाली');
- assert.equal(player.useUnspecifiedNepali('tr'),true);
- assert.equal(player.speakText('आज राम्रो दिन हो।','ne-NP','tr'),true);
- assert.equal(speaks.length,2);
- assert.equal(speaks[1].voice,'Google नेपाली');
- // Changing Male/Female invalidates the one-time unknown-gender preference.
- player.select('tr','male');
- assert.equal(player.useUnspecifiedNepali('tr'),false);
- assert.equal(player.speakText('भोलि भेटौँला','ne-NP','tr'),false);
-});
-
-test('No Nepali voice never offers a Hindi-labeled substitute: only an optional no-voice probe',()=>{
- const {win,sections,speaks}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
- win.__sikauNepaliVoice.select('tr','female');
- assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
- assert.equal(speaks.length,0);
- assert.deepEqual(sections.tr.last.children.map(x=>x.className),['sikau-nepali-voice-try-native']);
- assert.match(sections.tr.last.textContent,/Install voice data/);
-});
-
-test('Galaxy A03s missing voice list offers explicit raw ne-NP speech test, not automatic Hindi',()=>{
- const {win,speaks,sections}=mock([
-  {name:'Google Hindi',lang:'hi-IN'},{name:'Google English',lang:'en-US'}
- ]);
- win.__sikauNepaliVoice.select('tr','female');
- assert.equal(win.__sikauNepaliVoice.speakText('पोखरा सुन्दर छ।','ne-NP','tr'),false);
- assert.equal(speaks.length,0);
- const testButton=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native');
- assert.ok(testButton,'User can opt in to a one-time Android engine test');
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
- testButton.onclick();
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].lang,'ne-NP');
- assert.equal(speaks[0].voice,'','Raw Android engine test does not send Hindi voice object');
- assert.equal(speaks[0].text,'नमस्ते। तपाईंलाई कस्तो छ?');
- speaks[0].utterance.onstart();
- speaks[0].utterance.onend();
- const accept=sections.tr.last.children.find(x=>x.className==='sikau-nepali-native-confirm');
- assert.ok(accept,'No voice adopted until user hears and confirms');
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
- accept.onclick();
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),true);
- assert.equal(speaks.length,2);
- assert.equal(speaks[1].text,'पोखरा सुन्दर छ।');
- assert.equal(speaks[1].lang,'ne-NP');
- assert.equal(speaks[1].voice,'');
- win.__sikauNepaliVoice.select('tr','male');
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
-});
-
-test('Galaxy A03s native TTS error never enables unsafe fallback',()=>{
- const {win,speaks,sections}=mock([{name:'Google English',lang:'en-US'}]);
- win.__sikauNepaliVoice.select('tr','female');
- assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
- const b=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native');
- assert.ok(b);
- b.onclick();
- speaks[0].utterance.onerror({error:'language-unavailable'});
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
- assert.match(sections.tr.last.textContent,/speech failed/);
-});
-
-test('Galaxy A03s cannot confirm a silent test that never started',()=>{
- const {win,speaks,sections}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
- win.__sikauNepaliVoice.select('tr','female');
- win.__sikauNepaliVoice.speakText('नमस्ते','ne-NP','tr');
- sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native').onclick();
- speaks[0].utterance.onend();
- assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
- assert.match(sections.tr.last.textContent,/No playable Nepali voice confirmed/);
+ assert.doesNotMatch(bridge,/chooseGender|sagarMale|speakWithGender|Play available Nepali voice \(gender not verified\)/);
 });
