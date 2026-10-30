@@ -37,6 +37,15 @@ function nepaliText(line){
   const value=clean(line.getAttribute?.(key)||'');
   if(/[\u0900-\u097f]/u.test(value))return value;
  }
+ // Lesson versions differ in translation markup. Detect a real Devanagari
+ // leaf instead of guessing the class name or displaying the NP button text.
+ const leaves=line.querySelectorAll?.('span,p,div,small')||[];
+ for(const item of leaves){
+  if(item.querySelector?.('button,[role="button"]'))continue;
+  const value=clean(item.textContent||'');
+  if(value.length>=9&&value.length<=1000&&/[\u0900-\u097f]/u.test(value)&&
+     !/^(?:नेपाली|नेपाली हेर्नुहोस्|सुन्नुहोस्|कथा पढ्नुहोस्)$/u.test(value))return value;
+ }
  return '';
 }
 function sentenceTexts(lines){
