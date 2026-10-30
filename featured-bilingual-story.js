@@ -110,7 +110,7 @@ function install(doc,reader,accountId){
  header.append(count);root.append(header);
  const shelf=make(doc,'section','sikau-story-shelf');
  shelf.setAttribute('aria-label','Choose a book · किताब छान्नुहोस्');
- const categories=['All','Adventure','Mystery','Culture','Everyday Life'];
+ const categories=['All','Quick Reads','Adventure','Mystery','Culture','Everyday Life'];
  const filters=make(doc,'nav','sikau-library-filters');
  filters.setAttribute('aria-label','Book categories');
  const grid=make(doc,'div','sikau-library-grid');
@@ -166,7 +166,7 @@ function install(doc,reader,accountId){
    filters.append(tab);
   }
   for(const book of LIBRARY){
-   if(category!=='All'&&book.category!==category)continue;
+   if(category==='Quick Reads'?book.chapters.length>3:category!=='All'&&book.category!==category)continue;
    const progress=selected(book);
    const passed=progress.passed.length;
    const card=make(doc,'article','sikau-library-card');
@@ -179,7 +179,7 @@ function install(doc,reader,accountId){
     make(doc,'p','sikau-library-ne-title',book.neTitle),
     make(doc,'p','sikau-library-description',book.description||'A connected English and Nepali chapter story.'),
     make(doc,'p','sikau-library-ne-description',book.neDescription||''),
-    make(doc,'p','sikau-library-progress',book.chapters.length+' chapters · '+passed+'/'+book.chapters.length+' completed · '+book.level));
+    make(doc,'p','sikau-library-progress',(book.chapters.length<=3?'⚡ Quick read · ':'')+book.chapters.length+' chapters · '+passed+'/'+book.chapters.length+' completed · '+book.level));
    const button=make(doc,'button','sikau-library-open',passed?'Continue reading · पढाइ जारी':'Read this book · किताब पढ्नुहोस्');
    button.type='button';button.addEventListener('click',()=>openBook(book));
    copy.append(button);card.append(image,copy);grid.append(card);
@@ -244,22 +244,37 @@ function install(doc,reader,accountId){
   }
   quiz.append(make(doc,'h4','','Check your understanding · कथा कति बुझ्नुभयो?'));
   quiz.append(make(doc,'p','sikau-featured-help',
-   'Get 100% to unlock the next chapter · अर्को अध्याय खोल्न १००% ल्याउनुहोस्।'));
+   'Tap ONE answer for each question, then check your answers. · प्रत्येक प्रश्नमा एउटा उत्तर छान्नुहोस्, त्यसपछि जाँच्नुहोस्।'));
   const answerKey=currentBook.id+'|'+active;
   const saved=quizAnswers.get(answerKey)||[];
+  const answerCount=make(doc,'p','sikau-featured-answer-count');
+  answerCount.setAttribute('role','status');
+  answerCount.setAttribute('aria-live','polite');
+  const updateAnswerCount=()=>{
+   const answers=quizAnswers.get(answerKey)||[];
+   const filled=c.questions.reduce((sum,_q,i)=>sum+(Number.isInteger(answers[i])?1:0),0);
+   answerCount.textContent=filled+' of '+c.questions.length+' selected · '+filled+'/'+c.questions.length+' उत्तर छानियो';
+  };
+  quiz.append(answerCount);updateAnswerCount();
   c.questions.forEach((question,i)=>{
    const field=make(doc,'fieldset','sikau-featured-question');
    field.append(make(doc,'legend','',String(i+1)+'. '+question.en+' · '+question.ne));
    question.choices.forEach(([en,ne],j)=>{
     const line=make(doc,'label','sikau-featured-option');
     const input=make(doc,'input');input.type='radio';
+    input.className='sikau-featured-radio';
     input.name='sikau-book-'+currentBook.id+'-'+active+'-'+i;
     input.value=String(j);input.checked=saved[i]===j;
     input.addEventListener('change',()=>{
      const answers=quizAnswers.get(answerKey)||[];answers[i]=j;quizAnswers.set(answerKey,answers);
-     feedback.textContent='';
+     feedback.textContent='';updateAnswerCount();
     });
-    line.append(input,make(doc,'span','',en+' · '+ne));field.append(line);
+    const marker=make(doc,'span','sikau-featured-choice-marker','ABC'[j]);
+    marker.setAttribute('aria-hidden','true');
+    const choice=make(doc,'span','sikau-featured-choice-text',en+' · '+ne);
+    const chosen=make(doc,'span','sikau-featured-choice-state','✓ Selected · छानियो');
+    chosen.setAttribute('aria-hidden','true');
+    line.append(input,marker,choice,chosen);field.append(line);
    });
    quiz.append(field);
   });
@@ -269,7 +284,7 @@ function install(doc,reader,accountId){
   check.addEventListener('click',()=>{
    const answers=quizAnswers.get(answerKey)||[];
    const score=c.questions.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);
-   if(answers.length<c.questions.length||answers.some(x=>!Number.isInteger(x))){
+   if(c.questions.some((_q,i)=>!Number.isInteger(answers[i]))){
     feedback.textContent='Answer all questions · सबै प्रश्नको उत्तर दिनुहोस्।';return;
    }
    if(score!==c.questions.length){
