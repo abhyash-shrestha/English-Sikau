@@ -416,5 +416,68 @@ books.push(
 }
 );
 
+
+/* Two additional original, connected three-chapter short books. */
+books.push(
+{
+ id:'mysterious-house',title:'The Mysterious House',neTitle:'रहस्यमय घर',
+ category:'Mystery',level:'A2–B1',cover:'./assets/read-topics/mystery.svg',
+ description:'A curious light leads two cousins to an old neighborhood secret.',
+ neDescription:'एउटा अनौठो बत्तीले दुई दाजुबहिनीलाई पुरानो रहस्यसम्म पुर्‍याउँछ।',
+ chapters:[
+ chapter('The Light in the Window','झ्यालमा देखिएको उज्यालो',[
+ ['Every evening, a small light appeared in the window of an empty house near Aarav’s home in Bhaktapur. No one had lived there for years. When his cousin Mira visited, she noticed the same light and asked who was inside.','भक्तपुरमा आरवको घरनजिकैको खाली घरको झ्यालमा हरेक साँझ सानो बत्ती बल्थ्यो। वर्षौँदेखि त्यहाँ कोही बसेका थिएनन्। उसकी बहिनी मिरा भेट्न आउँदा उनले पनि त्यो उज्यालो देखिन् र भित्र को होला भनेर सोधिन्।'],
+ ['Aarav wanted to climb the wall, but Mira stopped him. “It belongs to someone. We should ask the owner,” she said. Their grandmother knew the family and offered to call them the following morning.','आरव पर्खाल चढ्न चाहन्थ्यो, तर मिराले रोकिन्। “यो कसैको घर हो। हामीले मालिकलाई सोध्नुपर्छ,” उनले भनिन्। उनीहरूकी हजुरआमाले त्यो परिवारलाई चिन्नुहुन्थ्यो र भोलिपल्ट फोन गर्ने बताउनुभयो।']
+ ],[
+ q('Where did the strange light appear?','अनौठो उज्यालो कहाँ देखिन्थ्यो?', [['In an empty house','खाली घरमा'],['Under a bridge','पुलमुनि'],['Inside a bus','बसभित्र']],0),
+ q('Why did Mira stop Aarav from climbing the wall?','मिराले आरवलाई पर्खाल चढ्न किन रोकिन्?', [['The house belonged to someone','घरको मालिक थियो'],['She wanted to race him','उनी दौड गर्न चाहन्थिन्'],['They had no shoes','उनीहरूसँग जुत्ता थिएन']],0)
+ ]),
+ chapter('The Keeper of the Keys','साँचो राख्ने व्यक्ति',[
+ ['The owner explained that a retired clockmaker named Dev had permission to look after the house. He visited in the evenings to repair a collection of old wall clocks. Grandmother arranged for the children to meet him at the front door.','घरका मालिकले देव नामका अवकाशप्राप्त घडी मर्मत गर्ने व्यक्तिलाई घरको हेरचाह गर्न अनुमति दिएको बताए। उनी बेलुका पुराना भित्ते घडीहरू मर्मत गर्न आउँथे। हजुरआमाले बालबालिकालाई मूल ढोकामा उनीसँग भेट्ने व्यवस्था गर्नुभयो।'],
+ ['Dev smiled when he heard their question. “The light comes from my worktable,” he said. Inside, dozens of clocks waited on shelves. He showed them a wooden clock that had stopped exactly twenty years earlier.','उनीहरूको प्रश्न सुनेर देव मुस्कुराए। “त्यो बत्ती मेरो काम गर्ने टेबुलको हो,” उनले भने। भित्र दराजहरूमा दर्जनौँ घडी थिए। उनले ठ्याक्कै बीस वर्षअघि रोकिएको काठको घडी देखाए।']
+ ],[
+ q('Who had permission to visit the house?','घरमा जान कसलाई अनुमति थियो?', [['Dev, the clockmaker','घडी मर्मत गर्ने देवलाई'],['A school driver','विद्यालयको चालकलाई'],['An unknown tourist','अपरिचित पर्यटकलाई']],0),
+ q('What was Dev repairing?','देवले के मर्मत गर्दै थिए?', [['Old clocks','पुराना घडीहरू'],['Bicycles','साइकलहरू'],['Televisions','टेलिभिजनहरू']],0)
+ ]),
+ chapter('The House That Ticked Again','फेरि टिकटक गर्ने घर',[
+ ['Dev explained that the clock had belonged to the owner’s grandfather. He had promised to repair it before the family reunion on Saturday. Mira helped sort the clock parts while Aarav carefully read the instructions aloud.','देवले त्यो घडी घरमालिकका हजुरबुबाको भएको बताए। शनिबारको पारिवारिक भेटघाटअघि मर्मत गर्ने उनले वाचा गरेका थिए। मिराले घडीका भागहरू मिलाउन सघाइन् र आरवले निर्देशनहरू ध्यानपूर्वक पढेर सुनायो।'],
+ ['At last, the clock began to tick. On Saturday, the family gathered and heard its familiar sound again. Aarav looked at the window and laughed. The mysterious light had not hidden a ghost; it had helped bring a family memory back to life.','अन्ततः घडी टिकटक गर्न थाल्यो। शनिबार परिवार भेला हुँदा सबैले त्यो परिचित आवाज फेरि सुने। आरवले झ्यालतिर हेरेर हाँस्यो। रहस्यमय उज्यालोले कुनै भूत लुकाएको थिएन; त्यसले परिवारको पुरानो सम्झना फेरि जीवित बनाउन सहयोग गरेको थियो।']
+ ],[
+ q('Whose clock was being repaired?','मर्मत भइरहेको घडी कसको थियो?', [['The owner’s grandfather’s','घरमालिकका हजुरबुबाको'],['Mira’s teacher’s','मिराकी शिक्षिकाको'],['A bus passenger’s','बस यात्रीको']],0),
+ q('What was the real reason for the evening light?','बेलुकाको बत्ती बल्नुको वास्तविक कारण के थियो?', [['Dev was working on old clocks','देव पुराना घडी मर्मत गर्दै थिए'],['Someone was hiding treasure','कसैले खजाना लुकाउँदै थियो'],['A ghost was visiting','भूत आइरहेको थियो']],0)
+ ])
+ ]
+},
+{
+ id:'visit-to-bhaktapur',title:'A Visit to Bhaktapur',neTitle:'भक्तपुरको भ्रमण',
+ category:'Culture',level:'A2',cover:'./assets/read-topics/culture.svg',
+ description:'A family day trip becomes a lesson in art and helping strangers.',
+ neDescription:'परिवारको भक्तपुर भ्रमण कला र सहयोगको रमाइलो पाठ बन्छ।',
+ chapters:[
+ chapter('The Morning in the Square','दरबार क्षेत्रको बिहान',[
+ ['On Saturday morning, Lila visited Bhaktapur Durbar Square with her father and her cousin Ben, who had come from abroad. Ben carried a sketchbook because he wanted to draw the temples and wooden windows.','शनिबार बिहान लिला बुबा र विदेशबाट आएका दाजु बेनसँग भक्तपुर दरबार क्षेत्र गइन्। बेनले मन्दिर र काठका झ्यालको चित्र कोर्न स्केचबुक बोकेका थिए।'],
+ ['They walked slowly through the square and listened to a local guide explain the traditional buildings. Lila translated a few unfamiliar English words for her father. Ben stopped beside a beautiful carved window to draw it.','उनीहरू दरबार क्षेत्रमा बिस्तारै हिँडे र स्थानीय पथप्रदर्शकले परम्परागत भवनबारे बताएका कुरा सुने। लिलाले केही अपरिचित अंग्रेजी शब्द बुबालाई नेपालीमा बुझाइन्। बेन एउटा सुन्दर कुँदिएको झ्यालछेउ चित्र कोर्न रोकिए।']
+ ],[
+ q('Why did Ben bring a sketchbook?','बेनले स्केचबुक किन बोकेका थिए?', [['To draw buildings','भवनहरूको चित्र कोर्न'],['To record bus fares','बस भाडा लेख्न'],['To write a shopping bill','किनमेलको बिल लेख्न']],0),
+ q('Who explained the traditional buildings?','परम्परागत भवनबारे कसले बताए?', [['A local guide','स्थानीय पथप्रदर्शकले'],['A bus conductor','बस सहचालकले'],['A chef','भान्सेले']],0)
+ ]),
+ chapter('A Missing Sketchbook','हराएको स्केचबुक',[
+ ['After lunch, Ben reached for his bag and realized the sketchbook was missing. He had left it beside the carved window. The group returned to the square, but it was no longer there. Ben looked disappointed.','खाना खाइसकेपछि बेनले झोला खोल्दा स्केचबुक हराएको थाहा पाए। उनले त्यो कुँदिएको झ्यालछेउ छोडेका रहेछन्। उनीहरू दरबार क्षेत्रमा फर्किए, तर कापी त्यहाँ थिएन। बेन निराश देखिए।'],
+ ['Instead of searching carelessly, Lila asked nearby shopkeepers if anyone had found a notebook. A pottery seller remembered that a young student had taken it to the visitor information desk so the owner could collect it.','जथाभावी खोज्नुको सट्टा लिलाले नजिकका पसलेहरूलाई कसैले कापी भेट्यो कि भनेर सोधिन्। एक माटाका भाँडा बेच्ने व्यक्तिले एक विद्यार्थीले मालिकले लिन सकून् भनेर त्यो कापी पर्यटक सूचना केन्द्रमा पुर्‍याएको बताए।']
+ ],[
+ q('Where did Ben leave his sketchbook?','बेनले स्केचबुक कहाँ छोडेका थिए?', [['Beside a carved window','कुँदिएको झ्यालछेउ'],['Inside a taxi','ट्याक्सीभित्र'],['At their hotel','होटलमा']],0),
+ q('Where was the notebook taken?','कापी कहाँ पुर्‍याइएको थियो?', [['To the information desk','सूचना केन्द्रमा'],['To the bus station','बसपार्कमा'],['To a hospital','अस्पतालमा']],0)
+ ]),
+ chapter('A Memory to Take Home','घर लैजाने सम्झना',[
+ ['At the information desk, Ben described his blue cover and the drawing on the first page. The worker checked the details and returned the sketchbook. Ben thanked the student through a note left at the desk.','सूचना केन्द्रमा बेनले निलो कभर र पहिलो पानाको चित्रबारे बताए। कर्मचारीले विवरण मिलाएर स्केचबुक फिर्ता दिए। बेनले विद्यार्थीका लागि धन्यवादको चिठी त्यहीँ छोडे।'],
+ ['Before leaving, the family visited Pottery Square and watched an artist shape clay on a wheel. Ben added one final drawing to his book: a potter at work. “I came for buildings,” he said, “but I will remember the helpful people too.”','फर्कनुअघि परिवार माटाका भाँडा बनाउने चोक पुग्यो र एक कलाकारले चाकमा माटोको भाँडा बनाएको हेर्‍यो। बेनले किताबमा अन्तिम चित्र कोरे: काम गरिरहेका कुमाले। “म भवन हेर्न आएको थिएँ,” उनले भने, “तर सहयोगी मानिसहरूलाई पनि सम्झिरहनेछु।”']
+ ],[
+ q('How did Ben prove the sketchbook was his?','बेनले स्केचबुक आफ्नो भएको कसरी पुष्टि गरे?', [['By describing its cover and drawing','कभर र चित्रबारे बताएर'],['By buying a new notebook','नयाँ कापी किनेर'],['By asking a stranger to guess','अपरिचितलाई अनुमान लगाउन भनेर']],0),
+ q('What did Ben draw at Pottery Square?','बेनले माटाका भाँडा बनाउने चोकमा केको चित्र कोरे?', [['A potter at work','काम गरिरहेका कुमालेको'],['A bicycle race','साइकल दौडको'],['A football match','फुटबल खेलको']],0)
+ ])
+ ]
+}
+);
+
 window.__sikauExtraStoryBooks=books;
 })();
