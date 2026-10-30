@@ -41,6 +41,7 @@ class Element{
    if(selector==='[data-storylevel].on')return !!node.attrs['data-storylevel']&&node.className.split(/\s+/).includes('on');
    if(selector[0]==='#')return node.id===selector.slice(1);
    if(selector[0]==='.')return node.className.split(/\s+/).includes(selector.slice(1));
+   if(/^[a-z]+$/i.test(selector))return node.tagName===selector.toUpperCase();
    return false;
   };
   const walk=node=>{for(const child of node.children){
