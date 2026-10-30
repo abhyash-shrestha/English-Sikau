@@ -1,0 +1,36 @@
+name: Free Cloudflare Pages build check
+on:
+  pull_request:
+    paths:
+      - 'scripts/build-cloudflare-pages.mjs'
+      - 'cloudflare-site/**'
+      - 'test/cloudflare-pages-build.test.mjs'
+      - '.github/workflows/cloudflare-pages-build.yml'
+      - '*.html'
+      - '*.js'
+      - '*.css'
+      - 'assets/**'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build-cloudflare-pages.mjs'
+      - 'cloudflare-site/**'
+      - 'test/cloudflare-pages-build.test.mjs'
+      - '.github/workflows/cloudflare-pages-build.yml'
+      - '*.html'
+      - '*.js'
+      - '*.css'
+      - 'assets/**'
+jobs:
+  validate-static-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build public site; confirm Appwrite functions stay private
+        run: node --test test/cloudflare-pages-build.test.mjs
