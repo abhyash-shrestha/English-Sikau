@@ -772,6 +772,98 @@ function sendToNative(d,ask,prompt){
  * Clicking the Visa item opens the authorized Coach page using its native
  * navigation button, then displays only the Visa study experience.
  */
+// Visa navigation is part of the core classroom, not a side effect of
+// opening Coach. Create it as soon as the authenticated nav exists.
+function ensureVisaNavigation(doc,onSelect){
+ const nav=doc?.querySelector('#mobileModes.nav')||doc?.querySelector('.nav');
+ if(!nav)return false;
+ const coach=nav.querySelector('button[data-t="coach"]');
+ const existing=Array.from(nav.querySelectorAll(':scope > button.sikau-visa-nav'));
+ let visa=nav.__sikauVisaOriginal?.parentElement===nav?nav.__sikauVisaOriginal:
+  existing.find(button=>button.__sikauVisaBound)||existing[0]||null;
+ if(!visa){
+  visa=doc.createElement('button');
+  visa.type='button';
+  visa.className='sikau-visa-nav';
+  const icon=doc.createElement('i');
+  icon.className='sikau-visa-nav-icon';icon.textContent='🏛️';
+  icon.setAttribute('aria-hidden','true');
+  const words=doc.createElement('span');words.className='sikau-nav-word sikau-visa-nav-word';
+  const title=doc.createElement('strong');title.textContent='U.S. Visa Interview';
+  const nepali=doc.createElement('small');nepali.lang='ne';
+  nepali.textContent='अमेरिकी भिसा अन्तर्वार्ता';
+  words.append(title,nepali);visa.append(icon,words);
+  if(coach)nav.insertBefore(visa,coach.nextSibling);
+  else nav.appendChild(visa);
+ }
+ for(const extra of existing)if(extra!==visa)extra.remove();
+ visa.type='button';
+ visa.setAttribute('aria-label','U.S. Visa Interview · अमेरिकी भिसा अन्तर्वार्ता');
+ visa.hidden=false;
+ if(visa.style?.display==='none')visa.style.removeProperty('display');
+ nav.__sikauVisaOriginal=visa;
+ // Full Coach setup attaches its own click handler to this same node.
+ // The bootstrap handler runs ONLY before that handler is available.
+ if(!visa.__sikauVisaEarlyBound){
+  visa.__sikauVisaEarlyBound=true;
+  visa.addEventListener('click',event=>{
+   if(visa.__sikauVisaBound)return;
+   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+   if(nav.__sikauVisaEarlyLoading)return;
+   nav.__sikauVisaEarlyLoading=true;
+   const root=doc.documentElement;
+   root.classList.add('sikau-visa-nav-active');
+   root.classList.remove('sikau-home-active');
+   root.dataset.sikauVisaMode='visa';
+   // Native Coach navigation loads its content on some protected builds.
+   const coachNow=nav.querySelector('button[data-t="coach"]');
+   if(coachNow){
+    nav.__sikauSelectingVisa=true;
+    try{coachNow.click();}finally{nav.__sikauSelectingVisa=false;}
+   }
+   // Some private builds initialize #coach after an async redraw. Recheck
+   // briefly rather than making the student click Coach manually.
+   const view=doc.defaultView;
+   let attempts=0;
+   const finish=()=>{
+    if(!visa.isConnected||nav.isConnected===false){nav.__sikauVisaEarlyLoading=false;return;}
+    try{onSelect?.();}catch(_){}
+    const active=nav.querySelector('.sikau-visa-nav');
+    if(active?.__sikauVisaBound){
+     nav.__sikauVisaEarlyLoading=false;
+     active.click();
+    }else if(++attempts<20){
+     view?.setTimeout?.(finish,100);
+    }else{
+     nav.__sikauVisaEarlyLoading=false;
+     root.dataset.sikauVisaMode='everyday';
+     root.classList.remove('sikau-visa-nav-active');
+     // Keep the tab visible and provide useful feedback if the private
+     // Coach screen genuinely failed to load.
+     const status=doc.querySelector('#coach .content')||doc.querySelector('.content');
+     let notice=doc.getElementById('sikauVisaLoadError');
+     if(!notice&&status){
+      notice=doc.createElement('p');notice.id='sikauVisaLoadError';
+      notice.setAttribute('role','status');status.prepend(notice);
+     }
+     if(notice)notice.textContent='Visa practice could not load. Please refresh the classroom and retry.';
+    }
+   };
+   finish();
+  });
+ }
+ if(!nav.__sikauVisaPresenceObserver&&typeof doc.defaultView?.MutationObserver==='function'){
+  const observer=new doc.defaultView.MutationObserver(records=>{
+   if(!records.some(r=>r.type==='childList'))return;
+   if(!nav.querySelector(':scope > button.sikau-visa-nav'))
+    ensureVisaNavigation(doc,onSelect);
+  });
+  observer.observe(nav,{childList:true});
+  nav.__sikauVisaPresenceObserver=observer;
+ }
+ return true;
+}
+window.sikauEnsureVisaNav=ensureVisaNavigation;
 function installVisaSidebar(doc,shell,visaController){
  const nav=doc.querySelector('#mobileModes.nav')||doc.querySelector('.nav');
  if(!nav||!visaController)return false;
@@ -990,8 +1082,11 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  if(!oldHero||!ask||!oldHero.parentElement)return;
  const previous=doc.getElementById('sikauCoachConversations');
  if(previous&&(previous.isConnected||previous.parentElement)){
-  // The parent's personalization observer may revisit an already mounted
-  // Coach. Reassert the actual sidebar mode without installing new listeners.
+  // A private lesson may rebuild the navigation without rebuilding Coach.
+  // Rebind its existing controller on the NEW nav, rather than making Visa
+  // appear only after Coach gets clicked again.
+  if(previous.__sikauVisaController)
+   installVisaSidebar(doc,previous,previous.__sikauVisaController);
   const nav=doc.querySelector('#mobileModes.nav')||doc.querySelector('.nav');
   if(nav?.__sikauVisaShell===previous){
    if(doc.documentElement.dataset.sikauVisaMode==='visa')nav.__sikauVisaController?.showVisa();
@@ -1512,6 +1607,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
  everydayContainer.id='sikauCoachEveryday';
  [top,banner,browser,stage,notice].forEach(node=>everydayContainer.appendChild(node));
  const visaController=enhanceVisaInterviewCoach(doc,shell,ask);
+ shell.__sikauVisaController=visaController;
  installVisaSidebar(doc,shell,visaController);
  hideRedundantCoachCultureLab(doc);
  hideRedundantCoachAdventurePanel(doc);
