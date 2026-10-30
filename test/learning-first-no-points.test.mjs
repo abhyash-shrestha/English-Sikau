@@ -14,8 +14,8 @@ const index=source('index.html');
 const coach=source('coach-dashboard.js');
 
 test('All edited JavaScript files remain syntactically valid',()=>{
- for(const code of [progress,nepal,game,coach]){
-  assert.doesNotThrow(()=>new Function(code));
+ for(const [name,code] of Object.entries({progress,nepal,game,coach})){
+  assert.doesNotThrow(()=>new Function(code),'Syntax error in '+name);
  }
 });
 
