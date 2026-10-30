@@ -16,12 +16,15 @@ function mock(voices){
  };
  const sections=Object.fromEntries(['tr','rd'].map(key=>[key,{
   last:null,appendChild(node){this.last=node;},
-  querySelector(){return null;},querySelectorAll(){return[]}
+  querySelector(selector){
+   return selector==='.sikau-nepali-voice-status'&&
+     this.last?.className==='sikau-nepali-voice-status'?this.last:null;
+  },querySelectorAll(){return[]}
  }]));
  const win={speechSynthesis:synth,SpeechSynthesisUtterance:class {constructor(text){this.text=text;this.lang='';this.voice=null;}}};
  const doc={body:{},defaultView:win,
   getElementById:key=>sections[key],
-  createElement:()=>({className:'',style:{},setAttribute(){},textContent:''}),
+  createElement:()=>({className:'',style:{},children:[],appendChild(node){this.children.push(node);},setAttribute(){},textContent:''}),
   addEventListener:(key,callback)=>{events[key]=callback}
  };
  const sandbox={window:win,console};
@@ -77,10 +80,10 @@ test('Female and male UI labels are recognized separately',()=>{
 
 test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/reading-dashboard\.js\?v=20261030-voice-gender-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
  assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
- assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
+ assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
  assert.match(translate,/__sikauNepaliVoice\.speakText/);
  assert.match(translate,/const outputLanguage=nativeDirection\(sec\)==='ne'\?'en-US':'ne-NP'/);
 });
@@ -263,4 +266,38 @@ test('Translate explicitly calls verified voice routing on every device, not onl
  assert.match(translate,/v\.__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
  assert.doesNotMatch(translate,/const isIphone=/);
  assert.match(translate,/Selected voice unavailable on this device/);
+});
+
+test('Android gender-unknown Nepali voice can be explicitly played without using Hindi',()=>{
+ const androidNepali={name:'Google नेपाली',lang:'ne-NP'};
+ const {win,synth,speaks,sections}=mock([
+  {name:'Google हिन्दी',lang:'hi-IN'},androidNepali
+ ]);
+ const player=win.__sikauNepaliVoice;
+ player.select('tr','female');
+ assert.equal(player.speakText('नेपालमा स्वागत छ','ne-NP','tr'),false);
+ assert.equal(speaks.length,0);
+ const button=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-use-device');
+ assert.ok(button,'Offers optional device Nepali voice when gender is unknown');
+ assert.match(button.textContent,/gender not verified/i);
+ button.onclick();
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].text,'नेपालमा स्वागत छ');
+ assert.equal(speaks[0].voice,'Google नेपाली');
+ assert.equal(player.useUnspecifiedNepali('tr'),true);
+ assert.equal(player.speakText('आज राम्रो दिन हो।','ne-NP','tr'),true);
+ assert.equal(speaks.length,2);
+ assert.equal(speaks[1].voice,'Google नेपाली');
+ // Changing Male/Female invalidates the one-time unknown-gender preference.
+ player.select('tr','male');
+ assert.equal(player.useUnspecifiedNepali('tr'),false);
+ assert.equal(player.speakText('भोलि भेटौँला','ne-NP','tr'),false);
+});
+
+test('No Nepali voice never offers a Hindi-labeled fallback button',()=>{
+ const {win,sections}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
+ win.__sikauNepaliVoice.select('tr','female');
+ assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
+ assert.equal(sections.tr.last.children.length,0);
+ assert.match(sections.tr.last.textContent,/Install voice data/);
 });
