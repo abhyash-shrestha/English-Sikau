@@ -146,6 +146,7 @@ function installReadingRepairs(d,box,accountId){
 window.enhanceReadingDashboard=function(d,accountId){
  if(d?.body)window.enhanceUnifiedSpeech?.(d);
  installClearNepaliActions(d);
+ window.enhancePracticeBilingualReading?.(d);
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
  if(!rd||!content||!mode||!box)return;
  installReadingRepairs(d,box,accountId);
