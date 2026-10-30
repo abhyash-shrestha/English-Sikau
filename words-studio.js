@@ -121,18 +121,15 @@ function combined(doc,box){
 }
 function speak(doc,text,lang){
  if(!text)return;
- try{
-  if(typeof doc.defaultView.speak==='function'){
-   doc.defaultView.speak(text,.88,lang);
-   return;
-  }
- }catch(_){}
- const view=doc.defaultView;
- if(view.speechSynthesis&&view.SpeechSynthesisUtterance){
-  const utterance=new view.SpeechSynthesisUtterance(text);
-  utterance.lang=lang==='ne'?'ne-NP':'en-US';utterance.rate=.88;
-  view.speechSynthesis.cancel();view.speechSynthesis.speak(utterance);
+ const view=doc.defaultView,locale=lang==='ne'?'ne-NP':'en-US';
+ // Words and sample sentences use the same US/Nepali player as Translate.
+ try{window.enhanceUnifiedSpeech?.(doc);}catch(_){}
+ if(view.__sikauNepaliVoice?.speakText){
+  view.__sikauNepaliVoice.speakText(text,locale,'words');
+  return;
  }
+ // No unverified locale or device-default fallback: missing speech is
+ // explained by the shared player after it is loaded.
 }
 window.enhanceWordsDashboard=function(doc){
  if(!doc?.body||!doc.head)return;
