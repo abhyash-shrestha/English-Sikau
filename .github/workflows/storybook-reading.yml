@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'storybook-reading.js'
+      - 'featured-bilingual-story.js'
+      - 'featured-bilingual-story.css'
+      - 'test/featured-bilingual-story.test.mjs'
       - 'storybook-reading.css'
       - 'reading-dashboard.js'
       - 'index.html'
@@ -14,6 +17,9 @@ on:
     branches: [main]
     paths:
       - 'storybook-reading.js'
+      - 'featured-bilingual-story.js'
+      - 'featured-bilingual-story.css'
+      - 'test/featured-bilingual-story.test.mjs'
       - 'storybook-reading.css'
       - 'reading-dashboard.js'
       - 'index.html'
@@ -32,4 +38,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test book layout, native audio, quiz unlocks
-        run: node --test test/storybook-reading.test.mjs test/story-level-grading.test.mjs test/learner-experience.test.mjs test/nepali-voice-bridge.test.mjs
+        run: node --test test/featured-bilingual-story.test.mjs test/storybook-reading.test.mjs test/story-level-grading.test.mjs test/learner-experience.test.mjs test/nepali-voice-bridge.test.mjs
