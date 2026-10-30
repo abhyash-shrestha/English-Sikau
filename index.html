@@ -1197,7 +1197,7 @@ html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
 <script src="./words-studio.js?v=20261030-learner-audit-r1"></script>
 <script src="./writing-coach-dashboard.js?v=20261030-learner-audit-r1"></script>
 <script src="./reading-dashboard.js?v=20261030-book-r1"></script>
-<script src="./storybook-reading.js?v=20261030-book-r1"></script>
+<script src="./storybook-reading.js?v=20261030-bilingual-r2"></script>
 <script src="./nepali-voice-bridge.js?v=20261030-platform-audio-r1"></script>
 <script src="./speech-input.js?v=20261030-platform-audio-r1"></script>
 <script src="./game-adventure.js?v=20261030-no-rewards-r1"></script>
@@ -3519,11 +3519,111 @@ async function openFile(token='',isTrial=false){
     const qualityInstalled=qualityEntry.test(repairedHtml);
     const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>lightningTimingPatch+'\n'+writingQualityPatch+'\n'+m):repairedHtml;
     if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
+    const gradedStoryPatch=String.raw`
+/* English Sikau · 10 truly graded story levels.
+   Override only the existing story-text generator INSIDE the authorized
+   private lesson. Keep its original book data, quizzes and access rules. */
+(function(){
+ if(typeof storyBuildChapters!=='function'||typeof storyQuestions!=='function')return;
+ storyBuildChapters=function(b,lvl){
+  var level=Math.max(1,Math.min(10,Number(lvl)||1));
+  var tier=Math.floor((level-1)/2),advanced=level%2===0;
+  var who=b.hero,place=b.place,goal=b.goal,obstacle=b.obstacle,
+      clue=b.clue,action=b.action,outcome=b.outcome,lesson=b.lesson;
+  var choose=function(easy,hard){return advanced?hard:easy};
+  var scenes;
+  if(tier===0){
+   scenes=[
+    [choose(who+' arrived at '+place+'.',who+' arrived at '+place+' and looked around.'),
+     choose(who+' wanted to '+goal+'.',who+' hoped to '+goal+' without any trouble.'),
+     choose('The day was just beginning.','At first, the plan seemed simple.')],
+    ['A problem appeared: '+obstacle+'.',
+     choose(who+' felt worried but stayed calm.',who+' was worried, but decided to stay calm.'),
+     choose(who+' looked for another way.',who+' took a moment to think about what to do next.')],
+    ['Then a useful clue appeared: '+clue+'.',
+     who+' '+action+'.',
+     choose('The plan began to work.','The careful choice slowly made things better.')],
+    ['In the end, '+outcome+'.',
+     who+' learned that '+lesson+'.',
+     choose('It was a day to remember.','The experience became an important memory.')]
+   ];
+  }else if(tier===1){
+   scenes=[
+    [choose(who+' arrived at '+place+', ready for a new challenge.',who+' reached '+place+' with a clear purpose in mind.'),
+     choose(who+' planned to '+goal+' because the goal mattered.','Although the task seemed manageable, '+who+' still intended to '+goal+'.'),
+     choose('Before starting, '+who+' checked the surroundings.','Rather than rushing, '+who+' considered the safest way to begin.')],
+    ['The plan became difficult when '+obstacle+'.',
+     choose(who+' remained calm and considered a different approach.','Although the setback was frustrating, '+who+' stayed composed and reconsidered the plan.'),
+     choose('A quick reaction might have caused more trouble.','Taking time to reflect seemed wiser than acting immediately.')],
+    ['The situation changed when '+clue+'.',
+     who+' '+action+'.',
+     choose('That decision helped the plan move forward.','Because the choice was thoughtful, the situation gradually improved.')],
+    ['Eventually, '+outcome+'.',
+     choose(who+' realized that '+lesson+'.','Reflecting on the experience, '+who+' understood that '+lesson+'.'),
+     choose('The challenges made the achievement more meaningful.','The obstacles gave the final outcome a deeper significance.')]
+   ];
+  }else if(tier===2){
+   scenes=[
+    [choose('After reaching '+place+', '+who+' considered the goal ahead.','Having arrived at '+place+', '+who+' began assessing the situation.'),
+     choose(who+' intended to '+goal+', although the route forward was uncertain.',who+' remained determined to '+goal+' despite the uncertainty ahead.'),
+     choose('A careful beginning seemed more sensible than a hurried one.','Recognizing the value of preparation, '+who+' resisted the temptation to rush.')],
+    ['The original plan was disrupted by an unexpected difficulty: '+obstacle+'.',
+     choose('Although concerned, '+who+' stayed calm enough to reconsider the available choices.','Remaining calm rather than allowing frustration to dictate the response, '+who+' evaluated alternative approaches.'),
+     choose('The most obvious response was not necessarily the wisest.','A decision made in haste could have made the circumstances even more difficult.')],
+    ['An important clue emerged: '+clue+'.',
+     choose('After weighing the possibilities, '+who+' '+action+'.','Having examined the evidence, '+who+' '+action+'.'),
+     choose('The resulting progress restored some confidence.','Each deliberate step reduced the uncertainty surrounding the goal.')],
+    ['Ultimately, '+outcome+'.',
+     choose('Looking back, '+who+' recognized that '+lesson+'.','The outcome led '+who+' to appreciate that '+lesson+'.'),
+     choose('The journey had demanded patience as well as effort.','What remained most valuable was the judgement acquired through difficulty.')]
+   ];
+  }else if(tier===3){
+   scenes=[
+    [choose('What began at '+place+' initially appeared to be a straightforward undertaking.','On arriving at '+place+', '+who+' faced a task that seemed deceptively straightforward.'),
+     choose('Determined to '+goal+', '+who+' considered several possible approaches.','While committed to '+goal+', '+who+' recognized that intention alone would not guarantee success.'),
+     choose('Careful observation provided a more reliable starting point than assumption.','The distinction between a plausible plan and a dependable one soon became important.')],
+    ['The undertaking was complicated by a significant obstacle: '+obstacle+'.',
+     choose('Rather than respond impulsively, '+who+' remained calm and reconsidered the priorities.','Although an immediate reaction might have been tempting, '+who+' remained calm and reassessed the available options.'),
+     choose('The situation demanded both flexibility and a clear assessment of risk.','The challenge revealed how easily a reasonable plan can be undermined by unforeseen circumstances.')],
+    ['A potentially valuable clue came to light: '+clue+'.',
+     choose('Having evaluated its relevance, '+who+' '+action+'.','Only after considering the evidence did '+who+' decide on a practical response: '+action+'.'),
+     choose('This measured response gradually restored progress.','Progress resulted not from chance alone but from several carefully connected decisions.')],
+    ['In the end, '+outcome+'.',
+     choose('In retrospect, '+who+' understood that '+lesson+'.','The final outcome reinforced the realization that '+lesson+'.'),
+     choose('The experience illustrated the value of thoughtful perseverance.','Its lasting importance lay as much in the decisions taken as in the achievement itself.')]
+   ];
+  }else{
+   scenes=[
+    [choose('At '+place+', '+who+' confronted an undertaking whose apparent simplicity concealed considerable uncertainty.','The circumstances awaiting '+who+' at '+place+' were more intricate than the initial objective suggested.'),
+     choose('Although determined to '+goal+', '+who+' resisted treating confidence as a substitute for preparation.','Despite a firm determination to '+goal+', '+who+' recognized that sound judgement would be indispensable.'),
+     choose('An informed decision required distinguishing observable facts from convenient assumptions.','Such an undertaking demanded not merely initiative but a disciplined assessment of the options available.')],
+    ['An unforeseen complication threatened the original plan: '+obstacle+'.',
+     choose('Rather than allow anxiety to narrow the choices, '+who+' calmly re-evaluated both the immediate risks and longer-term consequences.','Faced with circumstances that could not responsibly be ignored, '+who+' maintained composure while reassessing the underlying assumptions.'),
+     choose('A superficially attractive solution might have resolved the immediate difficulty while introducing more serious risks.','What appeared at first to be a minor setback now called for a response proportionate to its wider implications.')],
+    ['A significant new piece of evidence emerged: '+clue+'.',
+     choose('Having scrutinized its reliability and practical relevance, '+who+' '+action+'.','After considering how the clue affected the broader situation, '+who+' '+action+'.'),
+     choose('The resulting progress reflected a sequence of reasoned choices rather than an isolated stroke of luck.','The turning point demonstrated how careful interpretation of evidence can reshape an apparently intractable problem.')],
+    ['Ultimately, '+outcome+'.',
+     choose('In retrospect, '+who+' came to understand that '+lesson+'.','Reflecting on the outcome and the decisions that preceded it, '+who+' recognized that '+lesson+'.'),
+     choose('The achievement did not erase the earlier uncertainty; instead, it gave those difficult decisions their lasting meaning.','The deeper lesson concerned not simply achieving an objective but developing the judgement required to navigate uncertainty responsibly.')]
+   ];
+  }
+  return scenes.map(function(text,i){
+   return {title:['The Beginning','The Challenge','The Turning Point','The Ending'][i],
+    text:text,qa:storyQuestions(b,i)};
+  });
+ };
+})();
+`;
+    const storyGeneratorBoundary=/\nfunction storyQuestions\s*\(\s*b\s*,\s*i\s*\)\s*\{/;
+    const storyWithGrade=storyGeneratorBoundary.test(lessonsWithQuality)?
+      lessonsWithQuality.replace(storyGeneratorBoundary,m=>'\n'+gradedStoryPatch+m):lessonsWithQuality;
+    if(storyWithGrade===lessonsWithQuality)console.warn('Reading level grader: source signature not found, leaving private lessons unchanged.');
     const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261030-native-roman-r7',location.href).href;
     const languageScriptTag='<scr'+'ipt src="'+languageScriptUrl+'"></scr'+'ipt>';
-    const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
-      lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):
-      lessonsWithQuality+gameScriptTag+languageScriptTag;
+    const enhancedHtml=/<\/body\s*>/i.test(storyWithGrade)?
+      storyWithGrade.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):
+      storyWithGrade+gameScriptTag+languageScriptTag;
     // Put the protection inside srcdoc HEAD too: the original lesson body
     // must never paint before the responsive enhancer can initialize.
     const noOldLessonFlash='<style id="sikauNoOldLessonFlash">html:not(.sikau-refresh) body{visibility:hidden!important}</style>';

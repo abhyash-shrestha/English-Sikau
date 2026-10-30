@@ -6,15 +6,20 @@ import vm from 'node:vm';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const source=read('storybook-reading.js'),css=read('storybook-reading.css'),
  app=read('index.html'),reading=read('reading-dashboard.js');
-const env={window:{},document:{baseURI:'https://englishsikau.example/'},URL,console};
-vm.runInNewContext(source,env,{timeout:1000});
-const {sentenceTexts,makeParagraphs,chapterIdentity}=env.window.__sikauStorybookText;
 
 class Element{
  constructor(tag='div',cls='',text=''){
-  this.tagName=tag.toUpperCase();this.className=cls;this.textContent=text;this.id='';
+  this.tagName=tag.toUpperCase();this.className=cls;this._text=text;this.id='';
   this.parentElement=null;this.children=[];this.dataset={};this.attrs={};this.listeners={};
-  this.style={};this.type='';this.lang='';
+  this.style={};this.type='';this.lang='';this.disabled=false;
+ }
+ set textContent(v){this._text=String(v);this.children=[];}
+ get textContent(){return this._text+this.children.map(n=>n.textContent).join('');}
+ cloneNode(deep=false){
+  const n=new Element(this.tagName,this.className,this._text);
+  n.id=this.id;n.attrs={...this.attrs};n.lang=this.lang;
+  if(deep)for(const c of this.children)n.append(c.cloneNode(true));
+  return n;
  }
  setAttribute(k,v){this.attrs[k]=String(v)}
  getAttribute(k){return this.attrs[k]??null}
@@ -32,114 +37,151 @@ class Element{
   this.parentElement=null;
  }
  querySelectorAll(selector){
-  const results=[];
-  const match=node=>{
-   if(selector==='.story-line')return node.className.split(/\s+/).includes('story-line');
-   if(selector==='.rs,.story-line-english,.story-line-text')
-    return ['rs','story-line-english','story-line-text'].some(c=>node.className.split(/\s+/).includes(c));
-   if(selector==='[data-storybook].on')return !!node.attrs['data-storybook']&&node.className.split(/\s+/).includes('on');
-   if(selector==='[data-storylevel].on')return !!node.attrs['data-storylevel']&&node.className.split(/\s+/).includes('on');
-   if(selector[0]==='#')return node.id===selector.slice(1);
-   if(selector[0]==='.')return node.className.split(/\s+/).includes(selector.slice(1));
-   if(/^[a-z]+$/i.test(selector))return node.tagName===selector.toUpperCase();
-   return false;
+  const selectors=selector.split(',').map(x=>x.trim()).filter(Boolean);
+  const match=(n,sel)=>{
+   if(sel==='[data-storybook].on')return n.attrs['data-storybook']&&n.className.split(/\s+/).includes('on');
+   if(sel==='[data-storylevel].on')return n.attrs['data-storylevel']&&n.className.split(/\s+/).includes('on');
+   if(sel[0]==='#')return n.id===sel.slice(1);
+   if(sel.startsWith('[lang^="ne"]'))return n.lang.startsWith('ne');
+   if(sel.startsWith('[lang="ne"]'))return n.lang==='ne';
+   if(sel.startsWith('[lang="ne-NP"]'))return n.lang==='ne-NP';
+   if(sel.startsWith('[data-story-nepali]'))return n.attrs['data-story-nepali'];
+   if(sel.startsWith('button')&&sel.includes('role'))return n.tagName==='BUTTON';
+   if(sel.startsWith('input[type='))return n.tagName==='INPUT'&&n.type==='button';
+   if(sel[0]==='.')return n.className.split(/\s+/).includes(sel.slice(1));
+   return n.tagName===sel.toUpperCase();
   };
-  const walk=node=>{for(const child of node.children){
-   if(match(child))results.push(child);
-   walk(child);
+  const found=[];
+  const walk=n=>{for(const c of n.children){
+   if(selectors.some(sel=>match(c,sel)))found.push(c);
+   walk(c);
   }};
-  walk(this);return results;
+  walk(this);return found;
  }
  querySelector(sel){return this.querySelectorAll(sel)[0]||null}
- closest(selector){
-  for(let n=this;n;n=n.parentElement)if(n.className.split(/\s+/).includes(selector.slice(1)))return n;
-  return null;
- }
+ closest(sel){for(let n=this;n;n=n.parentElement)if(sel[0]==='.'&&n.className.split(/\s+/).includes(sel.slice(1)))return n;return null}
 }
-function fixture(){
+function fixture(sentences=[
+ ['Nima arrived at a mountain footpath.','निमा पहाडको गोरेटो बाटोमा आइपुगिन्।'],
+ ['Nima wanted to find a safe route to the next village.','निमा अर्को गाउँ पुग्ने सुरक्षित बाटो खोज्दै थिइन्।']
+ ]){
  const callbacks=[],head=new Element('head'),reader=new Element('main'),host=new Element('section','read-v2-sentences');
  const title=new Element('h3','','Chapter 1: The Beginning');title.id='storyCurrentChapterTitle';
  const book=new Element('button','on');book.setAttribute('data-storybook','adventure-0');
  const level=new Element('button','on');level.setAttribute('data-storylevel','1');
- const lines=new Element('div','story-lines');
- function addLines(sentences){
+ const lines=new Element('div','story-lines'),stats={audio:0,nepali:0};
+ function addLines(list){
   lines.children=[];
-  for(const sentence of sentences){
+  for(const [english,nepali,auto=false] of list){
    const row=new Element('div','story-line');
-   const english=new Element('span','rs',sentence);
-   const speaker=new Element('button','speaker');speaker.addEventListener('click',()=>{});
-   row.append(english,speaker);lines.append(row);
+   const en=new Element('span','rs',english+' ');
+   const speaker=new Element('button','speaker','🔊');
+   speaker.addEventListener('click',()=>stats.audio++);
+   en.append(speaker);
+   row.append(en);
+   if(!auto){
+    row.append(new Element('p','story-nepali',nepali));
+   }else{
+    const np=new Element('button','sikau-see-nepali','NP');
+    np.addEventListener('click',()=>{
+     stats.nepali++;if(!row.querySelector('.story-nepali'))row.append(new Element('p','story-nepali',nepali));
+    });
+    row.append(np);
+   }
+   lines.append(row);
   }
  }
- addLines(['Nima arrived at the mountain footpath.','She needed to reach the next village.',
-  'The sky was beginning to turn grey.','She chose to look for a safer trail.']);
+ addLines(sentences);
  host.append(lines);reader.append(book,level,title,host);
  const doc={head,defaultView:{
    requestAnimationFrame:fn=>fn(),setTimeout:fn=>fn(),
    MutationObserver:class{constructor(fn){callbacks.push(fn)}observe(){}}
  },createElement:tag=>new Element(tag),
  getElementById:id=>head.querySelector('#'+id)};
- const appEnv={window:{},document:{baseURI:'https://englishsikau.example/'},URL,console};
- vm.runInNewContext(source,appEnv,{timeout:1000});
- return {doc,reader,host,title,book,level,lines,callbacks,addLines,install:()=>appEnv.window.enhanceStorybookReading(doc,reader)};
+ const w={};vm.runInNewContext(source,{window:w,document:{baseURI:'https://example.org/'},URL,console},{timeout:1000});
+ return {doc,reader,host,title,book,level,lines,callbacks,stats,addLines,
+  api:w.__sikauStorybookText,install:()=>w.enhanceStorybookReading(doc,reader)};
 }
-test('Original native sentences become continuous book prose without altering the source',()=>{
- const f=fixture(),before=sentenceTexts(f.lines);
- assert.equal(f.install(),true);
+test('Clean sentence extractor never includes speaker or NP button labels',()=>{
+ const f=fixture();
+ assert.equal(f.api.englishText(f.lines.querySelector('.story-line')),'Nima arrived at a mountain footpath.');
+ assert.deepEqual(Array.from(f.api.sentenceTexts(f.lines)),[
+  'Nima arrived at a mountain footpath.','Nima wanted to find a safe route to the next village.'
+ ]);
+});
+test('Literal speaker glyphs and NP text never leak into the story',()=>{
+ const f=fixture([['Nima reached the village. 🔊 NP','निमा गाउँमा पुगिन्।']]);
+ assert.equal(f.api.englishText(f.lines.querySelector('.story-line')),'Nima reached the village.');
+ f.install();
+ assert.equal(f.host.querySelector('.storybook-sentence').textContent,'Nima reached the village.');
+});
+test('English and existing Nepali appear together without a separate reveal-all control',()=>{
+ const f=fixture();assert.equal(f.install(),true);
  const page=f.host.querySelector('.storybook-page');
- assert.ok(page,'A book page is created');
- assert.equal(page.querySelector('.storybook-prose').querySelector('p')?.textContent,before.join(' '));
- assert.deepEqual(Array.from(sentenceTexts(f.lines)),Array.from(before));
- assert.equal(f.lines.querySelectorAll('.story-line').length,4,'Native sentence lines and their audio controls are kept');
- assert.equal(f.host.dataset.storyToolsOpen,'false');
- assert.equal(f.host.querySelector('.storybook-tools-toggle').getAttribute('aria-expanded'),'false');
+ assert.ok(page);assert.equal(page.querySelectorAll('.storybook-pair').length,2);
+ assert.equal(page.querySelectorAll('.storybook-nepali-text').length,2);
+ assert.equal(page.querySelector('.storybook-sentence').textContent,'Nima arrived at a mountain footpath.');
+ assert.equal(page.querySelector('.storybook-nepali-text').textContent,'निमा पहाडको गोरेटो बाटोमा आइपुगिन्।');
+ assert.equal(page.querySelector('.storybook-tools-toggle'),null);
+ assert.equal(f.lines.querySelectorAll('.story-line').length,2);
 });
-test('Sentence tools remain available and the book page is idempotent',()=>{
- const f=fixture();f.install();f.install();
- assert.equal(f.host.querySelectorAll('.storybook-page').length,1);
- const toggle=f.host.querySelector('.storybook-tools-toggle');
- toggle.click();assert.equal(f.host.dataset.storyToolsOpen,'true');
- assert.equal(toggle.getAttribute('aria-expanded'),'true');
- toggle.click();assert.equal(f.host.dataset.storyToolsOpen,'false');
- assert.equal(f.lines.querySelector('.speaker').listeners.click instanceof Function,true);
+test('Native NP action may populate Nepali once without disrupting quiz state',()=>{
+ const f=fixture([['Nima crossed the bridge.','निमाले पुल पार गरिन्।',true]]);
+ assert.equal(f.install(),true);
+ assert.equal(f.stats.nepali,1);
+ f.callbacks[0]([{target:f.lines}]);
+ assert.equal(f.host.querySelector('.storybook-nepali-text').textContent,'निमाले पुल पार गरिन्।');
+ assert.equal(f.stats.nepali,1,'Never toggles native control a second time');
 });
-test('Chapter 2 shows a factual recap from the previous displayed chapter, not invented text',()=>{
+test('Audio buttons retain original voice event handler',()=>{
  const f=fixture();f.install();
- f.title.textContent='Chapter 2: The Path';
- f.addLines(['Nima reached a bridge.','The crossing was slippery.','She waited for help.']);
+ const play=f.host.querySelector('.storybook-play');assert.ok(play);
+ play.click();assert.equal(f.stats.audio,1);
+});
+test('Changing levels keeps each reading page at three or fewer sentences',()=>{
+ const f=fixture();f.install();
+ f.level.setAttribute('data-storylevel','4');
+ f.addLines([
+ ['Nima arrived at the foothills.','निमा पहाडको फेदमा आइपुगिन्।'],
+ ['She noticed the path was overgrown.','बाटो झारपातले ढाकिएको थियो।'],
+ ['The valley was quiet.','उपत्यका शान्त थियो।'],
+ ['Despite her uncertainty, Nima continued cautiously.','अनिश्चित भए पनि निमा होसियारीपूर्वक अघि बढिन्।'],
+ ['She assessed the risks before crossing.','पार गर्नुअघि उनले जोखिम मूल्याङ्कन गरिन्।']
+ ]);
  f.callbacks[0]([{target:f.lines}]);
  const page=f.host.querySelector('.storybook-page');
- assert.equal(page.querySelector('.storybook-prose').querySelector('p').textContent,
-  'Nima reached a bridge. The crossing was slippery. She waited for help.');
- const recap=page.querySelector('.storybook-recap');
- assert.ok(recap);
- assert.equal(recap.querySelector('p').textContent,
-  'The sky was beginning to turn grey. She chose to look for a safer trail.');
- assert.equal(f.lines.querySelectorAll('.story-line').length,3);
+ assert.equal(page.querySelectorAll('.storybook-pair').length,3);
+ assert.equal(page.querySelector('.storybook-pagination').querySelector('span').textContent,'Page 1 of 2');
+ const controls=page.querySelector('.storybook-pagination').querySelectorAll('button');
+ controls[1].click();
+ assert.equal(f.host.querySelector('.storybook-page').querySelectorAll('.storybook-pair').length,2);
+ assert.equal(f.lines.querySelectorAll('.story-line').length,5,'Original full passage and quiz source remain intact');
 });
-test('Separate books never inherit a different story recap',()=>{
+test('Changing chapters uses only genuine previous text for recap, not invented details',()=>{
+ const f=fixture();f.install();
+ f.title.textContent='Chapter 2: The River';
+ f.addLines([['Nima reached the riverbank.','निमा नदी किनारमा पुगिन्।']]);
+ f.callbacks[0]([{target:f.lines}]);
+ const recap=f.host.querySelector('.storybook-recap');
+ assert.ok(recap);assert.match(recap.querySelector('p').textContent,/safe route/);
+});
+test('Different books do not inherit recaps',()=>{
  const f=fixture();f.install();
  f.book.setAttribute('data-storybook','adventure-1');
- f.title.textContent='Chapter 2: New Story';
- f.addLines(['A different person arrived at the market.']);
+ f.title.textContent='Chapter 2: Other book';
+ f.addLines([['A second learner went to the market.','अर्को विद्यार्थी बजार गयो।']]);
  f.callbacks[0]([{target:f.lines}]);
- assert.equal(f.host.querySelector('.storybook-page').querySelector('.storybook-recap'),null);
+ assert.equal(f.host.querySelector('.storybook-recap'),null);
 });
-test('Only the authorized Reading story view receives book styling and scripts',()=>{
- assert.match(reading,/window\.enhanceStorybookReading\?\.\(d,reader\)/);
- assert.match(app,/storybook-reading\.js\?v=20261030-book-r1/);
- assert.match(app,/reading-dashboard\.js\?v=20261030-book-r1/);
- assert.match(css,/#rd\.sikau-read-exact #storyReader\[data-sikau-book-ready="1"\]/);
- assert.match(css,/data-story-tools-open="false"/);
+test('All storybook changes remain presentation-only and preserve native gates',()=>{
+ assert.match(app,/storybook-reading\.js\?v=20261030-bilingual-r2/);
+ assert.match(reading,/enhanceStorybookReading/);
+ assert.match(css,/data-sikau-book-ready="2"/);
+ assert.match(css,/storybook-nepali-text/);
+ assert.match(css,/storybook-pagination/);
+ assert.match(css,/@media\(max-width:710px\)/);
  assert.match(css,/data-sikau-theme="dark"/);
- assert.match(css,/@media\(max-width:650px\)/);
  assert.doesNotMatch(source,/fetch\(|localStorage|createExecution|updateDocument|innerHTML\s*=/);
  assert.doesNotMatch(source,/storyQuizResult|storyNext|storyCheckQuiz/);
-});
-test('Paragraph grouping is ordered and does not create narrative facts',()=>{
- const examples=['A.','B.','C.','D.','E.','F.','G.'];
- assert.deepEqual(Array.from(makeParagraphs(examples)),['A. B. C. D.','E. F. G.']);
- const reader=fixture().reader;
- assert.deepEqual(JSON.parse(JSON.stringify(chapterIdentity(reader))),
-  {book:'adventure-0',level:'1',number:1,title:'Chapter 1: The Beginning',key:'adventure-0|1'});
+ assert.deepEqual(Array.from(fixture().api.makeParagraphs(['A.','B.','C.','D.'])),['A. B. C.','D.']);
 });
