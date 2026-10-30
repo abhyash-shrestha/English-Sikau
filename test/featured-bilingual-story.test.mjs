@@ -200,7 +200,7 @@ test('Practice Mode binds to actual lesson sentences, with clear audio and navig
  assert.match(index,/practice-bilingual-reading\.js\?v=20261030-native-pairs-r2/);
  assert.match(dashboard,/enhancePracticeBilingualReading\?\.\(d\)/);
  assert.match(practice,/rd\.querySelectorAll\('\.rs'\)/);
- assert.match(practice,/getElementById\('rtext'\)\|\|/);
+ assert.match(practice,/rd\.querySelector\('#rtext'\)\|\|/);
  assert.match(practice,/button\[data-rm="practice"\]\.on/);
  assert.match(practice,/revealed\.add\(e\.nativeNe\)/);
  assert.match(practice,/e\.nativeNe\.click\(\)/);
