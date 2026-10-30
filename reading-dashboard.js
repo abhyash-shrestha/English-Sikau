@@ -233,6 +233,8 @@ window.enhanceReadingDashboard=function(d,accountId){
      icon.style.setProperty('--read-position',(15+(sceneID*11)%70)+'%');
    }
    reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
+   // Preserve the native story/quiz UI; show connected prose in a separate book page.
+   window.enhanceStorybookReading?.(d,reader);
 
  }
  const observer=new d.defaultView.MutationObserver(()=>{organize();});
