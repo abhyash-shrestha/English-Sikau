@@ -17,6 +17,26 @@ const add=(doc,parent,tag,className,text)=>{
  return node;
 };
 const safeCount=value=>Number.isFinite(Number(value))?Math.max(0,Math.floor(Number(value))):0;
+const pendingProgress=new WeakSet();
+// Some lesson builds keep S inside a closure. Read their rendered statistics
+// instead of hiding the only available progress view.
+function readProgress(native,state){
+ if(state){
+  const words=state.words&&typeof state.words==='object'?Object.keys(state.words).length:0;
+  const scores=state.course?.best||{};
+  const passed=Object.values(scores).filter(n=>safeCount(n)>=70).length;
+  const reading=safeCount(state.rd);
+  return {words,passed,reading,writing:safeCount(state.hwT),speaking:safeCount(state.sp),
+   translated:safeCount(state.tr),days:state.days&&typeof state.days==='object'?Object.keys(state.days):null};
+ }
+ const text=String(native.textContent||'').replace(/[०-९]/g,c=>'०१२३४५६७८९'.indexOf(c));
+ const number=icon=>{const m=text.match(new RegExp(icon+'\\s*(\\d+)'));return m?Number(m[1]):null;};
+ const data={words:number('📚'),passed:number('📗'),reading:number('📖'),writing:number('✍'),
+  speaking:number('🎤'),translated:number('🔤'),days:null,dayCount:number('📅')};
+ // Variation selectors can occur between the pen icon and its number.
+ data.writing=number('✍[\\uFE0E\\uFE0F]?');
+ return Object.values(data).some(v=>typeof v==='number')?data:null;
+}
 window.enhanceProgressDashboard=function(doc){
  const section=doc?.getElementById('pg');
  const content=section?.querySelector(':scope > .content');
@@ -29,15 +49,18 @@ window.enhanceProgressDashboard=function(doc){
   link.href=cssURL;
   doc.head.append(link);
  }
- section.classList.add('sikau-progress-v1','sikau-learning-first');
- // Hide the old XP dashboard synchronously, even on a slow Android browser
- // before the external stylesheet finishes loading.
- native.hidden=true;
- native.style?.setProperty?.('display','none','important');
- // Retain native progress data and handlers, but don't expose rewards UI.
  if(section.dataset.sikauProgress==='learning-first')return;
- const state=doc.defaultView.S?.d;
- if(!state)return;
+ if(!readProgress(native,doc.defaultView.S?.d)){
+  if(!pendingProgress.has(native)){
+   pendingProgress.add(native);
+   const wait=new doc.defaultView.MutationObserver(()=>{
+    if(!readProgress(native,doc.defaultView.S?.d))return;
+    wait.disconnect();pendingProgress.delete(native);window.enhanceProgressDashboard(doc);
+   });
+   wait.observe(native,{childList:true,subtree:true,characterData:true});
+  }
+  return;
+ }
  section.dataset.sikauProgress='learning-first';
  const root=add(doc,content,'div','pv-root');
  const hero=add(doc,root,'section','pv-hero');
@@ -79,34 +102,26 @@ window.enhanceProgressDashboard=function(doc){
   add(doc,row,'b','',String(value));
  };
  const render=()=>{
-  const state=doc.defaultView.S?.d;
-  if(!state)return;
-  const words=state.words&&typeof state.words==='object'?
-   Object.keys(state.words).length:0;
-  const scores=state.course?.best||{};
-  // Chapter pass results are already recorded by the original course.
-  const passed=Object.values(scores).filter(n=>safeCount(n)>=70).length;
-  const reading=safeCount(state.rd);
-  const writing=safeCount(state.hwT);
-  const speaking=safeCount(state.sp);
-  const translated=safeCount(state.tr);
-  const days=state.days&&typeof state.days==='object'?
-   Object.keys(state.days):[];
+  const data=readProgress(native,doc.defaultView.S?.d);
+  if(!data)return;
+  const {words,passed,reading,writing,speaking,translated,days}=data;
+  const shown=n=>n===null?'—':n;
   stats.replaceChildren();
   sections.replaceChildren();
   activities.replaceChildren();
   const chapter=makeCard('Chapters Completed','पूरा गरेका अध्याय','📖',
-    passed+' / 80','Completed lessons with recorded passing results','chapters');
+    shown(passed)+' / 80','Passed chapter quizzes · उत्तीर्ण गरेका अध्याय','chapters');
   const bar=add(doc,chapter,'div','pv-track');
   add(doc,bar,'i').style.width=Math.min(100,passed/80*100)+'%';
-  makeCard('Words Saved','सिकेका शब्दहरू','📚',words,
-    'Words saved during vocabulary practice','words');
-  makeCard('Reading Practice','पढाइ अभ्यास','📗',reading,
-    'Recorded reading activities','reading');
-  makeCard('Writing Practice','लेखाइ अभ्यास','✍️',writing,
-    'Recorded writing checks','writing');
+  makeCard('Words Saved','सेभ गरेका शब्दहरू','📚',shown(words),
+    'Your saved vocabulary · सेभ गरिएको शब्दभण्डार','words');
+  makeCard('Reading Practice','पढाइ अभ्यास','📗',shown(reading),
+    'Completed reading activities · पूरा गरेका पढाइ अभ्यास','reading');
+  makeCard('Writing Practice','लेखाइ अभ्यास','✍️',shown(writing),
+    'Writing checks completed · जाँचिएका लेखहरू','writing');
 
-  const weekly=makeSection(sections,'Practice This Week','यस हप्ताको अभ्यास','🗓️');
+  const weekly=makeSection(sections,days?'Practice This Week':'Practice Days',days?'यस हप्ताको अभ्यास':'अभ्यास गरेका दिन','🗓️');
+  if(days){
   add(doc,weekly,'p','pv-secondary','Days with recorded practice · अभ्यास भएका दिन');
   const chart=add(doc,weekly,'div','pv-bars');
   chart.setAttribute('aria-label','Days with recorded activity in the last seven days');
@@ -123,19 +138,32 @@ window.enhanceProgressDashboard=function(doc){
    dayBar.classList.toggle('active',practiced);
    add(doc,col,'small','',date.toLocaleDateString('en-US',{weekday:'short'}));
   }
+  }else{
+   add(doc,weekly,'div','pv-large-value',shown(data.dayCount));
+   add(doc,weekly,'p','pv-secondary','Days with saved practice · अभ्यास गरेका दिनहरूको संख्या');
+  }
   const summary=makeSection(sections,'Your Learning Activity','तपाईंको अभ्यास','📋');
   for(const [icon,label,value] of [
-   ['🔤','Translations',translated],['📚','Saved words',words],
-   ['📖','Reading',reading],['✍️','Writing',writing],['🎤','Speaking',speaking]
-  ])activityRow(summary,icon,label,value);
+   ['🔤','Translations · अनुवाद',translated],['📚','Saved words · सेभ गरेका शब्द',words],
+   ['📖','Reading · पढाइ',reading],['✍️','Writing · लेखाइ',writing],['🎤','Speaking · बोलाइ',speaking]
+  ])activityRow(summary,icon,label,shown(value));
 
   const courses=makeSection(activities,'Keep Learning','सिकाइ जारी राख्नुहोस्','🌱');
   add(doc,courses,'p','pv-secondary',
    'Try another lesson, read a story, practice speaking, or review the words you saved.');
   add(doc,courses,'p','pv-secondary',
    'अर्को पाठ पढ्नुहोस्, कथा पढ्नुहोस् वा सिकेका शब्द फेरि अभ्यास गर्नुहोस्।');
+  const actions=add(doc,courses,'div','pv-actions');
+  for(const [tab,label] of [['learn','Continue lessons · पाठ जारी राख्नुहोस्'],['rd','Read a story · कथा पढ्नुहोस्'],['words','Review words · शब्द दोहोर्‍याउनुहोस्']]){
+   const button=add(doc,actions,'button','',label);button.type='button';
+   button.addEventListener('click',()=>doc.querySelector('.nav button[data-t="'+tab+'"]')?.click());
+  }
  };
  render();
+ // Only replace a usable native view after the new dashboard is populated.
+ section.classList.add('sikau-progress-v1','sikau-learning-first');
+ native.hidden=true;
+ native.style?.setProperty?.('display','none','important');
  // The original engine remains the source of truth. Do not modify scores,
  // answer validation, saved chapter data or Game district-unlock state.
  let scheduled=false;
@@ -147,6 +175,7 @@ window.enhanceProgressDashboard=function(doc){
    render();
   });
  });
- observe.observe(native,{childList:true});
+ observe.observe(native,{childList:true,subtree:true,characterData:true});
 };
 })();
+

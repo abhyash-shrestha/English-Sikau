@@ -109,7 +109,7 @@ window.enhanceTranslationDashboard=function(d){
  const selectors=put(d,entry,'div','ttx-directions');
  const btns={};
  [['ne','🇳🇵 Nepali → English','नेपाली → अंग्रेजी'],
-  ['en','🇬🇧 English → Nepali','अंग्रेजी → नेपाली']].forEach(([v,label,ne])=>{
+  ['en','🇺🇸 English → Nepali','अंग्रेजी → नेपाली']].forEach(([v,label,ne])=>{
   const b=put(d,selectors,'button','ttx-dir-button');
   b.type='button';b.dataset.direction=v;
   put(d,b,'strong','',label);put(d,b,'small','',ne);btns[v]=b;
@@ -166,7 +166,6 @@ window.enhanceTranslationDashboard=function(d){
   b.title='Click again for another example · अर्को अभ्यासका लागि फेरि थिच्नुहोस्';
   b.addEventListener('click',()=>choosePractice('topic-'+topic.kind,[topic.pair,...practiceTopics[topic.kind]]));
  }
- const saving=new Set();
  function directionUI(){
   const current=nativeDirection(sec);
   Object.entries(btns).forEach(([key,button])=>{
@@ -295,8 +294,10 @@ window.enhanceTranslationDashboard=function(d){
  save.addEventListener('click',()=>{
   const txt=resultText();
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
-  if(saving.has(txt)){saving.delete(txt);save.textContent='☆ Save · सेभ';notice.textContent='Removed from session bookmarks.';}
-  else{saving.add(txt);save.textContent='★ Saved';notice.textContent='Saved for this open session only · यो सत्रमा मात्र सेभ भयो।';}
+  const nativeSave=Array.from(output.querySelectorAll('button')).find(b=>/\bsave\b|सेभ/i.test(b.textContent||''));
+  if(!nativeSave){notice.textContent='Use the Save button in the result when it appears · नतिजाको सेभ बटन थिच्नुहोस्।';return;}
+  nativeSave.click();
+  notice.textContent='Check My Saved Words & Phrasebook in Words · शब्दभण्डारमा सेभ गरेका शब्द र वाक्य हेर्नुहोस्।';
  });
  // Observe native result updates to suppress redundant empty placeholder.
  const observer=new d.defaultView.MutationObserver(()=>{

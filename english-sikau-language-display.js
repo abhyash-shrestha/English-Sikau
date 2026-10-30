@@ -108,6 +108,7 @@
   'html[data-sikau-display-language="en"] .sikau-lang-ne{display:none!important}',
   'html[data-sikau-display-language="en-roman"] .sikau-lang-roman,html[data-sikau-display-language="all"] .sikau-lang-roman{display:inline!important}',
   'html[data-sikau-display-language="en-ne"] .i18n-sub .rm,html[data-sikau-display-language="en"] .i18n-sub .rm{display:none!important}',
+  'html:is([data-sikau-display-language="en-ne"],[data-sikau-display-language="en"]) :is(.sentence-rm,.roman,[lang="ne-Latn"]){display:none!important}',
   // The Reading tab uses CSS-generated text, which a DOM text walker cannot see.
   'html[data-sikau-display-language="en"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en"] #learn .sikau-see-nepali::after{content:"See Nepali"!important}',
   'html[data-sikau-display-language="en-roman"] #rd .sikau-see-nepali::after,html[data-sikau-display-language="en-roman"] #learn .sikau-see-nepali::after{content:"See Nepali\\A Nepali hernuhos"!important}',
@@ -310,3 +311,4 @@
  else queue(d.body);
  window.__sikauLanguageDisplay={apply:()=>queue(d.body),getMode:()=>select.value,romanize};
 })();
+

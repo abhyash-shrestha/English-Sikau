@@ -82,11 +82,73 @@ function installClearNepaliActions(d){
  update();
 }
 
-window.enhanceReadingDashboard=function(d){
+function storyIdentity(box){
+ const book=box.querySelector('[data-storybook].on')?.getAttribute('data-storybook');
+ const level=box.querySelector('[data-storylevel].on')?.getAttribute('data-storylevel');
+ const chapter=box.querySelector('#storyCurrentChapterTitle')?.textContent?.match(/Chapter\s+(\d+)/i)?.[1];
+ return book&&level&&chapter?[book,level,chapter].join('|'):'';
+}
+function passedStoryResult(text){return /^\s*100\s*%/.test(String(text||''));}
+function installReadingRepairs(d,box,accountId){
+ if(box.dataset.sikauReadingRepairs)return;
+ box.dataset.sikauReadingRepairs='1';
+ const storageKey='sikau-story-passes-v1:'+encodeURIComponent(accountId||'session');
+ let passes=new Set();
+ try{const saved=JSON.parse(d.defaultView.localStorage.getItem(storageKey)||'[]');if(Array.isArray(saved))passes=new Set(saved.filter(x=>typeof x==='string').slice(-1000));}catch(_){}
+ let quizKey='',checking='';
+ const update=()=>{
+  if(checking){
+   const result=box.querySelector('#storyQuizResult');
+   if(result&&passedStoryResult(result.textContent)&&checking===storyIdentity(box)){
+    passes.add(checking);
+    try{d.defaultView.localStorage.setItem(storageKey,JSON.stringify([...passes].slice(-1000)));}catch(_){}
+   }
+   checking='';
+  }
+  const key=storyIdentity(box),next=box.querySelector('#storyNext');
+  if(next&&key){
+   next.setAttribute('aria-describedby','sikauStoryGate');
+   let note=box.querySelector('#sikauStoryGate');
+   if(!note){note=mk(d,'p','story-mini');note.id='sikauStoryGate';next.parentElement.append(note);}
+   const text=passes.has(key)?'✓ Chapter quiz passed · अध्यायको परीक्षा उत्तीर्ण भयो।':'Get 100% on this chapter’s quiz to continue · अर्को अध्यायका लागि यो परीक्षामा १००% ल्याउनुहोस्।';
+   if(note.textContent!==text)note.textContent=text;
+  }
+  // Correct a generated question only when the passage explicitly says lives.
+  const reading=box.querySelector('#rtext')||box;
+  const passage=reading.textContent||'';
+  for(const el of box.querySelectorAll('label,h3,h4,strong,p')){
+   if(el.children.length)continue;
+   const match=(el.textContent||'').trim().match(/^Where did ([A-Za-z]+) go\?$/);
+   if(match&&new RegExp('\\b'+match[1]+' lives in [A-Za-z]+[.]').test(passage))el.textContent='Where does '+match[1]+' live?';
+  }
+ };
+ box.addEventListener('click',event=>{
+  const button=event.target.closest?.('button');if(!button)return;
+  const key=storyIdentity(box);
+  if(button.id==='storyQuiz')quizKey=key;
+  if(button.id==='storyCheckQuiz'){
+   if(quizKey&&quizKey===key)checking=key;
+   (d.defaultView.requestAnimationFrame||d.defaultView.setTimeout)(update);
+  }
+  if((button.id==='storyNext'||button.id==='storyQuizContinue')&&key&&!passes.has(key)){
+   event.preventDefault();event.stopImmediatePropagation();
+   quizKey=key;box.querySelector('#storyQuiz')?.click();update();
+   box.querySelector('#storyQuizForm')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+  }
+ },true);
+ let pending=false;
+ const observer=new d.defaultView.MutationObserver(()=>{
+  if(pending)return;pending=true;
+  (d.defaultView.requestAnimationFrame||d.defaultView.setTimeout)(()=>{pending=false;update();});
+ });
+ observer.observe(box,{childList:true,subtree:true,characterData:true});update();
+}
+window.enhanceReadingDashboard=function(d,accountId){
  if(d?.body)window.enhanceUnifiedSpeech?.(d);
  installClearNepaliActions(d);
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
  if(!rd||!content||!mode||!box)return;
+ installReadingRepairs(d,box,accountId);
  if(!d.getElementById('sikauReadStyle')){const link=mk(d,'link');link.id='sikauReadStyle';link.rel='stylesheet';link.href=url;d.head.append(link);}
  rd.classList.add('sikau-read-v2','sikau-read-exact');
  if(!content.querySelector('.read-v2-hero')){

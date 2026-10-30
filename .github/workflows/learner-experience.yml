@@ -1,0 +1,30 @@
+name: Learner experience checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.js'
+      - '*.html'
+      - 'test/learner-experience.test.mjs'
+      - 'test/coach-v4-exact-integration.test.mjs'
+      - '.github/workflows/learner-experience.yml'
+  pull_request:
+    paths:
+      - '*.js'
+      - '*.html'
+      - 'test/learner-experience.test.mjs'
+      - 'test/coach-v4-exact-integration.test.mjs'
+      - '.github/workflows/learner-experience.yml'
+jobs:
+  learners:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check learner flows and bilingual coverage
+        run: node --test test/learner-experience.test.mjs test/coach-v4-exact-integration.test.mjs test/festival-learning.test.mjs test/learning-first-no-points.test.mjs test/visa-navigation-always-visible.test.mjs

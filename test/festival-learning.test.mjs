@@ -69,7 +69,7 @@ test('expired events disappear and next published events fill upcoming slots',()
  assert.equal(upcoming('2027-04-15').length,0,'never invent dates after current published horizon');
 });
 test('festival page loads its content before dashboard and refreshes in Nepal time',()=>{
- assert.ok(html.indexOf('festival-stories.js?v=20261024-r1')<html.indexOf('festival-dashboard-preview.js?v=20261024-stories-r1'));
+ assert.ok(html.indexOf('festival-stories.js?v=20261030-nepali-r2')<html.indexOf('festival-dashboard-preview.js?v=20261030-nepali-r2'));
  assert.match(festivalJs,/timeZone:'Asia\/Kathmandu'/);
  assert.match(festivalJs,/lastRenderedDay!==todayInNepal\(\)/);
  assert.match(festivalJs,/\.slice\(0,limit\)/);
@@ -81,3 +81,4 @@ test('quiz stays in the UI only and does not award or modify student points',()=
  assert.match(festivalCss,/\.sfd-quiz-choice/);
  assert.match(festivalCss,/data-sikau-theme="dark"/);
 });
+

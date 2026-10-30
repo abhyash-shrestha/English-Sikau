@@ -358,9 +358,9 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   const change=add(doc,title,'button','sikau-visa-shuffle','🎲 Shuffle questions · नयाँ प्रश्न');change.type='button';change.addEventListener('click',repeatOrShuffle);
   if(done){
    const complete=add(doc,learner,'div','sikau-visa-done');
-   add(doc,complete,'h3','','🏆 Practice round complete!');
+   add(doc,complete,'h3','','✓ Practice round complete! · अभ्यास पूरा भयो');
    add(doc,complete,'p','','You practiced '+deck.length+' different questions. This is not official visa progress or an approval prediction. · सबै प्रश्न अभ्यास भयो!');
-   const again=add(doc,complete,'button','sikau-visa-primary','↻ New shuffled round');again.type='button';again.addEventListener('click',repeatOrShuffle);
+   const again=add(doc,complete,'button','sikau-visa-primary','↻ New shuffled round · नयाँ क्रमको अभ्यास');again.type='button';again.addEventListener('click',repeatOrShuffle);
    return;
   }
   const q=deck[cursor];if(!q)return;
@@ -375,21 +375,21 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
   add(doc,prompt,'h3','',q.q);
   add(doc,prompt,'p','',q.ne);
   const controls=add(doc,prompt,'div','sikau-visa-control-row');
-  const hear=add(doc,controls,'button','sikau-visa-secondary','🔊 Listen to question');hear.type='button';hear.addEventListener('click',()=>{
+  const hear=add(doc,controls,'button','sikau-visa-secondary','🔊 Listen to question · प्रश्न सुन्नुहोस्');hear.type='button';hear.addEventListener('click',()=>{
    const v=doc.defaultView;
    try{if(v.speechSynthesis&&v.SpeechSynthesisUtterance){v.speechSynthesis.cancel();const u=new v.SpeechSynthesisUtterance(q.q);u.lang='en-US';u.rate=.87;v.speechSynthesis.speak(u);}else if(typeof v.speak==='function')v.speak(q.q,.87,'en');}catch(_){}
   });
   const response=add(doc,learner,'div','sikau-visa-response');
   add(doc,response,'label','sikau-visa-label','✍️ Your answer in English · आफ्नो अंग्रेजी उत्तर');
   const input=add(doc,response,'textarea','sikau-visa-input');input.rows=4;input.maxLength=1200;input.value=typed;
-  input.placeholder='Speak from your own experience. If unsure, say so honestly…';
-  input.setAttribute('aria-label','Your draft interview answer');
+  input.placeholder='Use your own true experience · आफ्नो वास्तविक अनुभव लेख्नुहोस्। थाहा नभए स्पष्ट भन्नुहोस्…';
+  input.setAttribute('aria-label','Your draft interview answer · अन्तर्वार्ताको अभ्यास उत्तर');
   input.addEventListener('input',()=>{typed=input.value;});
   const buttonRow=add(doc,response,'div','sikau-visa-action-row');
-  const check=add(doc,buttonRow,'button','sikau-visa-primary','✓ Practice feedback');check.type='button';
+  const check=add(doc,buttonRow,'button','sikau-visa-primary','✓ Practice feedback · सुझाव हेर्नुहोस्');check.type='button';
   const unsure=add(doc,buttonRow,'button','sikau-visa-secondary','🤔 I don’t know · थाहा छैन');unsure.type='button';
-  const show=add(doc,buttonRow,'button','sikau-visa-secondary','👁 See answer guide');show.type='button';
-  const next=add(doc,buttonRow,'button','sikau-visa-secondary','Next question →');next.type='button';
+  const show=add(doc,buttonRow,'button','sikau-visa-secondary','👁 See answer guide · उत्तरको सुझाव');show.type='button';
+  const next=add(doc,buttonRow,'button','sikau-visa-secondary','Next question → · अर्को प्रश्न');next.type='button';
   const feedback=add(doc,response,'div','sikau-visa-feedback');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
   function setFeedback(kind,message){feedback.className='sikau-visa-feedback '+kind;feedback.textContent=message;}
   check.addEventListener('click',()=>{
@@ -403,19 +403,22 @@ function enhanceVisaInterviewCoach(doc,shell,ask){
    guide.replaceChildren();guide.hidden=!revealed;
    if(!revealed)return;
    add(doc,guide,'h4','','🌱 Answer coaching · उत्तर कसरी तयार गर्ने');
+   add(doc,guide,'p','','नेपालीमा तयारी: माथिको प्रश्नको आफ्नो सत्य उत्तर सोच्नुहोस्। वास्तविक मिति, कारण र अनुभव प्रयोग गरेर छोटा अंग्रेजी वाक्य बनाउनुहोस्।');
    add(doc,guide,'strong','','What matters · के महत्त्वपूर्ण छ');
    add(doc,guide,'p','',q.coach);
    add(doc,guide,'strong','','Example structure (customize truthfully) · नमुना बनावट');
    add(doc,guide,'blockquote','',q.sample);
+   add(doc,guide,'p','','नमुनाको कोष्ठकमा भएको ठाउँ आफ्नै सत्य विवरणले भर्नुहोस्। नमुनालाई जस्ताको तस्तै नदोहोर्‍याउनुहोस्।');
    add(doc,guide,'strong','','Important caution · सावधानी');
    add(doc,guide,'p','',q.caution);
+   add(doc,guide,'p','','थाहा नभएको कुरा अनुमान नगर्नुहोस्। आफ्नो आवेदन र सक्कली कागजातसँग मिल्ने तथ्य मात्र भन्नुहोस्। यो भाषा अभ्यास हो; हालको आधिकारिक निर्देशन सम्बन्धित लिंकमा हेर्नुहोस्।');
   }
   renderGuide();
   const ai=add(doc,response,'button','sikau-visa-ai','✨ Improve my English with AI Coach · AI बाट सुधार्नुहोस्');
   ai.type='button';ai.addEventListener('click',()=>sendNative(typed,q));
   const aiNotice=add(doc,response,'p','sikau-visa-ai-notice',notes);aiNotice.setAttribute('role','status');
   const source=add(doc,learner,'p','sikau-visa-category-source');
-  add(doc,source,'span','','Official category information: ');
+  add(doc,source,'span','','Official category information · आधिकारिक जानकारी: ');
   const link=add(doc,source,'a','',section.title+' · travel.state.gov ↗');link.href=section.source;link.target='_blank';link.rel='noopener noreferrer';
  }
  function switchView(visa){

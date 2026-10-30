@@ -227,11 +227,12 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     add(doc,bannerCopy,'h2','',f.name);
     if(f.ne)add(doc,bannerCopy,'p','sfd-story-ne',f.ne);
     add(doc,bannerCopy,'p','sfd-story-summary',lesson.summary);
+    if(lesson.summaryNe)add(doc,bannerCopy,'p','sfd-story-ne',lesson.summaryNe);
     var emblem=add(doc,banner,'span','sfd-story-emblem',f.icon||d.emoji);
     emblem.setAttribute('aria-hidden','true');
     var storyGrid=add(doc,study,'div','sfd-story-grid');
     var mainStory=add(doc,storyGrid,'section','sfd-story-card sfd-story-reading');
-    add(doc,mainStory,'span','sfd-story-section-label','01 · BEHIND THE STORY');
+    add(doc,mainStory,'span','sfd-story-section-label','01 · BEHIND THE STORY · चाडपर्वको कथा');
     add(doc,mainStory,'h3','','Why do people celebrate? · किन मनाइन्छ?');
     add(doc,mainStory,'p','sfd-story-body',lesson.story);
     var controls=add(doc,mainStory,'div','sfd-story-controls');
@@ -253,7 +254,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     });
 
     var moments=add(doc,storyGrid,'section','sfd-story-card');
-    add(doc,moments,'span','sfd-story-section-label','02 · CULTURAL MOMENTS');
+    add(doc,moments,'span','sfd-story-section-label','02 · CULTURAL MOMENTS · सांस्कृतिक झलक');
     add(doc,moments,'h3','','See the traditions · परम्परा हेर्नुहोस्');
     var momentGrid=add(doc,moments,'div','sfd-story-moments');
     lesson.moments.slice(0,3).forEach(function(m){
@@ -264,9 +265,10 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     });
     var fact=add(doc,moments,'p','sfd-story-fact','💡 Did you know? '+lesson.fact);
     fact.setAttribute('role','note');
+    if(lesson.factNe)add(doc,moments,'p','sfd-story-fact',lesson.factNe);
 
     var vocab=add(doc,study,'section','sfd-story-vocab');
-    add(doc,vocab,'span','sfd-story-section-label','03 · ENGLISH WORDS');
+    add(doc,vocab,'span','sfd-story-section-label','03 · ENGLISH WORDS · अंग्रेजी शब्दहरू');
     add(doc,vocab,'h3','','Learn 5 words · पाँच नयाँ शब्द');
     var vocabList=add(doc,vocab,'div','sfd-story-wordgrid');
     lesson.words.slice(0,5).forEach(function(pair){
@@ -277,15 +279,16 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
       var nepali=add(doc,block,'small','',pair[2]);nepali.lang='ne';
     });
     var sample=add(doc,study,'div','sfd-story-sentence');
-    add(doc,sample,'span','','💬 SAY IT IN ENGLISH');
+    add(doc,sample,'span','','💬 SAY IT IN ENGLISH · अंग्रेजीमा भन्नुहोस्');
     add(doc,sample,'p','',lesson.example);
+    if(lesson.exampleNe)add(doc,sample,'p','sfd-story-ne',lesson.exampleNe);
     if(win?.speechSynthesis&&win?.SpeechSynthesisUtterance){
       var play=add(doc,sample,'button','','🔊 Listen');
       play.type='button';play.addEventListener('click',function(){speakEnglish(lesson.example);});
     }
 
     var quiz=add(doc,study,'section','sfd-story-quiz');
-    add(doc,quiz,'span','sfd-story-section-label','04 · QUICK PRACTICE');
+    add(doc,quiz,'span','sfd-story-section-label','04 · QUICK PRACTICE · छिटो अभ्यास');
     add(doc,quiz,'h3','','Check your English · सानो अभ्यास');
     add(doc,quiz,'p','sfd-story-quiz-note','Just for practice — no XP or account changes. · यो अभ्यास मात्र हो।');
     var quizArea=add(doc,quiz,'div','sfd-story-quiz-area');
@@ -302,8 +305,9 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
         return;
       }
       var q=lesson.quiz[questionIndex];
-      add(doc,quizArea,'p','sfd-quiz-count','Question '+(questionIndex+1)+' of '+lesson.quiz.length);
+      add(doc,quizArea,'p','sfd-quiz-count','Question '+(questionIndex+1)+' of '+lesson.quiz.length+' · प्रश्न क्रम');
       add(doc,quizArea,'h4','',q[0]);
+      if(lesson.quizNe?.[questionIndex]?.[0])add(doc,quizArea,'p','sfd-story-ne',lesson.quizNe[questionIndex][0]);
       var answers=add(doc,quizArea,'div','sfd-quiz-answers');
       // Rotate the correct button position; do not teach a fixed A pattern.
       var spin=(f.name.length+questionIndex)%q[1].length;
@@ -328,7 +332,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
             answers.children[correctButton]?.classList.add('sfd-quiz-correct');
           }
           feedback.hidden=false;
-          feedback.textContent=(right?'✅ Correct! · सही उत्तर! ':'❌ Not quite · फेरि सिकौं। ')+q[3];
+          feedback.textContent=(right?'✅ Correct! · सही उत्तर! ':'❌ Not quite · फेरि सिकौं। ')+q[3]+(lesson.quizNe?.[questionIndex]?.[1]?' · '+lesson.quizNe[questionIndex][1]:'');
           feedback.className='sfd-quiz-feedback '+(right?'sfd-feedback-good':'sfd-feedback-review');
           var next=add(doc,quizArea,'button','sfd-story-quiz-next',questionIndex===lesson.quiz.length-1?
             'See results · नतिजा हेर्नुहोस् →':'Next question · अर्को प्रश्न →');
@@ -367,7 +371,9 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     var name=add(doc,card,'div','sfd-card-title',festival.name);
     if(festival.ne)add(doc,name,'span','',' / '+festival.ne);
     var copy=stories[key];
-    add(doc,card,'p','sfd-desc',(copy?.summary||d.english)+' '+(festival.bs||''));
+    add(doc,card,'p','sfd-desc',copy?.summary||d.english);
+    if(copy?.summaryNe)add(doc,card,'p','sfd-desc',copy.summaryNe);
+    if(festival.bs)add(doc,card,'small','sfd-date',festival.bs);
     var btn=add(doc,card,'button','sfd-learn','📖 Learn Festival English · अंग्रेजी सिक्नुहोस् →');
     btn.type='button';btn.setAttribute('aria-label','Learn English about '+festival.name);
     btn.addEventListener('click',function(){openLesson(festival,btn);});
@@ -394,7 +400,7 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
     more.hidden=filtered.length<=12;
     more.textContent=shownAll?'Show first 12 · पहिलो १२ हेर्नुहोस्':
       'Show '+(filtered.length-12)+' more upcoming · थप चाडपर्व हेर्नुहोस् ↓';
-    var countText=upcoming.length+' published upcoming celebrations · नेपाल समय अनुसार';
+    var countText=upcoming.length+' upcoming festivals · आगामी चाडपर्व · नेपाल समय अनुसार';
     var label=labels.querySelector('.sfd-muted');
     if(label)label.textContent=countText;
   }
@@ -420,3 +426,4 @@ window.enhanceFestivalDashboardPreview=function(doc,firstName,festivalRows,today
   });
 };
 })();
+

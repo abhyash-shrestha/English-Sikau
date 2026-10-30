@@ -10,7 +10,7 @@ const html=read('coach-v4-live.html');
 const originalConversationDataHash='ff89a5a06d89a055b5498a6c57628988c7bee4af8aa796f77bc3b57fd4fbee3c';
 const originalStore="const storeKey='english-sikau-175-preview-context-v4';";
 const newStore="const learnerToken=(new URLSearchParams(location.hash.slice(1))).get('uid')||''; const storeKey='english-sikau-175-preview-context-v4:'+(/^[A-Za-z0-9_-]{6,128}$/.test(learnerToken)?learnerToken:'standalone');";
-const closingBridgePattern=/<script src="\.\/coach-v4-bridge\.js\?v=20261029-[^"]+"><\/script>/;
+const closingBridgePattern=/<script src="\.\/coach-v4-bridge\.js\?v=20261030-[^"]+"><\/script>/;
 const guardRegex=/<script>\/\* The paid lesson loads only inside its authenticated parent frame\. \*\/[\s\S]*?<\/script>/;
 
 test('Removing the review panel does not modify the approved 175-topic dialogue data',()=>{
@@ -99,6 +99,17 @@ test('All 525 distinct starting routes can reach a clean ending in the exact V4 
  assert.equal(completed,525);
 });
 
+test('Café totals include selected drink, oat milk and food and clear changed orders',()=>{
+ const api=runPreview();api.selectTopic(9);
+ const pick=pattern=>{const i=api.getChoices().findIndex(x=>pattern.test(typeof x==='string'?x:x.label));assert.ok(i>=0,'Missing café choice '+pattern);api.choose(i);};
+ pick(/would like a coffee/i);pick(/medium iced/i);pick(/Oat milk/);pick(/To go/);
+ pick(/add a croissant/);
+ assert.match(api.view().state.messages.at(-1).text,/Rs 580/);
+ pick(/change my drink/);pick(/small hot latte/);pick(/Regular milk/);pick(/here, please/);pick(/What is my total/);
+ assert.match(api.view().state.messages.at(-1).text,/Rs 300/);
+ pick(/pay cash/);pick(/Goodbye/);assert.equal(api.view().state.ended,true);
+});
+
 test('Native Coach shell mounts the V4 lab after building the separate visa interview tab',()=>{
  const mount=read('coach-v4-mount.js'),index=read('index.html');
  assert.match(mount,/previous\(doc,firstName,verifiedStudentId\)/);
@@ -185,8 +196,8 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261029-student-name-r7'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261029-student-name-r7/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261030-learner-audit-r1'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261030-learner-audit-r1/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);
@@ -332,3 +343,4 @@ test('Coach learner name uses a neutral fallback when verified first name is abs
  api.choose(0);
  assert.match(elements.get('chat-transcript').innerHTML,/class="speaker">Learner · Learner<\/div>/);
 });
+

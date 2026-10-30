@@ -865,7 +865,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   min-height:38px!important;padding:7px 9px!important;border-radius:11px;
   white-space:normal;font-size:10px;line-height:1.3;
  }
- #protected #gameStudioNote{display:none!important}
+ #gameStudioNote{display:none!important}
 }
 
 
@@ -1170,10 +1170,10 @@ html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
     <button type="button" id="exit">Sign out · लगआउट <span aria-hidden="true">↗</span></button>
   </div>
 </div>
-<div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
+<div hidden id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
-<script src="./festival-stories.js?v=20261024-r1"></script>
-<script src="./festival-dashboard-preview.js?v=20261024-stories-r1"></script>
+<script src="./festival-stories.js?v=20261030-nepali-r2"></script>
+<script src="./festival-dashboard-preview.js?v=20261030-nepali-r2"></script>
 <script src="./mobile-bar-handles.js?v=20261029-manual-only-r2"></script>
 <script src="./coach-store-story.js?v=20261028-dialogue-only-r9"></script>
 <script src="./coach-topic-catalog-1.js?v=20261028-175topics-r1"></script>
@@ -1186,19 +1186,20 @@ html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
 <script src="./coach-adaptive-story.js?v=20261028-realistic-flow-r8&coach=20261029-context-r1"></script>
 <script src="./coach-drafts.js?v=20261028-payment-replies-r12&coach=20261029-context-r1"></script>
 <script src="./coach-pagination.js?v=20261029-pagination25-r1"></script>
-<script src="./coach-dashboard.js?v=20261030-always-visible-visa-r1"></script>
-<script src="./coach-v4-mount.js?v=20261029-student-name-r7"></script>
-<script src="./translate-studio-v4.js?v=20261030-platform-audio-r1"></script>
+<script src="./coach-dashboard.js?v=20261030-learner-audit-r1"></script>
+<script src="./coach-v4-mount.js?v=20261030-learner-audit-r1"></script>
+<script src="./translate-studio-v4.js?v=20261030-learner-audit-r1"></script>
 <script src="./sidebar-unified.js?v=20261029-desktop-tab-drag-r2"></script>
 <script src="./all-tabs-responsive.js?v=20261021-dark-contrast-r1"></script>
-<script src="./words-studio.js?v=20261030-single-voice-r1"></script>
-<script src="./writing-coach-dashboard.js?v=20261022-proofreading-quality-r1"></script>
-<script src="./reading-dashboard.js?v=20261030-single-voice-r2"></script>
+<script src="./words-studio.js?v=20261030-learner-audit-r1"></script>
+<script src="./writing-coach-dashboard.js?v=20261030-learner-audit-r1"></script>
+<script src="./reading-dashboard.js?v=20261030-learner-audit-r1"></script>
 <script src="./nepali-voice-bridge.js?v=20261030-platform-audio-r1"></script>
 <script src="./speech-input.js?v=20261030-platform-audio-r1"></script>
 <script src="./game-adventure.js?v=20261030-no-rewards-r1"></script>
 <script src="./nepal-explorer.js?v=20261030-districts-no-points-r1"></script>
-<script src="./progress-dashboard.js?v=20261030-learning-first-r2"></script>
+<script src="./progress-dashboard.js?v=20261030-learner-audit-r1"></script>
+<script src="./learner-nepali-support.js?v=20261030-learner-audit-r1"></script>
 <!-- Mobile top and bottom bars are now controlled only by their center arrow handles. -->
 <script>
 'use strict';
@@ -2608,7 +2609,7 @@ function enhanceBeginnerClarity(doc){
     const alreadyExplained=plain.length>=7;
     let label='';
     if(visibleText.includes('🎲') && !alreadyExplained)label='Change topic · विषय बदल्नुहोस्';
-    else if(visibleText.includes('🇳🇵') && !alreadyExplained)label='See Nepali · नेपाली अर्थ';
+    else if(visibleText.includes('🇳🇵') && !alreadyExplained && !button.closest('#speakDirSeg,#convoDirSeg,#dirSel,#langPref'))label='See Nepali · नेपाली अर्थ';
     else if(/[⬆⬇↑↓]/u.test(visibleText) && !alreadyExplained){
       const up=/[⬆↑]/u.test(visibleText),down=/[⬇↓]/u.test(visibleText);
       label=up&&down?'Change level · स्तर बदल्नुहोस्':
@@ -3036,7 +3037,7 @@ function personalizeStudentLesson(){
   void sikauRefreshSpeechCapabilities();
   uiStep('words vocabulary',()=>window.enhanceWordsDashboard?.(doc));
   uiStep('writing coach',()=>window.enhanceWritingCoachDashboard?.(doc));
-  uiStep('reading dashboard',()=>window.enhanceReadingDashboard?.(doc));
+  uiStep('reading dashboard',()=>window.enhanceReadingDashboard?.(doc,user.$id));
   uiStep('game adventure',()=>window.enhanceGameDashboard?.(doc));
   uiStep('nepal explorer map',()=>window.enhanceNepalJourney?.(doc,user.$id));
   uiStep('progress dashboard',()=>window.enhanceProgressDashboard?.(doc));
@@ -3046,6 +3047,7 @@ function personalizeStudentLesson(){
   uiStep('translate',()=>window.enhanceTranslationDashboard?.(doc));
   uiStep('festival calendar',()=>enhanceFestivalCalendar(doc));
   uiStep('festival home',()=>enhanceLearningHome(doc,first));
+  uiStep('Nepali learner help',()=>window.enhanceNepaliLearnerSupport?.(doc));
   uiStep('navigation consistency',()=>sikauPolishStudentNavigation(doc));
   uiStep('unified sidebar click and drag',()=>window.enhanceUnifiedSidebar?.(doc));
   // No scroll listeners alter top or bottom bar visibility; only arrow clicks do.
@@ -3402,6 +3404,8 @@ async function openFile(token='',isTrial=false){
    /\b(?:USA|Nepal)\s+I\s+(?:miss|want|need)\b/.test(t)}
 
  function improveSentences(v){return correctDraft(String(v||'')
+ .replace(/\b(my dream job|my goal|my ambition) is be\b/gi,'$1 is to be')
+ .replace(/\b(I|we|you|they) (enjoys|needs|studies)\b/gi,(_,sub,verb)=>sub+' '+({enjoys:'enjoy',needs:'need',studies:'study'}[verb.toLowerCase()]))
  .replace(/\bhellps\b/gi,'helps').replace(/\beverythough\b/gi,'even though')
  .replace(/\bindia\b/gi,'India').replace(/\bfacebook\b/gi,'Facebook')
  .replace(/\bin Facebook\b/gi,'on Facebook')
@@ -3511,7 +3515,7 @@ async function openFile(token='',isTrial=false){
     const qualityInstalled=qualityEntry.test(repairedHtml);
     const lessonsWithQuality=qualityInstalled?repairedHtml.replace(qualityEntry,m=>lightningTimingPatch+'\n'+writingQualityPatch+'\n'+m):repairedHtml;
     if(!qualityInstalled)console.warn('Writing checker signature changed; patch not installed.');
-    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261029-compact-roman-r6',location.href).href;
+    const languageScriptUrl=new URL('english-sikau-language-display.js?v=20261030-native-roman-r7',location.href).href;
     const languageScriptTag='<scr'+'ipt src="'+languageScriptUrl+'"></scr'+'ipt>';
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):

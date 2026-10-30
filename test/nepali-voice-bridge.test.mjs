@@ -201,9 +201,9 @@ test('voice failure is reported without using Hindi or other voices',()=>{
 });
 
 test('Translate, Words and Reading load identical shared engine across devices',()=>{
- assert.match(app,/translate-studio-v4\.js\?v=20261030-platform-audio-r1/);
- assert.match(app,/reading-dashboard\.js\?v=20261030-single-voice-r2/);
- assert.match(app,/words-studio\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/translate-studio-v4\.js\?v=20261030-learner-audit-r1/);
+ assert.match(app,/reading-dashboard\.js\?v=20261030-learner-audit-r1/);
+ assert.match(app,/words-studio\.js\?v=20261030-learner-audit-r1/);
  assert.match(app,/nepali-voice-bridge\.js\?v=20261030-platform-audio-r1/);
  assert.match(app,/uiStep\('one bilingual speech player',\(\)=>window\.enhanceUnifiedSpeech\?\.\(doc\)\)/);
  assert.match(translate,/__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);

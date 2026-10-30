@@ -185,7 +185,7 @@ window.enhanceWordsDashboard=function(doc){
  const filterHeading=add(doc,filterPanel,'div','wv-panel-header');
  const filterTitle=add(doc,filterHeading,'div','');
  add(doc,filterTitle,'strong','','🔎 Find words · शब्द खोज्नुहोस्');
- add(doc,filterTitle,'small','','Search first, or choose a level for practice.');
+ add(doc,filterTitle,'small','','Search first, or choose a level for practice. · खोज्नुहोस् वा अभ्यासको स्तर छान्नुहोस्।');
  const searchLine=add(doc,filterPanel,'div','wv-searchline');
  const search=add(doc,searchLine,'label','wv-search');
  const searchIcon=add(doc,search,'span','','⌕');searchIcon.setAttribute('aria-hidden','true');
@@ -197,7 +197,7 @@ window.enhanceWordsDashboard=function(doc){
  add(doc,levelArea,'span','wv-filter-label','Level · सिकाइ स्तर');
  const levelChips=add(doc,levelArea,'div','wv-level-chips');
  const levelButtons={};
- for(const [v,t] of [['all','All levels · सबै'],['1','Level 1'],['2','Level 2'],['3','Level 3']]){
+ for(const [v,t] of [['all','All levels · सबै'],['1','Level 1 · स्तर १'],['2','Level 2 · स्तर २'],['3','Level 3 · स्तर ३']]){
   const b=add(doc,levelChips,'button','wv-level-chip',t);
   b.type='button';b.dataset.level=v;
   b.addEventListener('click',()=>{level=v;render();});
@@ -492,9 +492,9 @@ window.enhanceWordsDashboard=function(doc){
    status.setAttribute('role','status');
    status.setAttribute('aria-live','polite');
    status.hidden=!feedback;
-   add(doc,question,'p','','Write the English word for: '+w.ne);
+   add(doc,question,'p','','Write the English word · अंग्रेजी शब्द लेख्नुहोस्: '+w.ne);
    const input=add(doc,question,'input','wv-quiz-input');
-   input.type='text';input.value=quizValue;input.placeholder='Type the English word…';
+   input.type='text';input.value=quizValue;input.placeholder='Type the English word… · अंग्रेजीमा लेख्नुहोस्…';
    input.setAttribute('aria-label','English translation for '+w.ne);
    input.addEventListener('input',()=>{quizValue=input.value;});
    const actions=add(doc,question,'div','wv-quiz-actions');
@@ -548,11 +548,11 @@ window.enhanceWordsDashboard=function(doc){
   }
   const practice=add(doc,aside,'div','wv-practice-card');
   add(doc,practice,'h3','','✏️ Try it yourself · आफैं प्रयास गर्नुहोस्');
-  add(doc,practice,'p','','Can you use “'+w.word+'” in your own sentence?');
-  const practiceB=add(doc,practice,'button','wv-practice-button','Practice this word →');
+  add(doc,practice,'p','','Can you use “'+w.word+'” in your own sentence? · यो शब्दबाट आफ्नै वाक्य बनाउनुहोस्।');
+  const practiceB=add(doc,practice,'button','wv-practice-button','Practice this word → · यो शब्दको अभ्यास');
   practiceB.type='button';practiceB.addEventListener('click',startPractice);
   }
-  add(doc,detail,'p','wv-feedback',feedback);
+  if(tab!=='practice')add(doc,detail,'p','wv-feedback',feedback);
  }
  function render(){
   items=combined(doc,wordBox);

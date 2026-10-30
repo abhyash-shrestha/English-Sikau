@@ -1489,6 +1489,10 @@ function endWithoutAction(){
 }
 /* Café conversation: a real order, seating enquiry and mistaken-drink complaint
    must never collapse into the same checkout or closing sequence. */
+function cafeTotal(order,food=order.food){
+ const base={'small hot latte':300,'medium iced coffee':350,'small latte to go':300,'hot tea':120,coffee:250};
+ return (base[order.drink]||250)+(order.milk==='oat milk'?50:0)+(food==='croissant'?180:0);
+}
 function cafeOptions(){
  if(current()?.title!=='Order at a café'||state.ended)return null;
  const c=(label,fn)=>({label,fn});
@@ -1505,19 +1509,19 @@ function cafeOptions(){
    option('What kinds of coffee do you have?',30,'We offer espresso, cappuccino, lattes and iced coffee. Would you like something hot or iced?')];
   if(state.stage===31)return [
    option('Regular milk and no extra sugar, please.',32,`Got it: ${d.drink||'coffee'} with regular milk and no extra sugar. Is that for here or to go?`,{milk:'regular milk',sweet:'no added sugar'}),
-   option('Oat milk, please. Is there an extra charge?',32,`I can check the oat milk option and its price. Your ${d.drink||'coffee'} will be made with oat milk if you confirm. For here or to go?`,{milk:'oat milk',sweet:'unspecified'}),
-   option('Actually, I need to change my drink.',30,'No problem. We have not started the order yet. What would you like instead?',{drink:null,milk:null})];
+   option('Oat milk, please. Is there an extra charge?',32,`Oat milk costs Rs 50 extra. Your ${d.drink||'coffee'} will have oat milk. For here or to go?`,{milk:'oat milk',sweet:'unspecified'}),
+   option('Actually, I need to change my drink.',30,'No problem. We have not started the order yet. What would you like instead?',{drink:null,milk:null,food:null,payment:null})];
   if(state.stage===32)return [
    option('To go, please.',33,`Perfect. I'll prepare your ${d.drink||'coffee'} with ${d.milk||'the selected milk'} for takeaway. Would you like anything else?`,{takeout:true}),
    option("I'll have it here, please.",33,`Of course. We can serve your ${d.drink||'coffee'} here. Would you like anything else?`,{takeout:false})];
   if(state.stage===33)return [
-   option("No thanks, that's everything. What is my total?",34,`Your order is one ${d.drink||'coffee'} with ${d.milk||'your selected milk'}. We'll confirm the displayed total, including any milk surcharge, before payment. Is the order correct?`,{food:'none'}),
-   option('Could I add a croissant?',34,`Certainly. I'll add a croissant and confirm the combined total with your ${d.drink||'coffee'}. Is that everything?`,{food:'croissant'}),
+   option("No thanks, that's everything. What is my total?",34,`Your total is Rs ${cafeTotal(d,'none')}, including ${d.milk==='oat milk'?'the Rs 50 oat milk charge':'regular milk'}. Is your order correct?`,{food:'none'}),
+   option('Could I add a croissant?',34,`A croissant is Rs 180. Your total with the ${d.drink||'coffee'} is Rs ${cafeTotal(d,'croissant')}. Is that everything?`,{food:'croissant'}),
    option('Actually, I do not want to order anymore.',39,'No problem. Nothing has been prepared or charged.',{canceled:true})];
   if(state.stage===34)return [
    option('Yes, that is my order. I will pay by card.',38,`Thank you. Your card payment for the ${d.drink||'coffee'}${d.food==='croissant'?' and croissant':''} is approved. Here is your receipt. ${d.takeout?'Your takeaway order will be ready at the counter.':'We will bring the order to your table.'}`,{payment:'card'}),
    option('Yes, that is correct. I will pay cash.',38,`Thank you. Your cash payment for the ${d.drink||'coffee'}${d.food==='croissant'?' and croissant':''} is complete. Here's your receipt.`,{payment:'cash'}),
-   option('Wait, I need to change my drink.',30,'Of course. We have not charged you. Which drink would you prefer?',{drink:null,milk:null}),
+   option('Wait, I need to change my drink.',30,'Of course. We have not charged you. Which drink would you prefer?',{drink:null,milk:null,food:null,payment:null}),
    option("I won't order after all.",39,"That's completely fine. Nothing has been charged.",{canceled:true})];
  }
  if(r===1){
@@ -1536,8 +1540,8 @@ function cafeOptions(){
    option('A small latte to go, please.',36,'Certainly. Would you like regular milk or oat milk?',{drink:'small latte to go'}),
    option('I have decided not to buy anything.',39,'No problem at all. Have a good day.',{canceled:true})];
   if(state.stage===36)return [
-   option('The regular option is fine. What is the total?',37,`Great. We'll confirm the price for your ${d.drink||'drink'} before taking payment.`),
-   option('Do you have a dairy-free option?',37,`We can check the available alternatives for your ${d.drink||'drink'} and confirm any price difference.`),
+   option('The regular option is fine. What is the total?',37,`Your total for the ${d.drink||'drink'} is Rs ${cafeTotal(d,'none')}. How would you like to pay?`),
+   option('Do you have a dairy-free option?',37,`We have oat milk for Rs 50 extra. Your total is Rs ${cafeTotal({...d,milk:'oat milk'},'none')}. Would you like to continue?`,{milk:'oat milk'}),
    option('I will decide later.',39,'Of course. No order has been placed.',{canceled:true})];
   if(state.stage===37)return [
    option('That works. I will pay by card.',38,`Thank you. Your card payment went through. Your ${d.drink||'drink'} order is confirmed. Enjoy your visit.`,{payment:'card'}),
@@ -1632,4 +1636,4 @@ function initialize(){bind();try{const saved=JSON.parse(localStorage.getItem(sto
 initialize();
 window.SikauPreview={authoring:topicDecisions,topics:topicsAll,view:()=>({activeIndex,activeFilter,page,state:JSON.parse(JSON.stringify(state))}),selectTopic:openTopic,reset:restart,choose:(i)=>{const options=stageOptions();options[i]?.fn()},getChoices:()=>stageOptions().map(x=>x.label),back:goBack,setTheme:(theme)=>{const wanted=theme==='dark';if(dark!==wanted){dark=wanted;save();}document.documentElement.dataset.theme=wanted?'dark':'light';const control=$('theme-toggle'),label=wanted?'☀️ Light mode':'🌙 Dark mode';if(control&&control.textContent!==label)control.textContent=label;}};
 })();
-</script><script src="./coach-v4-bridge.js?v=20261029-student-name-r7"></script></body></html>
+</script><script src="./coach-v4-bridge.js?v=20261030-learner-audit-r1"></script></body></html>

@@ -23,6 +23,8 @@ function previewFrom(section,limit){
 
 /* Conservative, testable ESL fallback. No claims of AI or verified grammar. */
 const BASIC_RULES=[
+ [/\b(my dream job|my goal|my ambition) is be\b/gi,'$1 is to be','लक्ष्य वा सपनाको पेशा बताउँदा “is to be” लेख्नुहोस्।'],
+ [/\b(I|we|you|they) (enjoys|needs|studies)\b/gi,(_,s,v)=>s+' '+({enjoys:'enjoy',needs:'need',studies:'study'}[v.toLowerCase()]),'I, we, you र they पछि क्रियाको मूल रूप प्रयोग हुन्छ।'],
  [/have you ever (visit|see|go|take|eat)\b/gi,(_,v)=>'have you ever '+({visit:'visited',see:'seen',go:'gone',take:'taken',eat:'eaten'}[v.toLowerCase()]),'“Have you ever” पछि past participle प्रयोग गर्नुहोस्।'],
  [/\b(mountains|tourists|roads) (touches|throws|becomes)\b/gi,(_,n,v)=>n+' '+({touches:'touch',throws:'throw',becomes:'become'}[v.toLowerCase()]),'बहुवचन subject सँग verb मा -s नजोड्नुहोस्।'],
  [/\b(Pokhara|Kathmandu|Chitwan|Nepal|Janakpur) are\b/gi,'$1 is','एउटा ठाउँको नाम एकवचन हो, त्यसैले “is” हुन्छ।'],
@@ -162,8 +164,12 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  const nativeCorrected=nativeSection(result,/Corrected version|Grammar-only correction/i);
  const originalAnswer=textarea?.value?.trim()||'';
  const existing=previewFrom(nativeCorrected);
+ // Use the learner's draft when the native grammar draft introduced a known
+ // bad correction (e.g. "My dream job is being a teacher").
+ const knownDraftError=/\b(my dream job|my goal|my ambition) is be\b/i.test(originalAnswer);
  const improved=(aiReview?.corrected && typeof aiReview.corrected==='string')
-   ?aiReview.corrected:polishWriting(existing||originalAnswer);
+   ?aiReview.corrected:polishWriting(knownDraftError?originalAnswer:(existing||originalAnswer));
+ const changed=improved.trim()!==originalAnswer.trim();
  const scoreLabel=aiReview?String(Math.max(0,Math.min(100,Number(aiReview.score)||0))):(score.textContent||'').trim();
  const mistakes=[...result.querySelectorAll('.mistake')].filter(n=>n.querySelector('.wrong,.right')).map(n=>({
     wrong:(n.querySelector('.wrong')?.textContent||'').trim(),
@@ -182,7 +188,7 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  const heading=add(doc,summary,'div','wc-simple-head');
  const main=add(doc,heading,'div');
  add(doc,main,'h2','','Your writing results · लेखाइको नतिजा');
- add(doc,main,'p','','Short, clear feedback to help you improve.');
+ add(doc,main,'p','','Clear feedback to help you improve · सुधार्न सहयोग गर्ने सरल सुझावहरू।');
  const stats=add(doc,summary,'div','wc-simple-stats');
  const scoreBox=add(doc,stats,'div','wc-simple-score');
  add(doc,scoreBox,'strong','',scoreLabel+'/100');
@@ -193,7 +199,7 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
  add(doc,info,'small','',aiReview?'AI-powered review · एआई लेखन जाँच':aiPending?'AI reviewing… · एआई जाँच हुँदैछ':aiUnavailable?'Basic checker used · सामान्य जाँच':'Basic grammar review · सामान्य जाँच');
  if(offTopic)add(doc,info,'p','','Answer the assigned question before fixing grammar. · पहिले सोधिएको विषयमा लेख्नुहोस्।');
  const corrected=add(doc,summary,'section','wc-simple-card wc-simple-corrected');
- add(doc,corrected,'h3','',aiReview?'✓ AI corrected version · एआईले सुधारेको उत्तर':'✓ Improved version · सुधारिएको उत्तर');
+ add(doc,corrected,'h3','',aiReview?'✓ AI corrected version · एआईले सुधारेको उत्तर':changed?'✓ Suggested revision · सुधारको सुझाव':'Your draft · तपाईंको लेखाइ');
  add(doc,corrected,'p','wc-simple-text',improved||'Your corrected paragraph was not available.');
  add(doc,corrected,'p','wc-simple-note',aiReview?'AI suggestions can still be inaccurate; compare with your own meaning. · एआईको सुझाव पनि जाँच्नुहोस्।':aiPending?'AI is checking the full paragraph. This is the basic result. · एआई जाँच हुँदैछ।':'Rule-based corrections can miss context-dependent errors. · स्वचालित सुधारमा गल्ती छुट्न सक्छ।');
  if(improved){
@@ -250,7 +256,7 @@ function renderRealFeedback(doc,result,summary,original,textarea,aiReview=null,a
    add(doc,li,'strong','',t.after);
    add(doc,li,'small','',t.ne);
   }
- }else add(doc,key,'p','wc-simple-text','No specific grammar suggestions were returned.');
+ }else add(doc,key,'p','wc-simple-text','No specific grammar suggestions were returned · खास व्याकरण सुधारको सुझाव आएन।');
  add(doc,key,'p','wc-simple-tip',aiReview?.tip_ne?'💡 '+String(aiReview.tip_ne).slice(0,450):'💡 Read the improved paragraph and try again in your own words. · सुधारिएको उत्तर पढेर आफ्नै शब्दमा फेरि लेख्नुहोस्।');
  const model=aiReview?.model_answer||getModelAnswer(result);
  if(model){
@@ -287,7 +293,7 @@ window.enhanceWritingCoachDashboard=function(doc){
  add(doc,intro,'h1','','Writing Coach');
  add(doc,intro,'h2','','लेखन कोच');
  add(doc,intro,'p','','Improve your English writing with feedback, model answers and simple explanations.');
- add(doc,intro,'p','','एआई फिडब्याक, नमुना उत्तर र सरल व्याख्याको साथ आफ्नो अंग्रेजी लेखन सुधार गर्नुहोस्।');
+ add(doc,intro,'p','','सुझाव, नमुना उत्तर र सरल व्याख्याबाट आफ्नो अंग्रेजी लेखन सुधार गर्नुहोस्।');
  const slogan=add(doc,hero,'div','wc-banner-slogan');
  add(doc,slogan,'strong','','Better Writing');
  add(doc,slogan,'strong','','Brighter Opportunities');

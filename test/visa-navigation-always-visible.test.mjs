@@ -143,7 +143,8 @@ test('Authenticated wrapper creates Visa before Coach and loads updated JS',()=>
  const early=index.indexOf("uiStep('always-visible Visa tab'");
  const coachStep=index.indexOf("uiStep('coach',");
  assert.ok(early>0&&coachStep>early,'Independent Visa bootstrap must run first');
- assert.match(index,/coach-dashboard\.js\?v=20261030-always-visible-visa-r1/);
+ assert.match(index,/coach-dashboard\.js\?v=20261030-learner-audit-r1/);
  assert.match(coach,/shell\.__sikauVisaController=visaController/);
  assert.match(coach,/installVisaSidebar\(doc,previous,previous\.__sikauVisaController\)/);
 });
+

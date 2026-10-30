@@ -378,6 +378,8 @@
  "Shop for family necessities": "परिवारका आवश्यक सामान किन्नु"
 };
  for(const [english,ne] of Object.entries(topicTitleNe))staticNe.set(english,ne);
+ // Reviewed everyday phrases remain available without a translation request.
+ for(const [en,ne] of Object.entries({"Of course. Do you prefer a hot coffee or something iced?": "अवश्य। तातो कफी चाहनुहुन्छ कि चिसो?", "A small hot latte, please.": "कृपया एउटा सानो तातो लाटे दिनुहोस्।", "A medium iced coffee, please.": "कृपया एउटा मझौला चिसो कफी दिनुहोस्।", "What kinds of coffee do you have?": "तपाईंसँग कस्ता कफी छन्?", "Sure. Would you like regular milk or a different kind?": "हुन्छ। सामान्य दूध चाहनुहुन्छ कि अर्को प्रकारको?", "Of course. What milk and sweetness would you prefer?": "हुन्छ। कुन दूध र कति गुलियो चाहनुहुन्छ?", "We offer espresso, cappuccino, lattes and iced coffee. Would you like something hot or iced?": "हामीसँग एस्प्रेसो, क्यापुचिनो, लाटे र चिसो कफी छन्। तातो चाहनुहुन्छ कि चिसो?", "Regular milk and no extra sugar, please.": "सामान्य दूध राख्नुहोस् र थप चिनी नराख्नुहोस्।", "Oat milk, please. Is there an extra charge?": "ओटको दूध राख्नुहोस्। थप पैसा लाग्छ?", "Actually, I need to change my drink.": "म आफ्नो पेय बदल्न चाहन्छु।", "No problem. We have not started the order yet. What would you like instead?": "हुन्छ। अर्डर बनाउन सुरु भएको छैन। सट्टामा के चाहनुहुन्छ?", "To go, please.": "कृपया प्याक गरिदिनुहोस्।", "I'll have it here, please.": "म यहीँ बसेर पिउँछु।", "No thanks, that's everything. What is my total?": "धन्यवाद, यति नै हो। जम्मा कति भयो?", "Could I add a croissant?": "एउटा क्रोइसान पनि थप्न मिल्छ?", "Actually, I do not want to order anymore.": "अब म अर्डर गर्न चाहन्नँ।", "No problem. Nothing has been prepared or charged.": "हुन्छ। केही बनाइएको छैन र पैसा पनि लिइएको छैन।", "Yes, that is my order. I will pay by card.": "हो, मेरो अर्डर यही हो। म कार्डबाट तिर्छु।", "Yes, that is correct. I will pay cash.": "हो, ठीक छ। म नगद तिर्छु।", "Wait, I need to change my drink.": "पख्नुहोस्, म पेय बदल्न चाहन्छु।", "Of course. We have not charged you. Which drink would you prefer?": "हुन्छ। पैसा लिएका छैनौँ। कुन पेय चाहनुहुन्छ?", "I won't order after all.": "अन्ततः म अर्डर गर्दिनँ।", "That's completely fine. Nothing has been charged.": "ठीक छ। पैसा लिइएको छैन।", "Thank you. Goodbye!": "धन्यवाद। नमस्ते!", "You are welcome. Thank you for speaking with us. Take care.": "स्वागत छ। हामीसँग कुरा गर्नुभएकोमा धन्यवाद। राम्रोसँग जानुहोस्।", "Could I sit somewhere quiet, away from the entrance?": "ढोकाबाट टाढा शान्त ठाउँमा बस्न मिल्छ?", "Is a window seat available?": "झ्यालछेउको सिट खाली छ?", "Yes, I would like that table.": "हो, मलाई त्यही टेबल चाहिन्छ।", "A cup of hot tea, please.": "कृपया एक कप तातो चिया दिनुहोस्।", "The regular option is fine. What is the total?": "सामान्य विकल्प नै ठीक छ। जम्मा कति भयो?", "Do you have a dairy-free option?": "दूधबाट नबनेको विकल्प छ?", "I will decide later.": "म पछि निर्णय गर्छु।", "That works. I will pay by card.": "हुन्छ। म कार्डबाट तिर्छु।", "I will pay cash, please.": "म नगद तिर्छु।"}))staticNe.set(en,ne);
  const romanWords={'नमस्ते':'Namaste','अभ्यास':'Abhyash','मेरो':'mero','नेपाली':'Nepali','कृपया':'kripaya','धन्यवाद':'dhanyabad','तपाईं':'tapai','तपाईंको':'tapaiko','तपाईंलाई':'tapailai','हो':'ho','छ':'chha','छैन':'chhaina','फेरि':'pheri','कुराकानी':'kurakani'};
  const cons={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'ng','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'ny','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'w','श':'sh','ष':'sh','स':'s','ह':'h'};
  const vowel={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au'};
@@ -469,6 +471,23 @@
  function localNe(english){
   const direct=staticNe.get(english);
   if(direct)return direct;
+  const drinks={'small hot latte':'सानो तातो लाटे','medium iced coffee':'मझौला चिसो कफी',coffee:'कफी','small latte to go':'प्याक गर्ने सानो लाटे','hot tea':'तातो चिया'};
+  const drink=x=>drinks[x]||x;
+  const milk=x=>x==='oat milk'?'ओटको दूध':'सामान्य दूध';
+  let cafe=english.match(/^Got it: (.+) with regular milk and no extra sugar\. Is that for here or to go\?$/);
+  if(cafe)return drink(cafe[1])+' मा सामान्य दूध राख्ने र थप चिनी नराख्ने। यहीँ पिउनुहुन्छ कि प्याक गर्ने?';
+  cafe=english.match(/^Oat milk costs Rs 50 extra\. Your (.+) will have oat milk\. For here or to go\?$/);
+  if(cafe)return 'ओटको दूधको थप रु ५० लाग्छ। '+drink(cafe[1])+' मा ओटको दूध राख्नेछौँ। यहीँ पिउने कि प्याक गर्ने?';
+  cafe=english.match(/^Perfect\. I'll prepare your (.+) with (.+) for takeaway\. Would you like anything else\?$/);
+  if(cafe)return drink(cafe[1])+' मा '+milk(cafe[2])+' राखेर प्याक गरिदिन्छु। अरू केही चाहिन्छ?';
+  cafe=english.match(/^Of course\. We can serve your (.+) here\. Would you like anything else\?$/);
+  if(cafe)return drink(cafe[1])+' यहीँ ल्याइदिन्छौँ। अरू केही चाहिन्छ?';
+  cafe=english.match(/^Your total is Rs (\d+), including (.+)\. Is your order correct\?$/);
+  if(cafe)return 'जम्मा रु '+cafe[1]+' भयो। '+(cafe[2].includes('50')?'ओटको दूधको थप रु ५० पनि यसमै छ।':'सामान्य दूधको मूल्य यसमै छ।')+' अर्डर ठीक छ?';
+  cafe=english.match(/^A croissant is Rs 180\. Your total with the (.+) is Rs (\d+)\. Is that everything\?$/);
+  if(cafe)return 'क्रोइसानको रु १८० हो। '+drink(cafe[1])+' सहित जम्मा रु '+cafe[2]+' भयो। यति नै हो?';
+  cafe=english.match(/^Thank you\. Your (card|cash) payment for the (.+?)(?: is approved| is complete)\. (.+)$/);
+  if(cafe)return 'धन्यवाद। '+(cafe[1]==='card'?'कार्ड':'नगद')+'बाट भुक्तानी भयो। यो तपाईंको रसिद हो। '+(english.includes('takeaway')?'प्याक गरेको अर्डर काउन्टरमा लिनुहोस्।':english.includes('table')?'अर्डर टेबलमा ल्याइदिन्छौँ।':'');
   // Dynamic UI values should not consume machine translation requests.
   let match=/^Topic (\d+) of 175$/.exec(english);
   if(match)return '१७५ मध्ये विषय '+match[1];
@@ -578,7 +597,13 @@
   let node=Array.from(el.children).find(x=>x.classList?.contains('sikau-v4-local'));
   if(mode==='en'||!english){node?.remove();return;}
   const ne=override?.ne||neFor(english);
-  if(!ne){node?.remove();return;}
+  if(!ne){
+   const waiting='नेपाली अर्थ लोड हुँदैछ…';
+   if(!node){node=document.createElement('span');node.className='sikau-v4-local';el.appendChild(node);}
+   const pendingText=mode==='en-roman'?'Nepali artha load hundai chha…':waiting;
+   if(node.textContent!==pendingText)node.textContent=pendingText;
+   return;
+  }
   const roman=capitalizeRomanSentences(override?.roman||romanize(ne));
   const parts=mode==='en-ne'?[['ne',ne]]:mode==='en-roman'?[['ne-Latn',roman]]:[['ne',ne],['ne-Latn',roman]];
   if(!node){node=document.createElement('span');node.className='sikau-v4-local';el.appendChild(node);}
@@ -652,10 +677,10 @@
    document.querySelector('#topic-browser .filterbar')?.insertAdjacentElement('afterend',note);
   }
   const message=mode==='en'?'':(failures>0&&Date.now()<coolUntil)?
-   'Translation service is temporarily limited. All 175 topics remain available in English; Nepali and Roman Nepali lines will reappear when translation is available.':
-   mode==='en-ne'?'English + नेपाली · All 175 topics · English with Nepali help; dialogue may use automatic translation.':
+   'Translation is temporarily limited · अहिले अनुवाद सीमित छ। उपलब्ध नेपाली अर्थसहित अभ्यास जारी राख्नुहोस्।':
+   mode==='en-ne'?'English + नेपाली · १७५ विषय · केही संवादको अर्थ स्वचालित अनुवाद हो।':
    mode==='en-roman'?'English + Roman Nepali · All 175 topics · English with Roman Nepali help.':
-   'English + नेपाली + Roman · All 175 topics · English, Nepali and Roman Nepali together.';
+   'English + नेपाली + Roman · १७५ विषय · नेपाली र रोमन अर्थसँग अंग्रेजी अभ्यास।';
   if(note.textContent!==message)note.textContent=message;
   note.hidden=mode==='en';
  }
@@ -724,6 +749,9 @@
   }
   schedule();
  },true);
+ // Run after native button handlers so known Nepali lines appear in the same turn.
+ document.addEventListener('click',()=>{syncLessonMode();decorate();measure();});
  schedule();
  window.parent.postMessage({type:'sikau-v4-ready'},'*');
 })();
+
