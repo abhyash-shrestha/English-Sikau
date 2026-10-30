@@ -26,6 +26,8 @@ test('Progress uses authentic learning activity, not XP, streak, or badge cards'
  for(const phrase of ['Total XP','Day Streak','Mastery points','Achievements','First XP','xp.toLocaleString'])
   assert.ok(!progress.includes(phrase),'Retired UI still present: '+phrase);
  assert.match(progressStyle,/#pg\.sikau-learning-first #pgo\{display:none!important\}/);
+ assert.match(progress,/native\.hidden=true/);
+ assert.match(index,/'sikauProgressCSS','nepalExplorerStyle','sikauGameStyle'/);
  assert.match(progress,/\bconst passed=Object\.values\(scores\)\.filter/);
  assert.match(progress,/\bconst words=state\.words/);
  assert.match(progress,/\bconst reading=safeCount\(state\.rd\)/);
@@ -106,7 +108,7 @@ test('Three successful missions on distinct dates unlock the next district witho
 
 test('Latest learning-focused script and stylesheet versions are used',()=>{
  for(const path of [
-  './progress-dashboard.js?v=20261030-learning-first-r1',
+  './progress-dashboard.js?v=20261030-learning-first-r2',
   './game-adventure.js?v=20261030-no-rewards-r1',
   './nepal-explorer.js?v=20261030-districts-no-points-r1'])
   assert.ok(index.includes(path),path);
