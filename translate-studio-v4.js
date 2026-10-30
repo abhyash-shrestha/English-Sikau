@@ -275,22 +275,16 @@ window.enhanceTranslationDashboard=function(d){
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
   if(!v.speechSynthesis||!v.SpeechSynthesisUtterance){notice.textContent='Audio is unavailable in this browser. · आवाज उपलब्ध छैन।';return}
   const outputLanguage=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
-  // Do not depend on replacing a read-only speechSynthesis.speak
-  // method. Safari, Android WebView and some browser engines forbid it.
-  // Route BOTH English and Nepali explicitly through the same verified
-  // Male/Female selector on every device.
-  try{
-   if(!v.__sikauNepaliVoice&&typeof window.enhanceNepaliSpeechVoices==='function')
-    window.enhanceNepaliSpeechVoices(d);
-  }catch(_){}
+  // Both languages now share one speaker each: US-English / Nepali (Nepal).
+  // Explicitly route the Listen button so iOS Safari does not need a
+  // writable speechSynthesis.speak method.
+  try{window.enhanceUnifiedSpeech?.(d);}catch(_){}
   if(v.__sikauNepaliVoice?.speakText){
-   const started=v.__sikauNepaliVoice.speakText(txt,outputLanguage,'tr');
-   if(!started)notice.textContent='Selected voice unavailable on this device. Please check the available voices above · छानिएको आवाज उपलब्ध छैन।';
+   v.__sikauNepaliVoice.speakText(txt,outputLanguage,'tr');
+   // The shared player shows actionable voice availability in this tab.
    return;
   }
-  // Never guess a gender or silently use Hindi if the shared voice bridge
-  // did not load. Ask for a reload instead of playing the wrong speaker.
-  notice.textContent='Voice selector is still loading. Please reload and retry · आवाज चयन लोड भएको छैन।';
+  notice.textContent='Audio is still loading. Please reopen Translate · आवाज लोड भएको छैन।';
  });
  save.addEventListener('click',()=>{
   const txt=resultText();
