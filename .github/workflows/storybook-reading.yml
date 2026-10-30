@@ -1,0 +1,34 @@
+name: Reading storybook experience
+on:
+  pull_request:
+    paths:
+      - 'storybook-reading.js'
+      - 'storybook-reading.css'
+      - 'reading-dashboard.js'
+      - 'index.html'
+      - 'test/storybook-reading.test.mjs'
+      - 'test/nepali-voice-bridge.test.mjs'
+      - '.github/workflows/storybook-reading.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'storybook-reading.js'
+      - 'storybook-reading.css'
+      - 'reading-dashboard.js'
+      - 'index.html'
+      - 'test/storybook-reading.test.mjs'
+      - 'test/nepali-voice-bridge.test.mjs'
+      - '.github/workflows/storybook-reading.yml'
+jobs:
+  book-chapters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test book layout, native audio, quiz unlocks
+        run: node --test test/storybook-reading.test.mjs test/learner-experience.test.mjs test/nepali-voice-bridge.test.mjs
