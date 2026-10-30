@@ -63,3 +63,14 @@ test('Reading loads featured book only inside the authenticated classroom',()=>{
  assert.match(styles,/data-sikau-theme="dark"/);
  assert.match(styles,/sikau-featured-reading\[hidden\]/);
 });
+// Guard against blank Reading: the native layout is intentionally hidden
+// while the featured book displays, so CSS may never hide both siblings.
+test('Featured story remains visible when native story layout is hidden',()=>{
+ const css=read('reading-dashboard.css');
+ assert.doesNotMatch(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\)\{display:none!important\}/);
+ assert.match(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\):not\(\.sikau-featured-book\)/);
+ assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
+ assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
+ assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-featured-visible-r2/);
+ assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-visible-book-r2/);
+});

@@ -14,7 +14,14 @@
 #rd.sikau-read-v2:has(#readModeSeg button[data-rm="practice"].on)>.content>.card.tight{display:block!important}
 #rd.sikau-read-v2 #rbox{max-width:100%!important;min-width:0!important}
 #rd.sikau-read-v2 #storyReader{display:block!important;background:#fff!important;border-radius:17px!important;border:1px solid #e8eaf2!important;box-shadow:0 8px 22px #29345410!important;padding:13px!important;width:100%!important;max-width:100%!important;min-width:0!important}
-#rd.sikau-read-v2 #storyReader[data-read-v2=yes]>:not(.read-v2-layout){display:none!important}
+/* Native reader controls stay hidden behind the designed story layout, but
+   the featured book must remain visible (it is a direct reader child). */
+#rd.sikau-read-v2 #storyReader[data-read-v2=yes]>:not(.read-v2-layout):not(.sikau-featured-book){display:none!important}
+#rd.sikau-read-v2 #storyReader[data-read-v2=yes]>.sikau-featured-book{display:block!important}
+/* Some private lesson versions place the whole Story reader in a card.tight.
+   A blanket practice-card hiding rule must never hide the actual reader. */
+#rd.sikau-read-v2>.content>.card.tight:has(#storyReader),
+#rd.sikau-read-v2>.content>.card.tight:has(#rbox){display:block!important}
 #rd.sikau-read-v2 .read-v2-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0;width:100%}
 #rd.sikau-read-v2 .read-v2-filters{display:grid;grid-template-columns:minmax(160px,185px) minmax(0,1fr);gap:8px;align-items:center;min-width:0}
 #rd.sikau-read-v2 .read-v2-filters h3{font-size:13px!important;margin:0!important;color:#2c365b!important}
