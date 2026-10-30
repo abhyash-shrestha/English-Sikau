@@ -81,7 +81,7 @@ test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
  assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
- assert.match(translate,/__sikauNepaliVoice\?\.speakNepali/);
+ assert.match(translate,/__sikauNepaliVoice\.speakText/);
  assert.match(translate,/if\(outputLanguage==='ne-NP'/);
 });
 
