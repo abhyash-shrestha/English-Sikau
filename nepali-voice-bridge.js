@@ -72,9 +72,9 @@ const isGender=(control)=>{
  const hint=[control.getAttribute?.('aria-label'),control.getAttribute?.('title'),
   control.getAttribute?.('class'),control.getAttribute?.('id')].join(' ');
  const selector=control.closest?.('.voice-options,.voice-controls,.voice-select,'+
-  '.voice-gender,.sikau-voice-gender,.story-actions,.ttx-result-actions,'+
+  '.voice-gender,.sikau-voice-gender,'+
   '[data-voice-selector]');
- const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts)\b/i.test(hint)||
+ const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts|gender)\b/i.test(hint)||
    !!control.getAttribute?.('data-voice-gender');
  // Never hide answers like "Male", "Female", or "Male doctors" outside
  // an actual voice selector. No guessing from a person's gender.
@@ -205,8 +205,7 @@ function install(doc){
    // well to remove the dark pill/background. Never remove lesson cards.
    const parent=control.parentElement;
    if(parent&&parent.childElementCount<=2&&explicitVoiceLabel(parent.textContent)&&
-      /(?:voice|gender|toast|snack|badge|notice|notification|alert)/i.test(
-       String(parent.className||'')+' '+String(parent.id||'')))hide(parent);
+      !/^(?:MAIN|SECTION|ARTICLE)$/i.test(String(parent.tagName||'')))hide(parent);
    hide(control);
   }
   // Plain DIV/SPAN toast, such as "👨 पुरुष आवाज" shown over Festivals.
