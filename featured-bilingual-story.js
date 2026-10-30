@@ -99,7 +99,7 @@ function install(doc,reader,accountId){
  const footer=make(doc,'div','sikau-featured-footer');
  storyArea.append(nav,section,quiz,feedback,footer);root.append(storyArea);
  reader.insertBefore(root,layout);
- const persist=()=>{try{view.localStorage.setItem(key,JSON.stringify([...completed].sort((a,b)=>a-b))}catch(_){}};
+ const persist=()=>{try{view.localStorage.setItem(key,JSON.stringify([...completed].sort((a,b)=>a-b)))}catch(_){}};
  const speak=(text,locale)=>{
   if(typeof view.__sikauSpeech==='function')view.__sikauSpeech(text,locale,'rd',{rate:0.94});
   else if(typeof view.__sikauNepaliVoice?.speakText==='function')view.__sikauNepaliVoice.speakText(text,locale,'rd',{rate:0.94});
