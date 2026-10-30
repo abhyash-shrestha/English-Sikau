@@ -3540,8 +3540,11 @@ async function openFile(token='',isTrial=false){
         htmlTag=htmlTag.replace(/\btranslate\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'translate="no"');
       else htmlTag=htmlTag.replace(/>$/,' translate="no">');
       if(/\bclass\s*=/.test(htmlTag))
-        htmlTag=htmlTag.replace(/\bclass\s*=\s*"([^"]*)"/i,(_m,classes)=>
-          'class="'+classes+(classes.split(/\s+/).includes('notranslate')?'':' notranslate')+'"');
+        htmlTag=htmlTag.replace(/\bclass\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i,
+          (_m,doubleQuoted,singleQuoted,bare)=>{
+            const classes=doubleQuoted??singleQuoted??bare??'';
+            return 'class="'+classes+(classes.split(/\s+/).includes('notranslate')?'':' notranslate')+'"';
+          });
       else htmlTag=htmlTag.replace(/>$/,' class="notranslate">');
       return htmlTag;
     });
