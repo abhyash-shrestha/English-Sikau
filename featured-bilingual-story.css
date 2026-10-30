@@ -148,3 +148,137 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-listen{backgroun
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-question{border-color:#666078}
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-option:has(input:checked){background:#53334b}
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.sikau-featured-play,.sikau-featured-stop,.sikau-featured-switch){background:#4f354c!important;color:#ffeaf3!important;border-color:#a16985!important}
+
+/* === V2: complete story-library bookshelf (no native story-card screen) === */
+#rd.sikau-read-v2 .sikau-library-v2{
+ max-width:1160px!important;margin:4px auto 20px!important;
+ background:#fffdfa!important;padding:clamp(16px,2vw,26px)!important;
+}
+#rd.sikau-read-v2 .sikau-library-header{
+ display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap;
+ border-bottom:1px solid #eadddf;padding:0 0 17px;margin-bottom:18px;
+}
+#rd.sikau-read-v2 .sikau-library-copy{flex:1;min-width:220px}
+#rd.sikau-read-v2 .sikau-library-copy h2{
+ font:850 clamp(25px,3vw,36px)/1.18 Georgia,serif!important;
+ margin:7px 0!important;color:#2e2b48!important;letter-spacing:-.03em;
+}
+#rd.sikau-read-v2 .sikau-library-copy p{
+ margin:0!important;color:#64586a!important;line-height:1.55!important;
+ font-size:13px!important;max-width:730px;
+}
+#rd.sikau-read-v2 .sikau-library-total{
+ font:750 13px/1.45 system-ui,sans-serif;
+ color:#862e59;background:#fff0f5;border-radius:999px;padding:9px 14px;
+ white-space:nowrap;
+}
+#rd.sikau-read-v2 .sikau-library-filters{
+ display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 20px;
+}
+#rd.sikau-read-v2 .sikau-library-filter{
+ background:#fff!important;color:#65485a!important;border:1px solid #ead7e1!important;
+ border-radius:999px!important;min-height:40px!important;padding:8px 14px!important;
+ font:750 12px/1.4 system-ui,sans-serif!important;cursor:pointer!important;
+}
+#rd.sikau-read-v2 .sikau-library-filter.on{
+ background:#a32a62!important;color:#fff!important;border-color:#a32a62!important;
+}
+#rd.sikau-read-v2 .sikau-library-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;gap:15px;
+}
+#rd.sikau-read-v2 .sikau-library-card{
+ display:flex;flex-direction:column;min-width:0;overflow:hidden;
+ background:#fff!important;border:1px solid #ebdfe5!important;
+ border-radius:17px!important;box-shadow:0 6px 22px rgba(43,39,57,.055);
+ transition:box-shadow .18s ease,transform .18s ease;
+}
+#rd.sikau-read-v2 .sikau-library-card:hover{
+ transform:translateY(-2px);box-shadow:0 13px 30px rgba(43,39,57,.10)
+}
+#rd.sikau-read-v2 .sikau-library-cover{
+ display:block!important;width:100%!important;height:165px!important;
+ object-fit:cover!important;background:#f3e6ed!important;
+ border-radius:0!important;
+}
+#rd.sikau-read-v2 .sikau-library-card-copy{
+ display:flex;flex:1;flex-direction:column;align-items:flex-start;min-width:0;
+ padding:16px!important;gap:5px;
+}
+#rd.sikau-read-v2 .sikau-library-category{
+ color:#ae3663!important;font:850 10px/1.45 system-ui,sans-serif!important;
+ letter-spacing:.07em;text-transform:uppercase;
+}
+#rd.sikau-read-v2 .sikau-library-card h3{
+ margin:0!important;color:#2c2943!important;
+ font:800 21px/1.25 Georgia,serif!important;overflow-wrap:anywhere;
+}
+#rd.sikau-read-v2 .sikau-library-ne-title{
+ margin:0!important;color:#884c6e!important;
+ font:750 15px/1.5 "Noto Sans Devanagari",system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-library-description{
+ margin:8px 0 0!important;font:450 13px/1.55 system-ui,sans-serif!important;
+ color:#55546b!important;
+}
+#rd.sikau-read-v2 .sikau-library-ne-description{
+ margin:0!important;color:#69647a!important;
+ font:450 12px/1.65 "Noto Sans Devanagari",system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-library-progress{
+ margin:auto 0 8px!important;padding-top:10px;
+ color:#7a6174!important;font:700 11px/1.5 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-library-open{
+ display:block!important;width:100%!important;min-height:44px!important;
+ border:0!important;border-radius:10px!important;background:#a12b60!important;
+ color:#fff!important;font:800 13px/1.4 system-ui,sans-serif!important;
+ padding:9px 12px!important;cursor:pointer!important;
+}
+#rd.sikau-read-v2 .sikau-library-v2 .sikau-featured-reading{
+ display:block;
+}
+#rd.sikau-read-v2 .sikau-library-v2 .sikau-featured-top{margin-top:4px}
+#rd.sikau-read-v2 .sikau-library-v2 .sikau-featured-chapters{
+ grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+}
+#rd.sikau-read-v2 .sikau-library-v2 .sikau-featured-tab{
+ padding:9px 8px!important;min-height:50px!important;
+ overflow-wrap:anywhere;
+}
+#rd.sikau-read-v2 .sikau-library-v2 :is(.sikau-story-shelf,.sikau-featured-reading)[hidden]{
+ display:none!important;
+}
+#rd.sikau-read-v2 .sikau-library-v2 :is(button,input):focus-visible{
+ outline:3px solid #416ee9!important;outline-offset:3px!important;
+}
+@media(max-width:980px){
+ #rd.sikau-read-v2 .sikau-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+ #rd.sikau-read-v2 .sikau-library-grid{grid-template-columns:minmax(0,1fr)}
+ #rd.sikau-read-v2 .sikau-library-cover{height:165px!important}
+ #rd.sikau-read-v2 .sikau-library-v2 .sikau-featured-chapters{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ #rd.sikau-read-v2 .sikau-library-header{align-items:flex-start}
+ #rd.sikau-read-v2 .sikau-library-card-copy{padding:15px!important}
+ #rd.sikau-read-v2 .sikau-library-copy h2{font-size:26px!important}
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-v2,
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-card{
+ background:#232b3c!important;border-color:#55566b!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-header{border-color:#59536b}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-v2 :is(.sikau-library-copy h2,.sikau-library-copy p,.sikau-library-card h3,.sikau-library-ne-title,.sikau-library-description,.sikau-library-ne-description,.sikau-library-progress){
+ color:#f7edf9!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-filter{
+ background:#3c344d!important;color:#f6eaf7!important;border-color:#65526c!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-filter.on{
+ background:#a83271!important;color:#fff!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-total{
+ background:#4c3452;color:#ffdeec;
+}
