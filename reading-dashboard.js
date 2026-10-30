@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261030-featured-visible-r2',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261030-clear-modes-r5',document.baseURI).href;
 // The shared audio bridge is loaded once by the authenticated wrapper.
  // No per-tab script injections, duplicate speech handlers, or race conditions.
 
@@ -158,11 +158,35 @@ window.enhanceReadingDashboard=function(d,accountId){
    hero.append(copy);
    content.insertBefore(hero,content.firstChild);
    mode.classList.add('read-v2-mode');
-   const orig=mode.parentElement;
-   // Keep mode buttons exactly as the original app created them.
+   // Decorate the *existing* private-lesson buttons: do not replace buttons
+   // or their click handlers, which select the lesson's real reading mode.
+   mode.setAttribute('aria-label','Choose how to read · पढ्ने तरिका छान्नुहोस्');
    for(const b of mode.querySelectorAll('button[data-rm]')){
      const story=b.dataset.rm==='story';
-     b.textContent=story?'📖 Story mode · कथा पढौं':'📋 Practice mode · अभ्यास';
+     const title=story?'Story mode · कथा पढौं':'Practice mode · अभ्यास';
+     const detail=story?'Chapter books & quizzes · अध्यायबद्ध कथा र प्रश्नोत्तर':
+       'Short passages & quick questions · छोटो पाठ र अभ्यास प्रश्न';
+     const icon=mk(d,'span','read-mode-card-icon',story?'📖':'📝');
+     icon.setAttribute('aria-hidden','true');
+     const copy=mk(d,'span','read-mode-card-copy');
+     copy.append(mk(d,'strong','read-mode-card-title',title),
+       mk(d,'span','read-mode-card-description',detail));
+     const arrow=mk(d,'span','read-mode-card-arrow','›');
+     arrow.setAttribute('aria-hidden','true');
+     b.replaceChildren(icon,copy,arrow);
+     b.classList.add('read-mode-card');
+     b.setAttribute('aria-label',title+'. '+detail);
+     b.setAttribute('title',detail);
+   }
+   const syncModeState=()=>{
+     for(const b of mode.querySelectorAll('button[data-rm]'))
+       b.setAttribute('aria-pressed',String(b.classList.contains('on')));
+   };
+   syncModeState();
+   if(typeof d.defaultView?.MutationObserver==='function'){
+     const modeObserver=new d.defaultView.MutationObserver(syncModeState);
+     for(const b of mode.querySelectorAll('button[data-rm]'))
+       modeObserver.observe(b,{attributes:true,attributeFilter:['class']});
    }
  }
 
