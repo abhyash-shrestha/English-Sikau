@@ -4,7 +4,7 @@
  */
 (function(){
 'use strict';
-const cssURL=new URL('progress-dashboard.css?v=20261030-learning-first-r1',document.baseURI).href;
+const cssURL=new URL('progress-dashboard.css?v=20261030-learner-audit-r2',document.baseURI).href;
 const element=(doc,tag,className,text)=>{
  const node=doc.createElement(tag);
  if(className)node.className=className;

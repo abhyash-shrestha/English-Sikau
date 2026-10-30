@@ -112,11 +112,11 @@ test('Three successful missions on distinct dates unlock the next district witho
 
 test('Latest learning-focused script and stylesheet versions are used',()=>{
  for(const path of [
-  './progress-dashboard.js?v=20261030-learner-audit-r1',
+  './progress-dashboard.js?v=20261030-learner-audit-r2',
   './game-adventure.js?v=20261030-no-rewards-r1',
   './nepal-explorer.js?v=20261030-districts-no-points-r1'])
   assert.ok(index.includes(path),path);
- assert.match(progress,/progress-dashboard\.css\?v=20261030-learning-first-r1/);
+ assert.match(progress,/progress-dashboard\.css\?v=20261030-learner-audit-r2/);
  assert.match(game,/game-adventure\.css\?v=20261030-no-rewards-r1/);
  assert.match(nepal,/nepal-explorer\.css\?v=20261030-districts-no-points-r1/);
 });
