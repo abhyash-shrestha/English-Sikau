@@ -11,7 +11,7 @@ function mock(voices){
  const speaks=[],events={};
  const synth={
   getVoices(){return voices;},
-  speak(utterance){speaks.push({text:utterance.text,voice:utterance.voice?.name||'',lang:utterance.lang});},
+  speak(utterance){speaks.push({text:utterance.text,voice:utterance.voice?.name||'',lang:utterance.lang,utterance});},
   cancel(){},addEventListener(){}
  };
  const sections=Object.fromEntries(['tr','rd'].map(key=>[key,{
@@ -80,10 +80,10 @@ test('Female and male UI labels are recognized separately',()=>{
 
 test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/reading-dashboard\.js\?v=20261030-voice-gender-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-galaxy-a03s-r3/);
  assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
- assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
+ assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-galaxy-a03s-r3/);
  assert.match(translate,/__sikauNepaliVoice\.speakText/);
  assert.match(translate,/const outputLanguage=nativeDirection\(sec\)==='ne'\?'en-US':'ne-NP'/);
 });
@@ -294,10 +294,63 @@ test('Android gender-unknown Nepali voice can be explicitly played without using
  assert.equal(player.speakText('भोलि भेटौँला','ne-NP','tr'),false);
 });
 
-test('No Nepali voice never offers a Hindi-labeled fallback button',()=>{
- const {win,sections}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
+test('No Nepali voice never offers a Hindi-labeled substitute: only an optional no-voice probe',()=>{
+ const {win,sections,speaks}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
  win.__sikauNepaliVoice.select('tr','female');
  assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
- assert.equal(sections.tr.last.children.length,0);
+ assert.equal(speaks.length,0);
+ assert.deepEqual(sections.tr.last.children.map(x=>x.className),['sikau-nepali-voice-try-native']);
  assert.match(sections.tr.last.textContent,/Install voice data/);
+});
+
+test('Galaxy A03s missing voice list offers explicit raw ne-NP speech test, not automatic Hindi',()=>{
+ const {win,speaks,sections}=mock([
+  {name:'Google Hindi',lang:'hi-IN'},{name:'Google English',lang:'en-US'}
+ ]);
+ win.__sikauNepaliVoice.select('tr','female');
+ assert.equal(win.__sikauNepaliVoice.speakText('पोखरा सुन्दर छ।','ne-NP','tr'),false);
+ assert.equal(speaks.length,0);
+ const testButton=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native');
+ assert.ok(testButton,'User can opt in to a one-time Android engine test');
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
+ testButton.onclick();
+ assert.equal(speaks.length,1);
+ assert.equal(speaks[0].lang,'ne-NP');
+ assert.equal(speaks[0].voice,'','Raw Android engine test does not send Hindi voice object');
+ assert.equal(speaks[0].text,'नमस्ते। तपाईंलाई कस्तो छ?');
+ speaks[0].utterance.onstart();
+ speaks[0].utterance.onend();
+ const accept=sections.tr.last.children.find(x=>x.className==='sikau-nepali-native-confirm');
+ assert.ok(accept,'No voice adopted until user hears and confirms');
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
+ accept.onclick();
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),true);
+ assert.equal(speaks.length,2);
+ assert.equal(speaks[1].text,'पोखरा सुन्दर छ।');
+ assert.equal(speaks[1].lang,'ne-NP');
+ assert.equal(speaks[1].voice,'');
+ win.__sikauNepaliVoice.select('tr','male');
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
+});
+
+test('Galaxy A03s native TTS error never enables unsafe fallback',()=>{
+ const {win,speaks,sections}=mock([{name:'Google English',lang:'en-US'}]);
+ win.__sikauNepaliVoice.select('tr','female');
+ assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
+ const b=sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native');
+ assert.ok(b);
+ b.onclick();
+ speaks[0].utterance.onerror({error:'language-unavailable'});
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
+ assert.match(sections.tr.last.textContent,/speech failed/);
+});
+
+test('Galaxy A03s cannot confirm a silent test that never started',()=>{
+ const {win,speaks,sections}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
+ win.__sikauNepaliVoice.select('tr','female');
+ win.__sikauNepaliVoice.speakText('नमस्ते','ne-NP','tr');
+ sections.tr.last.children.find(x=>x.className==='sikau-nepali-voice-try-native').onclick();
+ speaks[0].utterance.onend();
+ assert.equal(win.__sikauNepaliVoice.useNativeNepali('tr'),false);
+ assert.match(sections.tr.last.textContent,/No playable Nepali voice confirmed/);
 });
