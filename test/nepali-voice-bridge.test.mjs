@@ -80,10 +80,10 @@ test('Female and male UI labels are recognized separately',()=>{
 
 test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/reading-dashboard\.js\?v=20261030-voice-gender-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
  assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
- assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
+ assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-android-nepali-r2/);
  assert.match(translate,/__sikauNepaliVoice\.speakText/);
  assert.match(translate,/const outputLanguage=nativeDirection\(sec\)==='ne'\?'en-US':'ne-NP'/);
 });
