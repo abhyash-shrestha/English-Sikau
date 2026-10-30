@@ -57,11 +57,12 @@ test('When no genuine male voice exists, do not secretly play female',()=>{
  assert.match(sections.rd.last.textContent,/No male Nepali voice is available/);
 });
 
-test('English playback stays unchanged even with male Nepali selected',()=>{
- const {win,speaks,synth}=mock([sagar]);
+test('English must not silently switch to another gender when Male is selected',()=>{
+ const {win,speaks,synth,sections}=mock([sagar]);
  win.__sikauNepaliVoice.select('tr','male');
  synth.speak({lang:'en-US',text:'Hello!'});
- assert.deepEqual(speaks.map(x=>x.text),['Hello!']);
+ assert.deepEqual(speaks.map(x=>x.text),[]);
+ assert.match(sections.tr.last.textContent,/No male English voice is available/);
 });
 
 test('Female and male UI labels are recognized separately',()=>{
@@ -79,7 +80,7 @@ test('Both protected tabs actually install and use the voice guard',()=>{
  assert.match(app,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
  assert.match(app,/translate-studio-v4\.js\?v=20261030-voice-gender-r1/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
- assert.match(reading,/nepali-voice-bridge\.js\?v=20261029-iphone-direct-r8/);
+ assert.match(reading,/nepali-voice-bridge\.js\?v=20261030-voice-gender-r1/);
  assert.match(translate,/__sikauNepaliVoice\?\.speakNepali/);
  assert.match(translate,/if\(outputLanguage==='ne-NP'/);
 });
