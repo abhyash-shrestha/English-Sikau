@@ -8,6 +8,9 @@ on:
       - 'test/featured-bilingual-story.test.mjs'
       - 'storybook-reading.css'
       - 'reading-dashboard.js'
+      - 'reading-action-balance.js'
+      - 'reading-dashboard.css'
+      - 'test/reading-action-balance.test.mjs'
       - 'practice-bilingual-reading.js'
       - 'practice-bilingual-reading.css'
       - 'test/practice-bilingual-dom.test.mjs'
@@ -25,6 +28,9 @@ on:
       - 'test/featured-bilingual-story.test.mjs'
       - 'storybook-reading.css'
       - 'reading-dashboard.js'
+      - 'reading-action-balance.js'
+      - 'reading-dashboard.css'
+      - 'test/reading-action-balance.test.mjs'
       - 'practice-bilingual-reading.js'
       - 'practice-bilingual-reading.css'
       - 'test/practice-bilingual-dom.test.mjs'
@@ -44,4 +50,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test book layout, native audio, quiz unlocks
-        run: node --test test/practice-bilingual-dom.test.mjs test/featured-bilingual-story.test.mjs test/storybook-reading.test.mjs test/story-level-grading.test.mjs test/learner-experience.test.mjs test/nepali-voice-bridge.test.mjs
+        run: node --test test/reading-action-balance.test.mjs test/practice-bilingual-dom.test.mjs test/featured-bilingual-story.test.mjs test/storybook-reading.test.mjs test/story-level-grading.test.mjs test/learner-experience.test.mjs test/nepali-voice-bridge.test.mjs
