@@ -129,7 +129,16 @@ window.enhanceNepalJourney=function(doc,accountId){
  }
  const key=STORE+String(accountId).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,80);
  const read=()=>{
-  try{return normalize(JSON.parse(window.localStorage.getItem(key)||"{}"));}catch(_){return normalize(null);}
+  try{
+   const stored=JSON.parse(window.localStorage.getItem(key)||"{}");
+   const clean=normalize(stored);
+   // Migrate the original district-map save in place. Preserve all puzzle
+   // pieces and dates while dropping the retired Explorer points property.
+   if(stored&&typeof stored==="object"&&Object.prototype.hasOwnProperty.call(stored,"points")){
+    try{window.localStorage.setItem(key,JSON.stringify(clean));}catch(_){}
+   }
+   return clean;
+  }catch(_){return normalize(null);}
  };
  let state=read(),districts=null,route=null,selectedId="KATHMANDU",lastScore=null;
  const panel=place(doc,"section","ne-journey");
