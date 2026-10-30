@@ -294,5 +294,127 @@ const books=[
  ]
 }
 ];
+
+/* Quick Reads: four complete, short, three-chapter books.
+ * Every chapter has its own connected plot, natural Nepali and comprehension quiz. */
+books.push(
+{
+ id:'last-bus-home',title:'The Last Bus Home',neTitle:'घर फर्किने अन्तिम बस',
+ category:'Everyday Life',level:'A2',cover:'./assets/read-topics/travel.svg',
+ description:'A missed bus leads to an unexpected act of kindness.',
+ neDescription:'बस छुटेपछि भएको एउटा राम्रो घटनाको कथा।',
+ chapters:[
+ chapter('The Empty Bus Stop','सुनसान बस बिसौनी',[
+ ['After an evening class in Kathmandu, Pratik ran toward the bus stop. He was only a minute late, but the last bus had already left. His phone battery was almost empty.','काठमाडौँमा साँझको कक्षा सकेर प्रतीक बस बिसौनीतिर दौडियो। ऊ एक मिनेट मात्र ढिलो भएको थियो, तर अन्तिम बस छुटिसकेको थियो। उसको मोबाइलको ब्याट्री पनि सकिन लागेको थियो।'],
+ ['An older woman named Lata stood nearby with a heavy shopping bag. She was waiting for the same bus. Instead of walking into a dark, unfamiliar road, they decided to ask at the staffed transport counter.','लता नामकी एक वृद्ध महिला गह्रौँ झोला बोकेर नजिकै उभिएकी थिइन्। उनी पनि त्यही बस कुर्दै थिइन्। अँध्यारो अपरिचित बाटो हिँड्नुभन्दा उनीहरूले कर्मचारी भएको यातायात काउन्टरमा सोध्ने निर्णय गरे।']
+ ],[
+ q('Why was Pratik stuck at the bus stop?','प्रतीक बस बिसौनीमा किन अलपत्र पर्‍यो?', [['He missed the last bus','उसको अन्तिम बस छुट्यो'],['He lost his shoes','उसको जुत्ता हरायो'],['His class was canceled','उसको कक्षा रद्द भयो']],0),
+ q('Who was waiting beside him?','उसको छेउमा को पर्खिरहेकी थिइन्?', [['His teacher','उसकी शिक्षिका'],['Lata','लता'],['His sister','उसकी बहिनी']],1)
+ ]),
+ chapter('An Unexpected Ride','अप्रत्याशित सवारी',[
+ ['The counter worker checked the timetable and suggested a licensed taxi from the official stand. Pratik called his father from the counter phone and explained the plan. Lata said she lived near his neighborhood.','काउन्टरका कर्मचारीले समयतालिका हेरेर आधिकारिक स्ट्यान्डको अनुमति प्राप्त ट्याक्सी लिन सुझाव दिए। प्रतीकले काउन्टरको फोनबाट बुबालाई योजना सुनायो। लताले पनि आफू उसको टोलनजिकै बस्ने बताइन्।'],
+ ['They shared the taxi fare and talked about their day on the way home. Lata had been visiting her grandson at the hospital. Pratik listened carefully while the city lights passed outside the window.','दुवैले ट्याक्सी भाडा बाँडे र घर फर्किँदा दिनभरिका कुरा गरे। लता अस्पतालमा नातिलाई भेटेर आउँदै थिइन्। झ्यालबाहिर सहरका बत्ती देखिँदै गर्दा प्रतीकले उनको कुरा ध्यान दिएर सुन्यो।']
+ ],[
+ q('Who suggested the official taxi stand?','आधिकारिक ट्याक्सी स्ट्यान्ड कसले सुझाए?', [['The counter worker','काउन्टरका कर्मचारीले'],['A street musician','सडकका सङ्गीतकारले'],['The bus driver','बस चालकले']],0),
+ q('Where had Lata been?','लता कहाँ गएर फर्किँदै थिइन्?', [['At a cinema','चलचित्र हेर्न'],['At a hospital','अस्पतालमा'],['At the airport','विमानस्थलमा']],1)
+ ]),
+ chapter('A Familiar Neighbor','चिनेको छिमेकी',[
+ ['When they reached home, Pratik discovered that Lata lived only two houses away. His father came outside to welcome them. Lata thanked Pratik for staying calm and helping her find a safe ride.','घर पुगेपछि प्रतीकले थाहा पायो कि लता दुई घरपारि मात्र बस्दिरहिछन्। उसका बुबा स्वागत गर्न बाहिर आए। लताले शान्त रहेर सुरक्षित सवारी खोज्न सहयोग गरेकोमा प्रतीकलाई धन्यवाद दिइन्।'],
+ ['The next morning, Pratik charged his phone and checked the bus schedule before leaving. He also carried Lata’s shopping bag to her gate. Missing the bus had helped him meet a kind neighbor.','भोलिपल्ट बिहान प्रतीकले मोबाइल चार्ज गर्‍यो र बाहिर निस्कनुअघि बसको समय जाँच्यो। उसले लताको सामान पनि ढोकासम्म पुर्‍याइदियो। बस छुट्नुले उसलाई असल छिमेकी चिन्न मद्दत गरेको थियो।']
+ ],[
+ q('How close did Lata live to Pratik?','लता प्रतीकको घरबाट कति टाढा बस्थिन्?', [['Two houses away','दुई घरपारि'],['In another country','अर्को देशमा'],['Across a river','नदीपारि']],0),
+ q('What did Pratik change the next morning?','प्रतीकले भोलिपल्ट बिहान के परिवर्तन गर्‍यो?', [['He stopped attending class','उसले कक्षा छाड्यो'],['He checked the bus time and charged his phone','बसको समय जाँच्यो र फोन चार्ज गर्‍यो'],['He bought a new bus','उसले नयाँ बस किन्यो']],1)
+ ])
+ ]
+},
+{
+ id:'red-umbrella',title:'The Red Umbrella',neTitle:'रातो छाता',
+ category:'Mystery',level:'A2',cover:'./assets/read-topics/mystery.svg',
+ description:'A bright umbrella carries a tiny mystery through the rain.',
+ neDescription:'पानी पर्दा रातो छातासँग जोडिएको सानो रहस्य।',
+ chapters:[
+ chapter('An Umbrella Left Behind','छुटेको छाता',[
+ ['Rain began just as Aasha closed her small stationery shop in Patan. A red umbrella stood by the door, but no customer was nearby. Around its handle hung a tag with the words “Please return.”','पाटनमा आशाले आफ्नो सानो स्टेसनरी पसल बन्द गर्ने बेलामा पानी पर्न थाल्यो। ढोकानजिक रातो छाता थियो, तर कुनै ग्राहक थिएनन्। त्यसको बिँडमा “कृपया फिर्ता गरिदिनुहोस्” लेखिएको ट्याग झुन्डिएको थियो।'],
+ ['Aasha brought the umbrella inside so it would not blow away. On the tag she noticed a tiny drawing of a yellow bird. She remembered seeing the same bird on a nearby music school sign.','हावाले नउडाओस् भनेर आशाले छाता भित्र राखिन्। ट्यागमा सानो पहेँलो चरा कोरिएको थियो। उनलाई नजिकैको सङ्गीत विद्यालयको बोर्डमा त्यस्तै चरा देखेको सम्झना आयो।']
+ ],[
+ q('Where was the umbrella found?','छाता कहाँ भेटिएको थियो?', [['Outside the stationery shop','स्टेसनरी पसलबाहिर'],['On a bus','बसभित्र'],['Inside a library','पुस्तकालयभित्र']],0),
+ q('What picture was on the tag?','ट्यागमा केको चित्र थियो?', [['A blue bicycle','निलो साइकल'],['A yellow bird','पहेँलो चरा'],['A mountain','पहाड']],1)
+ ]),
+ chapter('The Music School','सङ्गीत विद्यालय',[
+ ['The next day, Aasha visited the music school with the umbrella. The receptionist recognized the bird but said it was only the school logo. Then a young violin student saw the umbrella and smiled.','भोलिपल्ट आशा छाता लिएर सङ्गीत विद्यालय पुगिन्। कार्यालयकी कर्मचारीले चराको चित्र चिन्नुभयो, तर त्यो विद्यालयको लोगो मात्र हो भन्नुभयो। त्यत्तिकैमा भायोलिन सिक्ने एक बालिकाले छाता देखेर मुस्कुराइन्।'],
+ ['“That belongs to my grandfather!” the girl said. She described a small repair on one side of the handle. Aasha checked it and found the same mark, but asked the girl to bring her grandfather before handing it over.','“यो मेरो हजुरबुबाको हो!” बालिकाले भनिन्। उनले बिँडको एक छेउमा गरिएको सानो मर्मतको चिनो बताइन्। आशाले त्यही चिनो भेटिन्, तर छाता दिनुअघि हजुरबुबालाई लिएर आउन भनिन्।']
+ ],[
+ q('What did the girl say about the umbrella?','बालिकाले छाताबारे के भनिन्?', [['It was the teacher’s','यो शिक्षकको हो'],['It belonged to her grandfather','यो हजुरबुबाको हो'],['It was brand-new','यो बिल्कुल नयाँ हो']],1),
+ q('How did she describe the umbrella?','उनले छाताको चिनारी कसरी दिइन्?', [['A repaired mark on the handle','बिँडमा मर्मतको चिनो'],['A broken wheel','भाँचिएको पाङ्ग्रा'],['A silver bell','चाँदीको घण्टी']],0)
+ ]),
+ chapter('The Thank-You Note','धन्यवादको चिठी',[
+ ['That afternoon, the girl returned with her grandfather. He showed Aasha an old photograph of himself holding the red umbrella beside his wife. It had been her favorite gift to him.','त्यस दिउँसो बालिका हजुरबुबासँग फर्किन्। उनले श्रीमतीसँग रातो छाता समातेर खिचेको पुरानो तस्बिर आशालाई देखाए। त्यो श्रीमतीले उनलाई दिएको मनपर्ने उपहार रहेछ।'],
+ ['Aasha returned it, and he thanked her warmly. A week later, a handwritten note appeared at her shop: “Some things are valuable because of their memories.” Aasha pinned it beside the door.','आशाले छाता फिर्ता दिइन् र उनले मनैदेखि धन्यवाद दिए। एक हप्तापछि पसलमा हस्तलिखित चिठी आयो: “केही वस्तु सम्झनाका कारण मूल्यवान् हुन्छन्।” आशाले त्यो चिठी ढोकाछेउ टाँसिन्।']
+ ],[
+ q('Who gave the umbrella to the grandfather?','हजुरबुबालाई छाता कसले दिएकी थिइन्?', [['His wife','उनकी श्रीमतीले'],['The receptionist','कार्यालयकी कर्मचारीले'],['Aasha','आशाले']],0),
+ q('Why was the umbrella special?','छाता किन विशेष थियो?', [['It was made of gold','यो सुनको थियो'],['It held memories','यससँग सम्झना जोडिएको थियो'],['It could fly','यो उड्न सक्थ्यो']],1)
+ ])
+ ]
+},
+{
+ id:'midnight-bakery',title:'The Midnight Bakery',neTitle:'मध्यरातको बेकरी',
+ category:'Everyday Life',level:'A2–B1',cover:'./assets/read-topics/food.svg',
+ description:'A surprise order changes a family bakery’s biggest night.',
+ neDescription:'एउटा अप्रत्याशित अर्डरले परिवारको बेकरीमा रमाइलो मोड ल्याउँछ।',
+ chapters:[
+ chapter('A Late Knock','अबेर आएको ग्राहक',[
+ ['It was almost closing time at a bakery in Pokhara. Nisha was sweeping the floor when someone knocked on the glass door. A tired nurse stood outside, holding a small piece of paper.','पोखराको एउटा बेकरी बन्द हुने बेला हुन लागेको थियो। निशा भुइँ बढार्दै थिइन्, त्यत्तिकैमा सिसाको ढोकामा कसैले ढकढक्यायो। बाहिर थाकेकी एक नर्स सानो कागज बोकेर उभिएकी थिइन्।'],
+ ['“Our hospital team has a birthday tomorrow, but the cake shop canceled our order,” she explained. Nisha checked the kitchen. They had flour, eggs, and fruit, but very little time.','“हाम्रो अस्पतालको टोलीमा भोलि जन्मदिन मनाउने कार्यक्रम छ, तर केक पसलले अर्डर रद्द गर्‍यो,” नर्सले भनिन्। निशाले भान्सा हेरिन्। पिठो, अण्डा र फलफूल थिए, तर समय धेरै थिएन।']
+ ],[
+ q('Who came to the bakery late?','बेकरीमा अबेर को आइन्?', [['A nurse','नर्स'],['A driver','चालक'],['A farmer','किसान']],0),
+ q('What had happened to the original cake order?','पहिलेको केक अर्डर के भएको थियो?', [['It was delivered early','चाँडै आइपुग्यो'],['It was canceled','रद्द भयो'],['It was doubled','दोब्बर भयो']],1)
+ ]),
+ chapter('The Small Cake Plan','सानो केकको योजना',[
+ ['Nisha called her father, who owned the bakery. He suggested making several small cakes instead of one huge cake. Nisha wrote the plan down, checked the ingredients, and told the nurse exactly what they could finish safely.','निशाले बेकरी चलाउने बुबालाई फोन गरिन्। उनले एउटा ठूलो केकको सट्टा केही साना केक बनाउने सुझाव दिए। निशाले योजना लेखिन्, सामग्री जाँचिन् र सुरक्षित रूपमा कति बनाउन सकिन्छ भनेर नर्सलाई स्पष्ट बताइन्।'],
+ ['Her brother helped prepare the boxes while Nisha baked. They worked carefully, not quickly enough to make mistakes. By midnight, the cakes were cooling on the counter and smelled wonderful.','निशाले केक पकाउँदा भाइले बाकस तयार गर्‍यो। गल्ती हुने गरी हतार नगरी उनीहरूले ध्यानपूर्वक काम गरे। मध्यरातसम्म केकहरू काउन्टरमा चिसिँदै थिए र मिठो बास्ना आइरहेको थियो।']
+ ],[
+ q('What did Nisha’s father suggest?','निशाका बुबाले के सुझाव दिए?', [['One enormous cake','एउटा अत्यन्त ठूलो केक'],['Several small cakes','केही साना केक'],['Canceling everything','सबै रद्द गर्ने']],1),
+ q('Who helped prepare the boxes?','बाकस तयार गर्न कसले सहयोग गर्‍यो?', [['Her brother','उनको भाइले'],['The nurse','नर्सले'],['A tourist','पर्यटकले']],0)
+ ]),
+ chapter('A Morning Surprise','बिहानको आश्चर्य',[
+ ['The nurse collected the cakes early the next morning. At the hospital, the team shared them with a colleague who was celebrating her birthday after a long night shift. Everyone appreciated the thoughtful surprise.','भोलिपल्ट बिहानै नर्सले केकहरू लगिन्। अस्पतालमा रातभर काम गरेर जन्मदिन मनाइरहेकी सहकर्मीलाई टोलीले ती केक बाँड्यो। सबैले त्यो आत्मीय आश्चर्यको प्रशंसा गरे।'],
+ ['That afternoon, Nisha received a photo of the smiling team and a thank-you message. She added a new item to the bakery menu: “Small Celebration Cakes.” Sometimes a difficult request leads to a wonderful idea.','त्यस दिउँसो निशालाई हाँसिरहेको टोलीको तस्बिर र धन्यवाद सन्देश आयो। उनले बेकरीको मेनुमा नयाँ परिकार थपिन्: “साना उत्सव केकहरू।” कहिलेकाहीँ गाह्रो अनुरोधबाट राम्रो विचार जन्मिन्छ।']
+ ],[
+ q('Where were the cakes delivered?','केकहरू कहाँ पुर्‍याइयो?', [['To the hospital','अस्पतालमा'],['To a school bus','विद्यालयको बसमा'],['To the airport','विमानस्थलमा']],0),
+ q('What new item did Nisha add to the menu?','निशाले मेनुमा के नयाँ थपिन्?', [['Small Celebration Cakes','साना उत्सव केकहरू'],['Vegetable soup','तरकारी सुप'],['Ice cream only','आइसक्रिम मात्र']],0)
+ ])
+ ]
+},
+{
+ id:'the-secret-seed',title:'The Secret Seed',neTitle:'रहस्यमय बीउ',
+ category:'Culture',level:'A2',cover:'./assets/read-topics/culture.svg',
+ description:'Two cousins plant a mysterious seed and discover its true gift.',
+ neDescription:'दुई दाजुभाइले रहस्यमय बीउ रोपेर यसको खास उपहार पत्ता लगाउँछन्।',
+ chapters:[
+ chapter('Grandmother’s Small Box','हजुरआमाको सानो बाकस',[
+ ['When Pema visited her grandmother in Ilam, she found a little wooden box on the shelf. Inside lay one dry brown seed and a note saying, “Plant this with patience.” Grandmother smiled but did not tell her what would grow.','इलाममा हजुरआमालाई भेट्न गएकी पेमाले दराजमा सानो काठको बाकस भेटिन्। त्यसमा एउटा सुक्खा खैरो बीउ र “धैर्य गरेर रोप” लेखिएको चिठी थियो। हजुरआमा मुस्कुराउनुभयो, तर के उम्रन्छ भन्नुभएन।'],
+ ['Pema and her cousin Sonam filled a pot with soil. They planted the seed, added a little water, and placed the pot where it received morning sunlight. Then they waited.','पेमा र उनका दाजुभाइ सोनामले गमलामा माटो भरे। उनीहरूले बीउ रोपे, अलिकति पानी हाले र बिहानको घाम आउने ठाउँमा गमला राखे। त्यसपछि पर्खिए।']
+ ],[
+ q('What did Pema find in the box?','पेमाले बाकसमा के भेटिन्?', [['A brown seed','खैरो बीउ'],['A silver key','चाँदीको साँचो'],['A blue pencil','निलो सिसाकलम']],0),
+ q('Where did they put the planted seed?','उनीहरूले रोपेको बीउ कहाँ राखे?', [['In a dark drawer','अँध्यारो दराजमा'],['In morning sunlight','बिहानको घाम आउने ठाउँमा'],['Under a bed','ओछ्यानमुनि']],1)
+ ]),
+ chapter('The Tiny Green Leaf','सानो हरियो पात',[
+ ['Each morning, Sonam wanted to dig up the seed to check it. Pema reminded him that roots need time to grow. After several days, a tiny green leaf appeared above the soil.','हरेक बिहान सोनामलाई बीउ खनेर हेर्न मन लाग्थ्यो। पेमाले जरालाई बढ्न समय चाहिन्छ भनेर सम्झाइन्। केही दिनपछि माटोमाथि सानो हरियो पात देखा पर्‍यो।'],
+ ['They rushed to show Grandmother. She asked them to write down how the plant changed every week. Soon the cousins noticed two more leaves and a strong stem. Their notebook filled with drawings.','उनीहरू हतारिँदै हजुरआमालाई देखाउन गए। हजुरआमाले हरेक हप्ता बिरुवामा आउने परिवर्तन लेख्न भन्नुभयो। चाँडै दुईवटा थप पात र बलियो डाँठ देखियो। उनीहरूको कापी चित्रहरूले भरियो।']
+ ],[
+ q('What first appeared above the soil?','माटोमाथि सुरुमा के देखियो?', [['A green leaf','हरियो पात'],['A yellow flower','पहेँलो फूल'],['A red fruit','रातो फल']],0),
+ q('What did Grandmother ask them to do?','हजुरआमाले उनीहरूलाई के गर्न भन्नुभयो?', [['Record the changes','परिवर्तन टिप्न'],['Throw away the pot','गमला फाल्न'],['Dig up the roots','जरा खन्न']],0)
+ ]),
+ chapter('The Real Surprise','साँचो आश्चर्य',[
+ ['A few weeks later, the plant produced beautiful marigold flowers. Grandmother explained that the seed came from the garden she had planted with Pema’s mother many years ago. The flowers were special because they carried a family memory.','केही हप्तापछि बिरुवामा सुन्दर सयपत्री फूल फुले। हजुरआमाले त्यो बीउ धेरै वर्षअघि पेमाकी आमासँग लगाएको बगैँचाबाट आएको बताउनुभयो। ती फूल परिवारको सम्झना भएकाले विशेष थिए।'],
+ ['At Tihar, Pema and Sonam used a few flowers to make a small garland for Grandmother. They kept the remaining seeds for next year. Pema finally understood the note: patience had helped a memory bloom again.','तिहारमा पेमा र सोनामले केही फूलबाट हजुरआमाका लागि सानो माला बनाए। बाँकी बीउ अर्को वर्षका लागि राखे। पेमाले चिठीको अर्थ बुझिन्: धैर्यले पुरानो सम्झनालाई फेरि फुल्न सहयोग गरेको थियो।']
+ ],[
+ q('What flowers grew?','कुन फूल फुले?', [['Marigolds','सयपत्री'],['Roses','गुलाफ'],['Lotuses','कमल']],0),
+ q('Why were the flowers special?','फूलहरू किन विशेष थिए?', [['They carried a family memory','परिवारको सम्झना बोकेका थिए'],['They were made of plastic','प्लास्टिकका थिए'],['They glowed at night','राति चम्किन्थे']],0)
+ ])
+ ]
+}
+);
+
 window.__sikauExtraStoryBooks=books;
 })();
