@@ -186,6 +186,7 @@ test('Reading mode choice cards explain their purpose and keep native buttons in
  assert.match(dashboard,/Short passages & quick questions/);
  assert.match(dashboard,/syncModeState\(\)/);
  assert.match(css,/#readModeSeg \.read-mode-card/);
+ assert.match(css,/#readModeSeg \.read-mode-card \*\{pointer-events:none!important\}/);
  assert.match(css,/\.read-mode-card\.on/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.match(css,/data-sikau-theme="dark"/);
