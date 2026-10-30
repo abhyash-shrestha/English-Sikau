@@ -1092,9 +1092,32 @@ html[data-sikau-theme="dark"] #panel[data-mode]:not([data-mode="payment"]) :is(b
  #protected #bar #cloudStoryToggle{grid-column:1/-1!important;justify-self:start!important;max-width:100%!important;min-width:0!important}
 }
 
+/* Anti-FOUC: never show the previous private lesson UI before all enhancements and CSS are ready. */
+#sikauBootCover{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:#fff8f8;color:#35243c;font:500 15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+#sikauBootCover[hidden]{display:none!important}
+#sikauBootCard{width:min(100%,390px);text-align:center;background:#fff;border:1px solid #eddee9;box-shadow:0 14px 44px #33164d12;border-radius:24px;padding:32px 25px}
+#sikauBootCard strong{display:block;font-size:23px;color:#a9154c;margin:7px 0}
+#sikauBootCard small{display:block;color:#706479;font-size:13px}
+#sikauBootSpinner{display:block;width:29px;height:29px;margin:18px auto;border:3px solid #f6cadc;border-top-color:#b71950;border-radius:50%;animation:sikauBootSpin .8s linear infinite}
+@keyframes sikauBootSpin{to{transform:rotate(360deg)}}
+#sikauBootRetry{margin:14px auto 0;padding:11px 16px;border:0;background:#b71950;color:white;border-radius:11px;font-weight:800}
+#sikauBootRetry[hidden]{display:none!important}
+html[data-sikau-theme="dark"] #sikauBootCover{background:#111626;color:#f2e6f6}
+html[data-sikau-theme="dark"] #sikauBootCard{background:#1f2639;border-color:#47516a}
+html[data-sikau-theme="dark"] #sikauBootCard strong{color:#ffacc9}
+html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
+#protected[data-sikau-booting="1"] #lessonFrame{visibility:hidden!important;pointer-events:none!important}
+@media(prefers-reduced-motion:reduce){#sikauBootSpinner{animation:none;border-top-color:#b71950}}
 </style>
 </head>
 <body>
+<div id="sikauBootCover" role="status" aria-live="polite" aria-label="Loading English Sikau">
+  <div id="sikauBootCard"><span aria-hidden="true">🇳🇵 📖</span><strong>English Sikau</strong>
+    <small id="sikauBootMessage">Preparing your learning space · कक्षा तयार हुँदैछ…</small>
+    <span id="sikauBootSpinner" aria-hidden="true"></span>
+    <button type="button" id="sikauBootRetry" hidden onclick="location.reload()">Retry loading · फेरि खोल्नुहोस्</button>
+  </div>
+</div>
 <div id="shell"><div id="panel">
 <header class="hero">
 <button id="sikauThemeAuth" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
@@ -1466,6 +1489,83 @@ const QR_SRC='data:image/jpeg;base64,/9j/4QDKRXhpZgAATU0AKgAAAAgABgESAAMAAAABAAE
 const $=id=>document.getElementById(id),escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let account=null,functions=null,ID=null,user=null,mode='signin',busy=false,pending=null,trial=null,refreshTimer=null,readNumber=0,trialInterval=null,lastStatus=0,openedAccess=null,lessonOpening=false,entitlementChecking=false,lastTrialCheckError='';
 const paid=u=>Array.isArray(u?.labels)&&CFG.paid.some(x=>u.labels.includes(x));
+
+/* Render barrier across Android Chrome, iOS Safari, Mac and Windows.
+ * The old private HTML is never visible while UI upgrades or styles load.
+ * No authentication, paywall, XP or lesson state is changed here. */
+let sikauInitialSessionPending=true,sikauBootGeneration=0;
+function sikauShowBoot(message){
+ const cover=$('sikauBootCover');
+ if(!cover)return;
+ cover.hidden=false;
+ const label=$('sikauBootMessage');if(label&&message)label.textContent=message;
+ const retry=$('sikauBootRetry');if(retry)retry.hidden=true;
+ const spin=$('sikauBootSpinner');if(spin)spin.hidden=false;
+ const protectedPage=$('protected');
+ if(protectedPage)protectedPage.dataset.sikauBooting='1';
+}
+function sikauHideBoot(){
+ const cover=$('sikauBootCover');if(cover)cover.hidden=true;
+ const protectedPage=$('protected');
+ if(protectedPage)delete protectedPage.dataset.sikauBooting;
+}
+function sikauBootError(message){
+ const cover=$('sikauBootCover');if(cover)cover.hidden=false;
+ const label=$('sikauBootMessage');
+ if(label)label.textContent=message||'The updated classroom could not load. Refresh to retry.';
+ const retry=$('sikauBootRetry');if(retry)retry.hidden=false;
+ const spin=$('sikauBootSpinner');if(spin)spin.hidden=true;
+}
+function sikauWaitForStyle(link){
+ // Appended stylesheets load asynchronously on slower phones. No time-based
+ // "reveal anyway" fallback: if a stylesheet fails, keep old UI covered.
+ if(link.sheet)return Promise.resolve(true);
+ return new Promise(resolve=>{
+  let settled=false;
+  const done=ok=>{
+   if(settled)return;settled=true;
+   link.removeEventListener('load',onLoad);
+   link.removeEventListener('error',onError);
+   clearTimeout(watchdog);
+   resolve(ok);
+  };
+  const onLoad=()=>done(true),onError=()=>done(false);
+  link.addEventListener('load',onLoad,{once:true});
+  link.addEventListener('error',onError,{once:true});
+  // The watchdog shows an actionable retry instead of leaking the old UI.
+  const watchdog=setTimeout(()=>done(!!link.sheet),12000);
+  if(link.sheet)done(true);
+ });
+}
+async function sikauRevealPreparedLesson(doc){
+ const frame=$('lessonFrame'),generation=++sikauBootGeneration,access=openedAccess;
+ const same=()=>openedAccess===access&&!!access&&frame.contentDocument===doc&&
+   $('protected')?.dataset.sikauBooting==='1'&&generation===sikauBootGeneration;
+ if(!same())return;
+ const ready=doc?.body&&doc.documentElement.classList.contains('sikau-refresh')&&
+   doc.getElementById('sikauUnifiedAllTabsStyle');
+ if(!ready){
+  sikauBootError('The refreshed learning interface did not initialize. Reload to try again.');
+  return;
+ }
+ // Only actual styles added to this protected lesson are required; never
+ // hold up the whole classroom for an inactive or nonexistent tab.
+ const ids=['sikauUnifiedAllTabsStyle','sikauUnifiedSidebarStyles','sikauReadStyle',
+  'sikauTranslateStudioV4','sfdDashboardStyles','sikauMobileBarHandleStyle'];
+ const links=ids.map(id=>doc.getElementById(id)).filter(el=>el?.tagName==='LINK');
+ const loaded=await Promise.all(links.map(sikauWaitForStyle));
+ if(!same())return;
+ if(loaded.some(ok=>!ok)){
+  sikauBootError('A classroom style did not load. Check your connection and retry.');
+  return;
+ }
+ // Give the browser one layout+paint opportunity while fully masked.
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ if(!same())return;
+ doc.documentElement.classList.add('sikau-parent-ready');
+ sikauHideBoot();
+}
+
 // Appwrite account IDs and labels come from the server, never from a browser
 // flag. A short reference helps learners compare devices without sharing a
 // password, session token, or the entire account ID.
@@ -2870,7 +2970,12 @@ function personalizeStudentLesson(){
   // Optional visibility handles run only after verified lesson content loads.
   try{window.sikauMobileBarHandles?.install(doc);}catch(error){console.warn('Mobile bar handles:',error)}
 }
-$('lessonFrame').addEventListener('load',()=>{if(openedAccess)personalizeStudentLesson();});
+$('lessonFrame').addEventListener('load',()=>{
+ if(!openedAccess)return;
+ personalizeStudentLesson();
+ const doc=$('lessonFrame').contentDocument;
+ void sikauRevealPreparedLesson(doc);
+});
 // Keep the visible festival schedule current across Nepal midnight, even without navigation.
 setInterval(()=>{if(openedAccess&&user)personalizeStudentLesson();},15*60*1000);
 
@@ -2886,6 +2991,9 @@ $('lessonFrame').addEventListener('load',function(){
 });
 
 function killLessons(){
+  // Close any in-flight UI preparation, without ever briefly exposing the old lesson.
+  sikauBootGeneration++;
+  if(!sikauInitialSessionPending)sikauHideBoot();
   // Manual hide/show preference remains under the learner's control.
   disconnectStudentLessonObserver();
   readNumber++;
@@ -2973,6 +3081,7 @@ function activeTrialExpiry(){const expiry=Date.parse(trial?.expiresAt||'');retur
 // entitlement before downloading the private lesson file from Appwrite Storage.
 async function openFile(token='',isTrial=false){
   const seq=++readNumber,accountId=user?.$id;
+  sikauShowBoot('Opening your updated classroom · नयाँ कक्षा खोल्दैछौं…');
   showMsg('Verifying account and downloading protected lessons…');
   try{
     if(!accountId||user.emailVerification!==true)throw Error('Sign in with a verified account first.');
@@ -3231,7 +3340,11 @@ async function openFile(token='',isTrial=false){
     const enhancedHtml=/<\/body\s*>/i.test(lessonsWithQuality)?
       lessonsWithQuality.replace(/<\/body\s*>/i,gameScriptTag+languageScriptTag+'</body>'):
       lessonsWithQuality+gameScriptTag+languageScriptTag;
-    frame.srcdoc=enhancedHtml;
+    // Put the protection inside srcdoc HEAD too: the original lesson body
+    // must never paint before the responsive enhancer can initialize.
+    const noOldLessonFlash='<style id="sikauNoOldLessonFlash">html:not(.sikau-refresh) body{visibility:hidden!important}</style>';
+    const stagedHtml=enhancedHtml.replace(/<head\b[^>]*>/i,head=>head+noOldLessonFlash);
+    frame.srcdoc=stagedHtml;
     openedAccess=kind;
     lessonOpening=false;
     $('sessionNote').textContent=kind==='lifetime'?'👑 Lifetime member':'⏰ Trial learner';
@@ -3416,5 +3529,5 @@ window.addEventListener('offline',()=>{if(openedAccess)lockProtected('Internet c
 // The interval intentionally runs only an account lookup and, for trial users, one
 // server trial-status request while protected lessons are open.
 setInterval(()=>{if(openedAccess)void revalidateOpenLessons()},60000);
-(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())pending=p}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session({silentGuest:true})}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}})();
+(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())pending=p}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session({silentGuest:true})}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}finally{sikauInitialSessionPending=false;if(!openedAccess)sikauHideBoot()}})();
 </script></body></html>
