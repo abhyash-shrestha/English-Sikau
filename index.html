@@ -1551,7 +1551,8 @@ async function sikauRevealPreparedLesson(doc){
  // Only actual styles added to this protected lesson are required; never
  // hold up the whole classroom for an inactive or nonexistent tab.
  const ids=['sikauUnifiedAllTabsStyle','sikauUnifiedSidebarStyles','sikauReadStyle',
-  'sikauTranslateStudioV4','sfdDashboardStyles','sikauMobileBarHandleStyle'];
+  'sikauTranslateStudioV4','sfdDashboardStyles','sikauMobileBarHandleStyle',
+  'sikauProgressCSS','nepalExplorerStyle','sikauGameStyle'];
  const links=ids.map(id=>doc.getElementById(id)).filter(el=>el?.tagName==='LINK');
  const loaded=await Promise.all(links.map(sikauWaitForStyle));
  if(!same())return;
