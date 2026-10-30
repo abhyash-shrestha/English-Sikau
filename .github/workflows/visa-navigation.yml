@@ -1,0 +1,28 @@
+name: Visa tab always visible
+on:
+  pull_request:
+    paths:
+      - 'coach-dashboard.js'
+      - 'index.html'
+      - 'test/visa-navigation-always-visible.test.mjs'
+      - '.github/workflows/visa-navigation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'coach-dashboard.js'
+      - 'index.html'
+      - 'test/visa-navigation-always-visible.test.mjs'
+      - '.github/workflows/visa-navigation.yml'
+jobs:
+  visa-navigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test Visa tab at startup, on tap, and after sidebar rebuild
+        run: node --test test/visa-navigation-always-visible.test.mjs
