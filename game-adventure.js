@@ -1,7 +1,7 @@
 /* English Sikau Game visual enhancement. Leaves original game engine and handlers intact. */
 (function(){
 'use strict';
-const file=new URL('game-adventure.css?v=20261021-big-answer-verdict-hotfix-r2',document.baseURI).href;
+const file=new URL('game-adventure.css?v=20261030-no-rewards-r1',document.baseURI).href;
 
 /* Lightning timing. The protected engine owns gameplay and awards.
  * This presentation-layer adapter updates the actual round state:
