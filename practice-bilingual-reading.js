@@ -39,6 +39,15 @@ function visibleTranslation(row,english){
  // the flag is pressed. A previously remembered English sentence protects it.
  const rs=row.querySelector?.('.rs');
  if(rs){const value=clean(rs.textContent||'');if(neScript.test(value)&&value!==english&&value.length<600)return value;}
+ // Unknown private lesson versions may use a plain paragraph instead of a
+ // named Nepali span. Read only short Devanagari leaf elements, never buttons.
+ for(const node of row.querySelectorAll?.('p,span,small,div')||[]){
+  if(node.closest?.('button,[role="button"],label'))continue;
+  if(node.querySelector?.('button,[role="button"]'))continue;
+  if(node.querySelector?.('p,span,small,div'))continue;
+  const value=extract(node);
+  if(value)return value;
+ }
  return '';
 }
 function englishFrom(source){
@@ -58,7 +67,10 @@ function sourceRow(source,host){
  while(parent&&parent!==host){
   if((parent.querySelectorAll?.('.rs')?.length||0)>1)break;
   chosen=parent;
-  if(parent.querySelector?.('button,.speaker,[role="button"]'))break;
+  // Include the English sound and the separate "See Nepali" action even
+  // when they are in sibling spans under the same sentence wrapper.
+  if(Array.from(parent.querySelectorAll?.('button,input[type="button"],[role="button"]')||[])
+      .some(isNepaliButton))break;
   parent=parent.parentElement;
  }
  return chosen;
@@ -166,7 +178,15 @@ function install(d){
      listen.addEventListener('click',()=>e.speaker.click());head.append(listen);
     }
     left.append(head,mk(d,'p','sikau-practice-sentence',e.english));
-    right.append(mk(d,'strong','sikau-practice-nepali-label','नेपाली'));
+    const neHead=mk(d,'div','sikau-practice-language-heading');
+    neHead.append(mk(d,'strong','sikau-practice-nepali-label','नेपाली'));
+    if(e.nepali&&typeof view.__sikauSpeech==='function'){
+     const playNe=mk(d,'button','sikau-practice-listen','🔊 सुन्नुहोस्');
+     playNe.type='button';playNe.setAttribute('aria-label','Listen to Nepali sentence');
+     playNe.addEventListener('click',()=>view.__sikauSpeech(e.nepali,'ne-NP','rd',{rate:0.94}));
+     neHead.append(playNe);
+    }
+    right.append(neHead);
     if(e.nepali)right.append(mk(d,'p','sikau-practice-translation',e.nepali));
     else if(e.button){
      // Fallback only when a private lesson has not supplied the translation.
