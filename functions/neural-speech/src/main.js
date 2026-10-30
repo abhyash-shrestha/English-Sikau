@@ -191,11 +191,12 @@ export default async function({req,res}){
  const key=process.env.AZURE_SPEECH_KEY;
  const region=String(process.env.AZURE_SPEECH_REGION||'').trim().toLowerCase();
  const provider=String(process.env.SPEECH_PROVIDER||'').trim().toLowerCase();
- // Opt-in cloned Nepali male voice. Other voices are intentionally left to
- // their existing browser paths; no impersonation or free GPU is implied.
+ // Owner-hosted Swar uses the same approved Nepali voice for every Nepali
+ // utterance. It does not synthesize English and does not depend on gender.
+ // The browser keeps English on its existing voice path.
  if(provider==='swar'){
-  if(lang!=='ne-NP'||gender!=='male')
-   return reply({status:'error',message:'Swar voice is configured only for Nepali male playback'},422);
+  if(lang!=='ne-NP')
+   return reply({status:'error',message:'Owner voice is configured for Nepali speech only'},422);
   try{return reply({status:'ok',...(await swarAudio(text))})}
   catch(_){return reply({status:'unavailable',message:'Private Nepali voice service unavailable'},503)}
  }
