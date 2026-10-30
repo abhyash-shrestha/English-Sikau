@@ -113,3 +113,104 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.sikau-practice-language-hea
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.sikau-practice-listen,.sikau-practice-translation-fallback){
  background:#4d364d!important;color:#ffeaf5!important;border-color:#a67791!important;
 }
+
+
+/* Native sentence rows are hidden only after the bilingual pairs render.
+   Never hide a parent card, quiz, lesson heading or action bar. */
+#rd.sikau-read-v2 .sikau-practice-source-hidden{display:none!important}
+#rd.sikau-read-v2 .sikau-practice-bilingual{
+ max-width:100%!important;margin:8px 0 20px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-pair{
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+}
+#rd.sikau-read-v2 .sikau-practice-english,
+#rd.sikau-read-v2 .sikau-practice-nepali{
+ min-width:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-english .sikau-practice-listen,
+#rd.sikau-read-v2 .sikau-practice-nepali .sikau-practice-listen{
+ min-width:97px!important;min-height:40px!important;
+}
+/* Bigger and visible native topic / level controls, placed above the lesson. */
+#rd.sikau-read-v2 .sikau-practice-navigation{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:15px!important;flex-wrap:wrap!important;
+ width:100%!important;min-width:0!important;
+ padding:17px 19px!important;margin:3px 0 7px!important;
+ border:2px solid #f3bad2!important;border-radius:16px!important;
+ background:#fff4f8!important;
+ box-shadow:0 5px 18px #8e2c5910!important;
+ box-sizing:border-box!important;
+}
+#rd.sikau-read-v2 .sikau-practice-navigation[hidden]{display:none!important}
+#rd.sikau-read-v2 .sikau-practice-nav-intro{
+ flex:1 1 210px;min-width:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-intro h3{
+ color:#353150!important;margin:0 0 4px!important;
+ font:850 17px/1.35 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-intro p{
+ color:#7b4261!important;margin:0!important;
+ font:650 12px/1.55 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-buttons{
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:10px!important;flex:2 1 570px!important;min-width:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-action{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;
+ align-items:flex-start!important;gap:3px!important;min-width:0!important;
+ min-height:62px!important;padding:9px 13px!important;
+ border:1.5px solid #e99abb!important;border-radius:11px!important;
+ background:#fff!important;color:#9b225e!important;
+ box-shadow:0 3px 7px #9630570b!important;cursor:pointer!important;
+ text-align:left!important;white-space:normal!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-action:hover{
+ background:#ffe2ee!important;border-color:#c5266b!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-action strong{
+ font:850 13px/1.35 system-ui,sans-serif!important;
+ color:inherit!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-action span{
+ font:650 11px/1.45 system-ui,sans-serif!important;
+ color:#825b70!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nav-action:focus-visible{
+ outline:3px solid #4567d6!important;outline-offset:3px!important;
+}
+@media(max-width:900px){
+ #rd.sikau-read-v2 .sikau-practice-navigation{padding:13px 14px!important}
+ #rd.sikau-read-v2 .sikau-practice-nav-buttons{flex:1 1 100%!important}
+}
+@media(max-width:700px){
+ #rd.sikau-read-v2 .sikau-practice-pair{
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-nav-buttons{
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-nav-action{
+  min-height:53px!important;
+ }
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-navigation{
+ background:#30283f!important;border-color:#80516d!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-nav-intro h3{
+ color:#fff0f9!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-nav-intro p{
+ color:#e0c6d8!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-nav-action{
+ background:#49384f!important;border-color:#926984!important;
+ color:#fff0f9!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-nav-action span{
+ color:#e3c8d9!important;
+}
