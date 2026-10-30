@@ -134,6 +134,39 @@ async function geminiAudio(text,lang,gender,key){
  return {mime:'audio/wav',voice:name,model,engine:'gemini-neural',
   audioBase64:wav.toString('base64')};
 }
+// Swar is an opt-in, owner-hosted Nepali voice clone. The voice recording and
+// model stay on the owner's private inference host, never in GitHub Pages or
+// this Appwrite function. This adapter only forwards approved lesson text.
+async function swarAudio(text){
+ const raw=String(process.env.SWAR_TTS_URL||'').trim();
+ const secret=String(process.env.SWAR_TTS_TOKEN||'').trim();
+ let endpoint;
+ try{endpoint=new URL(raw)}catch(_){throw Error('Swar endpoint not configured')}
+ if(endpoint.protocol!=='https:'||endpoint.username||endpoint.password||
+    endpoint.hash||!secret||secret.length<16)
+  throw Error('Swar endpoint must be a private authenticated HTTPS service');
+ const response=await fetch(endpoint.href,{
+  method:'POST',
+  headers:{'authorization':'Bearer '+secret,'content-type':'application/json','accept':'audio/wav, audio/mpeg'},
+  body:JSON.stringify({text}),
+  signal:AbortSignal.timeout(20000)
+ });
+ if(!response.ok)throw Error('Swar generation unavailable');
+ const mime=String(response.headers?.get?.('content-type')||'').split(';')[0].trim().toLowerCase();
+ if(!['audio/wav','audio/x-wav','audio/mpeg'].includes(mime))
+  throw Error('Invalid Swar audio MIME type');
+ const bytes=Buffer.from(await response.arrayBuffer());
+ if(bytes.length<48||bytes.length>1400000)throw Error('Swar audio invalid or too long');
+ const wav=bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WAVE';
+ const mp3=bytes.toString('ascii',0,3)==='ID3'||
+  (bytes[0]===0xff&&(bytes[1]&0xe0)===0xe0);
+ if(mime!=='audio/mpeg'&&!wav)throw Error('Invalid Swar WAV data');
+ if(mime==='audio/mpeg'&&!mp3)throw Error('Invalid Swar MP3 data');
+ return {mime:mime==='audio/mpeg'?'audio/mpeg':'audio/wav',
+  voice:'Owner Nepali Voice',engine:'swar-nepali',
+  audioBase64:bytes.toString('base64')};
+}
+
 export default async function({req,res}){
  const reply=(payload,code=200)=>res.json(payload,code,{
   'Cache-Control':'no-store','Pragma':'no-cache'
@@ -158,6 +191,14 @@ export default async function({req,res}){
  const key=process.env.AZURE_SPEECH_KEY;
  const region=String(process.env.AZURE_SPEECH_REGION||'').trim().toLowerCase();
  const provider=String(process.env.SPEECH_PROVIDER||'').trim().toLowerCase();
+ // Opt-in cloned Nepali male voice. Other voices are intentionally left to
+ // their existing browser paths; no impersonation or free GPU is implied.
+ if(provider==='swar'){
+  if(lang!=='ne-NP'||gender!=='male')
+   return reply({status:'error',message:'Swar voice is configured only for Nepali male playback'},422);
+  try{return reply({status:'ok',...(await swarAudio(text))})}
+  catch(_){return reply({status:'unavailable',message:'Private Nepali voice service unavailable'},503)}
+ }
  // Prefer owner-selected provider, then an existing Azure Speech resource,
  // then Gemini AI Studio's free-tier-capable TTS endpoint.
  const useGemini=provider==='gemini'||(!key&&!!geminiKey);
