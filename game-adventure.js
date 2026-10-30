@@ -226,14 +226,8 @@ window.enhanceGameDashboard=function(d){
    const title=banner.querySelector('h2');
    if(title)title.textContent='Adventure Across Nepal 🇳🇵';
    const subtitle=banner.querySelector('p');
-   if(subtitle)subtitle.textContent='Complete missions, collect stars and reach Everest! · मिसन पूरा गरौं, तारा संकलन गरौं।';
+   if(subtitle)subtitle.textContent='Learn with missions across Nepal, one question at a time. · प्रश्नको अभ्यास गर्दै नेपाल घुमौं।';
    const intro=banner.querySelector('.game-caption');if(intro)intro.textContent='ENGLISH QUEST · अंग्रेजी खोज अभियान';
-   const hud=banner.querySelector('.game-hud');
-   if(hud){
-    for(const part of hud.querySelectorAll('span')){
-     if(/coins/i.test(part.textContent))part.title='Actual game coins earned';
-    }
-   }
    const mission=host.querySelector('.game-mission'),map=host.querySelector('.game-map');
    if(!mission||!map)return; // Game question screen: do not change.
    const shell=map.closest('.game-shell');
