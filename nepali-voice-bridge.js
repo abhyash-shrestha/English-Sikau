@@ -231,12 +231,14 @@ function install(doc){
  };
 
  hideGender();
- let scheduled=false;
+ // MutationObserver fires before the browser paints newly inserted lesson
+ // controls. Remove a resurrected voice badge immediately, not next frame.
+ let checking=false;
  if(typeof view.MutationObserver==='function'){
-  const obs=new view.MutationObserver(()=>{
-   if(scheduled)return;
-   scheduled=true;
-   (view.requestAnimationFrame||view.setTimeout)(()=>{scheduled=false;hideGender();});
+  const obs=new view.MutationObserver(records=>{
+   if(checking||!records.some(r=>r.type==='childList'&&r.addedNodes?.length))return;
+   checking=true;
+   try{hideGender();}finally{checking=false;}
   });
   obs.observe(doc.body,{childList:true,subtree:true});
  }
