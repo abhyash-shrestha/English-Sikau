@@ -73,7 +73,7 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
  assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clear-modes-r5/);
- assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-practice-bilingual-r6/);
+ assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-native-practice-r7/);
 });
 
 test('Story Mode uses curated bookshelf, not the native generated story cards',()=>{
@@ -190,25 +190,31 @@ test('Reading mode choice cards explain their purpose and keep native buttons in
  assert.match(css,/\.read-mode-card\.on/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.match(css,/data-sikau-theme="dark"/);
- assert.match(index,/reading-dashboard\.js\?v=20261030-practice-bilingual-r6/);
+ assert.match(index,/reading-dashboard\.js\?v=20261030-native-practice-r7/);
 });
 
 
-test('Practice tab exposes English and Nepali together without modifying native quiz handling',()=>{
+test('Practice Mode binds to actual lesson sentences, with clear audio and navigation',()=>{
  const practice=read('practice-bilingual-reading.js');
  const practiceCss=read('practice-bilingual-reading.css');
- assert.match(index,/practice-bilingual-reading\.js\?v=20261030-practice-r1/);
+ assert.match(index,/practice-bilingual-reading\.js\?v=20261030-native-pairs-r2/);
  assert.match(dashboard,/enhancePracticeBilingualReading\?\.\(d\)/);
- assert.match(practice,/getElementById\('rtext'\)/);
+ assert.match(practice,/rd\.querySelectorAll\('\.rs'\)/);
+ assert.match(practice,/rd\.querySelector\('#rtext'\)\|\|/);
  assert.match(practice,/button\[data-rm="practice"\]\.on/);
- assert.match(practice,/seenButtons\.add\(entry\.button\)/);
- assert.match(practice,/entry\.button\.click\(\)/);
- assert.match(practice,/sikau-practice-original-hidden/);
- assert.match(practice,/visibleTranslation\(e\.row,e\.english\)/);
+ assert.match(practice,/revealed\.add\(e\.nativeNe\)/);
+ assert.match(practice,/e\.nativeNe\.click\(\)/);
+ assert.match(practice,/sikau-practice-source-hidden/);
+ assert.match(practice,/translationFrom\(e\)/);
  assert.match(practice,/sikau-practice-english/);
  assert.match(practice,/sikau-practice-nepali/);
- assert.match(practice,/view\.__sikauSpeech\(e\.nepali,'ne-NP','rd'/);
+ assert.match(practice,/speakerButton\('🔊 Listen','en-US',e\)/);
+ assert.match(practice,/speakerButton\('🔊 सुन्नुहोस्','ne-NP',e\)/);
+ assert.match(practice,/Change topic · विषय बदल्नुहोस्/);
+ assert.match(practice,/Easier level · सजिलो तह/);
+ assert.match(practice,/Harder level · गाह्रो तह/);
  assert.match(practiceCss,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(practiceCss,/sikau-practice-nav-action/);
  assert.match(practiceCss,/@media\(max-width:700px\)/);
  assert.match(practiceCss,/data-sikau-theme="dark"/);
  assert.doesNotMatch(practice,/innerHTML|updatePrefs|createExecution|updateDocument/);
