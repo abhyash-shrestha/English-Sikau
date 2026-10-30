@@ -19,17 +19,19 @@ const voices={
  hindi:{name:'Google हिन्दी Hindi India',lang:'hi-IN'}
 };
 
-function build(available,{withNative=true,toolbarControls=[]}={}){
+function build(available,{withNative=true,toolbarControls=[],service=null,Audio=null}={}){
  const spoken=[],cancelled=[],nodes=[];
+ const synthListeners={},timers=new Map();let clock=0,nextTimer=0;
  const synth={
   getVoices:()=>available,
   speak(utterance){spoken.push(utterance);return undefined;},
   cancel(){cancelled.push(true)},
-  addEventListener(){}
+  addEventListener(type,fn){synthListeners[type]=fn;}
  };
  const make=tag=>({
   tagName:tag.toUpperCase(),className:'',style:{display:'',cssText:''},
   attrs:{},hidden:false,
+  listeners:{},addEventListener(type,fn){this.listeners[type]=fn;},
   setAttribute(key,value){this.attrs[key]=value;},
   getAttribute(key){return this.attrs[key]??null;},
   matches(){return false},
@@ -69,14 +71,20 @@ function build(available,{withNative=true,toolbarControls=[]}={}){
    observe(){this.attached=true;}
   },
   requestAnimationFrame(fn){fn();},
-  setTimeout(fn){fn();},
+  setTimeout(fn,delay){const id=++nextTimer;timers.set(id,{fn,at:clock+delay});return id;},
+  clearTimeout(id){timers.delete(id);},
+  addEventListener(){},
+  ...(Audio?{Audio}:{}),
   ...(withNative?{speak(text,rate,lang){originalNative.push([text,rate,lang]);}}:{})
  };
+ win.parent=service||win;
  doc.defaultView=win;
  vm.runInNewContext(bridge,vm.createContext({window:win,console}),{timeout:1500});
  assert.equal(win.enhanceUnifiedSpeech(doc),true);
  return {win,doc,synth,roots,spoken,cancelled,originalNative,nodes,
-   toolbarControls,voiceGroups,observers};
+   toolbarControls,voiceGroups,observers,timers,
+   setVoices(list){available=list;synthListeners.voiceschanged?.();},
+   advance(ms){clock+=ms;for(const [id,timer] of [...timers])if(timer.at<=clock){timers.delete(id);timer.fn();}}};
 }
 
 test('one voice per language, prioritizes natural US English and authentic Nepal Nepali',()=>{
@@ -126,6 +134,7 @@ test('native Reading speechSynthesis requests use same voices through unified br
  const ne=new win.SpeechSynthesisUtterance('यो एउटा कथा हो।');
  ne.lang='ne-NP';
  synth.speak(ne);
+ spoken[0].onend();
  assert.deepEqual(spoken.map(v=>v.voice.name),[voices.us.name,voices.nepali.name]);
  assert.equal(spoken[0].lang,'en-US');
 });
@@ -192,10 +201,10 @@ test('voice failure is reported without using Hindi or other voices',()=>{
 });
 
 test('Translate, Words and Reading load identical shared engine across devices',()=>{
- assert.match(app,/translate-studio-v4\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/translate-studio-v4\.js\?v=20261030-platform-audio-r1/);
  assert.match(app,/reading-dashboard\.js\?v=20261030-single-voice-r2/);
  assert.match(app,/words-studio\.js\?v=20261030-single-voice-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-single-voice-r3/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-platform-audio-r1/);
  assert.match(app,/uiStep\('one bilingual speech player',\(\)=>window\.enhanceUnifiedSpeech\?\.\(doc\)\)/);
  assert.match(translate,/__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
  assert.match(words,/__sikauNepaliVoice\.speakText\(text,locale,'words'\)/);
@@ -233,3 +242,94 @@ test('the retired full-page scan and duplicate Reading bridge loader are gone',(
  assert.doesNotMatch(bridge,/data-sikau-voice-gender-hidden/);
  assert.doesNotMatch(reading,/voiceScriptLoading|document\.createElement\('script'\)/);
 });
+
+test('Android voices arriving late play the requested language once',()=>{
+ const b=build([]);
+ assert.equal(b.win.__sikauSpeech('नेपाल सुन्दर छ।','ne-NP','tr'),true);
+ assert.equal(b.spoken.length,0);
+ b.setVoices([voices.hindi,voices.nepaliAndroid]);
+ assert.equal(b.spoken.length,1);
+ assert.equal(b.spoken[0].voice,voices.nepaliAndroid);
+ b.spoken[0].onstart();b.spoken[0].onend();b.advance(3000);
+ assert.equal(b.spoken.length,1);
+ assert.equal(b.roots.tr.children[0].textContent,'');
+});
+
+test('Stop and a newer Listen request invalidate delayed voices',()=>{
+ const b=build([]);
+ b.win.__sikauSpeech('Old request','en-US','rd');
+ b.win.__sikauSpeech('Latest request','en-US','tr');
+ b.setVoices([voices.us]);
+ assert.deepEqual(b.spoken.map(x=>x.text),['Latest request']);
+ b.synth.cancel();b.setVoices([voices.us]);b.advance(50000);
+ assert.equal(b.spoken.length,1);
+});
+
+test('native queued Reading utterances do not cancel or overlap each other',()=>{
+ const b=build([voices.us]);const ended=[];
+ for(const text of ['First sentence.','Second sentence.']){
+  const u=new b.win.SpeechSynthesisUtterance(text);u.lang='en-US';u.onend=()=>ended.push(text);
+  b.synth.speak(u);
+ }
+ assert.equal(b.spoken.length,1);assert.equal(b.cancelled.length,0);
+ b.spoken[0].onstart();b.spoken[0].onend();
+ assert.equal(b.spoken.length,2);
+ b.spoken[1].onstart();b.spoken[1].onend();
+ assert.deepEqual(ended,['First sentence.','Second sentence.']);
+ assert.equal(b.cancelled.length,0);
+});
+
+test('long readings play completely in short segments rather than truncating at 2800',()=>{
+ const b=build([voices.us]);
+ const text=Array.from({length:160},(_,i)=>'Sentence '+i+' contains useful English practice.').join(' ');
+ b.win.__sikauSpeech(text,'en-US','rd');
+ let i=0;
+ while(i<b.spoken.length){assert.ok(i<100);b.spoken[i].onstart();b.spoken[i++].onend();}
+ assert.equal(b.spoken.map(u=>u.text).join(' '),text);
+ assert.ok(b.spoken.every(u=>u.text.length<=260));
+});
+
+test('native Stop prevents an old onend from starting the next chunk',()=>{
+ const b=build([voices.us]);
+ b.win.__sikauSpeech('A long sentence. '.repeat(50),'en-US','rd');
+ const old=b.spoken[0];b.synth.cancel();old.onend();
+ assert.equal(b.spoken.length,1);assert.equal(b.timers.size,0);
+});
+
+test('slow pronunciation mode keeps the requested speed and natural pitch',()=>{
+ const b=build([voices.us]);b.win.speak('Please repeat after me.',0.8,'en-US');
+ assert.equal(b.spoken[0].rate,0.8);assert.equal(b.spoken[0].pitch,1);
+});
+
+test('a rejected Safari playback offers a direct Play gesture without changing voice',()=>{
+ const b=build([voices.us]);b.win.__sikauSpeech('Hello','en-US','tr');
+ const first=b.spoken[0];first.onerror({error:'not-allowed'});
+ const action=b.roots.tr.children[0].child;
+ assert.match(action.textContent,/Play audio/);action.listeners.click();
+ assert.equal(b.spoken.length,2);assert.equal(b.spoken[1].voice,voices.us);
+ first.onend();assert.equal(b.spoken.length,2);
+});
+
+const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
+test('stopped cloud requests never play when the provider response finally arrives',async()=>{
+ let resolve;const plays=[];
+ const service={sikauNaturalSpeechAvailable:()=>true,sikauNaturalSpeech:()=>new Promise(r=>resolve=r)};
+ const b=build([voices.us],{service,Audio:class{play(){plays.push(true);return Promise.resolve();}}});
+ b.win.__sikauSpeech('Hello','en-US','tr');await flush();b.synth.cancel();
+ resolve({mime:'audio/mpeg',audioBase64:'SUQz'});await flush();
+ assert.equal(plays.length,0);assert.equal(b.spoken.length,0);
+});
+
+test('optional natural audio uses a gesture retry when Safari rejects autoplay',async()=>{
+ let plays=0;const calls=[];
+ const service={sikauNaturalSpeechAvailable:()=>true,async sikauNaturalSpeech(input){calls.push(input);return {mime:'audio/mpeg',audioBase64:'SUQz'};}};
+ const b=build([voices.us],{service,Audio:class{
+  play(){plays++;return plays===1?Promise.reject(Object.assign(Error('gesture'),{name:'NotAllowedError'})):Promise.resolve();}
+  pause(){}
+ }});
+ b.win.__sikauSpeech('नमस्ते','ne-NP','tr');await flush();
+ assert.equal(calls[0].lang,'ne-NP');assert.equal(b.spoken.length,0);
+ b.roots.tr.children[0].child.listeners.click();await flush();
+ assert.equal(plays,2);assert.equal(b.roots.tr.children[0].textContent,'');
+});
+

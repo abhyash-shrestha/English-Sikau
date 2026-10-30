@@ -100,7 +100,7 @@ async function geminiAudio(text,lang,gender,key){
   generation_config:{speech_config:[{voice:name}]}
  }:{
   contents:[{parts:[{text:
-   (lang==='ne-NP'?'Speak natural Nepali from Nepal. ':'Speak natural English. ')+
+   (lang==='ne-NP'?'Speak natural Nepali from Nepal. ':'Speak natural American English from the United States. ')+
    'Read exactly: '+text
   }]}],
   generationConfig:{
@@ -134,6 +134,46 @@ async function geminiAudio(text,lang,gender,key){
  return {mime:'audio/wav',voice:name,model,engine:'gemini-neural',
   audioBase64:wav.toString('base64')};
 }
+async function transcribe(input){
+ const key=process.env.GROQ_API_KEY;
+ if(process.env.SPEECH_TRANSCRIPTION_ENABLED!=='1'||!key)
+  return {code:503,data:{status:'unavailable',message:'Speech input is not configured'}};
+ const lang=input.lang;
+ const types={
+  'audio/mp4':['m4a',bytes=>bytes.toString('ascii',4,8)==='ftyp'],
+  'audio/webm':['webm',bytes=>bytes.subarray(0,4).equals(Buffer.from([0x1a,0x45,0xdf,0xa3]))],
+  'audio/ogg':['ogg',bytes=>bytes.toString('ascii',0,4)==='OggS'],
+  'audio/wav':['wav',bytes=>bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WAVE']
+ };
+ const mime=String(input.mime||'').split(';')[0].toLowerCase();
+ const encoded=input.audioBase64;
+ if(!['ne-NP','en-US'].includes(lang)||!types[mime]||
+    typeof encoded!=='string'||encoded.length>1600000||
+    !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded))
+  return {code:400,data:{status:'error',message:'Invalid recording'}};
+ const bytes=Buffer.from(encoded,'base64');
+ if(bytes.length<32||bytes.length>1200000||bytes.toString('base64')!==encoded||!types[mime][1](bytes))
+  return {code:400,data:{status:'error',message:'Invalid recording'}};
+ const form=new FormData();
+ form.append('file',new Blob([bytes],{type:mime}),'speech.'+types[mime][0]);
+ form.append('model','whisper-large-v3-turbo');
+ form.append('language',lang==='ne-NP'?'ne':'en');
+ form.append('response_format','verbose_json');form.append('temperature','0');
+ // Keep the original language. The translations endpoint would turn Nepali
+ // into English before the learner can review what they actually said.
+ try{
+  const response=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
+   method:'POST',headers:{Authorization:'Bearer '+key},body:form,
+   signal:AbortSignal.timeout(20000)
+  });
+  if(!response.ok)return {code:503,data:{status:'unavailable',message:'Speech input is temporarily unavailable'}};
+  const result=await response.json();
+  if(!Number.isFinite(result.duration)||result.duration>31)
+   return {code:400,data:{status:'error',message:'Use a recording shorter than 30 seconds'}};
+  const text=take(result.text,2000);
+  return {code:200,data:{status:'ok',text}};
+ }catch(_){return {code:503,data:{status:'unavailable',message:'Speech input timed out'}};}
+}
 export default async function({req,res}){
  const reply=(payload,code=200)=>res.json(payload,code,{
   'Cache-Control':'no-store','Pragma':'no-cache'
@@ -148,8 +188,18 @@ export default async function({req,res}){
  if(!user)return reply({status:'error',message:'Verified active membership or trial required'},403);
  let input;
  try{input=bodyOf(req)}catch(_){return reply({status:'error',message:'Invalid JSON'},400)}
+ if(input?.action==='capabilities')return reply({status:'ok',
+  tts:!!((process.env.AZURE_SPEECH_KEY&&process.env.AZURE_SPEECH_REGION)||process.env.GEMINI_API_KEY),
+  transcription:process.env.SPEECH_TRANSCRIPTION_ENABLED==='1'&&!!process.env.GROQ_API_KEY
+ });
+ if(input?.action==='transcribe'){
+  if(!allowed(user))return reply({status:'unavailable',message:'Try again shortly'},429);
+  const result=await transcribe(input);return reply(result.data,result.code);
+ }
  const text=take(input?.text,1200);
- const lang=input?.lang,gender=input?.gender;
+ // The app requests one consistent voice per language. Retain compatibility
+ // with old authenticated clients without exposing a gender selector again.
+ const lang=input?.lang,gender=input?.gender||'female';
  if(!VOICES[lang]||!['female','male'].includes(gender)||
    !text||text.length>550||Buffer.byteLength(text,'utf8')>2200)
   return reply({status:'error',message:'Invalid speech input'},400);
@@ -194,3 +244,4 @@ export default async function({req,res}){
   return reply({status:'unavailable',message:'Natural speech timed out'},503);
  }
 }
+

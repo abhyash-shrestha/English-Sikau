@@ -5,19 +5,27 @@ on:
     paths:
       - 'functions/neural-speech/**'
       - 'nepali-voice-bridge.js'
+      - 'speech-input.js'
+      - 'index.html'
       - 'reading-dashboard.js'
       - 'translate-studio-v4.js'
       - 'test/neural-speech-function.test.mjs'
       - 'test/nepali-voice-bridge.test.mjs'
+      - 'test/speech-input.test.mjs'
+      - 'test/speech-transcription-function.test.mjs'
       - '.github/workflows/neural-speech.yml'
   pull_request:
     paths:
       - 'functions/neural-speech/**'
       - 'nepali-voice-bridge.js'
+      - 'speech-input.js'
+      - 'index.html'
       - 'reading-dashboard.js'
       - 'translate-studio-v4.js'
       - 'test/neural-speech-function.test.mjs'
       - 'test/nepali-voice-bridge.test.mjs'
+      - 'test/speech-input.test.mjs'
+      - 'test/speech-transcription-function.test.mjs'
 jobs:
   speech:
     runs-on: ubuntu-latest
@@ -33,7 +41,9 @@ jobs:
         run: |
           node --check functions/neural-speech/src/main.js
           node --check nepali-voice-bridge.js
+          node --check speech-input.js
           node --check reading-dashboard.js
           node --check translate-studio-v4.js
       - name: Run isolated tests (no external speech requests or secrets)
-        run: node --test test/neural-speech-function.test.mjs test/nepali-voice-bridge.test.mjs
+        run: node --test test/neural-speech-function.test.mjs test/nepali-voice-bridge.test.mjs test/speech-input.test.mjs test/speech-transcription-function.test.mjs
+

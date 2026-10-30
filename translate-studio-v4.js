@@ -256,7 +256,14 @@ window.enhanceTranslationDashboard=function(d){
    recognition.interimResults=false;
    recognition.onresult=e=>{const phrase=e.results?.[0]?.[0]?.transcript;
     if(phrase){ensureTyping();safeInput(d,input,phrase);notice.textContent='Speech captured. Press Translate · अनुवाद थिच्नुहोस्।';}};
-   recognition.onerror=()=>{notice.textContent='Microphone unavailable or permission denied · माइक्रोफोनको अनुमति छैन।';};
+   recognition.onerror=e=>{
+    notice.textContent=e.error==='not-allowed'?
+     'Allow the microphone for this site in browser settings. · माइक्रोफोनको अनुमति दिनुहोस्।':
+     e.error==='language-not-supported'||e.error==='service-not-allowed'?
+      'This browser cannot recognize this language. You can type instead. · यो भाषा बोलेर लेख्न मिलेन। टाइप गर्नुहोस्।':
+      e.error==='no-speech'?'No speech heard. Please try again. · आवाज सुनिएन। फेरि प्रयास गर्नुहोस्।':
+       'Speech input could not connect. Try again. · फेरि प्रयास गर्नुहोस्।';
+   };
    recognition.onend=()=>{recognition=null;};
    recognition.start();notice.textContent='Listening… · सुन्दैछ…';
   }catch(_){recognition=null;notice.textContent='Unable to start the microphone · माइक्रोफोन सुरु भएन।';}
@@ -273,7 +280,6 @@ window.enhanceTranslationDashboard=function(d){
  speakOut.addEventListener('click',()=>{
   const txt=resultText(),v=d.defaultView;
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
-  if(!v.speechSynthesis||!v.SpeechSynthesisUtterance){notice.textContent='Audio is unavailable in this browser. · आवाज उपलब्ध छैन।';return}
   const outputLanguage=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
   // Both languages now share one speaker each: US-English / Nepali (Nepal).
   // Explicitly route the Listen button so iOS Safari does not need a
