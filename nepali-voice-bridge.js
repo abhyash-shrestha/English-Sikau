@@ -55,11 +55,20 @@ const choose=(synth,locale)=>{
 const short=(value)=>String(value||'').replace(/\s+/g,' ').trim().slice(0,140);
 const isGender=(control)=>{
  if(!control)return false;
- const value=String(control?.matches?.('input')?control.value:control.textContent||'').trim();
- const direct=String(control?.getAttribute?.('aria-label')||'')+' '+String(control?.getAttribute?.('data-voice-gender')||'');
- return /^(?:♂|♀|male|female|पुरुष|महिला|पुरूष)(?:\s+(?:voice|आवाज))?$/i.test(value)||
+ const raw=String(control?.matches?.('input')?control.value:control.textContent||'').trim();
+ const clean=raw.replace(/[👨👩♂♀️🔊🔉]/gu,'').trim();
+ const hint=[control.getAttribute?.('aria-label'),control.getAttribute?.('title'),
+  control.getAttribute?.('class'),control.getAttribute?.('id')].join(' ');
+ const selector=control.closest?.('.voice-options,.voice-controls,.voice-select,'+
+  '.voice-gender,.sikau-voice-gender,.story-actions,.ttx-result-actions,'+
+  '[data-voice-selector]');
+ const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts)\b/i.test(hint)||
+   !!control.getAttribute?.('data-voice-gender');
+ // Do not remove answers in a story or quiz just because they say Male/Female.
+ if(!hasVoiceContext)return false;
+ return /^(?:male|female|पुरुष|महिला|पुरूष)(?:\s+(?:voice|आवाज))?$/i.test(clean)||
   /^(?:male|female)$/i.test(String(control?.value||''))||
-  /\b(?:male|female)\s+voice\b/i.test(direct)||
+  /\b(?:male|female)\s+voice\b/i.test(hint)||
   /^(?:male|female)$/i.test(String(control?.getAttribute?.('data-gender')||''));
 };
 function install(doc){
