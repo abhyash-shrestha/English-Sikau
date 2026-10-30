@@ -72,7 +72,7 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\):not\(\.sikau-featured-book\)/);
  assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
- assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clear-modes-r5/);
+ assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clean-toolbar-r8/);
  assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-clean-toolbar-r8/);
 });
 
