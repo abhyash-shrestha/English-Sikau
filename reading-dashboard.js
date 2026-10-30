@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261021-dark-contrast-r1',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261030-featured-visible-r2',document.baseURI).href;
 // The shared audio bridge is loaded once by the authenticated wrapper.
  // No per-tab script injections, duplicate speech handlers, or race conditions.
 
