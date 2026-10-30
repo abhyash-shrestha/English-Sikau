@@ -1176,7 +1176,7 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
 <script src="./coach-adaptive-story.js?v=20261028-realistic-flow-r8&coach=20261029-context-r1"></script>
 <script src="./coach-drafts.js?v=20261028-payment-replies-r12&coach=20261029-context-r1"></script>
 <script src="./coach-pagination.js?v=20261029-pagination25-r1"></script>
-<script src="./coach-dashboard.js?v=20261029-pagination25-r1"></script>
+<script src="./coach-dashboard.js?v=20261030-always-visible-visa-r1"></script>
 <script src="./coach-v4-mount.js?v=20261029-student-name-r7"></script>
 <script src="./translate-studio-v4.js?v=20261030-single-voice-r1"></script>
 <script src="./sidebar-unified.js?v=20261029-desktop-tab-drag-r2"></script>
@@ -2800,6 +2800,10 @@ function personalizeStudentLesson(){
     try{fn();}catch(error){console.warn('English Sikau UI enhancement:',name,error);}
   };
   uiStep('responsive all tabs',()=>window.enhanceUnifiedStudentUI?.(doc));
+  // U.S. Visa Interview must be present immediately, even if native Coach
+  // has not initialized (common on Android, iOS and slow laptop refreshes).
+  uiStep('always-visible Visa tab',()=>window.sikauEnsureVisaNav?.(
+   doc,()=>window.enhanceCoachDashboard?.(doc,first,user.$id)));
   uiStep('one bilingual speech player',()=>window.enhanceUnifiedSpeech?.(doc));
   uiStep('words vocabulary',()=>window.enhanceWordsDashboard?.(doc));
   uiStep('writing coach',()=>window.enhanceWritingCoachDashboard?.(doc));
