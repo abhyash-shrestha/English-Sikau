@@ -1108,6 +1108,16 @@ html[data-sikau-theme="dark"] #sikauBootCard strong{color:#ffacc9}
 html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
 #protected[data-sikau-booting="1"] #lessonFrame{visibility:hidden!important;pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){#sikauBootSpinner{animation:none;border-top-color:#b71950}}
+
+/* Account feedback stays beside the action on mobile and desktop. */
+.auth-feedback{margin:12px 0;padding:12px 14px;border:1px solid #efb6c5;border-radius:12px;background:#fff0f4;color:#9e183c;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.auth-feedback[hidden]{display:none!important}
+.auth-field-hint{font-size:12px;line-height:1.5;min-height:18px;margin:4px 0 8px;color:#66576a}
+.auth-code-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0}
+.auth-code-actions .primary{width:100%}
+#activeForm [aria-invalid="true"]{border-color:#c72350;outline-color:#c72350}
+html[data-sikau-theme="dark"] .auth-feedback{background:#381c30;color:#ffc4d7;border-color:#79405b}
+html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
 </style>
 </head>
 <body>
@@ -1143,7 +1153,7 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
 <path d="M45 82q7-7 15 0m32 7q8-8 15 0m457-6q8-9 16 0" stroke="#592a53" stroke-width="2" fill="none" stroke-linecap="round"/>
 </svg>
 </header>
-<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">🔒 Your account is checked by Appwrite. Creating an account does not unlock paid lessons. Never share your password or verification code.</p><footer class="footer-credit" aria-label="English Sikau creator"><div class="nepal-landscape" aria-hidden="true"><span class="landscape-sun"></span><span class="landscape-ridge ridge-back"></span><span class="landscape-ridge ridge-front"></span><span class="landscape-temple left">🏯</span><span class="landscape-temple right">🏯</span><span class="landscape-birds">⌁　⌁</span></div><span class="credit-line">Made with ❤️ in Nepal by <strong>Abhyash.</strong></span><span class="credit-nepali">नेपालमा मायाले बनाइएको · अभ्यास</span></footer></main>
+<main class="content"><div class="auth-eyebrow"><span class="tag">🔐 SECURE ACCOUNT · सुरक्षित खाता</span><span class="auth-step">Created by <strong>अभ्यास · Abhyash</strong></span></div><div id="screen"></div><div id="message" role="status" class="msg">Checking your session…</div><hr><p class="notice">Use your own email so you can receive your sign-in code. · लगइन कोड पाउन आफ्नो इमेल प्रयोग गर्नुहोस्।</p><footer class="footer-credit" aria-label="English Sikau creator"><div class="nepal-landscape" aria-hidden="true"><span class="landscape-sun"></span><span class="landscape-ridge ridge-back"></span><span class="landscape-ridge ridge-front"></span><span class="landscape-temple left">🏯</span><span class="landscape-temple right">🏯</span><span class="landscape-birds">⌁　⌁</span></div><span class="credit-line">Made with ❤️ in Nepal by <strong>Abhyash.</strong></span><span class="credit-nepali">नेपालमा मायाले बनाइएको · अभ्यास</span></footer></main>
 </div></div>
 <section id="protected" class="hide" aria-label="Protected English Sikau student application"><div id="bar" class="student-topbar">
   <div class="student-topbar-brand" aria-label="English Sikau · अंग्रेजी सिकौं">
@@ -1575,20 +1585,197 @@ const verifiedAccountLine=u=>`<p class="muted" style="font-size:13px;line-height
   <span style="display:block">Membership on this device · यो उपकरणको सदस्यता:
   ${paid(u)?'✅ Lifetime confirmed · आजीवन पुष्टि':'⚠️ Lifetime not confirmed · आजीवन पुष्टि भएन'}</span>
 </p>`;
-function showMsg(t,type=''){const el=$('message');el.className='msg'+(type?' '+type:'');el.textContent=t}
+function showMsg(t,type=''){const el=$('message');el.hidden=!t;el.className='msg'+(type?' '+type:'');el.textContent=t}
 function shortError(e){if(!navigator.onLine)return 'No internet connection. · इन्टरनेट छैन।';const code=Number(e?.code||0);if(code===429)return 'Too many requests. Please wait. · धेरै पटक प्रयास भयो।';if(code===409)return 'Account already exists. Please sign in. · खाता बनिसकेको छ।';return (String(e?.message||e||'Unknown issue')).slice(0,240)}
+/* Smooth account creation. Passwords and verification codes stay in the form;
+   only email/name and the pending verification step may survive a refresh. */
+let authDraft={email:'',first:'',last:''},authCodePurpose='signin';
+let authCountdown=null,authBusyLabel='';
+const authModes=new Set(['signin','signup','emailcode','verify','forgot','reset']);
+function rememberAuthFields(){
+ for(const key of ['email','first','last']){
+  const input=$(key);if(input)authDraft[key]=input.value.trim();
+ }
+}
+function authFieldError(message,field){return Object.assign(Error(message),{field});}
+function checkNewPassword(){
+ const password=$('password')?.value||'',confirm=$('confirm')?.value||'';
+ if(password.length<8||password.length>256)
+  throw authFieldError('Use 8–256 characters. · ८ देखि २५६ अक्षर प्रयोग गर्नुहोस्।','password');
+ if(password!==confirm)
+  throw authFieldError('The passwords do not match. · दुवै पासवर्ड उस्तै राख्नुहोस्।','confirm');
+ return password;
+}
+function authFailure(error){
+ const type=String(error?.type||''),code=Number(error?.code||0);
+ let message=error?.message||'Please try again. · फेरि प्रयास गर्नुहोस्।',field=error?.field;
+ if(navigator.onLine===false)message='No internet connection. Your details are still here. · इन्टरनेट जाँच्नुहोस्।';
+ else if(type==='password_pwned'||/exposed.*data breach|known data breach/i.test(message)){
+  message='This password was exposed online. Choose another, or use an email code below. · अर्को पासवर्ड रोज्नुहोस् वा इमेल कोड प्रयोग गर्नुहोस्।';field='password';
+ }else if(type==='user_password_reset_required'){
+  message='Please reset this password, or sign in with an email code. · पासवर्ड बदल्नुहोस् वा इमेल कोडबाट लगइन गर्नुहोस्।';field='password';
+ }else if(code===409){
+  message='An account already uses this email. Log in or use an email code. · यो इमेलको खाता छ। लगइन वा इमेल कोड प्रयोग गर्नुहोस्।';field='email';
+ }else if(mode==='verify'&&(type==='user_invalid_token'||type==='user_not_found'||code===401)){
+  message='The code is incorrect or expired. Try again or request a new code. · कोड गलत छ वा म्याद सकियो। नयाँ कोड माग्नुहोस्।';field='otp';
+ }else if(mode==='signin'&&(type==='user_invalid_credentials'||code===401)){
+  message='The email or password did not match. Try again or use an email code. · इमेल वा पासवर्ड मिलेन।';field='password';
+ }else if(type==='general_pwned_passwords_unavailable'){
+  message='Password checking is temporarily unavailable. Try again or use an email code. · फेरि प्रयास गर्नुहोस् वा इमेल कोड प्रयोग गर्नुहोस्।';
+ }else if(code===429){
+  message='Please wait a minute before trying again. · एक मिनेटपछि फेरि प्रयास गर्नुहोस्।';
+ }else if(!error?.field&&type!=='verification_delivery_failed'){
+  message=shortError(error);
+ }
+ showMsg(message,'error');
+ const feedback=$('authFeedback');
+ if(feedback){feedback.textContent=message;feedback.hidden=false;$('message').hidden=true;}
+ const input=field&&$(field);
+ if(input){input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby','authFeedback');input.focus();}
+}
+function syncAuthBusy(label=authBusyLabel){
+ const screen=$('screen');if(!screen)return;
+ screen.setAttribute('aria-busy',String(busy));
+ if(!authModes.has(mode))return;
+ for(const button of screen.querySelectorAll('button[type="submit"],[data-mode],[data-auth-code],[data-auth-resend]')){
+  button.disabled=busy||!!(button.hasAttribute('data-auth-resend')&&pending?.retryAt>Date.now());
+  if(button.type==='submit'){
+   if(!button.dataset.readyLabel)button.dataset.readyLabel=button.textContent;
+   button.textContent=busy?(label||'Please wait… · पर्खनुहोस्…'):button.dataset.readyLabel;
+  }
+ }
+}
+function bindAuthExperience(){
+ clearInterval(authCountdown);authCountdown=null;
+ if(!authModes.has(mode))return;
+ for(const key of ['email','first','last']){
+  const input=$(key);if(input&&!input.value)input.value=authDraft[key]||'';
+ }
+ const email=$('email');
+ if(email){email.inputMode='email';email.autocapitalize='none';email.spellcheck=false;}
+ const password=$('password'),confirm=$('confirm'),feedback=$('authFeedback');
+ for(const input of [email,$('first'),$('last'),password,confirm].filter(Boolean)){
+  input.addEventListener('input',()=>{
+   input.removeAttribute('aria-invalid');input.removeAttribute('aria-describedby');
+   if(feedback){feedback.hidden=true;feedback.textContent='';}
+  });
+ }
+ if(password&&confirm){
+  const update=()=>{
+   const length=password.value.length,lengthHint=$('passwordLength'),matchHint=$('passwordMatch');
+   if(lengthHint)lengthHint.textContent=length===0?'8–256 characters · ८ देखि २५६ अक्षर':
+    length<8?length+' / 8 characters · कम्तीमा ८ अक्षर':length>256?'Use no more than 256 characters. · २५६ अक्षरसम्म राख्नुहोस्।':
+     '✓ Length is good · पासवर्डको लम्बाइ मिल्यो';
+   confirm.setCustomValidity(confirm.value&&confirm.value!==password.value?
+    'Passwords do not match. · दुवै पासवर्ड उस्तै राख्नुहोस्।':'');
+   if(matchHint)matchHint.textContent=!confirm.value?'':confirm.value===password.value?
+    '✓ Passwords match · पासवर्ड मिल्यो':'Passwords do not match yet · पासवर्ड अझै मिलेन';
+  };
+  password.addEventListener('input',update);confirm.addEventListener('input',update);update();
+ }
+ const otp=$('otp');
+ if(otp){
+  otp.inputMode='numeric';otp.maxLength=6;otp.minLength=6;otp.pattern='[0-9]{6}';otp.enterKeyHint='go';
+  otp.addEventListener('input',()=>{
+   otp.value=otp.value.replace(/[०-९]/g,c=>String(c.charCodeAt(0)-0x0966)).replace(/\D/g,'').slice(0,6);
+   otp.removeAttribute('aria-invalid');otp.removeAttribute('aria-describedby');if(feedback)feedback.hidden=true;
+  });
+  otp.addEventListener('paste',event=>{
+   const text=event.clipboardData?.getData('text');if(!text)return;
+   event.preventDefault();otp.value=text.replace(/[०-९]/g,c=>String(c.charCodeAt(0)-0x0966)).replace(/\D/g,'').slice(0,6);
+   otp.removeAttribute('aria-invalid');otp.removeAttribute('aria-describedby');if(feedback)feedback.hidden=true;
+  });
+  if(mode==='verify')otp.focus();
+ }
+ $('screen').querySelectorAll('[data-auth-code]').forEach(button=>button.addEventListener('click',()=>{
+  if(!busy)go('emailcode',{purpose:button.dataset.authCode});
+ }));
+ const resend=$('authResend');
+ if(resend){
+  const update=()=>{
+   const seconds=Math.max(0,Math.ceil(((pending?.retryAt||0)-Date.now())/1000));
+   resend.disabled=busy||seconds>0;
+   resend.textContent=seconds?'Send again in '+seconds+'s · '+seconds+' सेकेन्डपछि':
+    pending?.codeSent===false?'Send verification code · कोड पठाउनुहोस्':'Send a new code · नयाँ कोड पठाउनुहोस्';
+  };
+  resend.addEventListener('click',()=>{void resendAuthCode();});update();
+  authCountdown=setInterval(update,1000);
+ }
+ syncAuthBusy();
+}
+async function requestAuthCode(details){
+ if(details.requiresSignout){
+  // A password login can leave an unverified session active. Close only that
+  // same unverified session before exchanging its email code for a session.
+  let current=null;
+  try{current=await account.get();}catch(error){if(Number(error?.code)!==401)throw error;}
+  if(current&&current.emailVerification!==true&&current.email?.toLowerCase()===details.email)
+   await account.deleteSession('current');
+  details={...details,requiresSignout:false};
+  if(pending?.email===details.email)savePending(details);
+ }
+ const token=await account.createEmailToken(ID.unique(),details.email);
+ if(typeof token?.userId!=='string'||!token.userId)throw Error('Could not send a verification code. Please try again.');
+ const expiry=Date.parse(token.expire||'');
+ savePending({...details,userId:token.userId,requiresSignout:false,codeSent:true,
+  until:Number.isFinite(expiry)?expiry:Date.now()+15*60*1000,retryAt:Date.now()+60000});
+}
+async function registerAuthAccount(){
+ const password=checkNewPassword();rememberAuthFields();
+ const email=authDraft.email.toLowerCase(),name=[authDraft.first,authDraft.last].filter(Boolean).join(' ');
+ if(!name)throw authFieldError('Enter your name. · आफ्नो नाम लेख्नुहोस्।','first');
+ const created=await account.create(ID.unique(),email,password,name);
+ savePending({email,name,purpose:'signup',userId:created.$id,codeSent:false});
+ mode='verify';show();
+ try{
+  await requestAuthCode(pending);show();
+  showMsg('Account created. Enter the code from your email. · इमेलको कोड राख्नुहोस्।','ok');
+ }catch(error){
+  if(Number(error?.code)===429)savePending({...pending,retryAt:Date.now()+60000});
+  show();throw Object.assign(Error('Your account was created. We could not send the code. Tap Send verification code to retry. · खाता बन्यो। कोड फेरि पठाउनुहोस्।'),{type:'verification_delivery_failed'});
+ }
+}
+async function startAuthEmailCode(){
+ rememberAuthFields();
+ const details={email:authDraft.email.toLowerCase(),purpose:authCodePurpose,
+  name:authCodePurpose==='signup'?[authDraft.first,authDraft.last].filter(Boolean).join(' '):''};
+ await requestAuthCode(details);mode='verify';show();
+ showMsg('Enter the 6-digit code from your email. · इमेलको ६-अङ्कको कोड राख्नुहोस्।','ok');
+}
+async function resendAuthCode(){
+ if(busy||!pending||pending.retryAt>Date.now())return;
+ busy=true;authBusyLabel='Sending code… · कोड पठाउँदै…';syncAuthBusy();
+ try{await requestAuthCode(pending);show();showMsg('A new code was sent. Use the latest email. · पछिल्लो इमेलको कोड प्रयोग गर्नुहोस्।','ok');}
+ catch(error){
+  if(Number(error?.code)===429)savePending({...pending,retryAt:Date.now()+60000});
+  authFailure(error);
+ }finally{busy=false;authBusyLabel='';syncAuthBusy();}
+}
+async function verifyAuthCode(){
+ if(!pending||pending.codeSent===false)throw Error('Request an email code first. · पहिले कोड माग्नुहोस्।');
+ const otp=($('otp')?.value||'').trim();
+ if(!/^\d{6}$/.test(otp))throw authFieldError('Enter all 6 digits. · ६-अङ्कको कोड राख्नुहोस्।','otp');
+ const name=pending.purpose==='signup'?pending.name:'';
+ await account.createSession(pending.userId,otp);
+ pending=null;try{sessionStorage.removeItem('sikau-v2-pending-otp');}catch(_){}
+ if(name){
+  try{const profile=await account.get();if(!profile.name?.trim())await account.updateName(name);}catch(_){}
+ }
+ await session();
+}
+/* End smooth account helpers. */
 function makeInput(id,label,type='text',autocomplete='',value='',required=true){return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" autocomplete="${autocomplete}" maxlength="254" ${required?'required':''} value="${escapeHTML(value)}"></div>`}
-function pwd(id,label,autocomplete='current-password'){return `<div class="field"><label for="${id}">${label}</label><div class="secret"><input id="${id}" type="password" minlength="8" maxlength="256" autocomplete="${autocomplete}" required><button type="button" data-show="${id}">Show</button></div></div>`}
+function pwd(id,label,autocomplete='current-password'){return `<div class="field"><label for="${id}">${label}</label><div class="secret"><input id="${id}" type="password" ${autocomplete==='new-password'?'minlength="8" ':''}maxlength="256" autocomplete="${autocomplete}" autocapitalize="none" spellcheck="false" required><button type="button" data-show="${id}" aria-label="Show ${id==='confirm'?'confirmation password':'password'}">Show</button></div></div>${autocomplete==='new-password'?`<p class="auth-field-hint" id="${id==='confirm'?'passwordMatch':'passwordLength'}" aria-live="polite"></p>`:''}`}
 function navButton(mode,label){return `<button type="button" class="tertiary" data-mode="${mode}">${label}</button>`}
-function form(title,inner,button){return `<h2>${title}</h2><form id="activeForm">${inner}<button type="submit" class="primary">${button}</button></form>`}
+function form(title,inner,button){return `${title?`<h2>${title}</h2>`:''}<form id="activeForm">${inner}<div id="authFeedback" class="auth-feedback" role="alert" hidden></div><button type="submit" class="primary">${button}</button></form>`}
 function authTabs(active){return `<div class="auth-tabs" role="tablist" aria-label="Account options"><button type="button" role="tab" aria-selected="${active==='signin'}" class="auth-tab${active==='signin'?' active':''}" data-mode="signin"><span class="tab-icon" aria-hidden="true">●</span> Log in <span>लगइन</span></button><button type="button" role="tab" aria-selected="${active==='signup'}" class="auth-tab${active==='signup'?' active':''}" data-mode="signup"><span class="tab-icon" aria-hidden="true">✚</span> Create account <span>खाता बनाउनुहोस्</span></button></div>`}
 function paymentHelp(){return `Need help? · भुक्तानी सहायता <a href="https://wa.me/${CFG.whatsapp}" target="_blank" rel="noopener noreferrer">WhatsApp +977-9813419260 ↗</a>`}
 function show(){$('panel').dataset.mode=mode;let out='';const name=escapeHTML(user?.name||user?.email||'Student');switch(mode){
 case 'welcome':out=`${authTabs('signin')}<h2 class="auth-title">Welcome to English Sikau</h2><p class="auth-description">स्वागत छ! Sign in to keep learning, or create your own account to get started.</p><div class="stack"><button type="button" class="primary" data-mode="signin">Log in · लगइन</button><button type="button" class="secondary" data-mode="signup">Create a new account · नयाँ खाता बनाउनुहोस्</button></div>`;break;
 case 'signin':out=`${authTabs('signin')}<div class="auth-intro"><h2 class="auth-title">Welcome back <span>फेरि स्वागत छ!</span></h2><p class="auth-description">Sign in to continue your English-learning journey.<br><span lang="ne">सिकाइ जारी राख्न लगइन गर्नुहोस्।</span></p><span class="auth-doodle" aria-hidden="true">☀<small>A brighter<br>You awaits ♡</small></span></div>${form('',makeInput('email','Email address · इमेल','email','email')+pwd('password','Password · पासवर्ड'),'Log in · लगइन')}<div class="auth-linkrow">${navButton('forgot','Forgot password? · पासवर्ड बिर्सनुभयो?')}</div><div class="auth-alt"><span>Or</span></div><button type="button" class="secondary auth-email-btn" data-mode="emailcode">✉ Sign in with email code · इमेल कोडबाट</button><p class="auth-bottom">New to English Sikau? ${navButton('signup','Create an account · खाता बनाउनुहोस्')}</p>`;break;
-case 'signup':out=`${authTabs('signup')}<div class="auth-intro"><h2 class="auth-title">Create your account <span>आफ्नो खाता बनाउनुहोस्!</span></h2><p class="auth-description">Join English Sikau and start your English-learning journey today.<br><span lang="ne">आजै English Sikau मा जोडिनुहोस् र अंग्रेजी सिक्न सुरु गर्नुहोस्।</span></p><span class="auth-doodle" aria-hidden="true">☀<small>A brighter<br>You awaits ♡</small></span></div>${form('',`<div class="pair">${makeInput('first','First name · नाम','text','given-name')}${makeInput('last','Last name · थर','text','family-name')}</div>`+makeInput('email','Email address · इमेल','email','email')+pwd('password','Create password · पासवर्ड बनाउनुहोस्','new-password')+pwd('confirm','Confirm password · पासवर्ड पुष्टि','new-password')+`<p class="password-help">ⓘ Must be at least 8 characters. · कम्तीमा ८ अक्षर हुनुपर्छ।</p>`,'Create account · खाता बनाउनुहोस्')}<p class="auth-description auth-verification">✉ We will send a 6-digit email verification code.<br><span lang="ne">इमेलमा ६-अङ्कको कोड पठाइनेछ।</span></p><p class="auth-bottom">Already registered? ${navButton('signin','Log in · लगइन')}</p>`;break;
-case 'emailcode':out=form('Sign in with email code',makeInput('email','Email · इमेल','email','email'),'Send 6-digit email code')+navButton('signin','← Sign in with password');break;
-case 'verify':out=form('Verify your email · इमेल प्रमाणित गर्नुहोस्',`<p class="muted">Enter the six-digit code sent to ${escapeHTML(pending?.email||'your email')}.</p>`+makeInput('otp','6-digit code · ६-अङ्कको कोड','text','one-time-code'),'Verify and continue')+navButton('emailcode','Request another code');break;
+case 'signup':out=`${authTabs('signup')}<div class="auth-intro"><h2 class="auth-title">Create your account <span>आफ्नो खाता बनाउनुहोस्!</span></h2><p class="auth-description">Join English Sikau and start your English-learning journey today.<br><span lang="ne">आजै English Sikau मा जोडिनुहोस् र अंग्रेजी सिक्न सुरु गर्नुहोस्।</span></p><span class="auth-doodle" aria-hidden="true">☀<small>A brighter<br>You awaits ♡</small></span></div>${form('',`<div class="pair">${makeInput('first','First name · नाम','text','given-name')}${makeInput('last','Last name · थर','text','family-name')}</div>`+makeInput('email','Email address · इमेल','email','email')+pwd('password','Create password · पासवर्ड बनाउनुहोस्','new-password')+pwd('confirm','Confirm password · पासवर्ड पुष्टि','new-password'),'Create account · खाता बनाउनुहोस्')}<div class="auth-alt"><span>Or · वा</span></div><button type="button" class="secondary auth-email-btn" data-auth-code="signup">✉ Create with email code · इमेल कोडबाट खाता बनाउनुहोस्</button><p class="auth-description auth-verification">✉ We will send a 6-digit email verification code.<br><span lang="ne">इमेलमा ६-अङ्कको कोड पठाइनेछ।</span></p><p class="auth-bottom">Already registered? ${navButton('signin','Log in · लगइन')}</p>`;break;
+case 'emailcode':out=form(authCodePurpose==='signup'?'Create with email code · इमेल कोडबाट खाता बनाउनुहोस्':'Sign in with email code · इमेल कोडबाट लगइन',`<p class="auth-description">We will email you a 6-digit code. No password needed. · इमेलमा ६-अङ्कको कोड आउनेछ। पासवर्ड चाहिँदैन।</p>`+(authCodePurpose==='signup'?`<div class="pair">${makeInput('first','First name · नाम','text','given-name')}${makeInput('last','Last name · थर','text','family-name','',false)}</div>`:'')+makeInput('email','Email · इमेल','email','email'),'Send email code · इमेल कोड पठाउनुहोस्')+navButton(authCodePurpose==='signup'?'signup':'signin','← Use a password · पासवर्ड प्रयोग गर्नुहोस्');break;
+case 'verify':out=(pending?.codeSent===false?`<h2>Verify your email · इमेल प्रमाणित गर्नुहोस्</h2><p class="auth-description">Your account is ready. Send a code to ${escapeHTML(pending?.email||'your email')} to continue.<br>खाता तयार छ। अगाडि बढ्न इमेलमा कोड पठाउनुहोस्।</p>`:form('Check your email · इमेल हेर्नुहोस्',`<p class="auth-description">Enter the 6-digit code sent to <strong>${escapeHTML(pending?.email||'your email')}</strong>. Check Spam/Junk if needed.<br>इमेलमा आएको ६-अङ्कको कोड राख्नुहोस्। Spam/Junk पनि हेर्नुहोस्।</p>`+makeInput('otp','Email code · इमेल कोड','text','one-time-code'),'Verify and continue · प्रमाणित गरी अगाडि बढ्नुहोस्'))+`<div class="auth-code-actions"><button id="authResend" type="button" class="${pending?.codeSent===false?'primary':'secondary'}" data-auth-resend>Send verification code · कोड पठाउनुहोस्</button>${navButton('emailcode','Change email · इमेल बदल्नुहोस्')}</div>`;break;
 case 'forgot':out=form('Reset password · पासवर्ड परिवर्तन',makeInput('email','Account email · इमेल','email','email'),'Send recovery link')+navButton('signin','← Sign in');break;
 case 'reset':out=form('Choose a new password',pwd('password','New password','new-password')+pwd('confirm','Confirm new password','new-password'),'Reset password');break;
 case 'idlogin':mode='signin';show();showMsg('Sign in with your own verified Appwrite account.');return;
@@ -1741,10 +1928,18 @@ case 'locked':out=`<h2>🔒 Access is not approved</h2><p class="muted">We could
 }
 $('screen').innerHTML=out;if(mode==='signin'||mode==='signup'){for(const [id,v] of Object.entries({first:'Your first name',last:'Your last name',email:'your@email.com',password:mode==='signup'?'Create a password':'Enter your password',confirm:'Confirm your password'})){const el=$(id);if(el)el.placeholder=v}}
 $('screen').querySelectorAll('[data-mode]').forEach(x=>x.addEventListener('click',()=>action(x.dataset.mode)));
-$('screen').querySelectorAll('[data-show]').forEach(x=>x.addEventListener('click',()=>{const input=$(x.dataset.show);input.type=input.type==='password'?'text':'password';x.textContent=input.type==='password'?'Show':'Hide'}));
+$('screen').querySelectorAll('[data-show]').forEach(x=>x.addEventListener('click',()=>{const input=$(x.dataset.show);input.type=input.type==='password'?'text':'password';x.textContent=input.type==='password'?'Show':'Hide';x.setAttribute('aria-label',(input.type==='password'?'Show ':'Hide ')+(x.dataset.show==='confirm'?'confirmation password':'password'));}));
 $('activeForm')?.addEventListener('submit',submit);$('paymentForm')?.addEventListener('submit',sendClaim);
+bindAuthExperience();
 }
-function go(next){mode=next;showMsg('Choose an option to continue.');show()}
+function go(next,{purpose='signin'}={}){
+ rememberAuthFields();
+ const nextPurpose=mode==='verify'&&next==='emailcode'&&pending?.purpose==='signup'?'signup':purpose;
+ if(mode==='verify'&&next!=='verify'){pending=null;try{sessionStorage.removeItem('sikau-v2-pending-otp');}catch(_){}}
+ if(next==='emailcode')authCodePurpose=nextPurpose;
+ mode=next;show();showMsg('');
+ ($('first')||$('email'))?.focus();
+}
 async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['https://cdn.jsdelivr.net/npm/appwrite@17.0.0/dist/iife/sdk.js','https://unpkg.com/appwrite@17.0.0/dist/iife/sdk.js']){try{await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.integrity='sha384-phNZum4lHcy1EBX3U1LcBErZWMZklS/yJ2NzJIk5VOJWDDYwavQurpyRdrH2uHZj';s.crossOrigin='anonymous';s.referrerPolicy='no-referrer';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});sdk=window.Appwrite;if(sdk)break}catch(_){}}}if(!sdk)throw Error('Could not load the Appwrite SDK.');const client=new sdk.Client().setEndpoint(CFG.endpoint).setProject(CFG.project);account=new sdk.Account(client);functions=new sdk.Functions(client);ID=sdk.ID;}
 
 
@@ -2995,9 +3190,11 @@ async function session({silentGuest=false}={}){
     const a=await account.get();
     if(!a?.$id)throw Error('No session');
     if(a.emailVerification!==true){
-      user=null;mode='signin';
-      showMsg('Please verify your email before continuing. · इमेल प्रमाणित गर्नुहोस्।','error');
-      show();return;
+      user=null;authDraft.email=a.email||'';
+      savePending({email:a.email,userId:a.$id,name:a.name,purpose:'signin',codeSent:false,requiresSignout:true});
+      mode='verify';show();
+      showMsg('Verify your email to continue. Tap Send verification code. · अगाडि बढ्न इमेल प्रमाणित गर्नुहोस्।');
+      return;
     }
     user=a;mode='payment';
     if(paid(a)){
@@ -3041,6 +3238,11 @@ async function session({silentGuest=false}={}){
     // but keep real errors visible and do not weaken authentication checks.
     const noSession=Number(e?.code||0)===401 ||
       /(?:role:\s*guests|user_unauthorized|missing scopes.*account)/i.test(String(e?.message||''));
+    if(noSession&&pending?.email&&pending?.userId&&pending.until>Date.now()){
+      authDraft.email=pending.email;mode='verify';show();
+      showMsg(pending.codeSent===false?'Send your verification code to continue. · कोड पठाउनुहोस्।':'Continue with the code from your email. · इमेलको कोड राख्नुहोस्।');
+      return;
+    }
     if(silentGuest && noSession){
       showMsg('Welcome! Sign in to continue learning. · सिक्नका लागि लगइन गर्नुहोस्।');
     }else{
@@ -3404,15 +3606,21 @@ async function trialOpen(){
   }
 }
 async function action(which){if(busy)return;if(['welcome','signin','signup','emailcode','forgot','idlogin'].includes(which))return go(which);if(which==='signout')return signOut();if(which==='checkapproval'){await session();return}if(which==='trialcheck'){await trialCheck();show();return}if(which==='trialstart'){if(!user)return;if(!trialPassReady()){showMsg('Secure trial-pass service has not been configured. Trial not started.','error');return}try{busy=true;showMsg('Recording your first and only trial on the server…');const result=await fnCall(CFG.trial,'start');trial={...result,available:true};show();if(trial?.expiresAt&&Date.now()<Date.parse(trial.expiresAt))await trialOpen()}catch(e){showMsg('Trial could not start: '+shortError(e),'error')}finally{busy=false}return}if(which==='trialopen')return trialOpen()}
-function savePending(next){pending={...next,until:Date.now()+15*60*1000};sessionStorage.setItem('sikau-v2-pending-otp',JSON.stringify(pending))}
-async function submit(e){e.preventDefault();if(busy)return;busy=true;try{const val=id=>($(id)?.value||'').trim();if(mode==='signin'){await account.createEmailPasswordSession(val('email').toLowerCase(),$('password').value);await session()}
-else if(mode==='signup'){if($('password').value!==$('confirm').value)throw Error('Passwords do not match');const name=[val('first'),val('last')].filter(Boolean).join(' ');if(!name)throw Error('Please provide your name');const email=val('email').toLowerCase();await account.create(ID.unique(),email,$('password').value,name);const token=await account.createEmailToken(ID.unique(),email);savePending({email,userId:token.userId});mode='verify';show();showMsg('Account created. Enter the six-digit code emailed to you.','ok')}
-else if(mode==='emailcode'){const email=val('email').toLowerCase();const token=await account.createEmailToken(ID.unique(),email);savePending({email,userId:token.userId});mode='verify';show();showMsg('Enter the six-digit code from your email.','ok')}
-else if(mode==='verify'){if(!pending)throw Error('Request a new email code.');const otp=val('otp');if(!/^\d{6}$/.test(otp))throw Error('Enter all six digits');await account.createSession(pending.userId,otp);pending=null;sessionStorage.removeItem('sikau-v2-pending-otp');await session()}
+function savePending(next){
+ pending={email:String(next.email||'').trim().toLowerCase(),userId:String(next.userId||''),
+  name:String(next.name||'').slice(0,128),purpose:next.purpose==='signup'?'signup':'signin',
+  codeSent:next.codeSent!==false,requiresSignout:next.requiresSignout===true,
+  retryAt:Number(next.retryAt)||0,until:Number(next.until)||Date.now()+15*60*1000};
+ try{sessionStorage.setItem('sikau-v2-pending-otp',JSON.stringify(pending));}catch(_){}
+}
+async function submit(e){e.preventDefault();if(busy)return;busy=true;authBusyLabel=mode==='signup'?'Creating account… · खाता बनाउँदै…':mode==='verify'?'Verifying… · प्रमाणित गर्दै…':mode==='emailcode'?'Sending code… · कोड पठाउँदै…':'Please wait… · पर्खनुहोस्…';syncAuthBusy();try{const val=id=>($(id)?.value||'').trim();if(mode==='signin'){rememberAuthFields();await account.createEmailPasswordSession(val('email').toLowerCase(),$('password').value);await session()}
+else if(mode==='signup'){await registerAuthAccount()}
+else if(mode==='emailcode'){await startAuthEmailCode()}
+else if(mode==='verify'){await verifyAuthCode()}
 else if(mode==='forgot'){await account.createRecovery(val('email'),location.origin+location.pathname+'?reset=1');showMsg('If eligible, your email will receive a password-reset link.','ok')}
 else if(mode==='reset'){if(!recoveryLink?.userId||!recoveryLink?.secret)throw Error('Open the password-reset link from your email again.');if($('password').value!==$('confirm').value)throw Error('Passwords do not match');await account.updateRecovery(recoveryLink.userId,recoveryLink.secret,$('password').value);recoveryLink=null;history.replaceState(null,'',location.pathname);mode='signin';show();showMsg('Password reset. Sign in with your new password.','ok')}
 else if(mode==='idlogin'){mode='signin';show();showMsg('Sign in with your own verified Appwrite account.')}
-}catch(err){showMsg('Unable to continue: '+shortError(err),'error')}finally{busy=false}}
+}catch(err){authFailure(err)}finally{busy=false;authBusyLabel='';syncAuthBusy()}}
 async function sendClaim(e){e.preventDefault();if(!user||paid(user))return;const ref=$('reference')?.value.trim()||'';if(!/^[\p{L}\p{N}\-_\/ ]{5,80}$/u.test(ref)){showMsg('Enter a valid bank transaction reference (5–80 characters).','error');return}try{busy=true;const next={...(user.prefs||{})};next[CFG.pref]={reference:ref,bank:CFG.bank,amountNpr:CFG.amount,submittedAt:new Date().toISOString(),userId:user.$id};await account.updatePrefs(next);user=await account.get();mode='payment';show();showMsg('Your reference was submitted. The lessons are STILL locked until the owner checks the bank and approves this account.','ok')}catch(err){showMsg('Reference submission failed: '+shortError(err),'error')}finally{busy=false}}
 async function signOut(){killLessons();clearInterval(trialInterval);user=null;pending=null;trial=null;try{await account?.deleteSession('current')}catch(err){console.warn('Unable to delete the Appwrite session:',err);showMsg('Unable to confirm sign-out. Clear the session or retry before sharing this device.','error');return}mode='signin';show();showMsg('Signed out. Private content closed.','ok')}
 $('exit').addEventListener('click',signOut);
@@ -3475,5 +3683,6 @@ window.addEventListener('offline',()=>{if(openedAccess)lockProtected('Internet c
 // The interval intentionally runs only an account lookup and, for trial users, one
 // server trial-status request while protected lessons are open.
 setInterval(()=>{if(openedAccess)void revalidateOpenLessons()},60000);
-(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())pending=p}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session({silentGuest:true})}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}finally{sikauInitialSessionPending=false;if(!openedAccess)sikauHideBoot()}})();
+(async()=>{try{await loadSDK();try{const raw=sessionStorage.getItem('sikau-v2-pending-otp');const p=JSON.parse(raw||'null');if(p?.until>Date.now())savePending(p)}catch(_){}if(new URLSearchParams(location.search).has('reset')){mode='reset';show();showMsg('Choose a new password from your recovery email.');return}await session({silentGuest:true})}catch(e){mode='welcome';show();showMsg('Cannot connect to Appwrite: '+shortError(e),'error')}finally{sikauInitialSessionPending=false;if(!openedAccess)sikauHideBoot()}})();
 </script></body></html>
+

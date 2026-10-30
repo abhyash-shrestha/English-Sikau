@@ -1,0 +1,26 @@
+name: Account experience checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'test/auth-experience.test.mjs'
+      - '.github/workflows/account-experience.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'test/auth-experience.test.mjs'
+      - '.github/workflows/account-experience.yml'
+jobs:
+  accounts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check signup, login and verification without sending real email
+        run: node --test test/auth-experience.test.mjs test/lesson-startup-no-flash.test.mjs
