@@ -410,3 +410,74 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 button.sikau-topic-action:hover,
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 button.sikau-level-action:hover{
  background:#513452!important;border-color:#d58eac!important;
 }
+
+
+/* Practice action row: more space for choosing topic and level; a compact
+   New reading button. The existing native buttons keep their click behavior. */
+#rd.sikau-read-v2 .sikau-practice-balanced-row{
+ display:grid!important;
+ align-items:stretch!important;
+ gap:10px!important;
+ width:100%!important;min-width:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row[data-sikau-balance="individual"]{
+ grid-template-columns:minmax(155px,33%) repeat(3,minmax(0,1fr))!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row[data-sikau-balance="grouped"]{
+ grid-template-columns:minmax(155px,33%) minmax(0,1fr)!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row>.sikau-practice-newreading-slot{
+ width:100%!important;min-width:0!important;max-width:none!important;
+ flex:none!important;margin:0!important;align-self:stretch!important;
+ min-height:54px!important;border-radius:12px!important;
+ padding:10px 14px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row>.sikau-practice-actions-slot{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ align-items:stretch!important;gap:10px!important;
+ flex:none!important;min-width:0!important;width:100%!important;
+ margin:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action{
+ display:inline-flex!important;justify-content:center!important;align-items:center!important;
+ flex:1 1 0!important;min-width:0!important;max-width:none!important;
+ width:100%!important;margin:0!important;
+ min-height:54px!important;
+ padding:10px 12px!important;
+ font-size:15px!important;font-weight:850!important;
+ border-radius:12px!important;
+ white-space:nowrap!important;
+}
+#rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action::after{
+ font-size:14px!important;line-height:1.35!important;
+ white-space:nowrap!important;
+}
+@media(max-width:720px){
+ #rd.sikau-read-v2 .sikau-practice-balanced-row[data-sikau-balance="individual"]{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row[data-sikau-balance="grouped"]{
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row>.sikau-practice-newreading-slot{
+  grid-column:1/-1!important;min-height:49px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action{
+  min-height:50px!important;font-size:13px!important;padding:9px 7px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action::after{
+  font-size:12px!important;
+ }
+}
+@media(max-width:400px){
+ #rd.sikau-read-v2 .sikau-practice-balanced-row,
+ #rd.sikau-read-v2 .sikau-practice-balanced-row>.sikau-practice-actions-slot{
+  gap:5px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action{
+  font-size:11px!important;min-height:48px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-balanced-row .sikau-practice-large-action::after{
+  font-size:11px!important;
+ }
+}
