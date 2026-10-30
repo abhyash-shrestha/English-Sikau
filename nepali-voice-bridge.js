@@ -162,6 +162,17 @@
       typeof view.parent?.sikauNeuralSpeech==='function'}
    catch(_){return false}
   };
+  const hasOwnerNepaliVoice=()=>{
+   try{return view.parent?.sikauOwnerNepaliVoiceConfigured===true&&hasNeural();}
+   catch(_){return false;}
+  };
+  function shouldPlayNeural(utterance){
+   if(!hasNeural())return false;
+   // Owner voice is for ALL Nepali speech. Keep English exactly as it was.
+   if(hasOwnerNepaliVoice())return isNepali(utterance);
+   const lang=String(utterance?.lang||'').toLowerCase().replace('_','-');
+   return isNepali(utterance)||/^en(?:-|$)/.test(lang);
+  }
   function prepareNeural(){
    if(!hasNeural())return;
    try{
@@ -290,7 +301,13 @@
    // Switching while a sentence plays must never finish in the old voice.
    try{synth.cancel()}catch(_){};
    stopNeural();
-   if(hasNeural()){prepareNeural();status(scope,'Natural neural voice selected · प्राकृतिक आवाज छानियो।');return;}
+   if(hasNeural()){
+    prepareNeural();
+    status(scope,hasOwnerNepaliVoice()?
+     'Nepali speech uses the owner’s voice · नेपालीमा आफ्नै आवाज।':
+     'Natural neural voice selected · प्राकृतिक आवाज छानियो।');
+    return;
+   }
    if(gender==='male'){
     const found=firstMale(synth);
     if(found)status(scope,'Nepali male voice: '+found.name+' · नेपाली पुरुष आवाज उपलब्ध छ।');
@@ -326,7 +343,7 @@
    const lang=String(utterance.lang||'').replace('_','-').toLowerCase();
    // Once configured, the function supplies real neural MP3 for every
    // language/gender. Do not queue the robotic browser fallback.
-   if(hasNeural()&&(isNepali(utterance)||/^en(?:-|$)/.test(lang))){
+   if(shouldPlayNeural(utterance)){
     stopNeural();
     prepareNeural();
     void playNeural(utterance,active);
@@ -435,7 +452,7 @@
     return true;
    },
    maleSelected:scope=>currentGender(scope)==='male',
-   naturalSpeechAvailable:hasNeural,
+   naturalSpeechAvailable:hasNeural,ownerNepaliVoiceActive:hasOwnerNepaliVoice,
    patched
   };
   return true;
