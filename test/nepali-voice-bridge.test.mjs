@@ -139,18 +139,23 @@ test('Hindi explicitly marked hi-IN remains untouched; not relabeled Nepali',()=
 
 test('gender choice buttons disappear without hiding lesson buttons',()=>{
  const {win,roots}=build([voices.us,voices.nepali]);
- function control(text){
+ function control(text,inVoiceControl=false){
   return {textContent:text,style:{display:''},attrs:{},
    setAttribute(k,v){this.attrs[k]=v;},getAttribute(){return null;},
-   matches(){return false},closest(){return null;},hidden:false};
+   matches(){return false},closest(selector){
+    return inVoiceControl&&selector.includes('.voice-options')?{}:null;
+   },hidden:false};
  }
- const male=control('Male'),female=control('Female'),listen=control('🔊 Listen'),topic=control('Male doctors');
- roots.tr.controls=[male,female,listen,topic];
+ const male=control('Male',true),female=control('Female',true),
+  listen=control('🔊 Listen'),topic=control('Male doctors'),
+  quizChoice=control('Male');
+ roots.tr.controls=[male,female,listen,topic,quizChoice];
  win.__sikauNepaliVoice.removeGenderControls();
  assert.equal(male.hidden,true);
  assert.equal(female.hidden,true);
  assert.equal(listen.hidden,false);
  assert.equal(topic.hidden,false);
+ assert.equal(quizChoice.hidden,false,'Quiz Male answer must not be hidden');
 });
 
 test('voice failure is reported without using Hindi or other voices',()=>{
