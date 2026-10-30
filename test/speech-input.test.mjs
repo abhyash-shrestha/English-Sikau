@@ -159,7 +159,7 @@ test('a recorder error releases audio tracks and cannot upload a delayed recordi
 });
 
 test('the adapter is installed in srcdoc HEAD before native constructors are captured',()=>{
- assert.match(app,/head\+noOldLessonFlash\+earlyMicrophone/);
+ assert.match(app,/head\+browserTranslationMeta\+noOldLessonFlash\+earlyMicrophone/);
  assert.match(app,/speech-input\.js\?v=20261030-platform-audio-r1/);
  assert.match(app,/enhanceSpeechInput\?\.\(doc\)/);
  assert.ok(app.includes('speechAI:null'),'unconfigured providers stay disabled');
