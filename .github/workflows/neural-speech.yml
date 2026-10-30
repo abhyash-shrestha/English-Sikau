@@ -8,7 +8,9 @@ on:
       - 'reading-dashboard.js'
       - 'translate-studio-v4.js'
       - 'test/neural-speech-function.test.mjs'
+      - 'test/owner-nepali-voice.test.mjs'
       - 'test/nepali-voice-bridge.test.mjs'
+      - 'index.html'
       - '.github/workflows/neural-speech.yml'
   pull_request:
     paths:
@@ -17,7 +19,9 @@ on:
       - 'reading-dashboard.js'
       - 'translate-studio-v4.js'
       - 'test/neural-speech-function.test.mjs'
+      - 'test/owner-nepali-voice.test.mjs'
       - 'test/nepali-voice-bridge.test.mjs'
+      - 'index.html'
 jobs:
   speech:
     runs-on: ubuntu-latest
@@ -36,4 +40,4 @@ jobs:
           node --check reading-dashboard.js
           node --check translate-studio-v4.js
       - name: Run isolated tests (no external speech requests or secrets)
-        run: node --test test/neural-speech-function.test.mjs test/nepali-voice-bridge.test.mjs
+        run: node --test test/neural-speech-function.test.mjs test/nepali-voice-bridge.test.mjs test/owner-nepali-voice.test.mjs
