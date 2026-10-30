@@ -100,18 +100,20 @@ test('Practice sentences with no rtext become real side-by-side bilingual rows',
  assert.equal(f.taps.english,1);
  assert.equal(f.speech[0][1],'ne-NP');
 });
-test('Prominent topic and level buttons activate existing native controls',()=>{
+test('Practice keeps one set of native topic and level buttons, without an extra toolbar',()=>{
  const f=fixture();
  f.context.window.enhancePracticeBilingualReading(f.doc);
- const buttons=f.rd.querySelectorAll('.sikau-practice-nav-action');
- assert.equal(buttons.length,3);
- buttons.forEach(b=>b.click());
+ assert.equal(f.rd.querySelectorAll('.sikau-practice-navigation').length,0);
+ assert.equal(f.rd.querySelectorAll('.sikau-practice-nav-action').length,0);
+ const native=['Change topic','Level down','Level up']
+  .map(label=>f.card.children.find(c=>c.textContent===label));
+ assert.ok(native.every(Boolean));
+ native.forEach(b=>b.click());
  assert.equal(f.taps.topic,1);
  assert.equal(f.taps.down,1);
  assert.equal(f.taps.up,1);
  f.active.classList.remove('on');
  f.mode.listeners.click?.();
  assert.equal(f.rd.querySelector('.sikau-practice-bilingual')?.hidden,true);
- assert.equal(f.rd.querySelector('.sikau-practice-navigation')?.hidden,true);
  assert.equal(f.rd.querySelectorAll('.sikau-practice-source-hidden').length,0);
 });
