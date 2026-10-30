@@ -6,7 +6,6 @@
  */
 (function(){
 'use strict';
-const LOCALE={en:'en-US',ne:'ne-NP'};
 const voiceCatalog=synth=>{
  try{return Array.from(synth?.getVoices?.()||[]);}
  catch(_){return [];}
@@ -53,42 +52,38 @@ const choose=(synth,locale)=>{
  return available.sort((a,b)=>quality(b,locale)-quality(a,locale))[0]||null;
 };
 const short=(value)=>String(value||'').replace(/\s+/g,' ').trim().slice(0,140);
-// Some native lessons show floating gender buttons/toasts outside the
-// Translate and Reading sections. Explicit "पुरुष आवाज" or "महिला आवाज"
-// is a voice setting everywhere, including the festival home screen.
-const explicitVoiceLabel=value=>{
- const clean=String(value||'').replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu,'')
-  .replace(/\s+/g,' ').trim();
- if(clean.length>55)return false;
- return /^(?:(?:male|female|पुरुष|पुरूष|महिला)\s*(?:voice|आवाज)|(?:voice|आवाज)\s*(?:male|female|पुरुष|पुरूष|महिला))$/i.test(clean);
+// Legacy protected lesson toolbar offers 👨 / 👩 voice buttons alongside
+// the language selector. Those are removed by exact purpose, not by scanning
+// every paragraph or hiding possible "Male/Female" quiz answers.
+const genderLabel=value=>{
+ const text=String(value||'').trim().replace(/[\uFE0E\uFE0F\u200D]/g,'');
+ const normalized=text.replace(/\s+/g,' ');
+ if(!normalized||normalized.length>55)return false;
+ if(/^[👨👩](?:🏻|🏼|🏽|🏾|🏿)?$/u.test(normalized))return true;
+ return /^(?:male|female|पुरुष|पुरूष|महिला)(?:\s+(?:voice|आवाज))?$|^(?:voice|आवाज)\s+(?:male|female|पुरुष|पुरूष|महिला)$/i.test(normalized);
 };
-const isGender=(control)=>{
- if(!control)return false;
- const raw=String(control?.matches?.('input')?control.value:control.textContent||'').trim();
- const clean=raw.replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu,'')
-  .replace(/\s+/g,' ').trim();
- // Strong, unambiguous evidence, even for floating toast elements.
- if(explicitVoiceLabel(raw))return true;
- const hint=[control.getAttribute?.('aria-label'),control.getAttribute?.('title'),
-  control.getAttribute?.('class'),control.getAttribute?.('id')].join(' ');
- const selector=control.closest?.('.voice-options,.voice-controls,.voice-select,'+
-  '.voice-gender,.sikau-voice-gender,'+
-  '[data-voice-selector]');
- const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts|gender)\b/i.test(hint)||
-   !!control.getAttribute?.('data-voice-gender');
- // Never hide answers like "Male", "Female", or "Male doctors" outside
- // an actual voice selector. No guessing from a person's gender.
- if(!hasVoiceContext)return false;
- if(control.tagName==='SELECT'&&control.options?.length){
-  const vals=Array.from(control.options)
-   .map(o=>String(o.value||o.textContent||'').trim().toLowerCase())
-   .filter(s=>s&&s!=='choose voice'&&s!=='select voice');
-  return vals.length>0&&vals.every(v=>/^(male|female|पुरुष|महिला|पुरूष)$/.test(v));
+const controlIsRetiredVoice=(control,toolbar=false)=>{
+ if(!control||!/^(?:BUTTON|LABEL|SELECT|INPUT)$/i.test(String(control.tagName||'')))return false;
+ const label=String(control.textContent||control.value||'').trim();
+ const aria=String(control.getAttribute?.('aria-label')||'');
+ const title=String(control.getAttribute?.('title')||'');
+ if(toolbar&&(genderLabel(label)||genderLabel(aria)||genderLabel(title)))return true;
+ // Elsewhere require unmistakable evidence the control is for speech.
+ const id=String(control.id||''),name=String(control.name||'');
+ const marker=String(control.getAttribute?.('data-voice-gender')||
+  control.getAttribute?.('data-gender')||'');
+ const inVoiceGroup=!!control.closest?.('.voice-options,.voice-controls,.voice-select,'+
+  '.voice-gender,.sikau-voice-gender,[data-voice-selector]');
+ const voiceMetadata=/(?:voice|speech|speaker|tts)/i.test([id,name,aria,title].join(' '));
+ if(!inVoiceGroup&&!voiceMetadata&&!marker)return false;
+ if(control.tagName==='SELECT'){
+  const entries=Array.from(control.options||[])
+   .map(o=>String(o.value||o.textContent||'').trim())
+   .filter(x=>x&&!/^(?:choose|select)\s+voice$/i.test(x));
+  return entries.length>0&&entries.every(genderLabel);
  }
- return /^(?:male|female|पुरुष|महिला|पुरूष)(?:\s+(?:voice|आवाज))?$/i.test(clean)||
-  /^(?:male|female)$/i.test(String(control?.value||''))||
-  /\b(?:male|female)\s+voice\b/i.test(hint)||
-  /^(?:male|female)$/i.test(String(control?.getAttribute?.('data-gender')||''));
+ return genderLabel(label)||genderLabel(aria)||genderLabel(title)||
+  /^(?:male|female)$/i.test(marker);
 };
 function install(doc){
  const view=doc?.defaultView,synth=view?.speechSynthesis;
@@ -97,7 +92,7 @@ function install(doc){
  const originalSpeak=synth.speak;
  const scopes={tr:doc.getElementById('tr'),rd:doc.getElementById('rd'),
   words:doc.getElementById('words'),sp:doc.getElementById('sp')};
- let previous=null,active='tr';
+ let active='tr';
  const status=(scope,message)=>{
   const root=scopes[scope]||doc.getElementById(scope)||doc.body;
   let label=root.querySelector?.('.sikau-simple-voice-status');
@@ -118,7 +113,7 @@ function install(doc){
    'Nepali (Nepal) voice is unavailable in this browser. Install a Nepali voice in your device text-to-speech settings, then reopen the app. Hindi is not substituted. · नेपाली आवाज उपलब्ध छैन।';
   status(scope,reason);
  };
- const cancel=()=>{try{synth.cancel();}catch(_){};previous=null;};
+ const cancel=()=>{try{synth.cancel();}catch(_){}};
  const play=(utterance,scope='tr')=>{
   if(!utterance)return false;
   const locale=infer(utterance.text,utterance.lang);
@@ -138,7 +133,6 @@ function install(doc){
     if(typeof priorError==='function')priorError.call(utterance,e);
    };
    const result=originalSpeak.call(synth,utterance);
-   previous=utterance;
    return result===false?false:true;
   }catch(_){status(scope,'Audio could not start on this device. Try again after refreshing.');return false;}
  };
@@ -180,73 +174,49 @@ function install(doc){
   wrapper.__sikauSimpleVoice=true;
   try{view.speak=wrapper;}catch(_){}
  }
- // Remove only controls whose entire purpose is choosing voice gender.
- // Never hide quiz choices, pronunciation buttons or listening controls.
- const hideGender=()=>{
-  const hide=(element)=>{
-   if(!element||element.getAttribute?.('data-sikau-voice-gender-hidden')==='1')return;
-   element.setAttribute?.('data-sikau-voice-gender-hidden','1');
-   element.hidden=true;
-   element.style?.setProperty?.('display','none','important');
-   if(element.style)element.style.display='none';
-   element.setAttribute?.('aria-hidden','true');
-  };
-  // Only query the explicit control shapes and small badges/toasts. Many
-  // floating voice indicators live immediately under BODY, not #tr or #rd.
-  const controls=doc.body.querySelectorAll(
-   'button,input[type="radio"],label,[role="radio"],[role="button"],select,'+
-   '[data-voice-gender],.voice-gender,.sikau-voice-gender,'+
-   '[class*="voice"],[class*="Voice"],[class*="toast"],[class*="Toast"],'+
-   '[class*="badge"],[class*="Badge"],[role="status"],[role="alert"]');
-  for(const control of controls){
-   if(control.getAttribute?.('data-sikau-voice-gender-hidden')==='1')continue;
-   if(!isGender(control))continue;
-   // If the badge is only a child of a floating toast, hide the toast as
-   // well to remove the dark pill/background. Never remove lesson cards.
-   const parent=control.parentElement;
-   if(parent&&parent.childElementCount<=2&&explicitVoiceLabel(parent.textContent)&&
-      !/^(?:MAIN|SECTION|ARTICLE)$/i.test(String(parent.tagName||'')))hide(parent);
-   hide(control);
+ // Retire the two legacy voice buttons at their actual origin:
+ // .app-header .header-btns. Do not search lesson cards or all DIV/SPAN
+ // elements. A MutationObserver watches only the tiny native header area.
+ const retireLegacyVoiceUi=()=>{
+  const header=doc.querySelector?.('.app-header');
+  if(!header)return;
+  const toolbar=header.querySelector?.('.header-btns');
+  const obsolete=[];
+  if(toolbar){
+   for(const control of toolbar.querySelectorAll('button,label,select,input')){
+    if(controlIsRetiredVoice(control,true))obsolete.push(control);
+   }
   }
-  // Plain DIV/SPAN toast, such as "👨 पुरुष आवाज" shown over Festivals.
-  // Only match a short exact voice label to avoid touching lesson content.
-  for(const item of doc.body.querySelectorAll('div,span,p,small')){
-   if(item.getAttribute?.('data-sikau-voice-gender-hidden')==='1')continue;
-   if(item.childElementCount>2||!explicitVoiceLabel(item.textContent))continue;
-   // Keep the smallest matching element except for dedicated floating
-   // wrappers, whose background would otherwise remain visible.
-   const child=Array.from(item.children||[]).find(x=>explicitVoiceLabel(x.textContent));
-   if(child&&!/(?:voice|gender|toast|snack|badge|notice|notification|alert)/i.test(
-     String(item.className||'')+' '+String(item.id||'')))continue;
-   hide(item);
+  // Other genuine dedicated voice selectors may appear in a lesson tab.
+  // Limit removal to voice selector containers, preserving quiz responses.
+  for(const group of doc.querySelectorAll('.voice-options,.voice-gender,'+
+     '.sikau-voice-gender,[data-voice-selector]')){
+   for(const control of group.querySelectorAll('button,label,select,input')){
+    if(controlIsRetiredVoice(control,false))obsolete.push(control);
+   }
   }
-  // A pure gender group can be removed; groups also holding listen/play
-  // controls must be kept.
-  for(const group of doc.body.querySelectorAll(
-    '.voice-options,.voice-gender,.voice-select,.sikau-voice-gender')){
-   const options=Array.from(group.querySelectorAll('button,label,input,[role="radio"]'));
-   if(options.length&&options.every(isGender))hide(group);
+  for(const control of new Set(obsolete)){
+   control.hidden=true;
+   control.setAttribute?.('aria-hidden','true');
+   control.remove?.();
   }
  };
-
- hideGender();
- // MutationObserver fires before the browser paints newly inserted lesson
- // controls. Remove a resurrected voice badge immediately, not next frame.
- let checking=false;
+ retireLegacyVoiceUi();
  if(typeof view.MutationObserver==='function'){
-  const obs=new view.MutationObserver(records=>{
-   if(checking||!records.some(r=>r.type==='childList'&&r.addedNodes?.length))return;
-   checking=true;
-   try{hideGender();}finally{checking=false;}
-  });
-  obs.observe(doc.body,{childList:true,subtree:true});
+  const header=doc.querySelector?.('.app-header');
+  if(header){
+   const observer=new view.MutationObserver(records=>{
+    if(records.some(record=>record.type==='childList'&&record.addedNodes?.length))
+     retireLegacyVoiceUi();
+   });
+   observer.observe(header,{childList:true,subtree:true});
+  }
  }
  // Remember tab only to place an error message alongside the right player.
  doc.addEventListener('click',event=>{
   const root=event.target?.closest?.('#tr,#rd,#words,#sp,#game,#hw,#learn');
   if(root)active=root.id==='learn'?'rd':root.id;
  },true);
- try{synth.addEventListener?.('voiceschanged',()=>{});}catch(_){}
  view.__sikauSimpleVoiceInstalled=true;
  view.__sikauNepaliVoiceInstalled=true;
  view.__sikauNepaliVoice={
@@ -254,7 +224,7 @@ function install(doc){
   chooseEnglish:()=>choose(synth,'en-US'),chooseNepali:()=>choose(synth,'ne-NP'),
   voices:()=>({english:candidates(synth,'en-US').map(v=>v.name),
     nepali:candidates(synth,'ne-NP').map(v=>v.name)}),
-  removeGenderControls:hideGender,patched,naturalSpeechAvailable:()=>false
+  removeGenderControls:retireLegacyVoiceUi,patched,naturalSpeechAvailable:()=>false
  };
  view.__sikauSpeech=speakText;
  return true;
