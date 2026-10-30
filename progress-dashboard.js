@@ -30,6 +30,10 @@ window.enhanceProgressDashboard=function(doc){
   doc.head.append(link);
  }
  section.classList.add('sikau-progress-v1','sikau-learning-first');
+ // Hide the old XP dashboard synchronously, even on a slow Android browser
+ // before the external stylesheet finishes loading.
+ native.hidden=true;
+ native.style?.setProperty?.('display','none','important');
  // Retain native progress data and handlers, but don't expose rewards UI.
  if(section.dataset.sikauProgress==='learning-first')return;
  const state=doc.defaultView.S?.d;
