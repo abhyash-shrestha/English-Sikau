@@ -66,6 +66,12 @@ const isGender=(control)=>{
    !!control.getAttribute?.('data-voice-gender');
  // Do not remove answers in a story or quiz just because they say Male/Female.
  if(!hasVoiceContext)return false;
+ if(control.tagName==='SELECT'&&control.options?.length){
+  const vals=Array.from(control.options)
+   .map(o=>String(o.value||o.textContent||'').trim().toLowerCase())
+   .filter(s=>s&&s!=='choose voice'&&s!=='select voice');
+  return vals.length>0&&vals.every(v=>/^(male|female|पुरुष|महिला|पुरूष)$/.test(v));
+ }
  return /^(?:male|female|पुरुष|महिला|पुरूष)(?:\s+(?:voice|आवाज))?$/i.test(clean)||
   /^(?:male|female)$/i.test(String(control?.value||''))||
   /\b(?:male|female)\s+voice\b/i.test(hint)||
