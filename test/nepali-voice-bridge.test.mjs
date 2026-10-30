@@ -169,7 +169,7 @@ test('the exact 👨 and 👩 screenshot toolbar buttons are deleted, not merely
 });
 
 test('legacy gender options in a genuine voice selector retire, not quiz answers',()=>{
- const male=fakeButton('Male'),female=fakeButton('Female');
+ const male=fakeButton('Male',{aria:'Male voice'}),female=fakeButton('Female',{aria:'Female voice'});
  const quizMale=fakeButton('Male'),topic=fakeButton('Male doctors');
  const listen=fakeButton('🔊 Listen');
  const {win,voiceGroups}=build([voices.us,voices.nepali]);
