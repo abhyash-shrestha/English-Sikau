@@ -145,3 +145,122 @@ html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-tools-toggle{
 html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-line .rs{
  color:#f7edf7!important;
 }
+
+/* 2026-10-30 bilingual storybook: all English and real Nepali visible together.
+ * A stable 3-sentence page prevents the reading viewport from growing by level.
+ * The complete native story and its quiz still exist behind these pages. */
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-reading{
+ max-width:1020px!important;width:100%!important;margin:8px auto!important;
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(140px,215px)!important;
+ gap:10px 20px!important;padding:clamp(16px,3vw,28px)!important;
+ background:#fffdfa!important;border:1px solid #e6dcd5!important;
+ box-shadow:0 12px 35px #332b2512!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-picture{
+ grid-column:2!important;grid-row:1!important;align-self:center!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-picture .story-hero{
+ max-height:150px!important;aspect-ratio:4/3!important;object-fit:cover!important;
+ border-radius:11px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-storyinfo{
+ grid-column:1!important;grid-row:1!important;align-self:center!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-storyinfo h2,
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-storyinfo .read-exact-current-title{
+ font:850 clamp(24px,3vw,34px)/1.24 Georgia,serif!important;color:#263146!important;margin:0 0 10px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-sentences{
+ grid-column:1/-1!important;grid-row:2!important;min-width:0!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .story-actions{
+ grid-column:1/-1!important;grid-row:3!important;
+ border-top:1px solid #ecdfd2!important;padding-top:15px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .storybook-page{
+ display:block!important;margin:0 auto!important;max-width:800px!important;width:100%!important;
+ background:transparent!important;padding:6px 0!important;color:#2c2933!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .story-lines{
+ display:none!important;
+}
+#rd.sikau-read-exact .storybook-bilingual{display:grid;gap:0;max-width:780px;margin:0 auto}
+#rd.sikau-read-exact .storybook-pair{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:clamp(12px,2vw,24px);
+ padding:16px 3px;border-bottom:1px solid #efe5dc;align-items:start;min-width:0;
+}
+#rd.sikau-read-exact .storybook-pair:last-child{border-bottom:0}
+#rd.sikau-read-exact .storybook-english,#rd.sikau-read-exact .storybook-nepali{min-width:0}
+#rd.sikau-read-exact .storybook-line-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#rd.sikau-read-exact .storybook-locale{
+ display:block;font:800 10px/1.3 system-ui,sans-serif;letter-spacing:.09em;color:#a63a65;
+ margin-bottom:8px;
+}
+#rd.sikau-read-exact .storybook-line-head .storybook-locale{margin-bottom:0}
+#rd.sikau-read-exact .storybook-pair .storybook-sentence{
+ margin:0!important;font:400 clamp(16px,1.6vw,19px)/1.8 Georgia,"Noto Serif",serif!important;
+ color:#292a34!important;text-wrap:pretty;hyphens:none!important;overflow-wrap:break-word;
+}
+#rd.sikau-read-exact .storybook-pair .storybook-nepali-text{
+ margin:0!important;font:450 clamp(16px,1.6vw,18px)/1.85 "Noto Sans Devanagari",system-ui,sans-serif!important;
+ color:#3c4260!important;overflow-wrap:anywhere;
+}
+#rd.sikau-read-exact .storybook-play,
+#rd.sikau-read-exact .storybook-native-nepali{
+ min-height:38px!important;max-width:100%;border:1px solid #e0b1c8!important;
+ border-radius:10px!important;background:#fff4f8!important;color:#91244f!important;
+ padding:7px 10px!important;font:750 12px/1.35 system-ui,sans-serif!important;
+ cursor:pointer!important;white-space:normal!important;
+}
+#rd.sikau-read-exact .storybook-native-nepali{min-height:44px!important}
+#rd.sikau-read-exact .storybook-translation-missing{
+ font-size:12px!important;color:#7c647a!important;
+}
+#rd.sikau-read-exact .storybook-pagination{
+ display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+ padding:15px 0 8px;margin-top:4px;
+}
+#rd.sikau-read-exact .storybook-pagination button{
+ min-height:44px!important;border:1px solid #dec6d1!important;border-radius:10px!important;
+ padding:8px 14px!important;background:#fff6fa!important;color:#9b2456!important;
+ font:750 12px/1.35 system-ui,sans-serif!important;cursor:pointer!important;
+}
+#rd.sikau-read-exact .storybook-pagination button:disabled{opacity:.45;cursor:default}
+#rd.sikau-read-exact .storybook-pagination span{
+ font:750 12px/1.35 system-ui,sans-serif;color:#705a6c
+}
+@media(max-width:710px){
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-reading{
+  grid-template-columns:minmax(0,1fr) 95px!important;padding:14px!important;gap:12px!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-picture{
+  grid-column:2!important;grid-row:1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-picture .story-hero{
+  max-height:105px!important;aspect-ratio:1/1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-storyinfo{
+  grid-column:1!important;grid-row:1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-sentences{
+  grid-column:1/-1!important;grid-row:2!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .story-actions{
+  grid-column:1/-1!important;grid-row:3!important;
+ }
+ #rd.sikau-read-exact .storybook-pair{grid-template-columns:1fr;gap:7px;padding:13px 0}
+ #rd.sikau-read-exact .storybook-nepali{padding-left:11px;border-left:3px solid #e7becf}
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-reading{
+ background:#242b3d!important;border-color:#525871!important;color:#f2ecf8!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="2"] .read-v2-storyinfo :is(h2,h3,.read-exact-current-title),
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-pair :is(.storybook-sentence,.storybook-nepali-text){
+ color:#f5edfc!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-pair{border-color:#51546a}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-locale{color:#ff9cbd}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-pagination span{color:#f0dfee}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact :is(.storybook-play,.storybook-native-nepali,.storybook-pagination button){
+ background:#57354d!important;color:#ffe7f1!important;border-color:#a16c83!important;
+}
