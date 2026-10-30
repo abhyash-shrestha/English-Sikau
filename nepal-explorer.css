@@ -64,3 +64,7 @@ html[data-sikau-theme="dark"] #game .ne-count{background:#56304c;color:#ffd7e7}
 html[data-sikau-theme="dark"] #game .ne-next,html[data-sikau-theme="dark"] #game .ne-locked,html[data-sikau-theme="dark"] #game .ne-claim>strong{color:#ffb9d7}
 html[data-sikau-theme="dark"] #game .ne-earned{color:#a7f0d4}
 @media(prefers-reduced-motion:reduce){#game .ne-district{transition:none}}
+
+/* Districts and genuine map pieces remain, without a separate points card. */
+#game .ne-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(max-width:420px){#game .ne-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
