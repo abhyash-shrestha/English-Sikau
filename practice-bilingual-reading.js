@@ -20,10 +20,10 @@ function isNepaliButton(b){
 }
 function visibleTranslation(row,english){
  const extract=el=>{
-  if(!el||isControl(el))return '';
+  if(!el||isControl(el)||el.querySelector?.('button,input[type="button"],[role="button"]'))return '';
   const data=el.getAttribute?.('data-nepali')||el.getAttribute?.('data-ne')||el.getAttribute?.('data-translation')||'';
   const text=clean(data||el.textContent||'');
-  if(!neScript.test(text)||/^(?:नेपाली|नेपाली हेर्नुहोस्|नेपालीमा)$/u.test(text))return '';
+  if(!neScript.test(text)||/^(?:नेपाली|नेपाली हेर्नुहोस्|नेपालीमा)$/u.test(text)||/see nepali|नेपाली हेर्नुहोस्/i.test(text))return '';
   if(text.length>600||text===english)return '';
   return text;
  };
