@@ -275,24 +275,22 @@ window.enhanceTranslationDashboard=function(d){
   if(!txt){notice.textContent='Translate first · पहिले अनुवाद गर्नुहोस्।';return}
   if(!v.speechSynthesis||!v.SpeechSynthesisUtterance){notice.textContent='Audio is unavailable in this browser. · आवाज उपलब्ध छैन।';return}
   const outputLanguage=nativeDirection(sec)==='ne'?'en-US':'ne-NP';
-  // iPhone Safari can prohibit replacing the Web Speech speak() method.
-  // Route explicitly through the same quality selector for BOTH languages,
-  // without changing the working Windows/desktop playback behavior.
-  const isIphone=/iPhone|iPod/i.test(v.navigator?.userAgent||'');
-  if(isIphone&&v.__sikauNepaliVoice?.speakText){
-   v.__sikauNepaliVoice.speakText(txt,outputLanguage,'tr');
+  // Do not depend on replacing a read-only speechSynthesis.speak
+  // method. Safari, Android WebView and some browser engines forbid it.
+  // Route BOTH English and Nepali explicitly through the same verified
+  // Male/Female selector on every device.
+  try{
+   if(!v.__sikauNepaliVoice&&typeof window.enhanceNepaliSpeechVoices==='function')
+    window.enhanceNepaliSpeechVoices(d);
+  }catch(_){}
+  if(v.__sikauNepaliVoice?.speakText){
+   const started=v.__sikauNepaliVoice.speakText(txt,outputLanguage,'tr');
+   if(!started)notice.textContent='Selected voice unavailable on this device. Please check the available voices above · छानिएको आवाज उपलब्ध छैन।';
    return;
   }
-  // The signed-in lesson's Nepali voice bridge enforces true male
-  // selection when requested. Female stays on the existing voice path.
-  if(outputLanguage==='ne-NP'&&v.__sikauNepaliVoice?.speakNepali){
-   v.__sikauNepaliVoice.speakNepali(txt,'tr');
-   return;
-  }
-  v.speechSynthesis.cancel();
-  const utterance=new v.SpeechSynthesisUtterance(txt);
-  utterance.lang=outputLanguage;
-  v.speechSynthesis.speak(utterance);
+  // Never guess a gender or silently use Hindi if the shared voice bridge
+  // did not load. Ask for a reload instead of playing the wrong speaker.
+  notice.textContent='Voice selector is still loading. Please reload and retry · आवाज चयन लोड भएको छैन।';
  });
  save.addEventListener('click',()=>{
   const txt=resultText();
