@@ -85,6 +85,17 @@
    /^en(?:-|$)/i.test(String(v?.lang||'').replace('_','-')));
   }catch(_){return[];}
  };
+ // The Web Speech API has no reliable cross-browser gender field. Only
+ // accept named voices with a known identity or explicitly labeled gender.
+ // In particular, "female" must never be counted as "male".
+ const englishGender=voice=>{
+  const explicit=String(voice?.gender||'').toLowerCase();
+  if(explicit==='male'||explicit==='female')return explicit;
+  const name=String(voice?.name||'');
+  if(/\bfemale\b|\bwoman\b|\bgirl\b|\bava\b|\bjenny\b|\baria\b|\bemma\b|\bsonia\b|\blibby\b|\bsamantha\b|\bserena\b|\bkaren\b|\ballison\b|\bmoira\b|\bzira\b|\bvictoria\b|\bjoanna\b|\bsusan\b|\bmoira\b/i.test(name))return 'female';
+  if(/\bmale\b|\bman\b|\bboy\b|\bandrew\b|\bguy\b|\bbrian\b|\bchristopher\b|\bryan\b|\bdaniel\b|\balex\b|\boliver\b|\brayan\b|\bryan\b|\bsteffan\b|\bryan\b|\bdavid\b|\bjames\b/i.test(name))return 'male';
+  return null;
+ };
  const voiceQuality=voice=>{
   const name=String(voice?.name||''),uri=String(voice?.voiceURI||'');
   const full=(name+' '+uri).toLowerCase();
@@ -101,20 +112,19 @@
   if(voice?.default)score+=5;
   return score;
  };
- function bestEnglish(synth,utterance){
-  const voices=englishVoices(synth);
+ function bestEnglish(synth,utterance,selectedGender=null){
+  const available=englishVoices(synth);
+  // An explicit Male/Female click is a strict requirement, not a hint.
+  const voices=selectedGender?
+   available.filter(v=>englishGender(v)===selectedGender):available;
   if(!voices.length)return null;
   const requested=String(utterance?.lang||'en-US').toLowerCase().replace('_','-');
   const locale=requested.match(/^en(?:-[a-z]{2})?/)?.[0]||'en-us';
   const rank=v=>voiceQuality(v)+
    (String(v.lang||'').toLowerCase().replace('_','-')===locale?18:0);
-  const sorted=voices.slice().sort((a,b)=>rank(b)-rank(a));
-  const preferred=sorted[0];
-  // A list containing only known synthetic/novelty voices is not an
-  // improvement. Leave the browser's original choice untouched.
-  if(voiceQuality(preferred)<0)return null;
-  // Do not replace an explicitly chosen good voice from the original
-  // lesson with a different accent just because the name looks promising.
+  const preferred=voices.slice().sort((a,b)=>rank(b)-rank(a))[0];
+  // Without explicit gender, never force a novelty-only browser voice.
+  if(!selectedGender&&voiceQuality(preferred)<0)return null;
   if(utterance?.voice&&voices.includes(utterance.voice)&&
      rank(utterance.voice)>=rank(preferred)-25)return utterance.voice;
   return preferred;
@@ -129,8 +139,10 @@
  function voiceChoiceReport(synth){
   const en=bestEnglish(synth,{lang:'en-US'});
   const nep=bestNepaliFemale(synth);
-  return {english:en?.name||null,nepaliFemale:nep?.name||null,
-   nepaliMale:firstMale(synth)?.name||null};
+  return {english:en?.name||null,
+   englishMale:bestEnglish(synth,{lang:'en-US'},'male')?.name||null,
+   englishFemale:bestEnglish(synth,{lang:'en-US'},'female')?.name||null,
+   nepaliFemale:nep?.name||null,nepaliMale:firstMale(synth)?.name||null};
  }
 
  const voiceReport=synth=>{
@@ -274,14 +286,16 @@
    label.hidden=!message;
    notice=label;noticeScope=scope;
   }
-  function sayUnavailable(scope){
-   const info=voiceReport(synth);
-   const names=info.available.slice(0,3).map(v=>v.name).join(', ');
-   status(scope,'No male Nepali voice is available in this browser. '+
-    (names?'Detected: '+names+'. ':'No Nepali voices reported. ')+
-    'The female voice cannot be converted into a native male voice. '+
-    'Microsoft Sagar requires a speech provider connection when not installed. '+
-    '· नेपाली पुरुष आवाज यस ब्राउजरमा छैन।');
+  function sayUnavailable(scope,lang='ne-NP',gender='male'){
+   const language=lang==='en-US'?'English':'Nepali';
+   const who=gender==='female'?'female':gender==='male'?'male':'';
+   const candidates=lang==='en-US'?englishVoices(synth):nepaliVoices(synth);
+   const names=candidates.slice(0,3).map(v=>v.name).join(', ');
+   status(scope,'No '+(who?who+' ':'')+language+' voice is available in this browser. '+
+    (names?'Detected '+language+' voices: '+names+'. ':'No '+language+' voices were reported. ')+
+    'The app will not play a different gender or Hindi voice instead. '+
+    'Try installing a voice for this language in device speech settings. '+
+    '· यहाँ छानिएको आवाज उपलब्ध छैन।');
   }
   function chooseGender(scope,gender){
    if(!scope||!gender)return;
@@ -291,11 +305,12 @@
    try{synth.cancel()}catch(_){};
    stopNeural();
    if(hasNeural()){prepareNeural();status(scope,'Natural neural voice selected · प्राकृतिक आवाज छानियो।');return;}
-   if(gender==='male'){
-    const found=firstMale(synth);
-    if(found)status(scope,'Nepali male voice: '+found.name+' · नेपाली पुरुष आवाज उपलब्ध छ।');
-    else sayUnavailable(scope);
-   }else status(scope,'');
+   const nep=gender==='male'?firstMale(synth):bestNepaliFemale(synth);
+   const eng=bestEnglish(synth,{lang:'en-US'},gender);
+   status(scope,'Selected '+(gender==='male'?'Male':'Female')+
+    '. Nepali: '+(nep?.name||'not installed')+
+    ' · English: '+(eng?.name||'not installed')+
+    '. Unavailable voices will not silently switch gender or language.');
   }
   const selectedGender=scope=>{
    const root=d.getElementById(scope==='rd'?'rd':'tr');
@@ -332,28 +347,35 @@
     void playNeural(utterance,active);
     return;
    }
+   const scope=active,gender=currentGender(scope);
    if(!isNepali(utterance)){
     if(/^en(?:-|$)/.test(lang)){
-     const high=bestEnglish(synth,utterance);
-     if(high){utterance.voice=high;utterance.lang=high.lang||utterance.lang;}
+     const chosen=bestEnglish(synth,utterance,gender);
+     if(!chosen&&gender){
+      try{synth.cancel()}catch(_){}
+      sayUnavailable(scope,'en-US',gender);
+      return false;
+     }
+     if(chosen){utterance.voice=chosen;utterance.lang=chosen.lang||utterance.lang;}
     }
     return speakOriginal(utterance);
    }
-   const scope=active;
-   if(currentGender(scope)!=='male'){
-    // If the browser exposes an explicitly named female Nepali neural
-    // voice, use it rather than a poor-quality default; otherwise retain
-    // existing female playback (especially important for Apple).
-    const better=bestNepaliFemale(synth);
-    if(better){utterance.voice=better;utterance.lang=better.lang||'ne-NP';}
-    return speakOriginal(utterance);
+   // Refuse Hindi or unrelated-language fallback even when a Devanagari
+   // phrase is entered. This is why a device lacking ne-NP cannot be made
+   // to sound like a Nepal-born speaker merely through browser settings.
+   const nepali=nepaliVoices(synth);
+   const voice=gender==='male'?firstMale(synth):
+    gender==='female'?bestNepaliFemale(synth):
+    (bestNepaliFemale(synth)||nepali.slice().sort((a,b)=>voiceQuality(b)-voiceQuality(a))[0]);
+   if(!voice){
+    try{synth.cancel()}catch(_){}
+    sayUnavailable(scope,'ne-NP',gender);
+    return false;
    }
-   const voice=firstMale(synth);
-   if(!voice){try{synth.cancel()}catch(_){}sayUnavailable(scope);return;}
    utterance.voice=voice;
-   utterance.lang=voice.lang||'ne-NP';
+   utterance.lang='ne-NP';
    utterance.pitch=1;
-   utterance.rate=0.98;
+   utterance.rate=1;
    status(scope,'');
    return speakOriginal(utterance);
   }
@@ -404,7 +426,8 @@
   view.__sikauNepaliVoice={
    isAuthenticMale,genderOf,controlGender,voiceReport:()=>voiceReport(synth),
    voiceChoiceReport:()=>voiceChoiceReport(synth),voiceQuality,bestEnglish:lang=>bestEnglish(synth,{lang}),
-   firstMale:()=>firstMale(synth),
+   firstMale:()=>firstMale(synth),bestNepaliFemale:()=>bestNepaliFemale(synth),
+   englishGender,selectedGender:scope=>currentGender(scope),
    select:chooseGender,available:()=>!!firstMale(synth),
    // Explicit route bypasses the non-writable speechSynthesis.speak monkey
    // patch on some Safari builds. Only the iPhone Translate player calls
@@ -412,8 +435,15 @@
    speakText:(text,lang='ne-NP',scope='tr')=>{
     if(scope==='tr'||scope==='rd')active=scope;
     if(!text||!view.SpeechSynthesisUtterance||!['en-US','ne-NP'].includes(lang))return false;
-    if(lang==='ne-NP'&&currentGender(active)==='male'&&!firstMale(synth)&&!hasNeural()){
-     sayUnavailable(active);return false;
+    if(!hasNeural()){
+     const chosen=currentGender(active);
+     if(lang==='ne-NP'&&!((chosen==='male'?firstMale(synth):
+       chosen==='female'?bestNepaliFemale(synth):nepaliVoices(synth)[0]))){
+      sayUnavailable(active,'ne-NP',chosen);return false;
+     }
+     if(lang==='en-US'&&chosen&&!bestEnglish(synth,{lang},chosen)){
+      sayUnavailable(active,'en-US',chosen);return false;
+     }
     }
     const utterance=new view.SpeechSynthesisUtterance(String(text));
     utterance.lang=lang;
@@ -427,8 +457,11 @@
     if(!text||!view.SpeechSynthesisUtterance)return false;
     const utterance=new view.SpeechSynthesisUtterance(String(text));
     utterance.lang='ne-NP';
-    if(currentGender(active)==='male'&&!firstMale(synth)&&!hasNeural()){
-     sayUnavailable(active);return false;
+    if(!hasNeural()){
+     const selected=currentGender(active);
+     const available=selected==='male'?firstMale(synth):
+       selected==='female'?bestNepaliFemale(synth):nepaliVoices(synth)[0];
+     if(!available){sayUnavailable(active,'ne-NP',selected);return false;}
     }
     synth.cancel();
     (patched?synth.speak:routedSpeak)(utterance);
