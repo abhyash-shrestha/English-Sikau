@@ -126,3 +126,7 @@ html[data-sikau-theme="dark"] #game.sikau-game-adventure .sikau-answer-verdict .
 @media(prefers-reduced-motion:reduce){
  #game.sikau-game-adventure .sikau-answer-verdict{animation:none!important;transition:none!important}
 }
+
+/* Focus on gameplay and corrections, not virtual currency.
+   Native game data and completion results remain available for the 77-district map. */
+#game.sikau-game-adventure .game-banner .game-hud{display:none!important}

@@ -91,3 +91,27 @@ html[data-sikau-theme="dark"] #pg .chips .pill{
  border:1px solid #687792!important;opacity:1!important;text-shadow:none!important;
 }
 html[data-sikau-theme="dark"] #pg #pgo :is(.pill,.badge,.tag,.level-tag) :is(span,small,strong,b){color:inherit!important;opacity:1!important}
+
+/* Learning-first experience: never reveal legacy XP, points or award badges. */
+#pg.sikau-learning-first #pgo{display:none!important}
+#pg.sikau-learning-first .pv-original,#pg.sikau-learning-first .pv-achievements,
+#pg.sikau-learning-first .pv-award{display:none!important}
+#pg.sikau-learning-first .pv-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+#pg.sikau-learning-first .pv-card{background:linear-gradient(125deg,#f4f9ff,#e9f4ff)!important}
+#pg.sikau-learning-first .pv-card.pv-reading{background:linear-gradient(125deg,#f0fff5,#e6faef)!important}
+#pg.sikau-learning-first .pv-card.pv-writing{background:linear-gradient(125deg,#fff4f2,#ffebe4)!important}
+#pg.sikau-learning-first .pv-bottom{grid-template-columns:minmax(0,1fr)!important}
+#pg.sikau-learning-first .pv-columns{grid-template-columns:repeat(2,minmax(0,1fr))}
+html[data-sikau-theme="dark"] #pg.sikau-learning-first .pv-card{background:#263750!important}
+@media(max-width:1050px){
+ #pg.sikau-learning-first .pv-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:680px){
+ #pg.sikau-learning-first .pv-columns{grid-template-columns:minmax(0,1fr)}
+ #pg.sikau-learning-first .pv-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pg.sikau-learning-first .pv-card{min-height:120px;padding:12px}
+}
+@media(max-width:350px){
+ #pg.sikau-learning-first .pv-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pg.sikau-learning-first .pv-card-value{font-size:21px}
+}

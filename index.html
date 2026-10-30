@@ -1154,7 +1154,7 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
     <div class="student-welcome-copy"><strong id="studentTopGreeting">Welcome back 👋 नमस्ते 🙏</strong></div>
     <span id="sessionNote" class="student-access-tag"></span>
   </div>
-  <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">⭐ My progress · मेरो प्रगति</button>
+  <button type="button" id="cloudStoryToggle" aria-controls="cloudStoryProgress" aria-expanded="false">📖 Learning activity · मेरो सिकाइ</button>
   <div class="student-top-actions">
     <span id="sikauUiBuild" title="English Sikau interface version and load status" role="status" style="font-size:10px;font-weight:800;white-space:nowrap;background:#ffffff20;border:1px solid #ffffff38;border-radius:9px;padding:5px 7px;color:inherit">UI v4 · checking</span>
     <button id="sikauThemeProtected" type="button" aria-pressed="false" aria-label="Switch to dark mode · डार्क मोड">🌙 <span class="sikau-theme-word">Dark · डार्क</span></button>
@@ -1162,7 +1162,7 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
   </div>
 </div>
 <div id="gameStudioNote" role="status" aria-live="polite" style="padding:5px 17px;background:#fff4e9;color:#8c345a;font-size:11px;font-weight:750;">🎮 Checking game topics…</div>
-<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking secure progress…</span><small>Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
+<section id="cloudStoryProgress" class="cloud-story-bar" hidden aria-label="Verified learning progress details"><div class="cloud-story-info"><strong>☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति</strong><span id="cloudStoryValues" role="status" aria-live="polite">Checking completed chapters…</span><small>Review your finished lessons and keep learning · पूरा गरेका पाठहरू हेर्नुहोस्।</small><small id="studentMembershipReference"></small></div><button id="cloudStoryRefresh" type="button">↻ Refresh · ताजा गर्नुहोस्</button></section>
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-stories.js?v=20261024-r1"></script>
 <script src="./festival-dashboard-preview.js?v=20261024-stories-r1"></script>
@@ -1187,9 +1187,9 @@ html[data-sikau-theme="dark"] #sikauBootCard small{color:#c3c8d7}
 <script src="./writing-coach-dashboard.js?v=20261022-proofreading-quality-r1"></script>
 <script src="./reading-dashboard.js?v=20261030-voice-gender-r1"></script>
 <script src="./nepali-voice-bridge.js?v=20261030-galaxy-a03s-r3"></script>
-<script src="./game-adventure.js?v=20261021-big-answer-verdict-hotfix-r2"></script>
-<script src="./nepal-explorer.js?v=20261021-r1"></script>
-<script src="./progress-dashboard.js?v=20261021-dark-contrast-r1"></script>
+<script src="./game-adventure.js?v=20261030-no-rewards-r1"></script>
+<script src="./nepal-explorer.js?v=20261030-districts-no-points-r1"></script>
+<script src="./progress-dashboard.js?v=20261030-learning-first-r1"></script>
 <!-- Mobile top and bottom bars are now controlled only by their center arrow handles. -->
 <script>
 'use strict';
@@ -1845,10 +1845,10 @@ function sikauApplyOuterDisplayLanguage(selected){
   en:'Welcome back 👋 '+first
  };
  const progress={
-  'en-ne':'⭐ My progress · मेरो प्रगति',
-  'en-roman':'⭐ My progress · Mero pragati',
-  all:'⭐ My progress · मेरो प्रगति (Mero pragati)',
-  en:'⭐ My progress'
+  'en-ne':'📖 Learning activity · मेरो सिकाइ',
+  'en-roman':'📖 Learning activity · Mero sikai',
+  all:'📖 Learning activity · मेरो सिकाइ (Mero sikai)',
+  en:'📖 Learning activity'
  };
  const signout={
   'en-ne':'Sign out · लगआउट ',
@@ -1861,7 +1861,7 @@ function sikauApplyOuterDisplayLanguage(selected){
  const progressButton=$('cloudStoryToggle');
  if(progressButton){
   const compact=window.matchMedia?.('(max-width:650px)')?.matches;
-  progressButton.textContent=compact?'⭐ My progress':progress[mode];
+  progressButton.textContent=compact?'📖 My learning':progress[mode];
   progressButton.setAttribute('aria-label',progress[mode]);
   progressButton.title=progress[mode];
  }
@@ -1871,10 +1871,10 @@ function sikauApplyOuterDisplayLanguage(selected){
   const note=progressPanel.querySelector('.cloud-story-info small');
   const refresh=$('cloudStoryRefresh');
   const labels={
-   'en-ne':['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate. · खेलको XP र नेपाल यात्राका अंक अलग हुन्।','↻ Refresh · ताजा गर्नुहोस्'],
-   'en-roman':['☁️ Verified chapter progress · Pramanit adhyaya pragati','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · Taja garnuhos'],
-   all:['☁️ Verified chapter progress · प्रमाणित अध्याय प्रगति (Pramanit adhyaya pragati)','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh · ताजा गर्नुहोस् (Taja garnuhos)'],
-   en:['☁️ Verified chapter progress','Verified chapter rewards only — game XP and Nepal Explorer stamps are separate.','↻ Refresh']
+   'en-ne':['📖 Completed chapters · पूरा गरेका अध्याय','Your completed lessons · पूरा गरेका पाठहरू','↻ Refresh · ताजा गर्नुहोस्'],
+   'en-roman':['📖 Completed chapters · Pura gareka adhyaya','Your completed lessons · Pura gareka pathharu','↻ Refresh · Taja garnuhos'],
+   all:['📖 Completed chapters · पूरा गरेका अध्याय (Pura gareka adhyaya)','Your completed lessons · पूरा गरेका पाठहरू (Pura gareka pathharu)','↻ Refresh · ताजा गर्नुहोस् (Taja garnuhos)'],
+   en:['📖 Completed chapters','Your completed lessons','↻ Refresh']
   }[mode];
   if(title)title.textContent=labels[0];
   if(note)note.textContent=labels[1];
@@ -3002,7 +3002,7 @@ function killLessons(){
   if($('cloudStoryProgress'))$('cloudStoryProgress').hidden=true;
   if($('cloudStoryToggle')){
     $('cloudStoryToggle').setAttribute('aria-expanded','false');
-    $('cloudStoryToggle').textContent='⭐ My progress · मेरो प्रगति';
+    $('cloudStoryToggle').textContent='📖 Learning activity · मेरो सिकाइ';
   }
   if($('cloudStoryValues'))$('cloudStoryValues').textContent='Sign in to view verified progress.';
   if($('studentMembershipReference'))$('studentMembershipReference').textContent='';
@@ -3411,10 +3411,10 @@ async function refreshCloudStoryProgress(){
   try{
     const p=await window.__englishSikauReadVerifiedProgress();
     if(!user||user.$id!==id||readNumber!==version||!openedAccess)return;
-    target.textContent='⭐ '+p.xp+' verified chapter XP  ·  🔥 '+p.streak+' UTC-day streak  ·  📚 '+p.chapters+' verified chapters  ·  🏆 '+p.mastery+' pilot mastery';
+    target.textContent='📖 '+p.chapters+' completed chapters · पूरा गरेका अध्याय';
   }catch(err){
     if(user&&user.$id===id&&readNumber===version&&openedAccess)
-      target.textContent='Cloud progress temporarily unavailable. Original app progress is unchanged.';
+      target.textContent='Completed chapter information is temporarily unavailable. Your lessons are unchanged.';
   }finally{cloudLoading=false;button.disabled=false}
 }
 $('cloudStoryRefresh').addEventListener('click',()=>{void refreshCloudStoryProgress()});
@@ -3423,7 +3423,7 @@ $('cloudStoryToggle').addEventListener('click',()=>{
   const open=panel.hidden;
   panel.hidden=!open;
   toggle.setAttribute('aria-expanded',String(open));
-  toggle.textContent=open?'✕ Hide progress · प्रगति बन्द':'⭐ My progress · मेरो प्रगति';
+  toggle.textContent=open?'✕ Hide activity · सिकाइ बन्द':'📖 Learning activity · मेरो सिकाइ';
   if(open)void refreshCloudStoryProgress();
 });
 

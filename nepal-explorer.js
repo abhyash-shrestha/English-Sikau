@@ -1,11 +1,12 @@
-/* English Sikau · Nepal Explorer 77 District Journey (cosmetic, local-first).
- * These are district map STAMPS, not Appwrite-verified student XP.
- * No payments, lessons, trial, game scoring, membership, or XP are modified.
+/* English Sikau · Nepal Explorer · Keep the full 77 district journey.
+ * Completing an English game can reveal a district map puzzle piece.
+ * Saved district dates are preserved; the old Explorer points ledger is retired.
+ * No quiz grading, authentication, membership or lesson state is changed.
  */
 (function(){
 "use strict";
 const DATA_URL=new URL("./assets/nepal-districts-lite.json?v=20261021-r1",document.baseURI).href;
-const CSS_URL=new URL("./nepal-explorer.css?v=20261021-r1",document.baseURI).href;
+const CSS_URL=new URL("./nepal-explorer.css?v=20261030-districts-no-points-r1",document.baseURI).href;
 const STORE="english-sikau-nepal-explorer-v1:";
 const PROVINCES={1:"Koshi",2:"Madhesh",3:"Bagmati",4:"Gandaki",5:"Lumbini",6:"Karnali",7:"Sudurpashchim"};
 const ROUTE=[3,4,5,6,7,1,2];
@@ -49,7 +50,8 @@ function normalize(raw){
   if(typeof key!=="string"||!Array.isArray(value))continue;
   days[key]=[...new Set(value.filter(d=>typeof d==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(0,CLAIM_STAMPS);
  }
- return {days,points:Number.isFinite(source.points)?Math.max(0,Math.min(20000,Math.floor(source.points))):0,lastDay:typeof source.lastDay==="string"?source.lastDay:""};
+ // Legacy saved points are deliberately ignored, without deleting district stamps.
+ return {days,lastDay:typeof source.lastDay==="string"?source.lastDay:""};
 }
 function completed(state,district){return (state.days[district.id]||[]).length>=CLAIM_STAMPS;}
 function currentDistrict(route,state){return route.find(d=>!completed(state,d))||null;}
@@ -61,10 +63,8 @@ function award(route,state,date,score){
  if(state.lastDay===date)return {ok:false,reason:"daily"};
  const list=state.days[next.id]||[];
  if(list.includes(date))return {ok:false,reason:"daily"};
- const bonus=score===100?5:0;
- const earned=10+bonus;
- const fresh={days:{...state.days,[next.id]:[...list,date].sort().slice(0,CLAIM_STAMPS)},points:state.points+earned,lastDay:date};
- return {ok:true,district:next,points:earned,unlocked:completed(fresh,next),state:fresh};
+ const fresh={days:{...state.days,[next.id]:[...list,date].sort().slice(0,CLAIM_STAMPS)},lastDay:date};
+ return {ok:true,district:next,unlocked:completed(fresh,next),state:fresh};
 }
 function missionScore(gameRoot){
  if(!gameRoot)return null;
@@ -129,13 +129,22 @@ window.enhanceNepalJourney=function(doc,accountId){
  }
  const key=STORE+String(accountId).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,80);
  const read=()=>{
-  try{return normalize(JSON.parse(window.localStorage.getItem(key)||"{}"));}catch(_){return normalize(null);}
+  try{
+   const stored=JSON.parse(window.localStorage.getItem(key)||"{}");
+   const clean=normalize(stored);
+   // Migrate the original district-map save in place. Preserve all puzzle
+   // pieces and dates while dropping the retired Explorer points property.
+   if(stored&&typeof stored==="object"&&Object.prototype.hasOwnProperty.call(stored,"points")){
+    try{window.localStorage.setItem(key,JSON.stringify(clean));}catch(_){}
+   }
+   return clean;
+  }catch(_){return normalize(null);}
  };
  let state=read(),districts=null,route=null,selectedId="KATHMANDU",lastScore=null;
  const panel=place(doc,"section","ne-journey");
  panel.setAttribute("aria-label","Nepal Explorer · नेपाल यात्रा");
  const header=place(doc,"div","ne-head");
- const copy=place(doc,"div");copy.append(place(doc,"span","ne-kicker","🗺️ NEPAL EXPLORER · नेपाल यात्रा"),place(doc,"h2",null,"Build your Nepal map · आफ्नो नेपाल बनाऔं"),place(doc,"p",null,"Complete English missions on different days to collect district puzzle pieces."));
+ const copy=place(doc,"div");copy.append(place(doc,"span","ne-kicker","🗺️ NEPAL EXPLORER · नेपाल यात्रा"),place(doc,"h2",null,"Build your Nepal map · आफ्नो नेपाल बनाऔं"),place(doc,"p",null,"Play English missions and reveal the 77 districts of Nepal, one puzzle piece at a time."));
  const counter=place(doc,"div","ne-count");
  header.append(copy,counter);panel.append(header);
  const stats=place(doc,"div","ne-stats");panel.append(stats);
@@ -147,7 +156,7 @@ window.enhanceNepalJourney=function(doc,accountId){
  const legend=place(doc,"div","ne-legend","🟨 Collected · 🌸 Current · ◻️ Still to discover");
  map.append(mapRoot,legend);
  wrap.append(map,side);panel.append(wrap);
- const footer=place(doc,"p","ne-note","Explorer points and map stamps are saved on this browser for this account; they are not verified XP or permanent cloud rewards. · यी स्थानीय खेलका अंक हुन्, प्रमाणित XP होइनन्।");
+ const footer=place(doc,"p","ne-note","Your Nepal map is saved in this browser for this account. Sign in on the same browser to continue · नेपालको नक्सा यही ब्राउजरमा सुरक्षित हुन्छ।");
  panel.append(footer);
  content.insertBefore(panel,host);
  let note="";
@@ -159,9 +168,8 @@ window.enhanceNepalJourney=function(doc,accountId){
   counter.textContent=complete+" / 77 districts";
   stats.replaceChildren();
   for(const [icon,value,label] of [
-   ["🧩",complete,"Map pieces · जिल्ला"],
-   ["✨",state.points,"Explorer points · यात्रा अंक"],
-   ["📅",progress+" / "+CLAIM_STAMPS,"Stamps for next district"],
+   ["🗺️",complete+" / 77","Districts discovered · जिल्ला"],
+   ["🧩",progress+" / "+CLAIM_STAMPS,"Pieces for next district · अर्को जिल्लाका टुक्रा"],
   ]){
    const item=place(doc,"div","ne-stat");item.append(place(doc,"strong",null,icon+" "+value),place(doc,"small",null,label));stats.append(item);
   }
@@ -183,18 +191,18 @@ window.enhanceNepalJourney=function(doc,accountId){
   const steps=["🏠","🌳","🏯"];
   for(let i=0;i<3;i++){
    const tile=place(doc,"span",i<selectedProgress?"earned":"locked",steps[i]);
-   tile.title=i<selectedProgress?"Collected":"Earn by completing English missions on a different day";
+   tile.title=i<selectedProgress?"Puzzle piece added":"Complete an English mission on another day to add this piece";
    tile.setAttribute("aria-label",i<progress?"Puzzle piece collected":"Puzzle piece locked");
    tiles.append(tile);
   }
-  journey.append(tiles,place(doc,"small",null,"Earn one stamp per Nepal calendar day. Three different days complete each district."));
+  journey.append(tiles,place(doc,"small",null,"Practice on three different Nepal calendar days to complete this district."));
   side.append(journey);
   if(complete<77){
    const reward=place(doc,"div","ne-claim");
    const today=nepalDate(),used=state.lastDay===today,score=missionScore(host);
-   reward.append(place(doc,"strong",null,used?"✓ Today's reward collected · आजको पुरस्कार लिइयो":score!==null?"🎉 Mission complete — earn your map stamp!":"🎮 Finish an English mission with at least 80% to earn a stamp."));
+   reward.append(place(doc,"strong",null,used?"✓ Today's map piece added · आजको टुक्रा थपियो":score!==null?"🎉 Mission complete — continue building your Nepal map!":"🎮 Finish an English mission with at least 80% correct to add a map piece."));
    if(!used&&score!==null){
-    const button=place(doc,"button","ne-claim-button","🎁 Claim +"+(score===100?15:10)+" Explorer points & stamp");
+    const button=place(doc,"button","ne-claim-button","🧩 Add today's Nepal map piece");
     button.type="button";
     button.addEventListener("click",()=>{
      // Check the native game result again at claim time.
@@ -202,17 +210,17 @@ window.enhanceNepalJourney=function(doc,accountId){
      if(currentScore===null)return;
      state=read();
      const action=award(route,state,nepalDate(),currentScore);
-     if(!action.ok){note="Today's reward is already collected.";show();return;}
+     if(!action.ok){note="Today's map piece is already added.";show();return;}
      state=action.state;
      try{window.localStorage.setItem(key,JSON.stringify(state));}
      catch(_){note="Browser storage unavailable. Explorer progress might not survive refresh.";}
      selectedId=action.unlocked?(currentDistrict(route,state)?.id||action.district.id):action.district.id;
-     note=action.unlocked?"🎊 "+action.district.en+" unlocked! New district available tomorrow.":"✅ +"+action.points+" Explorer points! Come back on another day for the next piece.";
+     note=action.unlocked?"🎊 "+action.district.en+" unlocked! Explore the next district tomorrow.":"✅ Map piece saved! Continue exploring on another day.";
      show();
     });
     reward.append(button);
    }
-   if(used)reward.append(place(doc,"small",null,"Come back tomorrow (Nepal time) for another map stamp. Games are still playable today."));
+   if(used)reward.append(place(doc,"small",null,"Continue your Nepal map tomorrow (Nepal time). You can still play English games today."));
    if(note)reward.append(place(doc,"p","ne-claim-status",note));
    side.append(reward);
   }else side.append(place(doc,"p","ne-victory","🏆 All 77 districts discovered! Well done!"));
@@ -236,7 +244,7 @@ window.enhanceNepalJourney=function(doc,accountId){
  const onReturn=()=>{
   // A new Nepal day or a different signed-in session should be reflected.
   const updated=read();
-  if(updated.lastDay!==state.lastDay||updated.points!==state.points){state=updated;show();}
+  if(updated.lastDay!==state.lastDay||JSON.stringify(updated.days)!==JSON.stringify(state.days)){state=updated;show();}
  };
  doc.addEventListener("visibilitychange",()=>{if(!doc.hidden)onReturn();});
 };

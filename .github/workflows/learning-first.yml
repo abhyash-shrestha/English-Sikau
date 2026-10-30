@@ -1,0 +1,38 @@
+name: Learning-first no-points regression
+on:
+  pull_request:
+    paths:
+      - 'progress-dashboard.js'
+      - 'progress-dashboard.css'
+      - 'nepal-explorer.js'
+      - 'nepal-explorer.css'
+      - 'game-adventure.js'
+      - 'game-adventure.css'
+      - 'index.html'
+      - 'test/learning-first-no-points.test.mjs'
+      - '.github/workflows/learning-first.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'progress-dashboard.js'
+      - 'progress-dashboard.css'
+      - 'nepal-explorer.js'
+      - 'nepal-explorer.css'
+      - 'game-adventure.js'
+      - 'game-adventure.css'
+      - 'index.html'
+      - 'test/learning-first-no-points.test.mjs'
+      - '.github/workflows/learning-first.yml'
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify learning only and 77 map pieces
+        run: node --test test/learning-first-no-points.test.mjs

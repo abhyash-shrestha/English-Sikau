@@ -1,25 +1,27 @@
-# Nepal Explorer · 77 district puzzle (phase 1)
+# Nepal Explorer · keep all 77 districts, without points
 
-An optional long-term cosmetic reward for English Sikau. Existing chapter XP, original game XP, private lessons and authorization rules are untouched.
+English Sikau's Game tab contains an optional Nepal map puzzle. The map is for exploring geography through English practice, **not a currency, XP, coins, badge, or rewards system**.
 
-## Features
-- Real interactive Nepal map with all 77 district outlines and Nepali/English names across seven provinces.
-- Kathmandu first, then seven-province journey. Click a district to see its province and headquarters.
-- Finish an existing native English Game mission (3+ questions, score at least 80%) to qualify for one map stamp.
-- Claim 10 Explorer points (+5 for perfect scores), maximum once per Nepal calendar day.
-- Three stamps on three separate days unlock a district and light up its map piece.
-- House, tree and pagoda village puzzle represents the three collected stamps.
-- Completing 77 districts requires at least 231 different days, even for a perfect student.
+## What stays
+- Interactive map with all 77 districts, seven provinces, Nepali/English names and district headquarters.
+- The exact **0 / 77 districts** counter, updated as students finish districts.
+- Kathmandu-first route, interactive map selection and highlighted completed districts.
+- House, tree and pagoda puzzle pieces; three separate Nepal calendar days of qualifying English missions (at least 80% correct, 3+ questions) reveal one district.
+- Native English Game questions, correct/incorrect feedback, timers, mission completion and chapter progression.
 
-## Important limitations
-Explorer stamps and points are local per-account cosmetics, saved only in this browser. They are not Appwrite-verified XP, not synced between devices, and clearing browser storage loses them. Browser localStorage can be edited, so it is not a security or paid-unlock boundary.
-The original Game XP/coins and separate cloud-verified chapter XP are different ledgers. This feature doesn't combine or mutate them.
+## What is removed
+- Explorer points: no new point additions, point totals, bonus for perfect scores, or point-earning announcements.
+- Claiming a map piece uses **Add today's Nepal map piece**, not a coins/points purchase or reward.
+- Existing local saves migrate automatically: `days` and `lastDay` stay intact while the retired `points` field is omitted. **Already unlocked districts do not reset**.
+- General progress UI now shows completed chapters, words, reading, writing and recorded practice activity. XP/streak/mastery/achievement cards and the native Game reward HUD are hidden.
 
-## Future phase: secure synced rewards
-An authenticated Appwrite awards function must validate gameplay server-side, issue one award per Nepal day, atomically deduplicate events and store user-specific progress. It must never trust the client's reported score and must respect existing account entitlements. Not implemented here: the live private game engine and Appwrite deployment are unavailable in this GitHub-only session.
+## Persistence and limits
+District progress is local to the learner's browser and account (not synced across devices); clearing browser data may remove it. These are exploratory map pieces, not verified memberships or security permissions. Game qualification remains client-side and does not certify proficiency.
+
+The protected course's internal scoring and server progress schema are retained for compatibility and to preserve chapter unlocking and the 77-district puzzle. They are no longer exposed as an earning/points interface. Modifying those private backend ledgers could disrupt current learner history and is not part of this change.
 
 ## Credits
-See assets/NEPAL-DISTRICTS-ATTRIBUTION.md. The simplified district boundaries are educational, not official surveying coordinates.
+See `assets/NEPAL-DISTRICTS-ATTRIBUTION.md`. The simplified district boundaries are educational, not official surveying coordinates.
 
-## Browser tests needed
-Quest 6/6 and 5/6 scores, score below 80%, duplicate on same day, next Nepal date, correct next district after three days, theme, device sizes, keyboard map access, account switch, refreshing, local storage limits.
+## Regression checks
+Existing district stamps, 0/77 and 1/77 counter, score 80% rule, qualifying 5/6, failed mission, duplicate same Nepal date, third stamp unlocking, next district, browser refresh, theme, tablet/phone width, keyboard map navigation.
