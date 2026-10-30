@@ -20,8 +20,8 @@ function englishText(line){
  return clean(value.replace(unwanted,'').replace(/(?:🔊|🔉|🔈)\s*(?:NP)?/gu,'').replace(/\bNP\s*$/i,''));
 }
 const translationSelectors=[
- '.story-line-nepali','.story-nepali','.nepali-translation','.nepali-text',
- '.story-translation','.translation-ne','.story-line .np-text',
+ '.nd','#storyNe0 .nd','.story-line-nepali','.story-nepali','.nepali-translation','.nepali-text',
+ '.story-translation','.translation-ne','.nz .nd','.story-line .np-text',
  '[data-story-nepali]','[lang="ne"]','[lang="ne-NP"]'
 ].join(',');
 function nepaliText(line){
