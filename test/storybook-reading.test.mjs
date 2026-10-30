@@ -109,6 +109,12 @@ test('Clean sentence extractor never includes speaker or NP button labels',()=>{
   'Nima arrived at a mountain footpath.','Nima wanted to find a safe route to the next village.'
  ]);
 });
+test('Literal speaker glyphs and NP text never leak into the story',()=>{
+ const f=fixture([['Nima reached the village. 🔊 NP','निमा गाउँमा पुगिन्।']]);
+ assert.equal(f.api.englishText(f.lines.querySelector('.story-line')),'Nima reached the village.');
+ f.install();
+ assert.equal(f.host.querySelector('.storybook-sentence').textContent,'Nima reached the village.');
+});
 test('English and existing Nepali appear together without a separate reveal-all control',()=>{
  const f=fixture();assert.equal(f.install(),true);
  const page=f.host.querySelector('.storybook-page');
