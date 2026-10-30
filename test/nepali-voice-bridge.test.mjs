@@ -42,7 +42,7 @@ function build(available,{withNative=true}={}){
   ...make('section'),children:[],hidden:false,
   querySelector(selector){return selector==='.sikau-simple-voice-status'?
    this.children.find(n=>n.className==='sikau-simple-voice-status')||null:null;},
-  querySelectorAll(selector){return this.controls||[]},
+  querySelectorAll(selector){return selector.startsWith('.voice-')||selector.startsWith('.sikau-voice')?[]:(this.controls||[])},
   appendChild(element){this.children.push(element)}
  });
  const roots={tr:root(),rd:root(),words:root(),sp:root()};
