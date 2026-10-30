@@ -1,0 +1,30 @@
+name: Learner daily mission
+on:
+  pull_request:
+    paths:
+      - 'learner-daily-mission.js'
+      - 'learner-daily-mission.css'
+      - 'index.html'
+      - 'test/learner-daily-mission.test.mjs'
+      - '.github/workflows/learner-daily-mission.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'learner-daily-mission.js'
+      - 'learner-daily-mission.css'
+      - 'index.html'
+      - 'test/learner-daily-mission.test.mjs'
+      - '.github/workflows/learner-daily-mission.yml'
+jobs:
+  daily-mission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test daily mission safety and navigation
+        run: node --test test/learner-daily-mission.test.mjs
