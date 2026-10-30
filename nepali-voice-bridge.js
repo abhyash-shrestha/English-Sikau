@@ -161,6 +161,11 @@
   if(view.__sikauNepaliVoiceInstalled)return true;
   const genders={tr:null,rd:null};
   const lastGenderControl={tr:null,rd:null};
+  // If Android exposes a real ne-NP voice but no gender metadata, let a
+  // learner explicitly opt into that Nepali voice. NEVER auto-substitute it
+  // for a requested male/female voice or use a Hindi-language voice.
+  const allowUnspecifiedNepali={tr:false,rd:false};
+  const pendingNepali={tr:null,rd:null};
   let active='tr',notice=null,noticeScope=null;
 
   // Shared neural playback: use the SAME provider audio on Safari,
@@ -291,15 +296,44 @@
    const who=gender==='female'?'female':gender==='male'?'male':'';
    const candidates=lang==='en-US'?englishVoices(synth):nepaliVoices(synth);
    const names=candidates.slice(0,3).map(v=>v.name).join(', ');
+   const hasNepali=lang==='ne-NP'&&candidates.length>0;
    status(scope,'No '+(who?who+' ':'')+language+' voice is available in this browser. '+
     (names?'Detected '+language+' voices: '+names+'. ':'No '+language+' voices were reported. ')+
-    'The app will not play a different gender or Hindi voice instead. '+
-    'Try installing a voice for this language in device speech settings. '+
+    (hasNepali?'This device reports Nepali, but not the requested gender. ':
+     'On Android: Settings → Accessibility → Text-to-speech output → Install voice data → Nepali (Nepal), if offered. ')+
+    'Hindi is never used as a Nepali fallback. '+
     '· यहाँ छानिएको आवाज उपलब्ध छैन।');
+   // Android sometimes advertises "Google नेपाली" or "Nepali" without
+   // specifying the speaker gender. The user can still hear that voice by
+   // explicitly choosing this button, with truthful gender disclosure.
+   if(!hasNepali||!pendingNepali[scope])return;
+   const root=d.getElementById(scope==='rd'?'rd':'tr');
+   const label=root?.querySelector?.('.sikau-nepali-voice-status')||notice;
+   if(!label||typeof view.SpeechSynthesisUtterance!=='function')return;
+   const btn=d.createElement('button');
+   btn.type='button';
+   btn.className='sikau-nepali-voice-use-device';
+   btn.textContent='▶ Play available Nepali voice (gender not verified)';
+   btn.style.cssText='display:block;margin:7px 0 0;padding:7px 10px;border-radius:9px;'+
+    'border:1px solid currentColor;background:transparent;color:inherit;font:inherit;cursor:pointer;';
+   btn.onclick=()=>{
+    const phrase=pendingNepali[scope];
+    if(!phrase)return;
+    allowUnspecifiedNepali[scope]=true;
+    pendingNepali[scope]=null;
+    active=scope;
+    const u=new view.SpeechSynthesisUtterance(phrase);
+    u.lang='ne-NP';
+    try{synth.cancel()}catch(_){}
+    routedSpeak(u);
+   };
+   label.appendChild?.(btn);
   }
   function chooseGender(scope,gender){
    if(!scope||!gender)return;
    active=scope;genders[scope]=gender;
+   allowUnspecifiedNepali[scope]=false;
+   pendingNepali[scope]=null;
    // Always stop the previous person's voice when switching female ↔ male.
    // Switching while a sentence plays must never finish in the old voice.
    try{synth.cancel()}catch(_){};
@@ -364,11 +398,15 @@
    // phrase is entered. This is why a device lacking ne-NP cannot be made
    // to sound like a Nepal-born speaker merely through browser settings.
    const nepali=nepaliVoices(synth);
-   const voice=gender==='male'?firstMale(synth):
+   const matched=gender==='male'?firstMale(synth):
     gender==='female'?bestNepaliFemale(synth):
     (bestNepaliFemale(synth)||nepali.slice().sort((a,b)=>voiceQuality(b)-voiceQuality(a))[0]);
+   const offered=allowUnspecifiedNepali[scope]?
+    nepali.slice().sort((a,b)=>voiceQuality(b)-voiceQuality(a))[0]:null;
+   const voice=matched||offered;
    if(!voice){
     try{synth.cancel()}catch(_){}
+    pendingNepali[scope]=String(utterance.text||'').trim().slice(0,2800);
     sayUnavailable(scope,'ne-NP',gender);
     return false;
    }
@@ -376,7 +414,8 @@
    utterance.lang='ne-NP';
    utterance.pitch=1;
    utterance.rate=1;
-   status(scope,'');
+   status(scope,matched?'':('Using available Nepali voice: '+voice.name+
+    ' (gender not verified). · नेपाली आवाज प्रयोग हुँदैछ।'));
    return speakOriginal(utterance);
   }
   let patched=false;
@@ -429,6 +468,8 @@
    firstMale:()=>firstMale(synth),bestNepaliFemale:()=>bestNepaliFemale(synth),
    englishGender,selectedGender:scope=>currentGender(scope),
    select:chooseGender,available:()=>!!firstMale(synth),
+   availableNepali:()=>nepaliVoices(synth).map(v=>({name:v.name,lang:v.lang})),
+   useUnspecifiedNepali:scope=>allowUnspecifiedNepali[scope]===true,
    // Explicit route bypasses the non-writable speechSynthesis.speak monkey
    // patch on some Safari builds. Only the iPhone Translate player calls
    // this new method; the working Windows playback stays unchanged.
@@ -438,7 +479,9 @@
     if(!hasNeural()){
      const chosen=currentGender(active);
      if(lang==='ne-NP'&&!((chosen==='male'?firstMale(synth):
-       chosen==='female'?bestNepaliFemale(synth):nepaliVoices(synth)[0]))){
+       chosen==='female'?bestNepaliFemale(synth):nepaliVoices(synth)[0]))&&
+       !(allowUnspecifiedNepali[active]&&nepaliVoices(synth).length)){
+      pendingNepali[active]=String(text).trim().slice(0,2800);
       sayUnavailable(active,'ne-NP',chosen);return false;
      }
      if(lang==='en-US'&&chosen&&!bestEnglish(synth,{lang},chosen)){
@@ -461,7 +504,10 @@
      const selected=currentGender(active);
      const available=selected==='male'?firstMale(synth):
        selected==='female'?bestNepaliFemale(synth):nepaliVoices(synth)[0];
-     if(!available){sayUnavailable(active,'ne-NP',selected);return false;}
+     if(!available&&!(allowUnspecifiedNepali[active]&&nepaliVoices(synth).length)){
+      pendingNepali[active]=String(text).trim().slice(0,2800);
+      sayUnavailable(active,'ne-NP',selected);return false;
+     }
     }
     synth.cancel();
     (patched?synth.speak:routedSpeak)(utterance);
