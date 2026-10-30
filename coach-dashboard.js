@@ -1318,7 +1318,7 @@ window.enhanceCoachDashboard=function(doc,_firstName,verifiedStudentId){
    add(doc,done,'p','','तपाईंले वास्तविक जीवनको कुराकानी अभ्यास पूरा गर्नुभयो।');
    add(doc,done,'p','',active.steps.length+' turns practiced · '+successful+' guided responses completed');
    if(active.isBranchingStore||active.isBranchingStory)add(doc,done,'p','','Your choices shaped this conversation. · तपाईंको उत्तरले यो कथा परिवर्तन गर्‍यो।');
-   add(doc,done,'small','','This is practice-only feedback; official learning XP and progress are unchanged.');
+   add(doc,done,'small','','This is practice feedback. Continue practicing another real-life conversation when you're ready.');
    const buttons=add(doc,done,'div','sikau-convo-finish-actions');
    const retry=add(doc,buttons,'button','sikau-convo-primary','↻ New questions · नयाँ प्रश्न');retry.type='button';retry.addEventListener('click',()=>start(active.coachOriginal||active));
    const readAll=add(doc,buttons,'button','sikau-convo-secondary','📖 Read full conversation · पूरा संवाद');readAll.type='button';
