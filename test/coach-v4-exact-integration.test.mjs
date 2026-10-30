@@ -211,11 +211,15 @@ test('Shared language bridge covers all V4 message types and retries temporarily
  const bridge=read('coach-v4-bridge.js');
  for(const path of [
   '#topic-grid .topic-card','#chat-transcript .bubble',
-  '#chat-choices .answer-button','#chat-title','#chat-role',
+  '#chat-choices .answer-button','#chat-role',
   '#category-filters .category-chip','#complete-actions p'
  ]){
   assert.ok(bridge.includes(path),'Coach multilingual coverage missing: '+path);
  }
+ // The live Coach title uses getElementById, not a CSS selector string.
+ // Assert its real localization operation instead of a stale literal.
+ assert.match(bridge,/const header=document\.getElementById\('chat-title'\)/);
+ assert.match(bridge,/display\(header,text,entry\)/);
  assert.match(bridge,/function readLessonMode\(/);
  assert.match(bridge,/function syncLessonMode\(/);
  assert.match(bridge,/translateWithMyMemory/);
