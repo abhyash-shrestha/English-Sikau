@@ -5,7 +5,7 @@
 'use strict';
 const BOOK={
  id:'old-bookshop',title:'The Secret of the Old Bookshop',neTitle:'पुरानो पुस्तक पसलको रहस्य',
- level:'A2–B1',cover:'./assets/read-topics/mystery.svg',
+ level:'A2–B1',category:'Mystery',description:'Maya finds a mysterious photograph and helps revive a forgotten dream.',neDescription:'मायाले रहस्यमय तस्बिर भेट्छिन् र बिर्सिएको सपना पूरा गर्न सहयोग गर्छिन्।',cover:'./assets/read-topics/mystery.svg',
  chapters:[
   {title:'A Rainy Afternoon',neTitle:'पानी परेको दिउँसो',paragraphs:[
    ['It was a rainy afternoon in Bhaktapur. Maya was walking home from school when heavy rain suddenly began. She ran into a small, old bookshop to stay dry.','भक्तपुरमा पानी परिरहेको दिउँसो थियो। माया विद्यालयबाट घर फर्किँदै गर्दा अचानक ठूलो पानी पर्न थाल्यो। पानीबाट बच्न उनी एउटा सानो, पुरानो पुस्तक पसलभित्र पसिन्।'],
