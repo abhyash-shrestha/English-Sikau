@@ -277,6 +277,8 @@ html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line :is(.rs,.story-li
  cursor:pointer!important;white-space:normal!important;
  transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;
 }
+/* Keep clicks targeted on the native buttons even when the new icon/text is tapped. */
+#rd.sikau-read-v2 #readModeSeg .read-mode-card *{pointer-events:none!important}
 #rd.sikau-read-v2 #readModeSeg .read-mode-card:hover{
  border-color:#d78bad!important;box-shadow:0 8px 22px #72325216!important;
  transform:translateY(-1px);
