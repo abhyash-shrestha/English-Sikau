@@ -2,28 +2,8 @@
 (function(){
 'use strict';
 const url=new URL('./reading-dashboard.css?v=20261021-dark-contrast-r1',document.baseURI).href;
- // Load the shared voice selector once in the authenticated lesson, so
- // both Reading's native player and Translate's Listen button see it.
- const voiceBridge=new URL('./nepali-voice-bridge.js?v=20261030-single-voice-r2',document.baseURI).href;
- let voiceScriptLoading=null;
- function ensureVoiceBridge(d){
-  if(typeof window.enhanceNepaliSpeechVoices==='function'){
-   window.enhanceNepaliSpeechVoices(d);return;
-  }
-  if(!voiceScriptLoading){
-   voiceScriptLoading=new Promise(resolve=>{
-    const tag=document.createElement('script');
-    tag.src=voiceBridge;
-    tag.async=true;
-    tag.onload=()=>resolve(true);
-    tag.onerror=()=>resolve(false);
-    document.head.appendChild(tag);
-   });
-  }
-  voiceScriptLoading.then(ready=>{
-   if(ready)window.enhanceNepaliSpeechVoices?.(d);
-  });
- }
+// The shared audio bridge is loaded once by the authenticated wrapper.
+ // No per-tab script injections, duplicate speech handlers, or race conditions.
 
 const mk=(d,t,c,s)=>{const x=d.createElement(t);if(c)x.className=c;if(s!=null)x.textContent=s;return x;};
 
@@ -103,7 +83,7 @@ function installClearNepaliActions(d){
 }
 
 window.enhanceReadingDashboard=function(d){
- if(d?.body)ensureVoiceBridge(d);
+ if(d?.body)window.enhanceUnifiedSpeech?.(d);
  installClearNepaliActions(d);
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
  if(!rd||!content||!mode||!box)return;
