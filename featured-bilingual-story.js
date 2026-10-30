@@ -106,7 +106,7 @@ function install(doc,reader,accountId){
   make(doc,'h2','','Short Story Library · छोटा कथाहरू'),
   make(doc,'p','','Choose a complete chapter book. Read English and Nepali together, listen, and unlock the next chapter with your quiz.'));
  header.append(headerCopy);
- const count=make(doc,'div','sikau-library-total',LIBRARY.length+' books · '+LIBRARY.length+' किताब');
+ const count=make(doc,'div','sikau-library-total',LIBRARY.length+' books · '+String(LIBRARY.length).replace(/\d/g,d=>'०१२३४५६७८९'[Number(d)])+' किताब');
  header.append(count);root.append(header);
  const shelf=make(doc,'section','sikau-story-shelf');
  shelf.setAttribute('aria-label','Choose a book · किताब छान्नुहोस्');

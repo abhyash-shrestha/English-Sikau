@@ -57,8 +57,8 @@ test('Audio is language-specific and chapter unlocking requires 100%',()=>{
 });
 test('Reading loads featured book only inside the authenticated classroom',()=>{
  assert.match(index,/protected.*lessonFrame/s);
- assert.match(index,/bilingual-story-library\.js\?v=20261030-quick-reads-r4/);
- assert.match(index,/featured-bilingual-story\.js\?v=20261030-quiz-cards-r4/);
+ assert.match(index,/bilingual-story-library\.js\?v=20261030-fifteen-books-r5/);
+ assert.match(index,/featured-bilingual-story\.js\?v=20261030-fifteen-books-r5/);
  assert.match(dashboard,/enhanceFeaturedBilingualStory\?\.\(d,reader,accountId\)/);
  assert.match(styles,/@media\(max-width:700px\)/);
  assert.match(styles,/data-sikau-theme="dark"/);
@@ -72,8 +72,8 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\):not\(\.sikau-featured-book\)/);
  assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
- assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-featured-visible-r2/);
- assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-visible-book-r2/);
+ assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clear-modes-r5/);
+ assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-mode-cards-r5/);
 });
 
 test('Story Mode uses curated bookshelf, not the native generated story cards',()=>{
@@ -87,10 +87,10 @@ test('Story Mode uses curated bookshelf, not the native generated story cards',(
  assert.match(styles,/sikau-story-shelf,.sikau-featured-reading/);
  const w={};
  vm.runInNewContext(data,{window:w,console},{timeout:2000});
- assert.equal(w.__sikauExtraStoryBooks.length,12);
+ assert.equal(w.__sikauExtraStoryBooks.length,14);
  const catalog=[book,...w.__sikauExtraStoryBooks];
- assert.equal(catalog.length,13);
- assert.equal(catalog.reduce((sum,item)=>sum+item.chapters.length,0),49);
+ assert.equal(catalog.length,15);
+ assert.equal(catalog.reduce((sum,item)=>sum+item.chapters.length,0),55);
  for(const item of catalog){
   assert.ok(item.chapters.length>=3);
   for(const c of item.chapters){
@@ -114,9 +114,10 @@ test('Four new short connected books are three chapters with usable bilingual qu
  const ctx={window:{}};
  vm.runInNewContext(read('bilingual-story-library.js'),ctx,{timeout:2000});
  const quick=ctx.window.__sikauExtraStoryBooks.filter(b=>b.chapters.length===3);
- assert.equal(quick.length,4);
+ assert.equal(quick.length,6);
  assert.deepEqual(Array.from(quick,b=>b.title),[
-  'The Last Bus Home','The Red Umbrella','The Midnight Bakery','The Secret Seed'
+  'The Last Bus Home','The Red Umbrella','The Midnight Bakery','The Secret Seed',
+  'The Mysterious House','A Visit to Bhaktapur'
  ]);
  for(const story of quick){
   assert.match(story.neTitle,/[\u0900-\u097F]/u);
@@ -147,4 +148,47 @@ test('Every quiz choice has an unmistakable custom selection indicator',()=>{
  assert.match(styles,/sikau-featured-choice-marker/);
  assert.match(styles,/data-sikau-theme="dark"/);
  assert.match(source,/featured-bilingual-story\.css\?v=20261030-quiz-cards-r4/);
+});
+
+
+test('Two new culturally grounded short books have complete chapters and answer keys',()=>{
+ const context={window:{}};
+ vm.runInNewContext(read('bilingual-story-library.js'),context,{timeout:2000});
+ const extra=context.window.__sikauExtraStoryBooks;
+ const newBooks=extra.slice(-2);
+ assert.deepEqual(Array.from(newBooks,b=>b.id),['mysterious-house','visit-to-bhaktapur']);
+ for(const book of newBooks){
+  assert.equal(book.chapters.length,3);
+  assert.match(book.neTitle,/[\u0900-\u097f]/);
+  for(const chapter of book.chapters){
+   assert.equal(chapter.paragraphs.length,2);
+   assert.equal(chapter.questions.length,2);
+   for(const pair of chapter.paragraphs){
+    assert.ok(pair[0].length>65);
+    assert.match(pair[1],/[\u0900-\u097f]/);
+   }
+   for(const question of chapter.questions){
+    assert.equal(question.choices.length,3);
+    assert.ok(question.answer>=0&&question.answer<=2);
+   }
+  }
+ }
+ assert.match(source,/LIBRARY\.length\+' books · '\+String\(LIBRARY\.length\)\.replace/);
+});
+
+test('Reading mode choice cards explain their purpose and keep native buttons intact',()=>{
+ const css=read('reading-dashboard.css');
+ assert.match(dashboard,/b\.replaceChildren\(icon,copy,arrow\)/);
+ assert.match(dashboard,/b\.dataset\.rm==='story'/);
+ assert.match(dashboard,/Story mode · कथा पढौं/);
+ assert.match(dashboard,/Practice mode · अभ्यास/);
+ assert.match(dashboard,/Chapter books & quizzes/);
+ assert.match(dashboard,/Short passages & quick questions/);
+ assert.match(dashboard,/syncModeState\(\)/);
+ assert.match(css,/#readModeSeg \.read-mode-card/);
+ assert.match(css,/#readModeSeg \.read-mode-card \*\{pointer-events:none!important\}/);
+ assert.match(css,/\.read-mode-card\.on/);
+ assert.match(css,/@media\(max-width:740px\)/);
+ assert.match(css,/data-sikau-theme="dark"/);
+ assert.match(index,/reading-dashboard\.js\?v=20261030-mode-cards-r5/);
 });
