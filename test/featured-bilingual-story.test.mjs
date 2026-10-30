@@ -72,8 +72,8 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\):not\(\.sikau-featured-book\)/);
  assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
- assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clear-modes-r5/);
- assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-native-practice-r7/);
+ assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-clean-toolbar-r8/);
+ assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-clean-toolbar-r8/);
 });
 
 test('Story Mode uses curated bookshelf, not the native generated story cards',()=>{
@@ -190,17 +190,18 @@ test('Reading mode choice cards explain their purpose and keep native buttons in
  assert.match(css,/\.read-mode-card\.on/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.match(css,/data-sikau-theme="dark"/);
- assert.match(index,/reading-dashboard\.js\?v=20261030-native-practice-r7/);
+ assert.match(index,/reading-dashboard\.js\?v=20261030-clean-toolbar-r8/);
 });
 
 
-test('Practice Mode binds to actual lesson sentences, with clear audio and navigation',()=>{
+test('Reading uses one compact native topic/level toolbar and bilingual sentence audio',()=>{
  const practice=read('practice-bilingual-reading.js');
  const practiceCss=read('practice-bilingual-reading.css');
- assert.match(index,/practice-bilingual-reading\.js\?v=20261030-native-pairs-r2/);
+ const readingCss=read('reading-dashboard.css');
+ assert.match(index,/practice-bilingual-reading\.js\?v=20261030-minimal-navigation-r3/);
+ assert.match(index,/reading-dashboard\.js\?v=20261030-clean-toolbar-r8/);
  assert.match(dashboard,/enhancePracticeBilingualReading\?\.\(d\)/);
  assert.match(practice,/rd\.querySelectorAll\('\.rs'\)/);
- assert.match(practice,/rd\.querySelector\('#rtext'\)\|\|/);
  assert.match(practice,/button\[data-rm="practice"\]\.on/);
  assert.match(practice,/revealed\.add\(e\.nativeNe\)/);
  assert.match(practice,/e\.nativeNe\.click\(\)/);
@@ -210,12 +211,16 @@ test('Practice Mode binds to actual lesson sentences, with clear audio and navig
  assert.match(practice,/sikau-practice-nepali/);
  assert.match(practice,/speakerButton\('🔊 Listen','en-US',e\)/);
  assert.match(practice,/speakerButton\('🔊 सुन्नुहोस्','ne-NP',e\)/);
- assert.match(practice,/Change topic · विषय बदल्नुहोस्/);
- assert.match(practice,/Easier level · सजिलो तह/);
- assert.match(practice,/Harder level · गाह्रो तह/);
+ assert.doesNotMatch(practice,/const nativeNav=|const renderNav=|nav=mk\(doc/);
+ assert.doesNotMatch(practiceCss,/sikau-practice-nav-action/);
+ assert.match(readingCss,/button\.sikau-topic-action::after/);
+ assert.match(readingCss,/content:"New topic"!important/);
+ assert.match(readingCss,/content:"Easier"!important/);
+ assert.match(readingCss,/content:"Harder"!important/);
+ assert.match(readingCss,/@media\(max-width:700px\)/);
+ assert.match(readingCss,/data-sikau-theme="dark"/);
  assert.match(practiceCss,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- assert.match(practiceCss,/sikau-practice-nav-action/);
- assert.match(practiceCss,/@media\(max-width:700px\)/);
- assert.match(practiceCss,/data-sikau-theme="dark"/);
+ assert.match(dashboard,/installReadCornerCleanup\(d\)/);
+ assert.match(dashboard,/Nepal\\s\*English\\s\*Corner/);
  assert.doesNotMatch(practice,/innerHTML|updatePrefs|createExecution|updateDocument/);
 });

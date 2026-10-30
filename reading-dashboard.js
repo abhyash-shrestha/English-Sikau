@@ -1,7 +1,7 @@
 /* Reading redesign: native controls and their event listeners are preserved. */
 (function(){
 'use strict';
-const url=new URL('./reading-dashboard.css?v=20261030-clear-modes-r5',document.baseURI).href;
+const url=new URL('./reading-dashboard.css?v=20261030-clean-toolbar-r8',document.baseURI).href;
 // The shared audio bridge is loaded once by the authenticated wrapper.
  // No per-tab script injections, duplicate speech handlers, or race conditions.
 
@@ -143,11 +143,34 @@ function installReadingRepairs(d,box,accountId){
  });
  observer.observe(box,{childList:true,subtree:true,characterData:true});update();
 }
+/* Remove the obsolete Nepal English Corner accordion only from the Read tab.
+   Its content duplicates the bilingual lessons and distracts from Practice/Story. */
+function installReadCornerCleanup(d){
+ const rd=d?.getElementById?.('rd');
+ if(!rd||rd.dataset.sikauCornerRemoved==='1')return;
+ rd.dataset.sikauCornerRemoved='1';
+ const obsolete=/Nepal\s*English\s*Corner|नेपालसँग\s*जोडिएको\s*अंग्रेजी/iu;
+ const cleanup=()=>{
+  for(const summary of rd.querySelectorAll('details > summary,summary')){
+   if(!obsolete.test(summary.textContent||''))continue;
+   const details=summary.closest('details');
+   if(details&&rd.contains(details))details.remove();
+  }
+ };
+ cleanup();
+ if(typeof d.defaultView?.MutationObserver==='function'){
+  const observer=new d.defaultView.MutationObserver(records=>{
+   if(records.some(r=>r.addedNodes?.length))cleanup();
+  });
+  observer.observe(rd,{childList:true,subtree:true});
+ }
+}
 window.enhanceReadingDashboard=function(d,accountId){
  if(d?.body)window.enhanceUnifiedSpeech?.(d);
  installClearNepaliActions(d);
  window.enhancePracticeBilingualReading?.(d);
  const rd=d?.getElementById('rd'),content=rd?.querySelector(':scope > .content'),mode=d?.getElementById('readModeSeg'),box=d?.getElementById('rbox');
+ installReadCornerCleanup(d);
  if(!rd||!content||!mode||!box)return;
  installReadingRepairs(d,box,accountId);
  if(!d.getElementById('sikauReadStyle')){const link=mk(d,'link');link.id='sikauReadStyle';link.rel='stylesheet';link.href=url;d.head.append(link);}

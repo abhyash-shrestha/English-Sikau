@@ -97,12 +97,11 @@ function install(doc){
  const win=doc.defaultView;
  if(!doc.getElementById('sikauPracticeBilingualCSS')){
   const link=mk(doc,'link');link.id='sikauPracticeBilingualCSS';link.rel='stylesheet';
-  link.href=new URL('./practice-bilingual-reading.css?v=20261030-native-pairs-r2',document.baseURI).href;
+  link.href=new URL('./practice-bilingual-reading.css?v=20261030-minimal-navigation-r3',document.baseURI).href;
   doc.head.append(link);
  }
  const priorEnglish=new WeakMap(),revealed=new WeakSet();
  let panel=null,previousRows=[],signature='',busy=false,pending=false;
- let nav=null;
  const inPractice=()=>!!mode.querySelector('button[data-rm="practice"].on');
  const unhideRows=()=>{for(const row of previousRows)row.classList.remove('sikau-practice-source-hidden');previousRows=[];};
  const speak=(text,lang)=>{
@@ -123,53 +122,7 @@ function install(doc){
   });
   return b;
  };
- const nativeNav=()=>{
-  const all=Array.from(rd.querySelectorAll('button'))
-   .filter(b=>visible(b)&&!b.closest('.sikau-practice-navigation'));
-  const text=b=>clean([b.textContent,b.getAttribute('aria-label')].join(' '));
-  return [
-   {key:'topic',label:'🔀 Change topic · विषय बदल्नुहोस्',
-    help:'Choose something new · नयाँ विषय छान्नुहोस्',
-    button:all.find(b=>/change topic|विषय बदल/i.test(text(b)))},
-   {key:'down',label:'↓ Easier level · सजिलो तह',
-    help:'Level down · स्तर घटाउनुहोस्',
-    button:all.find(b=>/level down|स्तर घट|level lower/i.test(text(b)))},
-   {key:'up',label:'↑ Harder level · गाह्रो तह',
-    help:'Level up · स्तर बढाउनुहोस्',
-    button:all.find(b=>/level up|स्तर बढ|level higher/i.test(text(b)))}
-  ];
- };
- const renderNav=()=>{
-  if(!inPractice()){if(nav)nav.hidden=true;return;}
-  const actions=nativeNav();
-  if(actions.every(a=>!a.button)){if(nav)nav.hidden=true;return;}
-  if(!nav){
-   nav=mk(doc,'section','sikau-practice-navigation');
-   nav.setAttribute('aria-label','Practice level and topic controls');
-   const intro=mk(doc,'div','sikau-practice-nav-intro');
-   intro.append(mk(doc,'h3','','Choose your next practice · अर्को अभ्यास छान्नुहोस्'),
-    mk(doc,'p','','Tap a button to change the topic or difficulty · विषय वा कठिनाइ बदल्न तलको बटन थिच्नुहोस्।'));
-   nav.append(intro);
-   const buttons=mk(doc,'div','sikau-practice-nav-buttons');
-   nav.append(buttons);
-   mode.parentElement.insertBefore(nav,mode.nextSibling);
-  }
-  nav.hidden=false;
-  const target=nav.querySelector('.sikau-practice-nav-buttons');
-  const current=actions.map(a=>a.key+':'+(a.button?'1':'0')).join('|');
-  if(target.dataset.keys===current)return;
-  target.dataset.keys=current;target.replaceChildren();
-  for(const action of actions){
-   if(!action.button)continue;
-   const button=mk(doc,'button','sikau-practice-nav-action');
-   button.type='button';
-   button.append(mk(doc,'strong','',action.label),mk(doc,'span','',action.help));
-   button.addEventListener('click',()=>{action.button.click();schedule();});
-   target.append(button);
-  }
- };
  const render=()=>{
-  renderNav();
   if(!inPractice()){
    if(panel)panel.hidden=true;
    unhideRows();signature='';
