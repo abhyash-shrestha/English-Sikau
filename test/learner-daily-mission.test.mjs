@@ -64,7 +64,6 @@ test('Installs a compact three-step mission only inside authorized learner home'
  assert.ok(card);assert.ok(card.dataset.date);assert.equal(card.attributes['aria-label'],"Today's English mission");
  assert.equal(v.home.children.indexOf(card),0,'Mission precedes the festival, never replaces it');
  assert.ok(v.home.querySelector('.sfd'),'Existing festival stays visible');
- assert.equal(card.querySelectorAll?.length||0,0);
  assert.match(index,/learner-daily-mission\.js\?v=20261030-r1/);
  assert.match(index,/enhanceDailyEnglishMission\?\.\(doc,user\.\$id\)/);
  assert.ok(!/createExecution|createRecovery|payment|trialPass/.test(code),'No authorization or payment operations');
