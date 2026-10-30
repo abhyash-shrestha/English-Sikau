@@ -1,0 +1,147 @@
+/* Storybook pages — continuous prose, small cover, accessible inline help.
+   Scope every rule to the authenticated Reading/Story mode only. */
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-reading{
+ max-width:1040px!important;margin:8px auto 12px!important;width:100%!important;
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(130px,230px)!important;
+ gap:12px 22px!important;align-items:center!important;padding:clamp(16px,3vw,30px)!important;
+ background:#fffdfa!important;border:1px solid #e6dcd5!important;
+ box-shadow:0 16px 48px #3e2d2910!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-picture{
+ grid-column:2!important;grid-row:1!important;align-self:center!important;width:100%!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-picture .story-hero{
+ width:100%!important;height:auto!important;max-height:165px!important;
+ aspect-ratio:4/3!important;object-fit:cover!important;border-radius:12px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo{
+ grid-column:1!important;grid-row:1!important;align-self:center!important;min-width:0!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo h2,
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo .read-exact-current-title{
+ font:850 clamp(24px,3vw,35px)/1.17 Georgia,"Noto Serif",serif!important;
+ letter-spacing:-.03em!important;margin:0 0 12px!important;
+ color:#293048!important;overflow-wrap:anywhere!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo h3{
+ font-size:14px!important;line-height:1.5!important;color:#746078!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-sentences{
+ grid-column:1/-1!important;grid-row:2!important;min-width:0!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-actions{
+ grid-column:1/-1!important;grid-row:3!important;margin-top:6px!important;
+ border-top:1px solid #ece2d8!important;padding-top:17px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .storybook-page{
+ display:block!important;width:100%!important;max-width:760px!important;
+ margin:0 auto!important;padding:12px 0 8px!important;background:transparent!important;
+ color:#2b2b32!important;overflow-wrap:break-word!important;
+}
+#rd.sikau-read-exact .storybook-page-top{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;
+ border-bottom:1px solid #e9ddd1;padding-bottom:12px;margin-bottom:20px;
+}
+#rd.sikau-read-exact .storybook-kicker{font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.11em;color:#a54462}
+#rd.sikau-read-exact .storybook-count{font:700 12px/1.4 system-ui,sans-serif;color:#836b71}
+#rd.sikau-read-exact .storybook-prose p{
+ display:block!important;font:400 clamp(17px,1.5vw,20px)/1.95 Georgia,"Noto Serif",serif!important;
+ color:#292733!important;letter-spacing:.005em!important;margin:0 0 1.1em!important;
+ text-align:left!important;hyphens:auto!important;overflow-wrap:break-word!important;
+}
+#rd.sikau-read-exact .storybook-prose .storybook-opening::first-letter{
+ font:700 2.45em/1 Georgia,serif;color:#b52055;padding-right:.06em;
+}
+#rd.sikau-read-exact .storybook-end{
+ font-size:15px;text-align:center;letter-spacing:.55em;color:#b87d91;
+ padding:6px 0 12px;user-select:none;
+}
+#rd.sikau-read-exact .storybook-recap{
+ padding:12px 15px;margin:0 0 22px;background:#f8f2ed;
+ border-left:3px solid #d6a58b;border-radius:7px;
+}
+#rd.sikau-read-exact .storybook-recap strong{
+ display:block;font:800 12px/1.4 system-ui,sans-serif;color:#775869;
+}
+#rd.sikau-read-exact .storybook-recap p{
+ font:400 14px/1.6 Georgia,serif;color:#625367;margin:6px 0 0;
+}
+#rd.sikau-read-exact .storybook-tools-toggle{
+ display:block!important;width:fit-content!important;max-width:100%!important;
+ min-height:44px!important;margin:12px auto!important;padding:10px 16px!important;
+ font:750 13px/1.4 system-ui,sans-serif!important;white-space:normal!important;
+ border:1px solid #d7b3c6!important;border-radius:12px!important;background:#fff3f7!important;
+ color:#9e2456!important;cursor:pointer!important;
+}
+#rd.sikau-read-exact .storybook-tools-toggle:focus-visible{
+ outline:3px solid #476ef2!important;outline-offset:3px!important;
+}
+#rd.sikau-read-exact .read-v2-sentences[data-story-tools-open="false"] .story-lines{
+ display:none!important;
+}
+#rd.sikau-read-exact .read-v2-sentences[data-story-tools-open="true"] .story-lines{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important;
+ max-width:760px!important;margin:15px auto!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-line{
+ background:#fff9f7!important;border:1px solid #e9dfe2!important;
+ border-radius:12px!important;padding:10px 12px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-line .rs{
+ font:400 15px/1.7 Georgia,serif!important;color:#343448!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-line .sikau-see-nepali{
+ min-width:110px!important;min-height:40px!important;max-width:100%!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-selection{
+ max-width:1100px;margin:auto;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-filters{
+ max-width:1100px;margin:auto;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-book-list .story-book{
+ min-height:65px!important;
+}
+#rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-book-ico.read-exact-thumb{
+ width:45px!important;height:45px!important;min-height:45px!important;flex-basis:45px!important;
+}
+@media(max-width:650px){
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-reading{
+   grid-template-columns:minmax(0,1fr) 95px!important;gap:8px 12px!important;padding:14px!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-picture{
+   grid-column:2!important;grid-row:1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-picture .story-hero{
+   max-height:110px!important;aspect-ratio:1/1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo{
+   grid-column:1!important;grid-row:1!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-sentences{
+   grid-column:1/-1!important;grid-row:2!important;
+ }
+ #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-actions{
+   grid-column:1/-1!important;grid-row:3!important;
+ }
+ #rd.sikau-read-exact .storybook-prose p{font-size:17px!important;line-height:1.85!important;}
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-reading{
+ background:#222836!important;border-color:#51536c!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .read-v2-storyinfo :is(h2,h3,.read-exact-current-title){
+ color:#f5eafa!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-page,
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-prose p{color:#f6eff8!important;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-page-top{border-color:#655567;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-kicker{color:#ff9cbd;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-count{color:#e1c9d6;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-recap{background:#343244;border-color:#dca0ad;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-recap :is(strong,p){color:#f6e9f0;}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact .storybook-tools-toggle{
+ color:#ffd3e6!important;background:#503047!important;border-color:#a16e84!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-exact #storyReader[data-sikau-book-ready="1"] .story-line .rs{
+ color:#f7edf7!important;
+}
