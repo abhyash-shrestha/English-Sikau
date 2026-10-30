@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 const DATA_URL=new URL("./assets/nepal-districts-lite.json?v=20261021-r1",document.baseURI).href;
-const CSS_URL=new URL("./nepal-explorer.css?v=20261021-r1",document.baseURI).href;
+const CSS_URL=new URL("./nepal-explorer.css?v=20261030-districts-no-points-r1",document.baseURI).href;
 const STORE="english-sikau-nepal-explorer-v1:";
 const PROVINCES={1:"Koshi",2:"Madhesh",3:"Bagmati",4:"Gandaki",5:"Lumbini",6:"Karnali",7:"Sudurpashchim"};
 const ROUTE=[3,4,5,6,7,1,2];
