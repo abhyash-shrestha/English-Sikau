@@ -57,7 +57,8 @@ test('Audio is language-specific and chapter unlocking requires 100%',()=>{
 });
 test('Reading loads featured book only inside the authenticated classroom',()=>{
  assert.match(index,/protected.*lessonFrame/s);
- assert.match(index,/featured-bilingual-story\.js\?v=20261030-chapters-r1/);
+ assert.match(index,/bilingual-story-library\.js\?v=20261030-library-r3/);
+ assert.match(index,/featured-bilingual-story\.js\?v=20261030-library-r3/);
  assert.match(dashboard,/enhanceFeaturedBilingualStory\?\.\(d,reader,accountId\)/);
  assert.match(styles,/@media\(max-width:700px\)/);
  assert.match(styles,/data-sikau-theme="dark"/);
@@ -73,4 +74,37 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
  assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-featured-visible-r2/);
  assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-visible-book-r2/);
+});
+
+test('Story Mode uses curated bookshelf, not the native generated story cards',()=>{
+ const data=read('bilingual-story-library.js');
+ assert.match(source,/__sikauExtraStoryBooks/);
+ assert.match(source,/sikau-library-grid/);
+ assert.match(source,/layout\.style\.setProperty\('display','none','important'\)/);
+ assert.doesNotMatch(source,/other\.textContent=.*Other stories/);
+ assert.match(source,/shelf\.hidden=true;reading\.hidden=false/);
+ assert.match(styles,/sikau-library-grid/);
+ assert.match(styles,/sikau-story-shelf,.sikau-featured-reading/);
+ const w={};
+ vm.runInNewContext(data,{window:w,console},{timeout:2000});
+ assert.equal(w.__sikauExtraStoryBooks.length,8);
+ const catalog=[book,...w.__sikauExtraStoryBooks];
+ assert.equal(catalog.length,9);
+ assert.equal(catalog.reduce((sum,item)=>sum+item.chapters.length,0),37);
+ for(const item of catalog){
+  assert.ok(item.chapters.length>=4);
+  for(const c of item.chapters){
+   assert.ok(c.paragraphs.length>=2);
+   assert.equal(c.questions.length,2);
+   for(const [english,nepali] of c.paragraphs){
+    assert.ok(english.length>=50);
+    assert.match(nepali,/[\u0900-\u097F]/u);
+   }
+   for(const q of c.questions){
+    assert.equal(q.choices.length,3);
+    assert.ok(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<=2);
+    assert.match(q.ne,/[\u0900-\u097F]/u);
+   }
+  }
+ }
 });
