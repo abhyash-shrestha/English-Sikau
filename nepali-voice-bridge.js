@@ -88,7 +88,11 @@ const controlIsRetiredVoice=(control,toolbar=false)=>{
 function install(doc){
  const view=doc?.defaultView,synth=view?.speechSynthesis;
  if(!doc?.body||!synth||typeof view?.SpeechSynthesisUtterance!=='function')return false;
- if(view.__sikauSimpleVoiceInstalled)return true;
+ if(view.__sikauSimpleVoiceInstalled){
+  // Re-run narrow cleanup after the private lesson rebuilds its header.
+  view.__sikauNepaliVoice?.removeGenderControls?.();
+  return true;
+ }
  const originalSpeak=synth.speak;
  const scopes={tr:doc.getElementById('tr'),rd:doc.getElementById('rd'),
   words:doc.getElementById('words'),sp:doc.getElementById('sp')};
@@ -177,8 +181,22 @@ function install(doc){
  // Retire the two legacy voice buttons at their actual origin:
  // .app-header .header-btns. Do not search lesson cards or all DIV/SPAN
  // elements. A MutationObserver watches only the tiny native header area.
+ let observedHeader=null,headerObserver=null;
  const retireLegacyVoiceUi=()=>{
   const header=doc.querySelector?.('.app-header');
+  // The entire header may be replaced by native lesson rerenders. Bind to
+  // the new header instead of leaving the observer on a detached old one.
+  if(header!==observedHeader){
+   headerObserver?.disconnect?.();
+   observedHeader=header||null;
+   if(header&&typeof view.MutationObserver==='function'){
+    headerObserver=new view.MutationObserver(records=>{
+     if(records.some(record=>record.type==='childList'&&record.addedNodes?.length))
+      retireLegacyVoiceUi();
+    });
+    headerObserver.observe(header,{childList:true,subtree:true});
+   }
+  }
   if(!header)return;
   const toolbar=header.querySelector?.('.header-btns');
   const obsolete=[];
@@ -187,8 +205,8 @@ function install(doc){
     if(controlIsRetiredVoice(control,true))obsolete.push(control);
    }
   }
-  // Other genuine dedicated voice selectors may appear in a lesson tab.
-  // Limit removal to voice selector containers, preserving quiz responses.
+  // Other genuine dedicated voice selectors may appear in Reading or
+  // Translate, but ordinary learner choices elsewhere are untouched.
   for(const group of doc.querySelectorAll('.voice-options,.voice-gender,'+
      '.sikau-voice-gender,[data-voice-selector]')){
    for(const control of group.querySelectorAll('button,label,select,input')){
@@ -202,16 +220,6 @@ function install(doc){
   }
  };
  retireLegacyVoiceUi();
- if(typeof view.MutationObserver==='function'){
-  const header=doc.querySelector?.('.app-header');
-  if(header){
-   const observer=new view.MutationObserver(records=>{
-    if(records.some(record=>record.type==='childList'&&record.addedNodes?.length))
-     retireLegacyVoiceUi();
-   });
-   observer.observe(header,{childList:true,subtree:true});
-  }
- }
  // Remember tab only to place an error message alongside the right player.
  doc.addEventListener('click',event=>{
   const root=event.target?.closest?.('#tr,#rd,#words,#sp,#game,#hw,#learn');
