@@ -235,6 +235,8 @@ window.enhanceReadingDashboard=function(d,accountId){
    reader.querySelector('.read-v2-storyinfo h2')?.classList.add('read-exact-current-title');
    // Preserve the native story/quiz UI; show connected prose in a separate book page.
    window.enhanceStorybookReading?.(d,reader);
+   // Open a complete, authored book alongside the native story library.
+   window.enhanceFeaturedBilingualStory?.(d,reader,accountId);
 
  }
  const observer=new d.defaultView.MutationObserver(()=>{organize();});
