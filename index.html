@@ -1,6 +1,9 @@
 <!doctype html>
-<html lang="ne">
+<html lang="en" translate="no" class="notranslate">
 <head>
+<!-- English Sikau handles bilingual language learning inside the app.
+     Prevent Chrome/Google Translate from offering to translate the whole page. -->
+<meta name="google" content="notranslate">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#b50c34">
@@ -3525,7 +3528,28 @@ async function openFile(token='',isTrial=false){
     const noOldLessonFlash='<style id="sikauNoOldLessonFlash">html:not(.sikau-refresh) body{visibility:hidden!important}</style>';
     const speechInputUrl=new URL('speech-input.js?v=20261030-platform-audio-r1',location.href).href;
     const earlyMicrophone='<scr'+'ipt src="'+speechInputUrl+'"></scr'+'ipt>';
-    const stagedHtml=enhancedHtml.replace(/<head\b[^>]*>/i,head=>head+noOldLessonFlash+earlyMicrophone);
+    // The private frame is a bilingual classroom, not a webpage that needs
+    // Chrome's automatic translation. Keep our own language selector intact.
+    const browserTranslationMeta='<meta name="google" content="notranslate">';
+    const lessonWithLanguageHints=enhancedHtml.replace(/<html\b[^>]*>/i,tag=>{
+      let htmlTag=tag;
+      if(/\blang\s*=/.test(htmlTag))
+        htmlTag=htmlTag.replace(/\blang\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'lang="en"');
+      else htmlTag=htmlTag.replace(/>$/,' lang="en">');
+      if(/\btranslate\s*=/.test(htmlTag))
+        htmlTag=htmlTag.replace(/\btranslate\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'translate="no"');
+      else htmlTag=htmlTag.replace(/>$/,' translate="no">');
+      if(/\bclass\s*=/.test(htmlTag))
+        htmlTag=htmlTag.replace(/\bclass\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i,
+          (_m,doubleQuoted,singleQuoted,bare)=>{
+            const classes=doubleQuoted??singleQuoted??bare??'';
+            return 'class="'+classes+(classes.split(/\s+/).includes('notranslate')?'':' notranslate')+'"';
+          });
+      else htmlTag=htmlTag.replace(/>$/,' class="notranslate">');
+      return htmlTag;
+    });
+    const stagedHtml=lessonWithLanguageHints.replace(/<head\b[^>]*>/i,
+      head=>head+browserTranslationMeta+noOldLessonFlash+earlyMicrophone);
     frame.srcdoc=stagedHtml;
     openedAccess=kind;
     lessonOpening=false;

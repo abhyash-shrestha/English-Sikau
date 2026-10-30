@@ -4,11 +4,15 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'coach-v4-live.html'
+      - 'test/browser-translation-optout.test.mjs'
       - 'test/lesson-startup-no-flash.test.mjs'
       - '.github/workflows/classroom-startup.yml'
   pull_request:
     paths:
       - 'index.html'
+      - 'coach-v4-live.html'
+      - 'test/browser-translation-optout.test.mjs'
       - 'test/lesson-startup-no-flash.test.mjs'
       - '.github/workflows/classroom-startup.yml'
 jobs:
@@ -23,4 +27,4 @@ jobs:
         with:
           node-version: '22'
       - name: Check lesson load barrier with simulated fast, slow and failed CSS
-        run: node --test test/lesson-startup-no-flash.test.mjs
+        run: node --test test/lesson-startup-no-flash.test.mjs test/browser-translation-optout.test.mjs

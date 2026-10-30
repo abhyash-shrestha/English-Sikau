@@ -20,7 +20,8 @@ test('loading cover exists before account shell and is theme-aware on every scre
 
 test('private srcdoc hides its original layout before responsive enhancement runs',()=>{
  assert.match(page,/const noOldLessonFlash='<style id="sikauNoOldLessonFlash">html:not\(\.sikau-refresh\) body\{visibility:hidden!important\}<\/style>'/);
- assert.match(page,/enhancedHtml\.replace\(\/<head\\b\[\^>\]\*>\//);
+ assert.match(page,/const stagedHtml=lessonWithLanguageHints\.replace\(\/<head\\b\[\^>\]\*>\//);
+ assert.match(page,/head=>head\+browserTranslationMeta\+noOldLessonFlash\+earlyMicrophone/);
  assert.match(page,/frame\.srcdoc=stagedHtml/);
  assert.match(page,/personalizeStudentLesson\(\);[\s\S]{0,100}void sikauRevealPreparedLesson\(doc\)/);
  assert.match(page,/sikauShowBoot\('Opening your updated classroom/);
