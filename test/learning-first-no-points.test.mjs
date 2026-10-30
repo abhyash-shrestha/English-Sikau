@@ -33,13 +33,17 @@ test('Progress uses authentic learning activity, not XP, streak, or badge cards'
  assert.match(progress,/\bconst reading=safeCount\(state\.rd\)/);
 });
 
-test('Top bar shows completed chapters only, retaining verified access',()=>{
- assert.match(index,/target\.textContent='📖 '\+p\.chapters\+' completed chapters/);
- assert.doesNotMatch(index,/target\.textContent='⭐ '\+p\.xp/);
- assert.doesNotMatch(index,/Verified chapter rewards only/);
- assert.match(index,/const payload = await fnCall\(CFG\.trialPass, 'progressGet'\)/);
- assert.match(index,/if \(!user \|\| user\.\$id !== initialId/);
- assert.match(index,/Learning activity · मेरो सिकाइ/);
+test('No redundant Learning activity control or expandable panel in top bar',()=>{
+ assert.doesNotMatch(index,/id="cloudStoryToggle"/);
+ assert.doesNotMatch(index,/id="cloudStoryProgress"/);
+ assert.doesNotMatch(index,/id="cloudStoryRefresh"/);
+ assert.doesNotMatch(index,/Learning activity · मेरो सिकाइ/);
+ assert.doesNotMatch(index,/\$\('cloudStoryToggle'\)\.addEventListener/);
+ assert.doesNotMatch(index,/refreshCloudStoryProgress\(\)/);
+ assert.match(index,/id="lessonFrame"/);
+ assert.match(index,/id="sikauThemeProtected"/);
+ assert.match(index,/id="exit"/);
+ assert.match(index,/window\.__englishSikauReadVerifiedProgress = async function/);
 });
 
 test('Game removes point HUD but keeps gameplay and district scoring',()=>{
