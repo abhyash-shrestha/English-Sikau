@@ -66,7 +66,7 @@
   return /(?:^|[^a-z])sagar(?:[^a-z]|$)/i.test(name)||
     /(?:^|[^a-z])male(?:[^a-z]|$)/i.test(name)||
     /पुरुष|पुरूष/.test(name)||
-    voice?.gender==='Male';
+    String(voice?.gender||'').toLowerCase()==='male';
  };
  const identifiedFemale=voices=>voices.find(v=>
   /(?:^|[^a-z])hemkala(?:[^a-z]|$)|(?:^|[^a-z])female(?:[^a-z]|$)|महिला/i.test(String(v.name||'')));
@@ -92,8 +92,8 @@
   const explicit=String(voice?.gender||'').toLowerCase();
   if(explicit==='male'||explicit==='female')return explicit;
   const name=String(voice?.name||'');
-  if(/\bfemale\b|\bwoman\b|\bgirl\b|\bava\b|\bjenny\b|\baria\b|\bemma\b|\bsonia\b|\blibby\b|\bsamantha\b|\bserena\b|\bkaren\b|\ballison\b|\bmoira\b|\bzira\b|\bvictoria\b|\bjoanna\b|\bsusan\b|\bmoira\b/i.test(name))return 'female';
-  if(/\bmale\b|\bman\b|\bboy\b|\bandrew\b|\bguy\b|\bbrian\b|\bchristopher\b|\bryan\b|\bdaniel\b|\balex\b|\boliver\b|\brayan\b|\bryan\b|\bsteffan\b|\bryan\b|\bdavid\b|\bjames\b/i.test(name))return 'male';
+  if(/\bfemale\b|\bwoman\b|\bgirl\b|\bava\b|\bjenny\b|\baria\b|\bemma\b|\bsonia\b|\blibby\b|\bsamantha\b|\bserena\b|\bkaren\b|\ballison\b|\bmoira\b|\bzira\b|\bvictoria\b|\bjoanna\b|\bsusan\b/i.test(name))return 'female';
+  if(/\bmale\b|\bman\b|\bboy\b|\bandrew\b|\bguy\b|\bbrian\b|\bchristopher\b|\bryan\b|\bdaniel\b|\balex\b|\boliver\b|\bsteffan\b|\bdavid\b|\bjames\b/i.test(name))return 'male';
   return null;
  };
  const voiceQuality=voice=>{
