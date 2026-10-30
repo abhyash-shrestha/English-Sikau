@@ -97,7 +97,7 @@ function install(doc){
  const win=doc.defaultView;
  if(!doc.getElementById('sikauPracticeBilingualCSS')){
   const link=mk(doc,'link');link.id='sikauPracticeBilingualCSS';link.rel='stylesheet';
-  link.href=new URL('./practice-bilingual-reading.css?v=20261030-native-pairs-r2',document.baseURI).href;
+  link.href=new URL('./practice-bilingual-reading.css?v=20261030-minimal-navigation-r3',document.baseURI).href;
   doc.head.append(link);
  }
  const priorEnglish=new WeakMap(),revealed=new WeakSet();
