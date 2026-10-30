@@ -282,3 +282,102 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-filter.on{
 html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-library-total{
  background:#4c3452;color:#ffdeec;
 }
+
+
+/* Clearly tappable quiz choices: browser/global form rules must never hide the choice UI. */
+#rd.sikau-read-v2 .sikau-featured-question{
+ padding:12px 14px!important;
+ border:1px solid #e7cdd9!important;
+ background:#fff!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-help{
+ font-weight:700!important;color:#7b365c!important;
+}
+#rd.sikau-read-v2 .sikau-featured-answer-count{
+ display:inline-flex!important;align-items:center!important;
+ margin:0 0 10px!important;
+ font:800 12px/1.55 system-ui,sans-serif!important;
+ color:#843354!important;padding:6px 11px!important;
+ background:#fff0f5!important;border-radius:999px!important;
+ border:1px solid #efc7d7!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option{
+ position:relative!important;
+ display:flex!important;align-items:center!important;gap:11px!important;
+ min-height:52px!important;width:100%!important;
+ margin:6px 0!important;padding:9px 12px!important;
+ background:#fff!important;
+ color:#302f45!important;
+ border:2px solid #e5dce5!important;
+ border-radius:12px!important;
+ box-shadow:0 1px 3px #5e335010!important;
+ cursor:pointer!important;
+ transition:background .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:hover{
+ background:#fff6fa!important;border-color:#be759a!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option input.sikau-featured-radio{
+ display:block!important;position:absolute!important;
+ opacity:0!important;pointer-events:none!important;
+ width:1px!important;height:1px!important;
+ margin:0!important;padding:0!important;inset:auto!important;
+}
+#rd.sikau-read-v2 .sikau-featured-choice-marker{
+ display:grid!important;place-items:center!important;
+ width:32px!important;height:32px!important;min-width:32px!important;
+ border:2px solid #c7a6b9!important;border-radius:50%!important;
+ background:#faf4f8!important;color:#794a66!important;
+ font:850 13px/1 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-featured-choice-text{
+ display:block!important;min-width:0!important;flex:1!important;
+ color:inherit!important;white-space:normal!important;
+ font:600 13px/1.6 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-featured-choice-state{
+ display:none!important;flex:0 0 auto!important;
+ font:850 11px/1.4 system-ui,sans-serif!important;
+ color:#9e2c5c!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:has(input:checked){
+ background:#fce8f1!important;border-color:#b12c65!important;
+ box-shadow:0 0 0 2px #b12c6520!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:has(input:checked) .sikau-featured-choice-marker{
+ background:#a32b63!important;border-color:#a32b63!important;color:#fff!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:has(input:checked) .sikau-featured-choice-state{
+ display:inline-block!important;
+}
+#rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:focus-within{
+ outline:3px solid #3867e0!important;outline-offset:2px!important;
+}
+@media(max-width:580px){
+ #rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option{gap:8px!important;padding:9px!important}
+ #rd.sikau-read-v2 .sikau-featured-choice-state{font-size:10px!important}
+ #rd.sikau-read-v2 .sikau-featured-choice-marker{
+  width:30px!important;height:30px!important;min-width:30px!important;
+ }
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-question{
+ background:#292c40!important;border-color:#65576c!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-answer-count{
+ background:#56374b!important;border-color:#a5768d!important;color:#fff0f9!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option{
+ background:#30344b!important;border-color:#636078!important;color:#fff1f7!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:hover{
+ background:#443850!important;border-color:#c288a5!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-choice-marker{
+ background:#3b3b54!important;color:#fff1f7!important;border-color:#a687a4!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-quiz .sikau-featured-option:has(input:checked){
+ background:#573349!important;border-color:#f2a3c4!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-featured-choice-state{
+ color:#ffd7e9!important;
+}
