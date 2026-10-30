@@ -52,6 +52,10 @@ function build(available,{withNative=true}={}){
   getElementById(key){return roots[key]||null;},
   addEventListener(name,fn){listener[name]=fn;}
  };
+ // Simulate a document-wide scan, including controls mounted inside tabs.
+ // Special floating-banner tests override this with their own fake DOM.
+ doc.body.querySelectorAll=selector=>
+  selector.startsWith('.voice-options')?[]:Object.values(roots).flatMap(root=>root.controls||[]);
  const originalNative=[];
  const win={
   speechSynthesis:synth,
@@ -170,10 +174,56 @@ test('Translate, Words and Reading load identical shared engine across devices',
  assert.match(app,/translate-studio-v4\.js\?v=20261030-single-voice-r1/);
  assert.match(app,/reading-dashboard\.js\?v=20261030-single-voice-r1/);
  assert.match(app,/words-studio\.js\?v=20261030-single-voice-r1/);
- assert.match(app,/nepali-voice-bridge\.js\?v=20261030-single-voice-r1/);
+ assert.match(app,/nepali-voice-bridge\.js\?v=20261030-single-voice-r2/);
  assert.match(app,/uiStep\('one bilingual speech player',\(\)=>window\.enhanceUnifiedSpeech\?\.\(doc\)\)/);
  assert.match(translate,/__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
  assert.match(words,/__sikauNepaliVoice\.speakText\(text,locale,'words'\)/);
  assert.match(reading,/enhanceNepaliSpeechVoices\?\.\(d\)/);
  assert.doesNotMatch(bridge,/chooseGender|sagarMale|speakWithGender|Play available Nepali voice \(gender not verified\)/);
+});
+
+test('Floating पुरुष आवाज toast on Nepali Festivals disappears outside voice tabs',()=>{
+ const {win,doc}=build([voices.us,voices.nepali]);
+ const toast={
+  tagName:'DIV',textContent:'👨 पुरुष आवाज',className:'floating-voice-toast',id:'',
+  childElementCount:0,children:[],hidden:false,
+  style:{display:'',setProperty(property,value){if(property==='display')this.display=value}},
+  attrs:{},
+  getAttribute(name){return this.attrs[name]||null;},
+  setAttribute(name,value){this.attrs[name]=value;},
+  querySelectorAll(){return[];},
+  closest(){return null}
+ };
+ doc.body.querySelectorAll=selector=>{
+  if(selector.startsWith('.voice-options'))return [];
+  return [toast];
+ };
+ win.__sikauNepaliVoice.removeGenderControls();
+ assert.equal(toast.hidden,true);
+ assert.equal(toast.style.display,'none');
+ assert.equal(toast.attrs['aria-hidden'],'true');
+ assert.equal(toast.attrs['data-sikau-voice-gender-hidden'],'1');
+});
+
+test('New female voice pill is removed, unrelated lesson questions are preserved',()=>{
+ const {win,doc}=build([voices.us,voices.nepali]);
+ const create=(content,className)=>({
+  tagName:'BUTTON',textContent:content,className,id:'',
+  hidden:false,childElementCount:0,children:[],
+  style:{display:'',setProperty(){}},attrs:{},
+  getAttribute(name){return this.attrs[name]||null;},
+  setAttribute(name,value){this.attrs[name]=value;},
+  querySelectorAll(){return[];},closest(){return null}
+ });
+ const female=create('👩 महिला आवाज','voice-pill');
+ const question=create('What does the word male mean?','quiz-answer');
+ const choice=create('Male','quiz-answer');
+ const btn=create('🔊 Listen','story-action');
+ doc.body.querySelectorAll=selector=>selector.startsWith('.voice-options')?[]:
+  selector.startsWith('div,span')?[]:[female,question,choice,btn];
+ win.__sikauNepaliVoice.removeGenderControls();
+ assert.equal(female.hidden,true);
+ assert.equal(question.hidden,false);
+ assert.equal(choice.hidden,false);
+ assert.equal(btn.hidden,false);
 });

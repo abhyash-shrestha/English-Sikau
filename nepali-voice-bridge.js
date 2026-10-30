@@ -53,18 +53,31 @@ const choose=(synth,locale)=>{
  return available.sort((a,b)=>quality(b,locale)-quality(a,locale))[0]||null;
 };
 const short=(value)=>String(value||'').replace(/\s+/g,' ').trim().slice(0,140);
+// Some native lessons show floating gender buttons/toasts outside the
+// Translate and Reading sections. Explicit "पुरुष आवाज" or "महिला आवाज"
+// is a voice setting everywhere, including the festival home screen.
+const explicitVoiceLabel=value=>{
+ const clean=String(value||'').replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu,'')
+  .replace(/\s+/g,' ').trim();
+ if(clean.length>55)return false;
+ return /^(?:(?:male|female|पुरुष|पुरूष|महिला)\s*(?:voice|आवाज)|(?:voice|आवाज)\s*(?:male|female|पुरुष|पुरूष|महिला))$/i.test(clean);
+};
 const isGender=(control)=>{
  if(!control)return false;
  const raw=String(control?.matches?.('input')?control.value:control.textContent||'').trim();
- const clean=raw.replace(/[👨👩♂♀️🔊🔉]/gu,'').trim();
+ const clean=raw.replace(/[\p{Extended_Pictographic}\uFE0E\uFE0F\u200D]/gu,'')
+  .replace(/\s+/g,' ').trim();
+ // Strong, unambiguous evidence, even for floating toast elements.
+ if(explicitVoiceLabel(raw))return true;
  const hint=[control.getAttribute?.('aria-label'),control.getAttribute?.('title'),
   control.getAttribute?.('class'),control.getAttribute?.('id')].join(' ');
  const selector=control.closest?.('.voice-options,.voice-controls,.voice-select,'+
-  '.voice-gender,.sikau-voice-gender,.story-actions,.ttx-result-actions,'+
+  '.voice-gender,.sikau-voice-gender,'+
   '[data-voice-selector]');
- const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts)\b/i.test(hint)||
+ const hasVoiceContext=!!selector||/\b(?:voice|speaker|speech|tts|gender)\b/i.test(hint)||
    !!control.getAttribute?.('data-voice-gender');
- // Do not remove answers in a story or quiz just because they say Male/Female.
+ // Never hide answers like "Male", "Female", or "Male doctors" outside
+ // an actual voice selector. No guessing from a person's gender.
  if(!hasVoiceContext)return false;
  if(control.tagName==='SELECT'&&control.options?.length){
   const vals=Array.from(control.options)
@@ -170,33 +183,61 @@ function install(doc){
  // Remove only controls whose entire purpose is choosing voice gender.
  // Never hide quiz choices, pronunciation buttons or listening controls.
  const hideGender=()=>{
-  for(const root of [scopes.tr,scopes.rd,doc.getElementById('learn'),
-      doc.getElementById('words'),doc.getElementById('sp')]){
-   if(!root)continue;
-   for(const control of root.querySelectorAll('button,input[type="radio"],label,[role="radio"],select')){
-    if(isGender(control)){
-     control.hidden=true;
-     control.style.display='none';
-     control.setAttribute('aria-hidden','true');
-     if(control.matches('input[type="radio"]')){
-      const parent=control.closest('label');
-      if(parent&&isGender(parent)){parent.hidden=true;parent.style.display='none';}
-     }
-    }
-   }
-   for(const group of root.querySelectorAll('.voice-options,.voice-gender,.voice-select,.sikau-voice-gender')){
-    const options=Array.from(group.querySelectorAll('button,label,input,[role="radio"]'));
-    if(options.length&&options.every(isGender)){group.hidden=true;group.style.display='none';}
-   }
+  const hide=(element)=>{
+   if(!element||element.getAttribute?.('data-sikau-voice-gender-hidden')==='1')return;
+   element.setAttribute?.('data-sikau-voice-gender-hidden','1');
+   element.hidden=true;
+   element.style?.setProperty?.('display','none','important');
+   if(element.style)element.style.display='none';
+   element.setAttribute?.('aria-hidden','true');
+  };
+  // Only query the explicit control shapes and small badges/toasts. Many
+  // floating voice indicators live immediately under BODY, not #tr or #rd.
+  const controls=doc.body.querySelectorAll(
+   'button,input[type="radio"],label,[role="radio"],[role="button"],select,'+
+   '[data-voice-gender],.voice-gender,.sikau-voice-gender,'+
+   '[class*="voice"],[class*="Voice"],[class*="toast"],[class*="Toast"],'+
+   '[class*="badge"],[class*="Badge"],[role="status"],[role="alert"]');
+  for(const control of controls){
+   if(control.getAttribute?.('data-sikau-voice-gender-hidden')==='1')continue;
+   if(!isGender(control))continue;
+   // If the badge is only a child of a floating toast, hide the toast as
+   // well to remove the dark pill/background. Never remove lesson cards.
+   const parent=control.parentElement;
+   if(parent&&parent.childElementCount<=2&&explicitVoiceLabel(parent.textContent)&&
+      !/^(?:MAIN|SECTION|ARTICLE)$/i.test(String(parent.tagName||'')))hide(parent);
+   hide(control);
+  }
+  // Plain DIV/SPAN toast, such as "👨 पुरुष आवाज" shown over Festivals.
+  // Only match a short exact voice label to avoid touching lesson content.
+  for(const item of doc.body.querySelectorAll('div,span,p,small')){
+   if(item.getAttribute?.('data-sikau-voice-gender-hidden')==='1')continue;
+   if(item.childElementCount>2||!explicitVoiceLabel(item.textContent))continue;
+   // Keep the smallest matching element except for dedicated floating
+   // wrappers, whose background would otherwise remain visible.
+   const child=Array.from(item.children||[]).find(x=>explicitVoiceLabel(x.textContent));
+   if(child&&!/(?:voice|gender|toast|snack|badge|notice|notification|alert)/i.test(
+     String(item.className||'')+' '+String(item.id||'')))continue;
+   hide(item);
+  }
+  // A pure gender group can be removed; groups also holding listen/play
+  // controls must be kept.
+  for(const group of doc.body.querySelectorAll(
+    '.voice-options,.voice-gender,.voice-select,.sikau-voice-gender')){
+   const options=Array.from(group.querySelectorAll('button,label,input,[role="radio"]'));
+   if(options.length&&options.every(isGender))hide(group);
   }
  };
+
  hideGender();
- let scheduled=false;
+ // MutationObserver fires before the browser paints newly inserted lesson
+ // controls. Remove a resurrected voice badge immediately, not next frame.
+ let checking=false;
  if(typeof view.MutationObserver==='function'){
-  const obs=new view.MutationObserver(()=>{
-   if(scheduled)return;
-   scheduled=true;
-   (view.requestAnimationFrame||view.setTimeout)(()=>{scheduled=false;hideGender();});
+  const obs=new view.MutationObserver(records=>{
+   if(checking||!records.some(r=>r.type==='childList'&&r.addedNodes?.length))return;
+   checking=true;
+   try{hideGender();}finally{checking=false;}
   });
   obs.observe(doc.body,{childList:true,subtree:true});
  }
