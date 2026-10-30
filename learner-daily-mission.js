@@ -83,7 +83,7 @@ function install(doc,account){
    button.setAttribute('aria-pressed',String(checks[i]));
   });
  };
- const note=add(doc,root,'p','mission-note','Check off lessons after practicing. Saved on this device only; not a test score.');
+ let note=null;
  TASKS.forEach((t,i)=>{
   const row=add(doc,root,'div','mission-row');
   const copy=add(doc,row,'div');
@@ -101,6 +101,7 @@ function install(doc,account){
   done.addEventListener('click',()=>{checks[i]=!checks[i];save(view,key,checks);update();});
   doneButtons.push(done);
  });
+ note=add(doc,root,'p','mission-note','Check off lessons after practicing. Saved on this device only; not a test score.');
  const festival=home.querySelector('.sfd');
  if(festival)home.insertBefore(root,festival);
  else home.insertBefore(root,home.firstChild);
