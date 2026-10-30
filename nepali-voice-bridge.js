@@ -13,7 +13,7 @@ const voiceCatalog=synth=>{
 };
 const language=code=>{
  const s=String(code||'').trim().toLowerCase().replace('_','-');
- if(/^(en-us|en)(?:-|$)/.test(s))return 'en-US';
+ if(/^en(?:-|$)/.test(s))return 'en-US'; // Force all English requests to US accent.
  if(/^(ne-np|ne)(?:-|$)/.test(s))return 'ne-NP';
  return null;
 };
