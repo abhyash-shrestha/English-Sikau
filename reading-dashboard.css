@@ -255,3 +255,95 @@ html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line{
  background:#303850!important;border-color:#56617c!important;color:#f5effa!important;
 }
 html[data-sikau-theme="dark"] #rd.sikau-read-exact .story-line :is(.rs,.story-line-text,.story-line-english){color:#f5effa!important}
+
+
+/* Reading mode choice cards — keeps the original mode switch behavior intact. */
+#rd.sikau-read-v2 #readModeSeg.read-v2-mode{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ align-items:stretch!important;gap:12px!important;
+ border:0!important;padding:0!important;background:transparent!important;
+ box-shadow:none!important;overflow:visible!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card{
+ display:grid!important;
+ grid-template-columns:60px minmax(0,1fr) 18px!important;
+ align-items:center!important;justify-items:stretch!important;
+ gap:14px!important;min-width:0!important;min-height:103px!important;
+ padding:14px 16px!important;margin:0!important;
+ border:1px solid #edd4df!important;border-radius:18px!important;
+ background:linear-gradient(110deg,#fffafc,#fff5f8)!important;
+ color:#293552!important;text-align:left!important;
+ box-shadow:0 4px 18px #1f314309!important;
+ cursor:pointer!important;white-space:normal!important;
+ transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card:hover{
+ border-color:#d78bad!important;box-shadow:0 8px 22px #72325216!important;
+ transform:translateY(-1px);
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card.on{
+ background:linear-gradient(108deg,#e91369,#ed6b9d)!important;
+ color:#fff!important;border:2px solid #bd1c62!important;
+ box-shadow:0 5px 22px #d92a6e25!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card-icon{
+ display:grid!important;place-items:center!important;min-width:0!important;
+ width:58px!important;height:58px!important;border-radius:50%!important;
+ background:#ffe8f2!important;color:#982d60!important;font-size:26px!important;
+ line-height:1!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card.on .read-mode-card-icon{
+ background:#fff!important;color:#c21b65!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card-copy{
+ display:flex!important;flex-direction:column!important;gap:5px!important;
+ min-width:0!important;align-items:flex-start!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card-title{
+ display:block!important;color:inherit!important;
+ font:850 clamp(17px,1.5vw,22px)/1.22 system-ui,sans-serif!important;
+ overflow-wrap:anywhere!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card-description{
+ display:block!important;color:#6b5972!important;
+ font:600 clamp(12px,1vw,14px)/1.5 system-ui,sans-serif!important;
+ overflow-wrap:anywhere!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card.on .read-mode-card-description{
+ color:#fff6fc!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card-arrow{
+ display:block!important;font-size:33px!important;line-height:1!important;
+ font-weight:400!important;text-align:center!important;color:inherit!important;
+}
+#rd.sikau-read-v2 #readModeSeg .read-mode-card:focus-visible{
+ outline:3px solid #386de8!important;outline-offset:3px!important;
+}
+@media(max-width:740px){
+ #rd.sikau-read-v2 #readModeSeg.read-v2-mode{
+  grid-template-columns:minmax(0,1fr)!important;gap:9px!important;
+ }
+ #rd.sikau-read-v2 #readModeSeg .read-mode-card{
+  min-height:80px!important;grid-template-columns:48px minmax(0,1fr) 18px!important;
+  gap:10px!important;padding:10px 13px!important;
+ }
+ #rd.sikau-read-v2 #readModeSeg .read-mode-card-icon{
+  width:46px!important;height:46px!important;font-size:23px!important;
+ }
+ #rd.sikau-read-v2 #readModeSeg .read-mode-card-title{
+  font-size:17px!important;
+ }
+ #rd.sikau-read-v2 #readModeSeg .read-mode-card-description{
+  font-size:12px!important;
+ }
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 #readModeSeg .read-mode-card:not(.on){
+ background:#2b354b!important;border-color:#64647c!important;
+ color:#f7eafb!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 #readModeSeg .read-mode-card:not(.on) .read-mode-card-icon{
+ background:#464458!important;color:#ffe7f1!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 #readModeSeg .read-mode-card:not(.on) .read-mode-card-description{
+ color:#e3d6eb!important;
+}
