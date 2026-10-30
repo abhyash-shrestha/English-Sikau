@@ -182,13 +182,13 @@ test('Use Hemkala natural Nepali female if browser exposes her explicitly',()=>{
  assert.equal(speaks[0].voice,hemkala.name);
 });
 
-test('Keep original Nepali female output if no positively identified better voice exists',()=>{
+test('Do not pretend a gender-unknown Nepali voice is female',()=>{
  const generic={name:'Nepali Standard',lang:'ne-NP'};
- const {win,synth,speaks}=mock([generic]);
+ const {win,synth,speaks,sections}=mock([generic]);
  win.__sikauNepaliVoice.select('rd','female');
  synth.speak({lang:'ne-NP',text:'नमस्कार',voice:null});
- assert.equal(speaks.length,1);
- assert.equal(speaks[0].voice,'');
+ assert.equal(speaks.length,0);
+ assert.match(sections.rd.last.textContent,/No female Nepali voice is available/);
 });
 
 
@@ -219,4 +219,47 @@ test('iPhone direct route never substitutes female voice for unavailable male Ne
  assert.equal(player.speakText('नमस्कार','ne-NP','tr'),false);
  assert.equal(speaks.length,0);
  assert.match(sections.tr.last.textContent,/No male Nepali voice is available/);
+});
+
+test('English Male/Female actually changes voice on Windows and Apple with named voices',()=>{
+ const ava={lang:'en-US',name:'Microsoft Ava Online (Natural)'};
+ const andrew={lang:'en-US',name:'Microsoft Andrew Online (Natural)'};
+ const samantha={lang:'en-US',name:'Samantha'};
+ const daniel={lang:'en-GB',name:'Daniel'};
+ for(const voices of [[ava,andrew],[samantha,daniel]]){
+  const {win,synth,speaks}=mock(voices);
+  win.__sikauNepaliVoice.select('tr','female');
+  synth.speak({lang:'en-US',text:'Hello, I am a woman'});
+  win.__sikauNepaliVoice.select('tr','male');
+  synth.speak({lang:'en-US',text:'Hello, I am a man'});
+  assert.equal(speaks.length,2);
+  assert.equal(win.__sikauNepaliVoice.englishGender(voices.find(v=>v.name===speaks[0].voice)),'female');
+  assert.equal(win.__sikauNepaliVoice.englishGender(voices.find(v=>v.name===speaks[1].voice)),'male');
+ }
+});
+
+test('English Male must never silently use a female voice if male is not installed',()=>{
+ const {win,synth,speaks,sections}=mock([{name:'Samantha',lang:'en-US'}]);
+ win.__sikauNepaliVoice.select('tr','male');
+ synth.speak({lang:'en-US',text:'A new sentence'});
+ assert.equal(speaks.length,0);
+ assert.match(sections.tr.last.textContent,/No male English voice is available/);
+});
+
+test('No Nepali language voice means no Hindi or English fallback on Android',()=>{
+ const {win,synth,speaks,sections}=mock([
+  {name:'Google Hindi India',lang:'hi-IN'},
+  {name:'Google US English',lang:'en-US'}
+ ]);
+ win.__sikauNepaliVoice.select('tr','female');
+ assert.equal(win.__sikauNepaliVoice.speakText('नमस्ते, नेपाल!','ne-NP','tr'),false);
+ synth.speak({lang:'ne-NP',text:'नेपाल सुन्दर छ।'});
+ assert.equal(speaks.length,0);
+ assert.match(sections.tr.last.textContent,/No female Nepali voice is available/);
+});
+
+test('Translate explicitly calls verified voice routing on every device, not only iPhone',()=>{
+ assert.match(translate,/v\.__sikauNepaliVoice\.speakText\(txt,outputLanguage,'tr'\)/);
+ assert.doesNotMatch(translate,/const isIphone=/);
+ assert.match(translate,/Selected voice unavailable on this device/);
 });
