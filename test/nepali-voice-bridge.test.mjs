@@ -294,11 +294,12 @@ test('Android gender-unknown Nepali voice can be explicitly played without using
  assert.equal(player.speakText('भोलि भेटौँला','ne-NP','tr'),false);
 });
 
-test('No Nepali voice never offers a Hindi-labeled fallback button',()=>{
- const {win,sections}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
+test('No Nepali voice never offers a Hindi-labeled substitute: only an optional no-voice probe',()=>{
+ const {win,sections,speaks}=mock([{name:'Google Hindi',lang:'hi-IN'}]);
  win.__sikauNepaliVoice.select('tr','female');
  assert.equal(win.__sikauNepaliVoice.speakText('नमस्कार','ne-NP','tr'),false);
- assert.equal(sections.tr.last.children.length,0);
+ assert.equal(speaks.length,0);
+ assert.deepEqual(sections.tr.last.children.map(x=>x.className),['sikau-nepali-voice-try-native']);
  assert.match(sections.tr.last.textContent,/Install voice data/);
 });
 
