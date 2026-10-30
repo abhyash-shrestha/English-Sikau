@@ -49,6 +49,8 @@ const BOOK={
   ]}
  ]
 };
+/* Curated books are public text, not the private native lesson generator. */
+const LIBRARY=[BOOK,...(Array.isArray(window.__sikauExtraStoryBooks)?window.__sikauExtraStoryBooks:[])];
 const make=(doc,tag,className,text)=>{
  const el=doc.createElement(tag);if(className)el.className=className;
  if(text!==undefined)el.textContent=String(text);
@@ -59,36 +61,70 @@ const readSaved=(view,key)=>{
   return Array.isArray(value)?value.filter(x=>Number.isInteger(x)&&x>=0&&x<BOOK.chapters.length):[];
  }catch(_){return [];}
 };
+const readProgress=(view,key)=>{
+ try{
+  const raw=JSON.parse(view.localStorage.getItem(key)||'{}');
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))return {};
+  const result={};
+  for(const book of LIBRARY){
+   const item=raw[book.id];if(!item||typeof item!=='object')continue;
+   const passed=Array.isArray(item.passed)?
+    item.passed.filter(i=>Number.isInteger(i)&&i>=0&&i<book.chapters.length):[];
+   result[book.id]={passed:[...new Set(passed)],
+    current:Number.isInteger(item.current)&&item.current>=0&&item.current<book.chapters.length?item.current:0};
+  }
+  return result;
+ }catch(_){return {};}
+};
 function install(doc,reader,accountId){
  if(!doc?.head||!doc?.defaultView||!reader)return false;
- if(reader.dataset.sikauFeaturedReady==='1')return true;
+ if(reader.dataset.sikauFeaturedReady==='2')return true;
  const layout=reader.querySelector('.read-v2-layout');
- if(!layout)return false;
- reader.dataset.sikauFeaturedReady='1';
+ if(!layout||!LIBRARY.length)return false;
  const view=doc.defaultView;
- const key='english-sikau-feature-book-v1:'+encodeURIComponent(accountId||'session');
- const completed=new Set(readSaved(view,key));
- const firstLocked=()=>{let n=0;while(n<BOOK.chapters.length&&completed.has(n))n++;return n;};
- let active=Math.min(firstLocked(),BOOK.chapters.length-1),showFeatured=true;
+ const key='english-sikau-short-books-v2:'+encodeURIComponent(accountId||'session');
+ const state=readProgress(view,key);
+ // Migrate completed Old Bookshop chapters without discarding existing progress.
+ const previousKey='english-sikau-feature-book-v1:'+encodeURIComponent(accountId||'session');
+ if(!state[BOOK.id]){
+  const saved=readSaved(view,previousKey);
+  if(saved.length)state[BOOK.id]={passed:saved,current:Math.min(saved.length,BOOK.chapters.length-1)};
+ }
+ const persist=()=>{try{view.localStorage.setItem(key,JSON.stringify(state))}catch(_){}};
+ const selected=(book)=>state[book.id]||(state[book.id]={passed:[],current:0});
  const styleId='sikauFeaturedBookStyle';
  if(!doc.getElementById(styleId)){
   const link=make(doc,'link');link.id=styleId;link.rel='stylesheet';
-  link.href=new URL('./featured-bilingual-story.css?v=20261030-chapters-r1',document.baseURI).href;
+  link.href=new URL('./featured-bilingual-story.css?v=20261030-library-r3',document.baseURI).href;
   doc.head.append(link);
  }
- const root=make(doc,'section','sikau-featured-book');
- root.setAttribute('aria-label','The Secret of the Old Bookshop, a bilingual chapter story');
+ const root=make(doc,'section','sikau-featured-book sikau-library-v2');
+ root.setAttribute('aria-label','English and Nepali short story library');
+ const header=make(doc,'header','sikau-library-header');
+ const headerCopy=make(doc,'div','sikau-library-copy');
+ headerCopy.append(make(doc,'span','sikau-featured-eyebrow','STORY MODE · कथा संग्रह'),
+  make(doc,'h2','','Short Story Library · छोटा कथाहरू'),
+  make(doc,'p','','Choose a complete chapter book. Read English and Nepali together, listen, and unlock the next chapter with your quiz.'));
+ header.append(headerCopy);
+ const count=make(doc,'div','sikau-library-total',LIBRARY.length+' books · '+LIBRARY.length+' किताब');
+ header.append(count);root.append(header);
+ const shelf=make(doc,'section','sikau-story-shelf');
+ shelf.setAttribute('aria-label','Choose a book · किताब छान्नुहोस्');
+ const categories=['All','Adventure','Mystery','Culture','Everyday Life'];
+ const filters=make(doc,'nav','sikau-library-filters');
+ filters.setAttribute('aria-label','Book categories');
+ const grid=make(doc,'div','sikau-library-grid');
+ shelf.append(filters,grid);root.append(shelf);
+ const reading=make(doc,'div','sikau-featured-reading');
+ reading.hidden=true;
  const top=make(doc,'div','sikau-featured-top');
- const cover=make(doc,'img','sikau-featured-cover');cover.src=new URL(BOOK.cover,document.baseURI).href;
- cover.alt='Mystery story illustration';cover.loading='lazy';
+ const cover=make(doc,'img','sikau-featured-cover');
+ cover.alt='Book cover';cover.loading='lazy';
  const intro=make(doc,'div','sikau-featured-intro');
- intro.append(make(doc,'span','sikau-featured-eyebrow','FEATURED SHORT BOOK · विशेष कथा'),
-  make(doc,'h2','',BOOK.title),make(doc,'p','sikau-featured-ntitle',BOOK.neTitle),
-  make(doc,'p','sikau-featured-level','5 connected chapters · ५ जोडिएका अध्याय · '+BOOK.level));
- const other=make(doc,'button','sikau-featured-switch','Other stories · अन्य कथाहरू');
- other.type='button';
- top.append(cover,intro,other);root.append(top);
- const storyArea=make(doc,'div','sikau-featured-reading');
+ const back=make(doc,'button','sikau-featured-switch','← All books · सबै किताब');
+ back.type='button';
+ top.append(cover,intro,back);
+ const storyArea=make(doc,'div','sikau-featured-story-area');
  const nav=make(doc,'nav','sikau-featured-chapters');
  nav.setAttribute('aria-label','Chapters · अध्यायहरू');
  const section=make(doc,'article','sikau-featured-chapter');
@@ -97,9 +133,20 @@ function install(doc,reader,accountId){
  const quiz=make(doc,'section','sikau-featured-quiz');
  quiz.setAttribute('aria-label','Chapter quiz');
  const footer=make(doc,'div','sikau-featured-footer');
- storyArea.append(nav,section,quiz,feedback,footer);root.append(storyArea);
+ storyArea.append(nav,section,quiz,feedback,footer);
+ reading.append(top,storyArea);root.append(reading);
  reader.insertBefore(root,layout);
- const persist=()=>{try{view.localStorage.setItem(key,JSON.stringify([...completed].sort((a,b)=>a-b)))}catch(_){}};
+ // Hide *only* the obsolete native Story-mode generator. Practice mode is separate.
+ layout.style.setProperty('display','none','important');
+ layout.setAttribute('aria-hidden','true');
+ reader.dataset.sikauFeaturedReady='2';
+ let currentBook=BOOK,active=0,completed=new Set(),category='All';
+ const quizAnswers=new Map();
+ const firstLocked=()=>{let i=0;while(i<currentBook.chapters.length&&completed.has(i))i++;return i;};
+ const stop=()=>{
+  if(view.__sikauNepaliVoice?.stop)view.__sikauNepaliVoice.stop();
+  else view.speechSynthesis?.cancel?.();
+ };
  const speak=(text,locale)=>{
   if(typeof view.__sikauSpeech==='function')view.__sikauSpeech(text,locale,'rd',{rate:0.94});
   else if(typeof view.__sikauNepaliVoice?.speakText==='function')view.__sikauNepaliVoice.speakText(text,locale,'rd',{rate:0.94});
@@ -110,42 +157,80 @@ function install(doc,reader,accountId){
   b.setAttribute('aria-label',locale==='ne-NP'?'Listen to Nepali audio':'Listen to English audio');
   b.addEventListener('click',()=>speak(text,locale));return b;
  };
- const setView=show=>{
-  showFeatured=show;
-  layout.style.setProperty('display',show?'none':'','important');
-  if(!show)layout.style.removeProperty('display');
-  storyArea.hidden=!show;
-  root.classList.toggle('sikau-featured-collapsed',!show);
-  other.textContent=show?'Other stories · अन्य कथाहरू':'Read featured story · विशेष कथा पढ्नुहोस्';
-  if(show)render();
+ const renderShelf=()=>{
+  filters.replaceChildren();grid.replaceChildren();
+  for(const value of categories){
+   const tab=make(doc,'button','sikau-library-filter'+(category===value?' on':''),value==='All'?'All books · सबै':value);
+   tab.type='button';tab.setAttribute('aria-pressed',String(category===value));
+   tab.addEventListener('click',()=>{category=value;renderShelf();});
+   filters.append(tab);
+  }
+  for(const book of LIBRARY){
+   if(category!=='All'&&book.category!==category)continue;
+   const progress=selected(book);
+   const passed=progress.passed.length;
+   const card=make(doc,'article','sikau-library-card');
+   const image=make(doc,'img','sikau-library-cover');
+   image.src=new URL(book.cover,document.baseURI).href;
+   image.alt='Illustration for '+book.title;image.loading='lazy';
+   const copy=make(doc,'div','sikau-library-card-copy');
+   copy.append(make(doc,'span','sikau-library-category',book.category||'Mystery'),
+    make(doc,'h3','',book.title),
+    make(doc,'p','sikau-library-ne-title',book.neTitle),
+    make(doc,'p','sikau-library-description',book.description||'A connected English and Nepali chapter story.'),
+    make(doc,'p','sikau-library-ne-description',book.neDescription||''),
+    make(doc,'p','sikau-library-progress',book.chapters.length+' chapters · '+passed+'/'+book.chapters.length+' completed · '+book.level));
+   const button=make(doc,'button','sikau-library-open',passed?'Continue reading · पढाइ जारी':'Read this book · किताब पढ्नुहोस्');
+   button.type='button';button.addEventListener('click',()=>openBook(book));
+   copy.append(button);card.append(image,copy);grid.append(card);
+  }
  };
- other.addEventListener('click',()=>setView(!showFeatured));
- const quizAnswers=new Map();
+ const openBook=book=>{
+  stop();
+  currentBook=book;
+  const progress=selected(book);
+  completed=new Set(progress.passed);
+  const highest=Math.min(firstLocked(),book.chapters.length-1);
+  active=Number.isInteger(progress.current)?Math.min(progress.current,highest):highest;
+  // Keep the learner on the last chapter they reached, even after refreshing.
+  cover.src=new URL(book.cover,document.baseURI).href;
+  cover.alt='Illustration for '+book.title;
+  intro.replaceChildren();
+  intro.append(make(doc,'span','sikau-featured-eyebrow','CHAPTER BOOK · अध्यायबद्ध कथा'),
+   make(doc,'h2','',book.title),make(doc,'p','sikau-featured-ntitle',book.neTitle),
+   make(doc,'p','sikau-featured-level',book.chapters.length+' connected chapters · '+book.level));
+  shelf.hidden=true;reading.hidden=false;
+  render();
+  root.scrollIntoView?.({block:'start',behavior:'smooth'});
+ };
+ const showShelf=()=>{
+  stop();reading.hidden=true;shelf.hidden=false;renderShelf();
+  root.scrollIntoView?.({block:'start',behavior:'smooth'});
+ };
+ back.addEventListener('click',showShelf);
  function render(){
-  const c=BOOK.chapters[active];
+  const c=currentBook.chapters[active];
+  selected(currentBook).current=active;persist();
   feedback.textContent='';
   nav.replaceChildren();section.replaceChildren();quiz.replaceChildren();footer.replaceChildren();
-  BOOK.chapters.forEach((chapter,i)=>{
+  currentBook.chapters.forEach((chapter,i)=>{
    const unlocked=i<=firstLocked()||completed.has(i);
    const button=make(doc,'button','sikau-featured-tab'+(i===active?' on':''),
-    (unlocked?'':'🔒 ')+'Chapter '+(i+1));
+    (unlocked?'':'🔒 ')+'Chapter '+(i+1)+' · '+chapter.neTitle);
    button.type='button';button.disabled=!unlocked;
    button.title=chapter.title+' · '+chapter.neTitle;
    button.setAttribute('aria-current',i===active?'step':'false');
-   button.addEventListener('click',()=>{active=i;render();});nav.append(button);
+   button.addEventListener('click',()=>{stop();active=i;render();});nav.append(button);
   });
-  section.append(make(doc,'p','sikau-featured-chapter-count','CHAPTER '+(active+1)+' OF '+BOOK.chapters.length),
+  section.append(make(doc,'p','sikau-featured-chapter-count','CHAPTER '+(active+1)+' OF '+currentBook.chapters.length),
    make(doc,'h3','',c.title),make(doc,'p','sikau-featured-subtitle',c.neTitle));
   const listen=make(doc,'div','sikau-featured-listen');
   const allEn=c.paragraphs.map(p=>p[0]).join(' '),allNe=c.paragraphs.map(p=>p[1]).join(' ');
   listen.append(playButton('🔊 Listen in English',allEn,'en-US'),
    playButton('🔊 नेपालीमा सुन्नुहोस्',allNe,'ne-NP'));
-  const stop=make(doc,'button','sikau-featured-stop','■ Stop · रोक्नुहोस्');stop.type='button';
-  stop.addEventListener('click',()=>{
-   if(view.__sikauNepaliVoice?.stop)view.__sikauNepaliVoice.stop();
-   else view.speechSynthesis?.cancel?.();
-  });
-  listen.append(stop);section.append(listen);
+  const stopButton=make(doc,'button','sikau-featured-stop','■ Stop · रोक्नुहोस्');
+  stopButton.type='button';stopButton.addEventListener('click',stop);
+  listen.append(stopButton);section.append(listen);
   for(const [en,ne] of c.paragraphs){
    const pair=make(doc,'div','sikau-featured-pair');
    const english=make(doc,'div','sikau-featured-lang'),nepali=make(doc,'div','sikau-featured-lang');
@@ -159,18 +244,19 @@ function install(doc,reader,accountId){
   }
   quiz.append(make(doc,'h4','','Check your understanding · कथा कति बुझ्नुभयो?'));
   quiz.append(make(doc,'p','sikau-featured-help',
-   'Answer both questions correctly to unlock the next chapter · अर्को अध्याय खोल्न दुवै प्रश्न मिलाउनुहोस्।'));
-  const saved=quizAnswers.get(active)||[];
+   'Get 100% to unlock the next chapter · अर्को अध्याय खोल्न १००% ल्याउनुहोस्।'));
+  const answerKey=currentBook.id+'|'+active;
+  const saved=quizAnswers.get(answerKey)||[];
   c.questions.forEach((question,i)=>{
    const field=make(doc,'fieldset','sikau-featured-question');
    field.append(make(doc,'legend','',String(i+1)+'. '+question.en+' · '+question.ne));
    question.choices.forEach(([en,ne],j)=>{
     const line=make(doc,'label','sikau-featured-option');
     const input=make(doc,'input');input.type='radio';
-    input.name='sikau-book-'+active+'-'+i;input.value=String(j);
-    input.checked=saved[i]===j;
+    input.name='sikau-book-'+currentBook.id+'-'+active+'-'+i;
+    input.value=String(j);input.checked=saved[i]===j;
     input.addEventListener('change',()=>{
-     const answers=quizAnswers.get(active)||[];answers[i]=j;quizAnswers.set(active,answers);
+     const answers=quizAnswers.get(answerKey)||[];answers[i]=j;quizAnswers.set(answerKey,answers);
      feedback.textContent='';
     });
     line.append(input,make(doc,'span','',en+' · '+ne));field.append(line);
@@ -181,34 +267,35 @@ function install(doc,reader,accountId){
    '✓ Passed · उत्तीर्ण':'Check answers · उत्तर जाँच्नुहोस्');
   check.type='button';
   check.addEventListener('click',()=>{
-   const answers=quizAnswers.get(active)||[];
+   const answers=quizAnswers.get(answerKey)||[];
    const score=c.questions.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);
    if(answers.length<c.questions.length||answers.some(x=>!Number.isInteger(x))){
-    feedback.textContent='Choose an answer for each question · सबै प्रश्नको उत्तर छान्नुहोस्।';return;
+    feedback.textContent='Answer all questions · सबै प्रश्नको उत्तर दिनुहोस्।';return;
    }
    if(score!==c.questions.length){
     feedback.textContent='Score: '+Math.round(100*score/c.questions.length)+'%. Try again for 100% · फेरि प्रयास गर्नुहोस्।';return;
    }
-   completed.add(active);persist();
-   feedback.textContent='100% — Wonderful! Next chapter unlocked · उत्कृष्ट! अर्को अध्याय खुल्यो।';
-   render();
+   completed.add(active);
+   selected(currentBook).passed=[...completed].sort((a,b)=>a-b);
+   persist();render();
    feedback.textContent='100% — Wonderful! Next chapter unlocked · उत्कृष्ट! अर्को अध्याय खुल्यो।';
   });
   quiz.append(check);
   const previous=make(doc,'button','sikau-featured-nav','← Previous chapter · अघिल्लो अध्याय');
   previous.type='button';previous.disabled=active===0;
-  previous.addEventListener('click',()=>{active--;render();});
+  previous.addEventListener('click',()=>{stop();active--;render();});
   footer.append(previous);
-  if(active<BOOK.chapters.length-1){
+  if(active<currentBook.chapters.length-1){
    const next=make(doc,'button','sikau-featured-nav sikau-featured-next','Next chapter · अर्को अध्याय →');
    next.type='button';next.disabled=!completed.has(active);
-   next.addEventListener('click',()=>{active++;render();});
+   next.addEventListener('click',()=>{stop();active++;render();});
    footer.append(next);
   }else if(completed.has(active))footer.append(make(doc,'p','sikau-featured-end','✦ The End · समाप्त ✦'));
  }
- setView(true);
+ renderShelf();
  return true;
 }
 window.enhanceFeaturedBilingualStory=install;
 window.__sikauFeaturedStoryData=BOOK;
+window.__sikauBookLibrary=LIBRARY;
 })();
