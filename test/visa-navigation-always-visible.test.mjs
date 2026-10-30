@@ -29,7 +29,8 @@ function node(tag){
   },
   click(){
    const event={preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}};
-   for(const fn of listeners.click||[])fn(event);
+   // DOM dispatch snapshots listeners: handlers added during this click run next time.
+   for(const fn of [...(listeners.click||[])])fn(event);
   }
  };
  element.classList={
