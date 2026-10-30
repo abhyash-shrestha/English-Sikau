@@ -1177,6 +1177,7 @@ html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-stories.js?v=20261030-nepali-r2"></script>
 <script src="./festival-dashboard-preview.js?v=20261030-nepali-r2"></script>
+<script src="./learner-daily-mission.js?v=20261030-r1"></script>
 <script src="./mobile-bar-handles.js?v=20261029-manual-only-r2"></script>
 <script src="./coach-store-story.js?v=20261028-dialogue-only-r9"></script>
 <script src="./coach-topic-catalog-1.js?v=20261028-175topics-r1"></script>
@@ -3068,6 +3069,7 @@ function personalizeStudentLesson(){
   }
   // Visual-only test dashboard; preserves original festival handlers and security.
   window.enhanceFestivalDashboardPreview?.(doc,first,[...SIKAU_FESTIVAL_PREVIEW,...SIKAU_NEXT_FESTIVALS],sikauNepalDate());
+  uiStep('daily English mission',()=>window.enhanceDailyEnglishMission?.(doc,user.$id));
   simplifyStudentHeroGreeting(doc,first);
   // Target only short hero/greeting and badge text. Never touch exercises,
   // storage, lesson state, XP, quiz scoring, or private source files.
