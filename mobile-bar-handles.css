@@ -74,6 +74,10 @@ html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .
 html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .sikau-nav-word small{
  color:var(--classroom-muted)!important;font:650 11px/1.2 system-ui,sans-serif!important;
 }
+/* Navigation already has a Nepali label in the default bilingual mode. */
+html.sikau-classroom:not([data-sikau-display-language="en-roman"],[data-sikau-display-language="all"]) #mobileModes .sikau-nav-word strong[data-sikau-ne-help]::after{
+ content:none!important;display:none!important;
+}
 html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified:hover:not(.on){
  background:var(--classroom-chip)!important;
 }
@@ -113,6 +117,14 @@ html.sikau-refresh.sikau-classroom .app-header .header-btns :is(button,select){
 html.sikau-refresh.sikau-classroom section[id]>.content,
 html.sikau-refresh.sikau-classroom #sikauHomeScreen.sfd-ready{
  max-width:1560px!important;padding-inline:var(--classroom-gutter)!important;
+}
+/* Give the Gregorian and Bikram Sambat dates separate lines in each card. */
+html.sikau-refresh.sikau-classroom #sikauHomeScreen .sfd .sfd-date{
+ position:static;z-index:auto;display:block;align-self:flex-start;
+ width:max-content;min-width:0;max-width:100%;margin:8px 2px 0;padding:5px 8px;
+ background:var(--classroom-chip);color:var(--classroom-accent);
+ border:1px solid var(--classroom-line);box-shadow:none;text-align:left;
+ font-size:clamp(10px,.85vw,11px);line-height:1.3;overflow-wrap:anywhere;
 }
 
 @media (max-width:767px){
@@ -253,8 +265,12 @@ html.sikau-refresh.sikau-classroom #sikauHomeScreen.sfd-ready{
   align-items:flex-start!important;text-align:left!important;
  }
  html.sikau-refresh.sikau-classroom #mobileModes.nav > .nav-brand{
+  display:flex!important;align-items:center;gap:8px;
   margin:0 0 5px!important;padding:4px 6px 10px!important;border-bottom:1px solid var(--classroom-line)!important;
   flex:none;
+ }
+ html.sikau-refresh.sikau-classroom #mobileModes.nav > .nav-brand b{
+  display:block;font:850 14px/1.2 system-ui,sans-serif;
  }
 }
 @media (min-width:768px) and (max-width:1023px){
