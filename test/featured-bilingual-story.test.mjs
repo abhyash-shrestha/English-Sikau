@@ -209,7 +209,7 @@ test('Reading uses one compact native topic/level toolbar and bilingual sentence
  assert.match(practice,/translationFrom\(e\)/);
  assert.match(practice,/sikau-practice-english/);
  assert.match(practice,/sikau-practice-nepali/);
- assert.match(practice,/speakerButton\('🔊 Listen','en-US',e\)/);
+ assert.match(practice,/speakerButton\('🔊 Play','en-US',e\)/);
  assert.match(practice,/speakerButton\('🔊 सुन्नुहोस्','ne-NP',e\)/);
  assert.doesNotMatch(practice,/const nativeNav=|const renderNav=|nav=mk\(doc/);
  assert.doesNotMatch(practiceCss,/sikau-practice-nav-action/);
