@@ -395,13 +395,24 @@ window.enhanceWordsDashboard=function(doc){
    const b=add(doc,list,'button','wv-word-row');
    b.type='button';if(selected===w.word)b.classList.add('selected');
    b.setAttribute('aria-pressed',String(selected===w.word));
-   const ico=add(doc,b,'span','wv-sound-icon','🔊');ico.setAttribute('aria-hidden','true');
+   const ico=add(doc,b,'span','wv-sound-icon','Aa');ico.setAttribute('aria-hidden','true');
    const words=add(doc,b,'span','wv-row-words');
    add(doc,words,'strong','',w.word);add(doc,words,'small','',w.ne);
    const extra=add(doc,b,'span','wv-row-extra');
    if(w.level)add(doc,extra,'span','wv-level','Level '+w.level);
-   add(doc,extra,'span','wv-row-star',w.saved?'★':'☆');
-   b.addEventListener('click',()=>choose(w.word));
+   if(w.saved)add(doc,extra,'span','wv-row-star','★').setAttribute('aria-hidden','true');
+   add(doc,extra,'span','wv-view-word','View →').setAttribute('aria-hidden','true');
+   b.setAttribute('aria-label','View '+w.word+' · '+w.ne);
+   b.addEventListener('click',event=>{
+    choose(w.word);
+    const view=doc.defaultView;
+    if(!event.detail||view.matchMedia('(max-width:767px)').matches){
+     const heading=detail.querySelector('h2');
+     if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
+     const reduced=view.matchMedia('(prefers-reduced-motion:reduce)').matches;
+     detail.scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'});
+    }
+   });
   }
  }
  function sentenceFor(w){

@@ -435,6 +435,10 @@
   'Deciding next steps':'अर्को कदम तय गर्दै',
   'Choose what you\'d actually say':'तपाईं वास्तवमै के भन्न चाहनुहुन्छ?',
   'Choose a card to start talking':'कुराकानी सुरु गर्न एउटा कार्ड छान्नुहोस्',
+  'Search by name or choose a topic card to start.':'खोज्नुहोस् वा सुरु गर्न एउटा विषय छान्नुहोस्।',
+  'Start conversation':'कुराकानी सुरु गर्नुहोस्',
+  'Filter by category':'विषयको प्रकार छान्नुहोस्',
+  'Choose a reply to continue':'अगाडि बढ्न जवाफ छान्नुहोस्',
   'Your request:':'तपाईंको अनुरोध:',
   'Previous':'अघिल्लो',
   'Next':'अर्को',
@@ -641,6 +645,15 @@
   localizedLabel('#chat-role,#chat-counter,#chat-step,#chat-goal,#choice-title,#total-counter,#page-summary,#topic-browser .sectiontitle,#topic-browser .sectionhint,#chat-view .kicker,#topic-browser .resultline span,#topic-browser .footnote,#chat-view .progressline span,#goal-status > span,#complete-actions strong,#complete-actions p');
   localizedLabel('#back-topics,#undo,#switch-goal,#restart,#restart-bottom,#pager-prev,#pager-next',el=>originalText(el).replace(/^[^\p{L}\p{N}]+/u,'').replace(/[^\p{L}\p{N}]+$/u,'').trim());
   localizedLabel('#category-filters .category-chip',el=>originalText(el));
+  localizedLabel('.mobile-category-copy');
+  const picker=document.getElementById('mobile-category');
+  for(const option of picker?.options||[]){
+   const ne=staticNe.get(option.value);
+   const help=mode==='en-ne'?ne:mode==='en-roman'&&ne?capitalizeRomanSentences(romanize(ne)):
+    mode==='all'&&ne?ne+' · '+capitalizeRomanSentences(romanize(ne)):'';
+   const label=option.value+' ('+option.dataset.count+')'+(help?' · '+help:'');
+   if(option.textContent!==label)option.textContent=label;
+  }
   localizedLabel('#topic-grid .no-results');
   // Personalize only the learner's speaker label. Never translate or
   // romanize the student's own first name; it comes from the verified

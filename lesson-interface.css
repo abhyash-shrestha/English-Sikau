@@ -1,0 +1,452 @@
+/* English Sikau learning surfaces. Shared with the embedded Coach workspace. */
+html:is(.sikau-lesson-interface,.sikau-coach-workspace){
+ --sx-surface:#fff;
+ --sx-canvas:#f7f6fc;
+ --sx-ink:#292442;
+ --sx-muted:#625d75;
+ --sx-edge:#d7cede;
+ --sx-quiet:#f4f0f8;
+ --sx-tint:#f9eaf2;
+ --sx-accent:#9f225c;
+ --sx-main:#a7225c;
+ --sx-main-hover:#891547;
+ --sx-focus:#4a56bd;
+ --sx-shadow:0 5px 18px #2614380a;
+}
+html.sikau-lesson-interface[data-sikau-theme="dark"],
+html.sikau-coach-workspace[data-theme="dark"]{
+ --sx-surface:#24283d;
+ --sx-canvas:#161a2b;
+ --sx-ink:#f7f1fb;
+ --sx-muted:#d0c8db;
+ --sx-edge:#595570;
+ --sx-quiet:#30344b;
+ --sx-tint:#483049;
+ --sx-accent:#ffc2de;
+ --sx-main:#ad2e65;
+ --sx-main-hover:#922450;
+ --sx-focus:#a9baff;
+ --sx-shadow:0 5px 18px #08051220;
+}
+html.sikau-refresh.sikau-lesson-interface{--classroom-canvas:var(--sx-canvas)}
+html.sikau-refresh.sikau-lesson-interface section[id] > .content.sx-content{padding-block-start:clamp(11px,1.7vw,26px)!important}
+
+.sx-heading{
+ display:flex;align-items:flex-start;gap:clamp(10px,1.6vw,18px);grid-column:1/-1;
+ width:100%;min-width:0;margin:0 0 clamp(12px,1.7vw,20px);
+ padding:clamp(13px,1.8vw,23px);border:1px solid var(--sx-edge);border-radius:17px;
+ background:linear-gradient(105deg,var(--sx-surface) 40%,var(--sx-quiet));
+ box-shadow:var(--sx-shadow);color:var(--sx-ink);
+}
+.sx-heading-icon{
+ flex:0 0 clamp(38px,4.5vw,58px);height:clamp(38px,4.5vw,58px);
+ display:grid;place-items:center;border:1px solid var(--sx-edge);border-radius:13px;
+ background:var(--sx-tint);color:var(--sx-accent);font:800 clamp(19px,2.7vw,30px)/1 system-ui,sans-serif;
+}
+.sx-heading-copy{min-width:0}
+html.sikau-refresh.sikau-lesson-interface .sx-heading .sx-title{
+ display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 10px;
+ margin:0 0 6px!important;color:var(--sx-ink)!important;
+ font:850 clamp(24px,3.2vw,39px)/1.14 system-ui,sans-serif!important;letter-spacing:-.035em;
+}
+.sx-title .sx-ne{
+ color:var(--sx-accent);font-size:clamp(14px,1.5vw,20px);font-weight:760;letter-spacing:0;
+ --sikau-roman-size:15px;
+}
+.sx-guide{
+ display:flex;flex-wrap:wrap;gap:1px 12px;max-width:87ch;
+ margin:0!important;color:var(--sx-muted);font:550 clamp(12px,1.2vw,15px)/1.5 system-ui,sans-serif;
+}
+.sx-guide .sx-ne{--sikau-roman-size:12px}
+.sx-caption{
+ display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 7px;grid-column:1/-1;flex-basis:100%;
+ margin:0 0 6px;padding:0 1px;color:var(--sx-ink);font:800 13px/1.35 system-ui,sans-serif;
+}
+.sx-caption .sx-ne{color:var(--sx-muted);font-size:11px;--sikau-roman-size:11px}
+html[data-sikau-display-language="en"] :is(.sx-title,.sx-guide,.sx-caption) .sx-ne{display:none}
+html.sikau-lesson-interface :is(.sx-heading,.sx-caption) [data-sikau-ne-help]::after,
+html.sikau-lesson-interface .sikau-current-lesson[data-sikau-ne-help]::after{display:none!important;content:none!important}
+html.sikau-refresh.sikau-lesson-interface .sx-content > .sikau-ui-intro,
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .sx-content>.ttx-hero,
+html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .sx-content .wc-banner,
+html.sikau-refresh.sikau-lesson-interface #pg.sikau-progress-v1 .sx-content .pv-hero,
+html.sikau-refresh.sikau-lesson-interface #rd.sikau-read-v2 .sx-content>.read-v2-hero,
+html.sikau-refresh.sikau-lesson-interface #game.sikau-game-adventure .sx-content>.game-v5-header,
+html.sikau-refresh.sikau-lesson-interface #learn .sx-content #courseRoot .sikau-course-steps{display:none!important}
+
+/* Controls use distinct pressed, available, and keyboard-focus states. */
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(button,.btn,summary,a[href].sfd-source,[role="button"]):focus-visible{
+ outline:3px solid var(--sx-focus)!important;outline-offset:2px!important;
+}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(button,summary,[role="button"]):not(:disabled):not([aria-disabled="true"]){cursor:pointer}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(button,summary):is(:disabled,[aria-disabled="true"]){cursor:default}
+
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(.ttx-dir-button,.wv-category,.wv-word-row,.wv-level-chip,.wv-tab,.read-mode-card,.sikau-library-filter,
+ .sikau-featured-tab,.sikau-visa-category,.sikau-visa-question-choice,.sfd-quiz-choice,.course-chapter,
+ .game-modes button,.game-map-stop,#speakDirSeg button,#spMode button){
+ min-height:44px!important;border:1px solid var(--sx-edge)!important;border-radius:11px!important;
+ background:var(--sx-surface)!important;color:var(--sx-ink)!important;box-shadow:var(--sx-shadow)!important;
+}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(.ttx-dir-button,.wv-category,.wv-word-row,.wv-level-chip,.wv-tab,.read-mode-card,.sikau-library-filter,
+ .sikau-featured-tab,.sikau-visa-category,.sikau-visa-question-choice,.sfd-quiz-choice,.course-chapter,
+ .game-modes button,.game-map-stop,#speakDirSeg button,#spMode button)
+ :is(strong,b){color:inherit!important}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+ :is(.ttx-dir-button,.wv-category,.wv-word-row,.read-mode-card,.sikau-featured-tab,.sikau-visa-category,.sikau-visa-question-choice,.game-map-stop)
+ small{color:var(--sx-muted)!important}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#coach,#sikauHomeScreen)
+ :is(.ttx-dir-button,.wv-category,.wv-word-row,.wv-level-chip,.wv-tab,.read-mode-card,.sikau-library-filter,
+ .sikau-featured-tab,.sikau-visa-category,.sikau-visa-question-choice,.course-chapter,.game-modes button,
+ .game-map-stop,#speakDirSeg button,#spMode button):is(.on,.active,.selected,[aria-pressed="true"],[aria-current="step"]){
+ background:var(--sx-tint)!important;border-color:var(--sx-accent)!important;
+ color:var(--sx-accent)!important;box-shadow:inset 0 0 0 1px var(--sx-accent)!important;
+}
+@media (hover:hover){
+ html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#rd,#learn,#game,#sp,#pg,#coach,#sikauHomeScreen)
+  :is(.ttx-dir-button,.ttx-quick,.ttx-topic,.wv-category,.wv-word-row,.wv-level-chip,.wv-tab,.read-mode-card,
+  .sikau-library-filter,.sikau-featured-tab,.sikau-visa-category,.sikau-visa-question-choice,.course-chapter,.game-map-stop):hover:not(:disabled){
+  border-color:var(--sx-accent)!important;
+ }
+}
+
+html.sikau-refresh.sikau-lesson-interface
+ :is(#tr #bt,#words .wv-study-primary,#words .wv-practice-button,#words .wv-check,#hw #writeCheck,#rd .sikau-library-open,
+ #rd .sikau-featured-check,#rd .sikau-featured-next,#learn .btn.primary,#game #gameStart,#sp #micBig,
+ #coach .sikau-visa-primary,#sikauHomeScreen .sfd-learn,#sikauHomeScreen .sfd-story-quiz-next){
+ min-height:44px!important;border:1px solid transparent!important;border-radius:11px!important;
+ background:var(--sx-main)!important;color:#fff!important;box-shadow:0 4px 9px #72214921!important;
+ font-weight:820!important;white-space:normal!important;overflow-wrap:anywhere;line-height:1.3!important;
+}
+html.sikau-refresh.sikau-lesson-interface
+ :is(#tr #bt,#words .wv-study-primary,#words .wv-practice-button,#words .wv-check,#hw #writeCheck,#rd .sikau-library-open,
+ #rd .sikau-featured-check,#rd .sikau-featured-next,#learn .btn.primary,#game #gameStart,#sp #micBig,
+ #coach .sikau-visa-primary,#sikauHomeScreen .sfd-learn,#sikauHomeScreen .sfd-story-quiz-next):hover:not(:disabled){
+ background:var(--sx-main-hover)!important;
+}
+html.sikau-refresh.sikau-lesson-interface
+ :is(#tr #clr,#tr #ex,#tr .ttx-mini,#tr .ttx-result-actions button,#words .wv-study-button:not(.wv-study-primary),
+ #words .wv-show-topics,#words .wv-show-answer,#words .wv-next-word,#words .wv-speak,#words .wv-save,
+ #hw .wc-change,#hw .wc-native-feedback summary,#rd .sikau-practice-listen,#rd .sikau-featured-play,
+ #rd .sikau-featured-switch,#rd .sikau-featured-stop,#sp .sikau-speech-help button,#coach .sikau-visa-secondary,
+ #coach .sikau-visa-browser-more,#coach .sikau-visa-shuffle,#sikauHomeScreen .sfd-more-btn,
+ #sikauHomeScreen .sfd-story-back,#sikauHomeScreen .sfd-story-voice,#sikauHomeScreen .sfd-story-translate){
+ min-height:44px!important;border:1px solid var(--sx-edge)!important;border-radius:10px!important;
+ background:var(--sx-surface)!important;color:var(--sx-accent)!important;
+ white-space:normal!important;line-height:1.25!important;font-weight:760!important;
+}
+
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#sp,#coach,#sikauHomeScreen)
+ :is(textarea,input[type="text"],input[type="search"]){
+ border:1px solid var(--sx-edge)!important;background:var(--sx-surface)!important;
+ color:var(--sx-ink)!important;border-radius:10px!important;min-width:0;
+}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#sp,#coach,#sikauHomeScreen)
+ :is(textarea,input[type="text"],input[type="search"])::placeholder{color:var(--sx-muted)!important;opacity:.9}
+html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#sp,#coach)
+ :is(textarea,input[type="text"],input[type="search"]):focus{
+ outline:2px solid var(--sx-focus)!important;outline-offset:1px;
+}
+
+/* Translate: direction, input and submit stay together. */
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-workspace{gap:clamp(10px,1.5vw,18px)!important}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-panel{
+ border:1px solid var(--sx-edge)!important;border-radius:15px!important;background:var(--sx-surface)!important;
+ color:var(--sx-ink)!important;box-shadow:var(--sx-shadow)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-entry .ttx-native #bt{
+ background:var(--sx-main)!important;color:#fff!important;
+}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-entry .ttx-native #bt:hover:not(:disabled){
+ background:var(--sx-main-hover)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-entry .ttx-native :is(#clr,#ex){
+ flex:1 1 94px!important;border:1px solid var(--sx-edge)!important;
+ color:var(--sx-accent)!important;background:var(--sx-surface)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #tr #ex::after{display:none!important;content:none!important}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-entry>.sx-caption{margin:0 0 6px}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-dir-button strong{font-size:clamp(11px,1.45vw,14px)!important}
+html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-dir-button small{font-size:clamp(10px,1.25vw,12px)!important}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-view-result{display:none}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-result-content{
+ border:1px dashed var(--sx-edge)!important;border-radius:12px!important;
+ background:var(--sx-quiet)!important;color:var(--sx-ink)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-result-placeholder{color:var(--sx-muted)!important;font-size:13px!important}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-notice:not(:empty){
+ padding:9px 10px;border-radius:8px;background:var(--sx-tint);color:var(--sx-ink);font-weight:700;
+}
+html.sikau-refresh.sikau-lesson-interface #tr .ttx-quick-footer{
+ border:1px solid var(--sx-edge);background:var(--sx-surface)!important;color:var(--sx-accent)!important;
+}
+
+/* Words: lead with search. Keep today's word as its own real shortcut. */
+.sx-words-start{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(205px,.42fr);
+ align-items:stretch;gap:12px;
+}
+html.sikau-refresh.sikau-lesson-interface #words .sx-words-start > .wv-hero{
+ display:flex!important;align-items:stretch;min-height:0!important;margin:0;padding:0!important;
+ background:none!important;box-shadow:none;border:0;
+}
+html.sikau-refresh.sikau-lesson-interface #words .sx-words-start .wv-hero :is(.wv-hero-art,.wv-hero-message){display:none!important}
+html.sikau-refresh.sikau-lesson-interface #words .sx-words-start .wv-today{
+ flex:1 1 100%;width:100%;max-width:none!important;min-width:0!important;
+ border:1px solid var(--sx-edge)!important;border-radius:14px!important;
+ background:var(--sx-tint)!important;color:var(--sx-ink)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #words .wv-today :is(strong,span,p,.wv-today-head){color:var(--sx-ink)!important}
+html.sikau-refresh.sikau-lesson-interface #words :is(.wv-list-pane,.wv-detail-pane,.wv-filter-panel,.wv-topic-panel){
+ background:var(--sx-surface)!important;border-color:var(--sx-edge)!important;box-shadow:var(--sx-shadow)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #words .wv-search input{min-height:44px;border:0!important}
+html.sikau-refresh.sikau-lesson-interface #words .wv-word-row .wv-row-extra{flex-wrap:wrap;justify-content:flex-end}
+html.sikau-refresh.sikau-lesson-interface #words .wv-word-row .wv-view-word{
+ color:var(--sx-accent);font:800 11px/1.2 system-ui,sans-serif;white-space:nowrap;
+}
+html.sikau-refresh.sikau-lesson-interface #words .wv-original > summary,
+html.sikau-refresh.sikau-lesson-interface #hw .wc-native-feedback > summary{
+ display:list-item;min-height:44px;padding:11px;border:1px solid var(--sx-edge)!important;
+ border-radius:11px;background:var(--sx-surface)!important;color:var(--sx-accent)!important;
+}
+
+/* Writing: keep the topic and answer adjacent before feedback and tips. */
+html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid{
+ grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)!important;
+ grid-template-rows:none!important;gap:13px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-primary-grid > :is(.wc-topic-panel,.wc-editor-panel,.wc-checklist){
+ grid-row:auto!important;grid-column:auto!important;
+}
+html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-primary-grid > .wc-checklist{
+ grid-column:1/-1!important;
+}
+html.sikau-refresh.sikau-lesson-interface #hw .wc-topic-heading{flex-wrap:wrap}
+html.sikau-refresh.sikau-lesson-interface #hw :is(.wc-topic-panel,.wc-editor-panel,.wc-checklist,.wc-simple-card,.wc-simple-model){
+ border:1px solid var(--sx-edge)!important;background:var(--sx-surface)!important;border-radius:14px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #hw .wc-change{padding:9px 11px!important}
+html.sikau-refresh.sikau-lesson-interface #hw #writeText{min-height:clamp(150px,18vw,240px);line-height:1.65}
+html.sikau-refresh.sikau-lesson-interface #hw #writeCheck{min-width:min(100%,185px)}
+html.sikau-refresh.sikau-lesson-interface #hw .wc-editor-panel :is(.wc-real-feedback,.wc-native-feedback):not([hidden]){margin-top:13px}
+html.sikau-lesson-interface #hw .wc-checklist h3[data-sikau-ne-help]::after{display:none!important;content:none!important}
+@media(min-width:768px) and (max-width:1459px){
+ html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-primary-grid > .wc-checklist{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px;
+ }
+ html.sikau-refresh.sikau-lesson-interface #hw .wc-checklist > :is(h3,p){grid-column:1/-1}
+}
+@media(min-width:1460px){
+ html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid{
+  grid-template-columns:minmax(220px,.87fr) minmax(0,1.3fr) minmax(205px,.66fr)!important;
+ }
+ html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-primary-grid > .wc-checklist{grid-column:auto!important}
+}
+
+/* Reading: mode is a choice. A book, a chapter and an audio action look distinct. */
+html.sikau-refresh.sikau-lesson-interface #rd #readModeSeg{margin-block:0 12px!important}
+html.sikau-refresh.sikau-lesson-interface #rd:has(#readModeSeg button[data-rm]:not([data-rm="story"]).on) #storyReader{display:none!important}
+html.sikau-refresh.sikau-lesson-interface #rd #readModeSeg .read-mode-card{
+ min-height:69px!important;padding:9px 11px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #rd .read-mode-card :is(.read-mode-card-title,.read-mode-card-arrow){color:inherit!important}
+html.sikau-refresh.sikau-lesson-interface #rd .read-mode-card .read-mode-card-description{color:var(--sx-muted)!important}
+html.sikau-refresh.sikau-lesson-interface #rd .sikau-library-card{
+ border-color:var(--sx-edge)!important;border-radius:15px!important;box-shadow:var(--sx-shadow)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #rd .sikau-practice-bilingual{
+ border-color:var(--sx-edge)!important;background:var(--sx-surface)!important;border-radius:15px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #rd .sikau-featured-lang p{
+ font-size:clamp(14px,1.35vw,17px)!important;line-height:1.72!important;
+}
+html.sikau-refresh.sikau-lesson-interface #rd .sikau-featured-option{
+ min-height:46px;border-color:var(--sx-edge)!important;cursor:pointer;
+}
+html.sikau-refresh.sikau-lesson-interface #rd .sikau-featured-option:has(:checked){
+ border-color:var(--sx-accent)!important;background:var(--sx-tint)!important;
+}
+
+/* Practice, games and speaking keep their active task above secondary detail. */
+html.sikau-refresh.sikau-lesson-interface #learn #courseRoot .course-chapter{
+ text-align:start;min-height:62px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #learn #courseRoot .course-levels button{min-height:44px}
+html.sikau-refresh.sikau-lesson-interface #game .game-modes{margin:0 0 12px!important}
+.sx-map-jump{
+ min-height:44px;margin-top:8px;padding:7px 10px;border:1px solid var(--sx-edge);
+ border-radius:9px;background:var(--sx-surface);color:var(--sx-accent);
+ font:750 12px/1.3 system-ui,sans-serif;
+}
+html.sikau-refresh.sikau-lesson-interface #game :is(.game-option,.game-answer,.game-choice,[data-game-answer]){
+ min-height:48px;border-radius:10px;white-space:normal;
+}
+html.sikau-refresh.sikau-lesson-interface #sp #micBig{
+ display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;
+ width:min(100%,270px)!important;min-width:0!important;min-height:64px!important;
+ margin:14px auto!important;padding:11px 16px!important;font-size:clamp(16px,2vw,23px)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #sp #micBig[data-sx-icon-mic]::after{
+ content:"Microphone";font-size:15px;font-weight:850;
+}
+html.sikau-refresh.sikau-lesson-interface #sp .sikau-speech-help{
+ border:1px solid var(--sx-edge)!important;border-radius:12px;background:var(--sx-quiet);
+}
+html.sikau-refresh.sikau-lesson-interface #sp .sikau-speech-help p:first-child{display:none}
+html.sikau-refresh.sikau-lesson-interface #sp .sikau-microphone-status:not(:empty){
+ padding:10px 12px;border:1px solid var(--sx-edge);border-radius:11px;background:var(--sx-tint);
+}
+html.sikau-refresh.sikau-lesson-interface #pg :is(.pv-card,.pv-section){
+ border-color:var(--sx-edge)!important;border-radius:13px!important;box-shadow:var(--sx-shadow)!important;
+}
+
+/* Visa: practice now, browse or review the notices below it. */
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged]{
+ display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:12px;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged] > *{
+ grid-column:1/-1!important;grid-row:auto!important;min-width:0;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged] > .sx-caption{margin:0}
+html.sikau-refresh.sikau-lesson-interface #coach :is(.sikau-visa-browser,.sikau-visa-learner){
+ border:1px solid var(--sx-edge)!important;border-radius:15px!important;
+ background:var(--sx-surface)!important;margin:0!important;box-shadow:var(--sx-shadow)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-hero{
+ padding:clamp(13px,1.8vw,23px)!important;margin:0!important;min-height:0!important;
+ border:1px solid var(--sx-edge);border-radius:16px!important;
+ background:linear-gradient(105deg,var(--sx-surface),var(--sx-tint))!important;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-hero :is(h2,p,small,span,strong){color:var(--sx-ink)!important}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-hero .sikau-visa-kicker{color:var(--sx-accent)!important}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-stats{
+ border:1px solid var(--sx-edge)!important;background:var(--sx-surface)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-prompt{
+ border:1px solid var(--sx-edge)!important;background:var(--sx-quiet)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-prompt :is(h3,p){color:var(--sx-ink)!important}
+@container (min-width:980px){
+ html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged]{
+  grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
+ }
+ html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged] > .sikau-visa-learner{grid-column:1!important}
+ html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged] > .sikau-visa-browser{grid-column:2!important}
+}
+
+/* Festivals: preserve the artwork, draw the eye to the lesson button. */
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-hero{
+ min-height:clamp(145px,16vw,196px)!important;padding:clamp(16px,2.4vw,31px)!important;
+}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-main-head{margin-block:16px 12px}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-card{
+ border-color:var(--sx-edge)!important;border-radius:15px!important;
+}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-desc{flex:0 0 auto}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-learn{margin-top:auto;padding-block:8px}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-correct{
+ background:#ddf3e6!important;border-color:#478562!important;color:#145337!important;
+}
+html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-quiz-choice.sfd-quiz-wrong{
+ background:#fee7ec!important;border-color:#a94e65!important;color:#80263f!important;
+}
+
+@media(max-width:767px){
+ .sx-heading{gap:9px;padding:11px 10px;border-radius:13px}
+ .sx-heading-icon{height:36px;flex-basis:36px;border-radius:10px}
+ html.sikau-refresh.sikau-lesson-interface .sx-heading .sx-title{font-size:clamp(22px,5.6vw,28px)!important;gap:2px 7px}
+ .sx-guide{display:block;font-size:12px}
+ .sx-guide>span{display:block}
+ html.sikau-refresh.sikau-lesson-interface :is(#tr,#words,#hw,#sp,#coach) :is(textarea,input[type="text"],input[type="search"]){font-size:16px!important}
+ .sx-words-start{grid-template-columns:minmax(0,1fr);gap:8px}
+ html.sikau-refresh.sikau-lesson-interface #words .sx-words-start .wv-today{padding:9px 11px!important}
+ html.sikau-refresh.sikau-lesson-interface #words .wv-list{max-height:275px;overscroll-behavior:contain}
+ html.sikau-refresh.sikau-lesson-interface #tr.sikau-studio-v4 .ttx-entry .ttx-native #bt{flex-basis:100%!important}
+ html.sikau-refresh.sikau-lesson-interface #tr .ttx-view-result:not([hidden]){
+  display:block;min-height:44px;width:100%;margin-top:8px;
+  border:1px solid var(--sx-accent);border-radius:10px;background:var(--sx-tint);color:var(--sx-accent);
+  font-weight:820;
+ }
+ html.sikau-refresh.sikau-lesson-interface #hw.sikau-writing-v1 .wc-dashboard .wc-primary-grid{grid-template-columns:minmax(0,1fr)!important}
+ html.sikau-refresh.sikau-lesson-interface #rd #readModeSeg .read-mode-card{padding:7px!important}
+ html.sikau-refresh.sikau-lesson-interface #sp #micBig{width:min(100%,290px)!important}
+ html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-main[data-sx-arranged]{gap:9px}
+ html.sikau-refresh.sikau-lesson-interface #coach .sikau-visa-hero .sikau-visa-stats{display:none}
+ html.sikau-refresh.sikau-lesson-interface #sikauHomeScreen .sfd .sfd-hero{min-height:0!important}
+}
+@media(max-width:380px){
+ html.sikau-refresh.sikau-lesson-interface #rd #readModeSeg .read-mode-card{
+  grid-template-columns:minmax(0,1fr) auto!important;
+ }
+ html.sikau-refresh.sikau-lesson-interface #rd .read-mode-card-icon{display:none!important}
+}
+
+/* Coach is a same-origin lesson iframe with its own theme and responsive width. */
+html.sikau-coach-workspace body{background:var(--sx-canvas);color:var(--sx-ink)}
+html.sikau-coach-workspace #root{padding:clamp(9px,1.8vw,23px) clamp(8px,1.7vw,20px) 25px}
+html.sikau-coach-workspace :is(#topic-browser,.conversation-panel){
+ border:1px solid var(--sx-edge);border-radius:17px;background:var(--sx-surface);box-shadow:var(--sx-shadow);
+}
+html.sikau-coach-workspace #topic-browser .filterbar{
+ gap:12px;margin-bottom:10px;padding:clamp(9px,1.4vw,17px);
+ border-radius:13px;background:linear-gradient(105deg,var(--sx-quiet),var(--sx-tint));
+}
+html.sikau-coach-workspace .sectiontitle{color:var(--sx-ink);font-size:clamp(21px,3.6vw,34px);letter-spacing:-.03em}
+html.sikau-coach-workspace .sectionhint{color:var(--sx-muted);font-size:13px;line-height:1.5}
+html.sikau-coach-workspace .searchbox{
+ min-height:46px;border:1px solid var(--sx-edge);background:var(--sx-surface);
+}
+html.sikau-coach-workspace .searchbox input{font-size:16px}
+html.sikau-coach-workspace :is(.topic-card,.answer-button,.category-chip,.page-nav,.page-number,.outline-btn){
+ min-height:44px;border:1px solid var(--sx-edge);border-radius:11px;
+ background:var(--sx-surface);color:var(--sx-ink);box-shadow:var(--sx-shadow);
+}
+html.sikau-coach-workspace :is(button,input):focus-visible{outline:3px solid var(--sx-focus);outline-offset:2px}
+html.sikau-coach-workspace :is(.category-chip,.page-number).is-current{
+ border-color:var(--sx-accent);background:var(--sx-tint);color:var(--sx-accent);
+}
+html.sikau-coach-workspace .topic-card{
+ min-height:153px;gap:7px;padding:11px;border-radius:13px;
+}
+html.sikau-coach-workspace .topic-card .card-icon{background:var(--sx-quiet)}
+html.sikau-coach-workspace .topic-card strong{font-size:clamp(13px,1.5vw,17px);line-height:1.25}
+html.sikau-coach-workspace .topic-card .topic-cta{
+ display:block;align-self:stretch;margin-top:auto;padding:6px 7px;border:1px solid var(--sx-edge);
+ border-radius:8px;background:var(--sx-tint);color:var(--sx-accent);
+ font-size:clamp(10px,1.05vw,12px);line-height:1.2;text-align:center;
+}
+html.sikau-coach-workspace .answer-button{
+ min-height:56px;padding:10px 12px;border-inline-start:3px solid var(--sx-accent);
+ text-align:start;font-size:clamp(13px,1.65vw,16px);line-height:1.48;
+}
+html.sikau-coach-workspace :is(.answer-button,.topic-card,.outline-btn):hover:not(:disabled){
+ border-color:var(--sx-accent);background:var(--sx-quiet);transform:none;
+}
+html.sikau-coach-workspace .choice-area{
+ border-top:1px solid var(--sx-edge);padding-top:12px;margin-top:10px;
+}
+html.sikau-coach-workspace .choice-title{color:var(--sx-ink);font-size:clamp(16px,2.6vw,22px)}
+html.sikau-coach-workspace .transcript{overscroll-behavior:contain;scrollbar-width:thin}
+html.sikau-coach-workspace .mobile-category-label{display:none}
+@media(max-width:620px){
+ html.sikau-coach-workspace .topic-card{min-height:132px;padding:9px}
+ html.sikau-coach-workspace .topic-card .card-icon{width:32px;height:32px;font-size:19px}
+ html.sikau-coach-workspace .page-nav{padding-inline:7px;white-space:normal}
+ html.sikau-coach-workspace .chat-toolbar .mini-actions{flex-wrap:wrap}
+ html.sikau-coach-workspace #category-filters{display:none}
+ html.sikau-coach-workspace .mobile-category-label{
+  display:grid;gap:5px;margin:10px 0 8px;color:var(--sx-ink);font-size:13px;font-weight:800;
+ }
+ html.sikau-coach-workspace .mobile-category-copy .sikau-v4-local{display:inline;margin:0 0 0 5px}
+ html.sikau-coach-workspace #mobile-category{
+  min-height:44px;width:100%;min-width:0;padding:6px 9px;
+  border:1px solid var(--sx-edge);border-radius:10px;background:var(--sx-surface);color:var(--sx-ink);font:inherit;
+ }
+ html.sikau-coach-workspace #mobile-category:focus-visible{outline:3px solid var(--sx-focus);outline-offset:2px}
+ html.sikau-coach-workspace #topic-browser .resultline > span:not(#total-counter){display:none}
+}

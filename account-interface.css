@@ -1,0 +1,209 @@
+/* Shared account entry: a calm classroom welcome and one clear form. */
+:root{
+ --entry-surface:#fffdfb;
+ --entry-page:#f1eaf0;
+ --entry-ink:#251c3e;
+ --entry-muted:#62576f;
+ --entry-line:#d8cbdb;
+ --entry-tint:#f8eef5;
+ --entry-accent:#a9235c;
+ --entry-accent-soft:#fce8f0;
+ --entry-focus:#4c56b8;
+}
+html[data-sikau-theme="dark"]{
+ --entry-surface:#212238;
+ --entry-page:#141524;
+ --entry-ink:#fcf4fb;
+ --entry-muted:#d4cada;
+ --entry-line:#59536d;
+ --entry-tint:#302a42;
+ --entry-accent:#ffb7d8;
+ --entry-accent-soft:#492c47;
+ --entry-focus:#a8b6ff;
+}
+html:has(#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"])) body{
+ display:flow-root;background:var(--entry-page)!important;
+}
+#shell:has(#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"])){
+ width:min(100%,1160px);max-width:none;margin:clamp(12px,3.5vh,36px) auto;padding:0 18px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]){
+ display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+ min-height:0;border:1px solid var(--entry-line);border-radius:26px;
+ background:var(--entry-surface);box-shadow:0 22px 56px #240e353a;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .hero{
+ display:flex;flex-direction:column;justify-content:flex-start;gap:0;min-height:0;
+ position:relative;isolation:isolate;overflow:hidden;
+ padding:clamp(24px,3.25vw,44px) clamp(22px,3.25vw,44px) clamp(136px,16vw,212px);
+ background:radial-gradient(ellipse at 87% 11%,#f45a9052 0%,transparent 40%),
+  linear-gradient(151deg,#3b1d48,#751e54 56%,#202950);
+ color:#fff;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-brand{
+ min-width:0;padding-inline-end:48px;gap:11px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-brand-flag{
+ display:grid;place-items:center;flex:0 0 46px;height:46px;
+ background:#ffffff18;border:1px solid #ffffff39;border-radius:14px;font-size:28px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-brand strong{
+ font-size:clamp(19px,2.6vw,31px);line-height:1.13;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-brand>div>span{
+ font-size:12px;font-weight:650;color:#ffe5ef;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-headline{
+ position:relative;z-index:2;margin:clamp(29px,4.8vw,66px) 0 0;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero h1{
+ margin:0 0 12px;max-width:16ch;font-size:clamp(32px,3.7vw,51px);
+ line-height:1.08;letter-spacing:-.045em;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero h1 span{color:#ffd99a}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-nepali{
+ margin:0 0 8px;color:#ffe2ee;font-size:clamp(14px,1.5vw,17px);line-height:1.55;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-sub{
+ max-width:34ch;font-size:14px;line-height:1.55;color:#fff6fb;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight{
+ display:inline-flex!important;align-self:flex-start;align-items:center;min-height:0;
+ width:auto;max-width:100%;gap:8px;margin:20px 0 0;padding:8px 11px;
+ border-radius:12px;background:#ffffff16;border:1px solid #ffffff37;box-shadow:none;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-mark{
+ width:28px;height:28px;flex:0 0 28px;border-radius:8px;font-size:16px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-copy small{
+ font-size:8px;letter-spacing:.065em;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-copy strong{
+ font-size:clamp(15px,1.9vw,22px);line-height:1.15;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) :is(.hero-benefits,.hero-footer){display:none!important}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-landscape{
+ display:block;opacity:.92;height:clamp(128px,16vw,220px);
+}
+#sikauThemeAuth{
+ min-width:44px;min-height:44px;padding:0;font-size:18px;border-radius:12px;
+}
+#sikauThemeAuth .sikau-theme-word{display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .content{
+ padding:clamp(22px,3.6vw,44px) clamp(22px,4vw,50px) 24px;
+ min-width:0;align-self:start;width:100%;background:var(--entry-surface);
+ color:var(--entry-ink);
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-eyebrow{justify-content:flex-start}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-eyebrow .tag{
+ padding:5px 9px;border-radius:7px;box-shadow:none;font-size:10px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-step{display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"]) > .content > :is(.notice,.footer-credit){display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tabs{
+ margin:14px 0 18px;padding:4px;gap:5px;
+ background:var(--entry-tint);border:1px solid var(--entry-line);border-radius:13px;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tab{
+ min-height:53px;padding:7px 6px;border:1px solid transparent;border-radius:10px;
+ color:var(--entry-muted);font-size:14px;line-height:1.25;box-shadow:none;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tab.active{
+ color:var(--entry-accent);background:var(--entry-surface);border-color:var(--entry-line);
+ box-shadow:0 2px 6px #3a18450b;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tab.active::after{display:none}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tab .tab-icon{display:inline;margin:0 3px 0 0}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tab span[lang="ne"]{font-size:11px}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-intro{padding:0}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-title{
+ margin:0 0 7px;color:var(--entry-ink);font-size:clamp(25px,3.15vw,39px);
+ line-height:1.12;letter-spacing:-.035em;
+}
+#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-title span{
+ margin-top:5px;color:var(--entry-accent);font-size:clamp(15px,1.7vw,19px);
+}
+#panel[data-mode] .auth-description{margin:5px 0 12px;color:var(--entry-muted);font-size:13px;line-height:1.55}
+#panel[data-mode] .field label{display:block;margin-bottom:5px;color:var(--entry-ink);font-weight:750}
+#panel[data-mode] .field input{
+ width:100%;min-height:48px;max-width:100%;border:1px solid var(--entry-line);
+ border-radius:10px;background:var(--entry-surface);color:var(--entry-ink);font-size:16px;
+}
+#panel[data-mode] :is(input,button,a):focus-visible{outline-color:var(--entry-focus)}
+#panel[data-mode] .secret button{
+ min-width:57px;min-height:44px;padding-inline:8px;border:1px solid var(--entry-line);
+ color:var(--entry-accent);background:var(--entry-tint);font-weight:760;
+}
+#panel[data-mode] #activeForm .primary{
+ min-height:50px;border:1px solid #a51d56;border-radius:11px;
+ background:linear-gradient(100deg,#9e2056,#c42562);color:#fff;box-shadow:0 5px 13px #9b1e512b;
+ font-size:15px;line-height:1.3;padding:10px 16px;
+}
+#panel[data-mode] #activeForm .primary::after{display:none}
+#panel[data-mode] .auth-alt{margin:9px 0;color:var(--entry-muted);font-size:11px}
+#panel[data-mode] :is(.auth-email-btn,.auth-code-actions button){
+ min-height:48px;border:1px solid var(--entry-line);border-radius:11px;
+ background:var(--entry-tint);color:var(--entry-ink);font-size:13px;font-weight:800;
+}
+#panel[data-mode] .auth-email-btn small{
+ display:block;margin-top:3px;color:var(--entry-muted);font-size:11px;font-weight:620;line-height:1.35;
+}
+#panel[data-mode] :is(.auth-linkrow,.auth-bottom){margin:7px 0 0}
+#panel[data-mode] :is(.auth-linkrow,.auth-bottom,.auth-code-actions) .tertiary,
+#panel:is([data-mode="emailcode"],[data-mode="forgot"]) #screen>.tertiary{
+ min-height:44px;padding:7px 10px;border:1px solid var(--entry-line);border-radius:9px;
+ background:var(--entry-surface);color:var(--entry-accent);font-weight:760;text-decoration:none;
+}
+#panel[data-mode] :is(.auth-linkrow,.auth-bottom,.auth-code-actions) .tertiary:hover,
+#panel[data-mode] .auth-email-btn:hover{background:var(--entry-accent-soft);border-color:var(--entry-accent)}
+#panel[data-mode] .auth-code-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#panel[data-mode] .auth-code-actions .primary{background:#a9235c;color:white;border-color:#a9235c}
+#panel[data-mode] .auth-field-hint:empty{display:none}
+#panel:is([data-mode="emailcode"],[data-mode="verify"],[data-mode="forgot"],[data-mode="reset"]) #screen>h2{
+ margin:12px 0 8px;color:var(--entry-ink);font-size:clamp(24px,4vw,34px);line-height:1.2;
+}
+#panel[data-mode="verify"] #otp{font-size:22px;font-weight:800;letter-spacing:.3em;font-variant-numeric:tabular-nums}
+#panel[data-mode="payment"] :is(.trial-button,.submit-payment,.approval-button){min-height:48px;border-radius:12px}
+#panel[data-mode="payment"] .payment-entry{border:1px solid var(--entry-line);border-radius:16px;padding:16px}
+#panel[data-mode="payment"] .payment-help a{display:inline-flex;align-items:center;min-height:44px}
+@media (min-width:768px) and (max-width:959px){
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]){grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .hero{padding-inline:22px}
+}
+@media (max-width:767px){
+ #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"])){
+  width:100%;margin:0;padding:0;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]){
+  display:block;border:0;border-radius:0;min-height:100dvh;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .hero{
+  padding:calc(11px + env(safe-area-inset-top,0px)) 17px 12px;min-height:0;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-brand-flag{
+  flex-basis:38px;height:38px;font-size:23px;border-radius:10px;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-headline{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-landscape{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight{
+  background:none;border:0;margin:7px 0 0;padding:0;gap:5px;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-mark{display:none}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-copy{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:5px;
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .creator-spotlight-copy strong{font-size:12px}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .content{
+  max-width:600px;margin:0 auto;padding:13px clamp(13px,4vw,24px) max(24px,env(safe-area-inset-bottom,0px));
+ }
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .auth-tabs{margin:9px 0 14px}
+ #panel[data-mode="signup"] .pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #panel[data-mode="signup"] .pair .field{min-width:0}
+}
+@media (min-width:500px) and (max-width:767px) and (max-height:490px) and (orientation:landscape){
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]){display:grid;grid-template-columns:minmax(0,.65fr) minmax(0,1.35fr)}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) > .hero{padding:16px 13px}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-headline{display:block;margin-top:23px}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero h1{font-size:23px}
+ #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"]) .hero-sub{display:none}
+}
