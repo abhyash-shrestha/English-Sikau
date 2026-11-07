@@ -197,12 +197,12 @@ test('Coach reloads updated iframe content without affecting other language and 
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
  assert.match(mount,/source\.searchParams\.set\('v','20261107-chat-r1'\)/);
- assert.match(app,/coach-v4-mount\\.js\\?v=20261107-chat-r1/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261107-chat-r1/);
  const chatCss=read('coach-chat-studio.css');
- assert.match(html,/coach-chat-studio\\.css\\?v=20261107-chat-r1/);
+ assert.match(html,/coach-chat-studio\.css\?v=20261107-chat-r1/);
  assert.match(chatCss,/counter-increment:coach-option/);
  assert.match(chatCss,/grid-template-areas:/);
- assert.match(chatCss,/max-height:min\\(48vh,400px\\)/);
+ assert.match(chatCss,/max-height:min\(48vh,400px\)/);
  assert.match(chatCss,/data-theme="dark"/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
