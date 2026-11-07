@@ -117,3 +117,22 @@ test('Practice keeps one set of native topic and level buttons, without an extra
  assert.equal(f.rd.querySelector('.sikau-practice-bilingual')?.hidden,true);
  assert.equal(f.rd.querySelectorAll('.sikau-practice-source-hidden').length,0);
 });
+
+test('Practice redesign keeps bilingual lessons and clearly labeled controls',()=>{
+ const practiceCSS=fs.readFileSync(new URL('../practice-bilingual-reading.css',import.meta.url),'utf8');
+ const dashboardCSS=fs.readFileSync(new URL('../reading-dashboard.css',import.meta.url),'utf8');
+ const practiceJS=fs.readFileSync(new URL('../practice-bilingual-reading.js',import.meta.url),'utf8');
+ const dashboardJS=fs.readFileSync(new URL('../reading-dashboard.js',import.meta.url),'utf8');
+ assert.match(practiceCSS,/grid-template-columns:minmax\(0,1fr\)!important/);
+ assert.match(practiceCSS,/sikau-practice-language-heading/);
+ assert.match(practiceCSS,/data-sikau-theme="dark"/);
+ assert.match(dashboardCSS,/sikau-practice-balanced-row/);
+ assert.match(dashboardCSS,/:has\(#readModeSeg button\[data-rm="practice"\]\.on\)/);
+ assert.match(practiceJS,/Read & listen/);
+ assert.match(practiceJS,/20261107-simple-practice-r1/);
+ assert.match(dashboardJS,/20261107-simple-practice-r1/);
+ const f=fixture();
+ f.context.window.enhancePracticeBilingualReading(f.doc);
+ assert.equal(f.rd.querySelectorAll('.sikau-practice-pair').length,4);
+ assert.equal(f.rd.querySelectorAll('.sikau-practice-listen').length,8);
+});

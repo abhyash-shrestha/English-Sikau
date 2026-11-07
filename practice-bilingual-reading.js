@@ -97,7 +97,7 @@ function install(doc){
  const win=doc.defaultView;
  if(!doc.getElementById('sikauPracticeBilingualCSS')){
   const link=mk(doc,'link');link.id='sikauPracticeBilingualCSS';link.rel='stylesheet';
-  link.href=new URL('./practice-bilingual-reading.css?v=20261030-minimal-navigation-r3',document.baseURI).href;
+  link.href=new URL('./practice-bilingual-reading.css?v=20261107-simple-practice-r1',document.baseURI).href;
   doc.head.append(link);
  }
  const priorEnglish=new WeakMap(),revealed=new WeakSet();
@@ -166,8 +166,8 @@ function install(doc){
    }else return;
    panel.replaceChildren();
    const head=mk(doc,'div','sikau-practice-bilingual-heading');
-   head.append(mk(doc,'h3','','English + Nepali · अंग्रेजी + नेपाली'),
-    mk(doc,'p','','Listen in both languages · दुवै भाषामा सुन्नुहोस्'));
+   head.append(mk(doc,'h3','','Read & listen · पढ्नुहोस् र सुन्नुहोस्'),
+    mk(doc,'p','','English first, Nepali below · पहिले अंग्रेजी, त्यसपछि नेपाली'));
    panel.append(head);
    const pairs=mk(doc,'div','sikau-practice-bilingual-pairs');
    for(const e of entries){
@@ -176,7 +176,7 @@ function install(doc){
     const ne=mk(doc,'div','sikau-practice-nepali');
     en.lang='en-US';ne.lang='ne-NP';
     const enHead=mk(doc,'div','sikau-practice-language-heading');
-    enHead.append(mk(doc,'strong','','English'),speakerButton('🔊 Listen','en-US',e));
+    enHead.append(mk(doc,'strong','','English'),speakerButton('🔊 Play','en-US',e));
     en.append(enHead,mk(doc,'p','sikau-practice-sentence',e.english));
     const neHead=mk(doc,'div','sikau-practice-language-heading');
     neHead.append(mk(doc,'strong','','नेपाली'));
