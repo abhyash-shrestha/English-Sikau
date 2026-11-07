@@ -103,6 +103,7 @@ window.enhanceTranslationDashboard=function(d){
  const result=put(d,workspace,'section','ttx-panel ttx-result');
  const toolPanel=put(d,workspace,'aside','ttx-panel ttx-side');
  entry.setAttribute('aria-label','Translate text');
+ input.setAttribute('aria-label','Text to translate · अनुवाद गर्ने पाठ');
  result.setAttribute('aria-label','Translation result');
  toolPanel.setAttribute('aria-label','Translation quick tools');
 
@@ -119,6 +120,14 @@ window.enhanceTranslationDashboard=function(d){
  const tools=put(d,entry,'div','ttx-input-tools');
  const notice=put(d,entry,'div','ttx-notice','');
  notice.setAttribute('role','status');
+ const viewResult=put(d,entry,'button','ttx-view-result','↓ View result · नतिजा हेर्नुहोस्');
+ viewResult.type='button';
+ tools.before(viewResult);
+ viewResult.addEventListener('click',()=>{
+  result.tabIndex=-1;
+  result.focus({preventScroll:true});
+  result.scrollIntoView({block:'start'});
+ });
  const resultHeader=put(d,result,'div','ttx-panel-head');
  const resultHeading=put(d,resultHeader,'div','');
  put(d,resultHeading,'strong','','✨ Translation Result');
@@ -191,7 +200,7 @@ window.enhanceTranslationDashboard=function(d){
   ensureTyping();
   const value=nativeDirection(sec)==='ne'?pair[1]:pair[0];
   safeInput(d,input,value);
-  notice.textContent='Ready. Press Translate to see the result. · अनुवाद थिच्नुहोस्।';
+  notice.textContent='Example added. Press Translate to see the result. · उदाहरण राखियो। नतिजा हेर्न अनुवाद थिच्नुहोस्।';
   input.focus({preventScroll:true});
   entry.scrollIntoView({behavior:'smooth',block:'nearest'});
  }
@@ -203,7 +212,6 @@ window.enhanceTranslationDashboard=function(d){
    pair=nextPractice(key,pool);
   }
   choosePair(pair);
-  notice.textContent='New practice! Click again for another · नयाँ अभ्यास! अर्कोका लागि फेरि थिच्नुहोस्।';
  }
  function updateCounter(){
   const c=sec.querySelector('.ttx-character-count');
@@ -300,15 +308,15 @@ window.enhanceTranslationDashboard=function(d){
   notice.textContent='Check My Saved Words & Phrasebook in Words · शब्दभण्डारमा सेभ गरेका शब्द र वाक्य हेर्नुहोस्।';
  });
  // Observe native result updates to suppress redundant empty placeholder.
- const observer=new d.defaultView.MutationObserver(()=>{
+ const syncResult=()=>{
   const filled=!!output.textContent.trim();
-  placeholder.hidden=filled;emptyIcon.hidden=filled;
- });
+  placeholder.hidden=filled;emptyIcon.hidden=filled;viewResult.hidden=!filled;
+ };
+ const observer=new d.defaultView.MutationObserver(syncResult);
  observer.observe(output,{subtree:true,childList:true,characterData:true});
- const clearResult=()=>{placeholder.hidden=!!output.textContent.trim();emptyIcon.hidden=!!output.textContent.trim();};
  dir.addEventListener('click',()=>{d.defaultView.setTimeout(directionUI,0)});
  input.addEventListener('input',updateCounter);
- clear?.addEventListener('click',()=>{d.defaultView.setTimeout(()=>{updateCounter();clearResult();},0)});
+ clear?.addEventListener('click',()=>{d.defaultView.setTimeout(()=>{updateCounter();syncResult();},0)});
  // When the private camera is open, native controls should remain visible.
  const originalTip=tip;
  if(originalTip){
@@ -324,6 +332,6 @@ window.enhanceTranslationDashboard=function(d){
  workspace.insertAdjacentElement('afterend',topicSection);
  sec.dataset.sikauStudio='4';
  sec.classList.add('sikau-studio-v4');
- directionUI();updateCounter();clearResult();
+ directionUI();updateCounter();syncResult();
 };
 })();

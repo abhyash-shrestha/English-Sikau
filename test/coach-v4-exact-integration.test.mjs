@@ -10,7 +10,7 @@ const html=read('coach-v4-live.html');
 const originalConversationDataHash='ff89a5a06d89a055b5498a6c57628988c7bee4af8aa796f77bc3b57fd4fbee3c';
 const originalStore="const storeKey='english-sikau-175-preview-context-v4';";
 const newStore="const learnerToken=(new URLSearchParams(location.hash.slice(1))).get('uid')||''; const storeKey='english-sikau-175-preview-context-v4:'+(/^[A-Za-z0-9_-]{6,128}$/.test(learnerToken)?learnerToken:'standalone');";
-const closingBridgePattern=/<script src="\.\/coach-v4-bridge\.js\?v=20261030-[^"]+"><\/script>/;
+const closingBridgePattern=/<script src="\.\/coach-v4-bridge\.js\?v=20261107-classroom-r1"><\/script>/;
 const guardRegex=/<script>\/\* The paid lesson loads only inside its authenticated parent frame\. \*\/[\s\S]*?<\/script>/;
 
 test('Removing the review panel does not modify the approved 175-topic dialogue data',()=>{
@@ -196,8 +196,8 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261030-learner-audit-r1'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261030-learner-audit-r1/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261107-classroom-r1'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261107-classroom-r1/);
  assert.match(mount,/getElementById\('sikauCoachEveryday'\)/);
  assert.match(mount,/getElementById\('langPref'\)/);
  assert.doesNotMatch(mount,/\.sikau-visa-hub.*replaceChildren/);

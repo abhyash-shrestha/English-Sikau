@@ -40,7 +40,7 @@ test('Existing single-quoted or unquoted language attributes retain working HTML
  assert.match(unquoted,/<html[^>]*class="course notranslate"/);
 });
 test('The independent Coach conversation frame is protected as well',()=>{
- assert.match(coach.slice(0,170),/<html lang="en" translate="no" class="notranslate">/);
+ assert.match(coach.slice(0,170),/<html lang="en" translate="no" class="notranslate(?: [^"]+)?">/);
  assert.match(coach.slice(0,210),/<meta name="google" content="notranslate">/);
 });
 test('Internal language picker, bilingual content, and protected lesson access remain',()=>{
