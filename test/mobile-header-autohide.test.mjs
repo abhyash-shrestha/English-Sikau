@@ -68,7 +68,7 @@ test('smooth header retains layout and transitions instead of abrupt display non
  assert.equal(root.style.properties['--sikau-mobile-header-height'],'228px');
  // The legacy auto-hide helper is intentionally kept off the live classroom.
  assert.doesNotMatch(website,/<script src="\.\/mobile-header-autohide\.js/);
- assert.match(website,/mobile-bar-handles\.js\?v=20261106-adaptive-r1/);
+ assert.match(website,/mobile-bar-handles\.js\?v=20261106-adaptive-r2/);
 });
 
 test('scroll down slides away, up restores, and rapid layout adjustments do not flicker',()=>{
