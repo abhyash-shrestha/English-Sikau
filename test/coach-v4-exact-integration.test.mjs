@@ -196,10 +196,10 @@ test('Conversation history stays in a bounded touch-scroll area on iPhone',()=>{
 test('Coach reloads updated iframe content without affecting other language and Visa tabs',()=>{
  const mount=read('coach-v4-mount.js');
  const app=read('index.html');
- assert.match(mount,/source\.searchParams\.set\('v','20261107-chat-r1'\)/);
- assert.match(app,/coach-v4-mount\.js\?v=20261107-chat-r1/);
+ assert.match(mount,/source\.searchParams\.set\('v','20261107-focus-r2'\)/);
+ assert.match(app,/coach-v4-mount\.js\?v=20261107-focus-r2/);
  const chatCss=read('coach-chat-studio.css');
- assert.match(html,/coach-chat-studio\.css\?v=20261107-chat-r1/);
+ assert.match(html,/coach-chat-studio\.css\?v=20261107-focus-r2/);
  assert.match(chatCss,/counter-increment:coach-option/);
  assert.match(chatCss,/grid-template-areas:/);
  assert.match(chatCss,/max-height:min\(48vh,400px\)/);
@@ -350,3 +350,20 @@ test('Coach learner name uses a neutral fallback when verified first name is abs
  assert.match(elements.get('chat-transcript').innerHTML,/class="speaker">Learner · Learner<\/div>/);
 });
 
+
+test('Coach mobile chat shows the latest exchange with a reversible history toggle',()=>{
+ const behavior=read('coach-chat-focus.js');
+ const css=read('coach-chat-studio.css');
+ assert.ok(html.includes('coach-chat-focus.js?v=20261107-focus-r2'),'Focus logic must load in protected chat');
+ assert.ok(behavior.includes("has('uid')"),'The focus script must only run in the protected frame');
+ assert.ok(behavior.includes("rows.length-2"),'Keep the last two messages in view');
+ assert.ok(behavior.includes("row.classList.toggle('sikau-chat-older'"),'Older messages are marked, not deleted');
+ assert.ok(behavior.includes("thread.classList.toggle('sikau-chat-recent'"),'History can be expanded and collapsed');
+ assert.ok(behavior.includes("toggle.setAttribute('aria-expanded'"),'Toggle must expose disclosure state');
+ assert.ok(behavior.includes("thread.scrollIntoView"),'Newest chat must come into view after a reply');
+ assert.ok(behavior.includes("new MutationObserver(schedule).observe(thread"),'New answers must refresh the compact view');
+ assert.ok(css.includes('.transcript.sikau-chat-recent>.message-row.sikau-chat-older'),'CSS must hide only earlier messages');
+ assert.ok(css.includes('max-height:none!important'),'Recent transcript should not require inner scrolling');
+ assert.ok(css.includes('.sikau-chat-history-toggle:not([hidden])'),'History toggle must be visible on phones');
+ assert.doesNotThrow(()=>new Function(behavior),'Focus script must be valid JavaScript');
+});
