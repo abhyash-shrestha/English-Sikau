@@ -306,7 +306,7 @@ test('All sidebar tabs including Coach can be dragged on desktop and reordered o
 
 test('Desktop Coach drag uses native HTML5 drop and keeps touch reordering',()=>{
  const src=read('sidebar-unified.js'),index=read('index.html');
- assert.match(index,/sidebar-unified\.js\?v=20261029-desktop-tab-drag-r2/);
+ assert.match(index,/sidebar-unified\.js\?v=20261106-adaptive-r1/);
  assert.match(src,/doc\.addEventListener\('dragstart'/);
  assert.match(src,/e\.dataTransfer\.setData\('text\/plain','sikau-tab:'\+id\(b\)\)/);
  assert.match(src,/applyDrop\(htmlDrag,e\.clientX,e\.clientY\)/);
