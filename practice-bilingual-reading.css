@@ -132,3 +132,157 @@ html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.sikau-practice-listen,.sika
 #rd.sikau-read-v2 .sikau-practice-nepali .sikau-practice-listen{
  min-width:97px!important;min-height:40px!important;
 }
+
+
+/* Practice reading · calm, beginner-friendly lesson cards (2026-11-07).
+   Retain original English/Nepali text, speech actions, and native quizzes. */
+#rd.sikau-read-v2 .sikau-practice-bilingual{
+ max-width:900px!important;
+ margin:12px auto 20px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-bilingual-heading{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ gap:6px 16px!important;
+ padding:0 2px!important;
+ margin:0 0 13px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-bilingual-heading h3{
+ font:850 clamp(19px,2vw,24px)/1.35 system-ui,sans-serif!important;
+ letter-spacing:-.025em!important;
+}
+#rd.sikau-read-v2 .sikau-practice-bilingual-heading p{
+ color:#6b7286!important;
+ font:600 12px/1.5 system-ui,sans-serif!important;
+}
+#rd.sikau-read-v2 .sikau-practice-bilingual-pairs{
+ gap:12px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-pair{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ gap:0!important;
+ border:1px solid #e5e8f1!important;
+ border-radius:17px!important;
+ box-shadow:0 3px 15px rgba(27,39,78,.045)!important;
+ overflow:hidden!important;
+}
+#rd.sikau-read-v2 .sikau-practice-english,
+#rd.sikau-read-v2 .sikau-practice-nepali{
+ gap:13px!important;
+ padding:19px 20px!important;
+ justify-content:flex-start!important;
+}
+#rd.sikau-read-v2 .sikau-practice-english{
+ background:#fff!important;
+ border-right:1px solid #e7e9f2!important;
+}
+#rd.sikau-read-v2 .sikau-practice-nepali{
+ background:#f8f7ff!important;
+}
+#rd.sikau-read-v2 .sikau-practice-language-heading{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ flex-wrap:wrap!important;
+ gap:8px!important;
+}
+#rd.sikau-read-v2 .sikau-practice-language-heading strong{
+ color:#505b7a!important;
+ font:800 12px/1.35 system-ui,sans-serif!important;
+ letter-spacing:0!important;
+}
+#rd.sikau-read-v2 .sikau-practice-sentence,
+#rd.sikau-read-v2 .sikau-practice-translation{
+ color:#27304b!important;
+ font-size:clamp(17px,1.75vw,20px)!important;
+ line-height:1.75!important;
+ font-weight:500!important;
+ letter-spacing:normal!important;
+}
+#rd.sikau-read-v2 .sikau-practice-listen,
+#rd.sikau-read-v2 .sikau-practice-translation-fallback{
+ min-height:42px!important;
+ min-width:0!important;
+ max-width:100%!important;
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ padding:8px 13px!important;
+ border:1px solid #d9ddec!important;
+ border-radius:12px!important;
+ background:#fff!important;
+ color:#344268!important;
+ box-shadow:none!important;
+ font:750 12px/1.35 system-ui,sans-serif!important;
+ white-space:normal!important;
+ text-align:center!important;
+}
+#rd.sikau-read-v2 .sikau-practice-listen:hover,
+#rd.sikau-read-v2 .sikau-practice-translation-fallback:hover{
+ background:#fcecf3!important;
+ border-color:#b8407b!important;
+ color:#832451!important;
+}
+@media(max-width:700px){
+ #rd.sikau-read-v2 .sikau-practice-bilingual{
+  margin:8px auto 16px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-bilingual-heading{
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:3px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-bilingual-heading h3{
+  font-size:19px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-bilingual-heading p{
+  font-size:11px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-pair{
+  grid-template-columns:minmax(0,1fr)!important;
+  border-radius:16px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-english,
+ #rd.sikau-read-v2 .sikau-practice-nepali{
+  padding:15px 16px!important;
+  gap:9px!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-english{
+  border-right:0!important;
+  border-bottom:1px solid #e7e9f2!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-sentence,
+ #rd.sikau-read-v2 .sikau-practice-translation{
+  font-size:17px!important;
+  line-height:1.7!important;
+ }
+ #rd.sikau-read-v2 .sikau-practice-listen{
+  min-height:42px!important;
+  min-width:100px!important;
+ }
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-pair{
+ border-color:#4b546e!important;
+ box-shadow:none!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-english{
+ background:#252e45!important;
+ border-color:#4b546e!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-nepali{
+ background:#30334d!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 :is(.sikau-practice-sentence,.sikau-practice-translation){
+ color:#f6f3ff!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-language-heading strong{
+ color:#d7dbf3!important;
+}
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-listen,
+html[data-sikau-theme="dark"] #rd.sikau-read-v2 .sikau-practice-translation-fallback{
+ background:#3b435e!important;
+ border-color:#626b86!important;
+ color:#fff!important;
+}
