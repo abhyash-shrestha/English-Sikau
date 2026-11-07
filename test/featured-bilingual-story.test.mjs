@@ -72,8 +72,8 @@ test('Featured story remains visible when native story layout is hidden',()=>{
  assert.match(css,/#storyReader\[data-read-v2=yes\]>:not\(\.read-v2-layout\):not\(\.sikau-featured-book\)/);
  assert.match(css,/#storyReader\[data-read-v2=yes\]>\.sikau-featured-book\{display:block!important\}/);
  assert.match(css,/\.card\.tight:has\(#rbox\)\{display:block!important\}/);
- assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261030-balanced-practice-r9/);
- assert.match(read('index.html'),/reading-dashboard\.js\?v=20261030-balanced-practice-r9/);
+ assert.match(read('reading-dashboard.js'),/reading-dashboard\.css\?v=20261107-simple-practice-r1/);
+ assert.match(read('index.html'),/reading-dashboard\.js\?v=20261107-simple-practice-r1/);
 });
 
 test('Story Mode uses curated bookshelf, not the native generated story cards',()=>{
@@ -190,7 +190,7 @@ test('Reading mode choice cards explain their purpose and keep native buttons in
  assert.match(css,/\.read-mode-card\.on/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.match(css,/data-sikau-theme="dark"/);
- assert.match(index,/reading-dashboard\.js\?v=20261030-balanced-practice-r9/);
+ assert.match(index,/reading-dashboard\.js\?v=20261107-simple-practice-r1/);
 });
 
 
@@ -198,8 +198,8 @@ test('Reading uses one compact native topic/level toolbar and bilingual sentence
  const practice=read('practice-bilingual-reading.js');
  const practiceCss=read('practice-bilingual-reading.css');
  const readingCss=read('reading-dashboard.css');
- assert.match(index,/practice-bilingual-reading\.js\?v=20261030-minimal-navigation-r3/);
- assert.match(index,/reading-dashboard\.js\?v=20261030-balanced-practice-r9/);
+ assert.match(index,/practice-bilingual-reading\.js\?v=20261107-simple-practice-r1/);
+ assert.match(index,/reading-dashboard\.js\?v=20261107-simple-practice-r1/);
  assert.match(dashboard,/enhancePracticeBilingualReading\?\.\(d\)/);
  assert.match(practice,/rd\.querySelectorAll\('\.rs'\)/);
  assert.match(practice,/button\[data-rm="practice"\]\.on/);
