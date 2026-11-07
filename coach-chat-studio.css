@@ -446,8 +446,8 @@ html.sikau-coach-workspace .ending p{color:var(--cc-muted)}
   }
 }
 
-/* Phone-specific: prevent a nested chat scroller inside Safari and
-   leave breathing space above the site's fixed bottom navigation. */
+/* Phone-specific: preserve the bounded iPhone chat-history scroller,
+   while keeping response choices easy to reach above the bottom navigation. */
 @media (max-width:620px){
   html.sikau-coach-workspace .chat-toolbar{
     display:grid;
@@ -518,11 +518,14 @@ html.sikau-coach-workspace .ending p{color:var(--cc-muted)}
   html.sikau-coach-workspace .transcript,
   html.sikau-coach-workspace.sikau-v4-in-lesson .transcript{
     width:100%;
-    min-height:0;
-    max-height:none;
-    overflow:visible;
-    overscroll-behavior:auto;
-    scroll-behavior:auto;
+    min-height:150px;
+    max-height:min(48vh,400px);
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    scroll-behavior:smooth;
     padding:15px 10px;
     gap:14px;
     border-radius:16px;
