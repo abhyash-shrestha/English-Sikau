@@ -92,6 +92,7 @@
      else legacy();
    };
    refresh();
+   win.matchMedia?.('(min-width:768px) and (hover:hover)')?.addEventListener('change',update);
    const lookup=e=>{
      const b=e.target?.closest?.(SELECTOR);
      return isTab(b,nav)?b:null;
@@ -236,7 +237,8 @@
    nav.addEventListener('keydown',e=>{
      const button=lookup(e);
      if(!button||!e.altKey||!/^Arrow(?:Up|Down|Left|Right)$/.test(e.key))return;
-     const list=tabs(nav),delta=/Up|Left/.test(e.key)?-1:1;
+     const list=tabs(nav).filter(tab=>tab.getClientRects().length);
+     const delta=/Up|Left/.test(e.key)?-1:1;
      const target=list[list.indexOf(button)+delta];
      if(!target)return;
      e.preventDefault();e.stopImmediatePropagation();
