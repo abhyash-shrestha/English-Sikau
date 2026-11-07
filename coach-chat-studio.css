@@ -1,0 +1,604 @@
+/* English Sikau · Coach conversation studio · 2026-11-07.
+   A focused visual refresh for the protected V4 Coach chat. The dialogue,
+   bilingual display, answer events, lesson access, and saved state stay intact. */
+
+html.sikau-coach-workspace {
+  --cc-surface:#fff;
+  --cc-well:#f5f7fd;
+  --cc-choice:#fff;
+  --cc-incoming:#fff;
+  --cc-outgoing:#fff0f7;
+  --cc-line:#e3e5f0;
+  --cc-ink:#202743;
+  --cc-muted:#616b82;
+  --cc-accent:#b3296c;
+  --cc-accent-soft:#fce9f2;
+  --cc-avatar:#fce5f0;
+  --cc-shadow:0 12px 30px rgba(23,27,64,.055);
+}
+html.sikau-coach-workspace[data-theme="dark"] {
+  --cc-surface:#22293e;
+  --cc-well:#191f33;
+  --cc-choice:#2a3249;
+  --cc-incoming:#2c3650;
+  --cc-outgoing:#463147;
+  --cc-line:#454d69;
+  --cc-ink:#f9f5ff;
+  --cc-muted:#d4d7e7;
+  --cc-accent:#ffacd1;
+  --cc-accent-soft:#49324a;
+  --cc-avatar:#57344f;
+  --cc-shadow:0 14px 35px rgba(2,4,15,.18);
+}
+
+/* The title is a compact, readable lesson header instead of a large banner. */
+html.sikau-coach-workspace .chat-shell{
+  width:100%;
+  max-width:1160px;
+  min-width:0;
+  margin:0 auto;
+}
+html.sikau-coach-workspace .chat-toolbar{
+  gap:10px;
+  margin:0 0 13px;
+}
+html.sikau-coach-workspace .chat-toolbar .mini-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+}
+html.sikau-coach-workspace .chat-toolbar .outline-btn{
+  background:var(--cc-surface);
+  color:var(--cc-ink);
+  border:1px solid var(--cc-line);
+  border-radius:12px;
+  box-shadow:none;
+  min-height:42px;
+  padding:9px 13px;
+  font-size:12px;
+  font-weight:750;
+  transition:background .16s ease,border-color .16s ease;
+}
+html.sikau-coach-workspace .chat-toolbar .outline-btn:hover:not(:disabled){
+  background:var(--cc-accent-soft);
+  border-color:var(--cc-accent);
+  transform:none;
+}
+html.sikau-coach-workspace .chat-header{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:16px;
+  overflow:hidden;
+  padding:23px clamp(18px,3vw,32px);
+  background:linear-gradient(112deg,#202858 0%,#49376e 60%,#993a78 100%);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px 22px 0 0;
+  box-shadow:0 13px 24px rgba(26,29,65,.10);
+}
+html.sikau-coach-workspace .chat-header::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  width:190px;
+  height:190px;
+  right:-54px;
+  top:-102px;
+  background:radial-gradient(circle,rgba(255,255,255,.13),transparent 70%);
+  pointer-events:none;
+}
+html.sikau-coach-workspace .chat-header > *{
+  position:relative;
+  z-index:1;
+  min-width:0;
+}
+html.sikau-coach-workspace .chat-header .kicker{
+  display:inline-block;
+  max-width:100%;
+  margin:0 0 9px;
+  padding:4px 9px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  color:#ffe8f5;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.065em;
+  line-height:1.45;
+  text-transform:none;
+}
+html.sikau-coach-workspace .chat-header h2{
+  color:#fff;
+  font-size:clamp(23px,2.6vw,30px);
+  font-weight:850;
+  letter-spacing:-.035em;
+  line-height:1.22;
+  margin:0 0 8px;
+  overflow-wrap:anywhere;
+}
+html.sikau-coach-workspace .chat-header .sikau-v4-inline-title{
+  font-size:clamp(12px,1.4vw,15px);
+  line-height:1.5;
+  font-weight:650;
+  color:#fbe0ee;
+  letter-spacing:normal;
+  margin:6px 0 0;
+}
+html.sikau-coach-workspace .chat-header small{
+  display:block;
+  color:#e9def4;
+  font-size:12px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+html.sikau-coach-workspace .chat-header .counter{
+  display:block;
+  width:max-content;
+  max-width:130px;
+  min-width:92px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.36);
+  border-radius:13px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  font-size:11px;
+  line-height:1.5;
+  font-weight:750;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+/* Desktop: keep the conversation on the left and clearly actionable
+   answer choices on the right. Tablet and phone use one natural column. */
+html.sikau-coach-workspace .conversation-panel{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(305px,.9fr);
+  grid-template-areas:
+    "step step"
+    "goal goal"
+    "thread replies"
+    "done done";
+  align-items:start;
+  gap:0 16px;
+  padding:0 clamp(13px,2.4vw,27px) 24px;
+  border:1px solid var(--cc-line);
+  border-top:0;
+  border-radius:0 0 22px 22px;
+  background:var(--cc-surface);
+  color:var(--cc-ink);
+  box-shadow:var(--cc-shadow);
+}
+html.sikau-coach-workspace .progressline{
+  grid-area:step;
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  flex-wrap:wrap;
+  min-width:0;
+  padding:17px 3px 13px;
+  border-bottom:1px solid var(--cc-line);
+  color:var(--cc-muted);
+  font-size:12px;
+  font-weight:800;
+  line-height:1.55;
+  letter-spacing:.012em;
+}
+html.sikau-coach-workspace .progressline > span:last-child{
+  display:none;
+}
+html.sikau-coach-workspace .goal{
+  grid-area:goal;
+  margin:14px 0 16px;
+  padding:12px 15px;
+  gap:5px 8px;
+  border:1px solid var(--cc-line);
+  border-radius:13px;
+  background:var(--cc-accent-soft);
+  color:var(--cc-ink);
+  font-size:12px;
+  line-height:1.55;
+}
+html.sikau-coach-workspace .goal span{color:var(--cc-muted)}
+html.sikau-coach-workspace .goal b{font-weight:800}
+
+/* The conversation now reads like a real messenger, including translations. */
+html.sikau-coach-workspace .transcript{
+  grid-area:thread;
+  width:100%;
+  min-width:0;
+  min-height:190px;
+  max-height:590px;
+  margin:0;
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  border:1px solid var(--cc-line);
+  border-radius:19px;
+  background:var(--cc-well);
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+}
+html.sikau-coach-workspace .message-row{
+  display:flex;
+  align-items:flex-end;
+  min-width:0;
+  gap:10px;
+}
+html.sikau-coach-workspace .message-row.by-you{
+  justify-content:flex-end;
+}
+html.sikau-coach-workspace .chat-avatar{
+  width:35px;
+  height:35px;
+  border:1px solid var(--cc-line);
+  border-radius:12px;
+  background:var(--cc-avatar);
+  font-size:19px;
+  flex-shrink:0;
+}
+html.sikau-coach-workspace .bubble{
+  display:block;
+  width:fit-content;
+  max-width:min(86%,650px);
+  min-width:0;
+  margin:0;
+  padding:13px 16px;
+  border:1px solid var(--cc-line);
+  border-radius:18px 18px 18px 6px;
+  background:var(--cc-incoming);
+  color:var(--cc-ink);
+  font-size:14px;
+  line-height:1.67;
+  font-weight:450;
+  box-shadow:0 3px 11px rgba(13,21,50,.035);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+html.sikau-coach-workspace .by-you .bubble{
+  background:var(--cc-outgoing);
+  border-color:var(--cc-line);
+  border-radius:18px 18px 6px 18px;
+}
+html.sikau-coach-workspace .bubble .speaker{
+  font-size:11px;
+  line-height:1.4;
+  font-weight:850;
+  padding:0 0 7px;
+  color:var(--cc-muted);
+}
+html.sikau-coach-workspace .bubble .sikau-v4-local{
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid var(--cc-line);
+  color:var(--cc-muted);
+  font-size:12px;
+  font-weight:550;
+  line-height:1.62;
+}
+html.sikau-coach-workspace .bubble .speaker .sikau-v4-local{
+  margin-top:3px;
+  padding-top:0;
+  border-top:0;
+  font-size:11px;
+}
+
+/* Choice buttons are real, high-contrast actions, not passive text cards. */
+html.sikau-coach-workspace .choice-area{
+  grid-area:replies;
+  min-width:0;
+  margin:0;
+  padding:19px;
+  border:1px solid var(--cc-line);
+  border-radius:19px;
+  background:var(--cc-well);
+  box-shadow:none;
+}
+html.sikau-coach-workspace .choice-title{
+  margin:0 0 15px;
+  color:var(--cc-ink);
+  font-size:clamp(17px,1.9vw,21px);
+  font-weight:850;
+  line-height:1.4;
+  letter-spacing:-.022em;
+}
+html.sikau-coach-workspace .choice-title::before{
+  content:"✦";
+  display:inline-grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  margin-right:8px;
+  vertical-align:middle;
+  border:1px solid var(--cc-line);
+  border-radius:9px;
+  background:var(--cc-accent-soft);
+  color:var(--cc-accent);
+  font-size:17px;
+}
+html.sikau-coach-workspace .choice-title .sikau-v4-local{
+  display:block;
+  margin:6px 0 0 36px;
+  font-size:12px;
+  font-weight:650;
+  letter-spacing:normal;
+}
+html.sikau-coach-workspace .answers{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  counter-reset:coach-option;
+}
+html.sikau-coach-workspace .answer-button,
+html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button{
+  counter-increment:coach-option;
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) 27px;
+  align-items:center;
+  justify-content:stretch;
+  gap:11px;
+  width:100%;
+  min-width:0;
+  min-height:77px;
+  padding:13px;
+  margin:0;
+  border:1px solid var(--cc-line);
+  border-inline-start:1px solid var(--cc-line);
+  border-radius:15px;
+  background:var(--cc-choice);
+  color:var(--cc-ink);
+  box-shadow:0 3px 12px rgba(23,27,64,.035);
+  text-align:start;
+  line-height:1.5;
+  cursor:pointer;
+  transition:border-color .17s ease,box-shadow .17s ease,background .17s ease,transform .17s ease;
+}
+html.sikau-coach-workspace .answer-button::before{
+  content:counter(coach-option);
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border:1px solid var(--cc-line);
+  border-radius:10px;
+  background:var(--cc-accent-soft);
+  color:var(--cc-accent);
+  font-size:12px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+html.sikau-coach-workspace .answer-button > span:first-child,
+html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button > span:first-child{
+  display:block;
+  min-width:0;
+  color:var(--cc-ink)!important;
+  font-size:14px!important;
+  font-weight:730!important;
+  line-height:1.55!important;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+html.sikau-coach-workspace .answer-button .sikau-v4-local,
+html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button .sikau-v4-local{
+  margin:6px 0 0;
+  color:var(--cc-muted)!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+  font-weight:550!important;
+}
+html.sikau-coach-workspace .answer-button > span:last-child{
+  display:grid;
+  place-items:center;
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  background:var(--cc-accent-soft);
+  color:var(--cc-accent);
+  font-size:24px;
+  line-height:1;
+}
+html.sikau-coach-workspace .answer-button:hover:not(:disabled),
+html.sikau-coach-workspace .answer-button:focus-visible{
+  background:var(--cc-accent-soft);
+  border-color:var(--cc-accent);
+  box-shadow:0 6px 22px rgba(160,32,90,.10);
+  transform:translateY(-1px);
+}
+html.sikau-coach-workspace .answer-button:focus-visible{
+  outline:3px solid var(--sx-focus);
+  outline-offset:2px;
+}
+html.sikau-coach-workspace .answer-button:active:not(:disabled){
+  transform:scale(.99);
+}
+html.sikau-coach-workspace .ending{
+  grid-area:done;
+  margin-top:16px;
+  border:1px solid var(--cc-line);
+  background:var(--cc-accent-soft);
+  color:var(--cc-ink);
+  border-radius:17px;
+}
+html.sikau-coach-workspace .ending p{color:var(--cc-muted)}
+
+/* Laptops with narrow windows, tablets and phones: read from top to bottom. */
+@media (max-width:900px){
+  html.sikau-coach-workspace .conversation-panel{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+  }
+  html.sikau-coach-workspace .goal{margin:12px 0}
+  html.sikau-coach-workspace .transcript{
+    min-height:0;
+    max-height:450px;
+  }
+  html.sikau-coach-workspace .choice-area{
+    margin-top:14px;
+  }
+}
+
+/* Phone-specific: prevent a nested chat scroller inside Safari and
+   leave breathing space above the site's fixed bottom navigation. */
+@media (max-width:620px){
+  html.sikau-coach-workspace .chat-toolbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:stretch;
+    gap:8px;
+    margin-bottom:11px;
+  }
+  html.sikau-coach-workspace .chat-toolbar > #back-topics{
+    width:100%;
+    text-align:center;
+  }
+  html.sikau-coach-workspace .chat-toolbar .mini-actions{
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:stretch;
+    min-width:0;
+    width:100%;
+    gap:6px;
+    overflow-x:auto;
+    scrollbar-width:thin;
+  }
+  html.sikau-coach-workspace .chat-toolbar .mini-actions .outline-btn{
+    flex:1 0 auto;
+    min-width:0;
+    padding:8px 11px;
+    min-height:40px;
+    font-size:11px;
+  }
+  html.sikau-coach-workspace .chat-header,
+  html.sikau-coach-workspace.sikau-v4-in-lesson .chat-header{
+    grid-template-columns:minmax(0,1fr);
+    justify-items:start;
+    gap:8px;
+    padding:16px 16px 15px;
+    border-radius:18px 18px 0 0;
+  }
+  html.sikau-coach-workspace .chat-header .kicker{
+    margin:0 0 8px;
+    font-size:10px;
+    letter-spacing:.02em;
+  }
+  html.sikau-coach-workspace .chat-header h2{
+    font-size:clamp(22px,6vw,26px);
+    margin-bottom:5px;
+  }
+  html.sikau-coach-workspace .chat-header .counter{
+    width:auto;
+    min-width:0;
+    max-width:100%;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:10px;
+    text-align:start;
+  }
+  html.sikau-coach-workspace .conversation-panel{
+    padding:0 10px 85px;
+    border-radius:0 0 18px 18px;
+  }
+  html.sikau-coach-workspace .progressline{
+    padding:12px 3px 10px;
+    font-size:11px;
+  }
+  html.sikau-coach-workspace .goal{
+    padding:10px 12px;
+    margin:11px 0;
+  }
+  html.sikau-coach-workspace .transcript,
+  html.sikau-coach-workspace.sikau-v4-in-lesson .transcript{
+    width:100%;
+    min-height:0;
+    max-height:none;
+    overflow:visible;
+    overscroll-behavior:auto;
+    scroll-behavior:auto;
+    padding:15px 10px;
+    gap:14px;
+    border-radius:16px;
+  }
+  html.sikau-coach-workspace .message-row{gap:7px}
+  html.sikau-coach-workspace .chat-avatar{
+    width:30px;
+    height:30px;
+    border-radius:10px;
+    font-size:17px;
+  }
+  html.sikau-coach-workspace .bubble{
+    max-width:calc(100% - 38px);
+    font-size:13.5px;
+    line-height:1.64;
+    padding:12px 13px;
+    border-radius:16px 16px 16px 5px;
+  }
+  html.sikau-coach-workspace .by-you .bubble{
+    max-width:88%;
+    border-radius:16px 16px 5px 16px;
+  }
+  html.sikau-coach-workspace .choice-area{
+    margin-top:12px;
+    padding:14px 11px;
+    border-radius:16px;
+  }
+  html.sikau-coach-workspace .choice-title{
+    margin-bottom:12px;
+    font-size:18px;
+  }
+  html.sikau-coach-workspace .answers{gap:9px}
+  html.sikau-coach-workspace .answer-button,
+  html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button{
+    grid-template-columns:27px minmax(0,1fr) 24px;
+    gap:9px;
+    min-height:66px;
+    padding:11px 10px;
+    border-radius:14px;
+  }
+  html.sikau-coach-workspace .answer-button::before{
+    width:27px;
+    height:27px;
+    border-radius:9px;
+  }
+  html.sikau-coach-workspace .answer-button > span:first-child,
+  html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button > span:first-child{
+    font-size:13.5px!important;
+    line-height:1.54!important;
+  }
+  html.sikau-coach-workspace .answer-button > span:last-child{
+    width:24px;
+    height:24px;
+    font-size:22px;
+  }
+  html.sikau-coach-workspace .answer-button .sikau-v4-local{
+    font-size:12px!important;
+    line-height:1.55!important;
+  }
+}
+@media (max-width:355px){
+  html.sikau-coach-workspace .chat-header h2{font-size:21px}
+  html.sikau-coach-workspace .chat-header .kicker{font-size:9px}
+  html.sikau-coach-workspace .bubble{font-size:13px}
+  html.sikau-coach-workspace .answer-button,
+  html.sikau-coach-workspace.sikau-v4-in-lesson .answer-button{
+    grid-template-columns:25px minmax(0,1fr) 22px;
+    gap:7px;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  html.sikau-coach-workspace .answer-button,
+  html.sikau-coach-workspace .chat-toolbar .outline-btn{
+    transition:none;
+  }
+  html.sikau-coach-workspace .answer-button:hover:not(:disabled){
+    transform:none;
+  }
+}
