@@ -63,7 +63,7 @@
   frame.style.setProperty('height','860px','important');
   frame.style.setProperty('width','100%','important');
   const source=new URL('coach-v4-live.html',window.location.href);
-  source.searchParams.set('v','20261107-classroom-r1');
+  source.searchParams.set('v','20261107-chat-r1');
   source.hash='uid='+encodeURIComponent(verifiedStudentId);
   frame.src=source.href;
   wrap.appendChild(frame);everyday.appendChild(wrap);
