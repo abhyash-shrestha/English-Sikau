@@ -94,8 +94,35 @@ function install(doc){
   view.__sikauNepaliVoice?.removeGenderControls?.();
   return true;
  }
+ // iOS Safari may expose a voice catalog in the top-level document even
+ // when the authenticated srcdoc iframe exposes no usable voices.
+ // Do not patch the top-level speech engine: it outlives lesson documents.
  const originalSpeak=synth?.speak,originalCancel=synth?.cancel;
- const nativeAvailable=!!(originalSpeak&&view.SpeechSynthesisUtterance);
+ const makeEngine=(host,engine,speak,cancel)=>{
+  if(!engine||typeof speak!=='function'||typeof host?.SpeechSynthesisUtterance!=='function')return null;
+  return {host,engine,speak,cancel};
+ };
+ const frameEngine=makeEngine(view,synth,originalSpeak,originalCancel);
+ let topEngine=null;
+ try{
+  const parent=view.parent;
+  if(parent&&parent!==view&&parent.speechSynthesis!==synth){
+   const engine=parent.speechSynthesis;
+   topEngine=makeEngine(parent,engine,engine?.speak,engine?.cancel);
+  }
+ }catch(_){}
+ const engines=[topEngine,frameEngine].filter(Boolean);
+ const nativeAvailable=engines.length>0;
+ const nativeChoice=locale=>{
+  for(const entry of engines){const voice=choose(entry.engine,locale);if(voice)return {entry,voice};}
+  // Generic English voices are not silently used for Nepali. If Safari
+  // has not enumerated any voices, let the OS try en-US on an explicit tap.
+  return null;
+ };
+ const hasCatalog=()=>engines.some(entry=>voiceCatalog(entry.engine).length>0);
+ const cancelNative=()=>{
+  for(const entry of engines){try{entry.cancel?.call(entry.engine);}catch(_){}}
+ };
  const scopes={tr:doc.getElementById('tr'),rd:doc.getElementById('rd'),
   words:doc.getElementById('words'),sp:doc.getElementById('sp')};
  let active='tr';
@@ -122,7 +149,7 @@ function install(doc){
  const missing=(scope,locale)=>{
   const reason=locale==='en-US'?
    'US-English voice is unavailable. Check your device speech languages.':
-   'Nepali (Nepal) voice is unavailable in this browser. Hindi is not substituted. You can continue reading. · यो ब्राउजरमा नेपाली आवाज उपलब्ध छैन। पढेर अभ्यास गर्न सक्नुहुन्छ।';
+   'Nepali audio is not available on this device and the JADOO service is not ready. English audio still works when an English voice is available. · नेपाली आवाज अहिले उपलब्ध छैन।';
   status(scope,reason);
  };
  let epoch=0,current=null,queue=[],voiceTimer=null,audio=null;
@@ -163,7 +190,7 @@ function install(doc){
   epoch++;queue=[];current=null;voiceTimer=null;
   for(const timer of timers)view.clearTimeout?.(timer);timers.clear();
   if(audio){audio.onended=null;audio.onerror=null;try{audio.pause();audio.removeAttribute?.('src');}catch(_){}}
-  try{originalCancel?.call(synth);}catch(_){}
+  cancelNative();
  };
  const live=job=>current===job&&job.epoch===epoch;
  const finish=(job,error,event)=>{
@@ -198,27 +225,33 @@ function install(doc){
  };
  function nativePlay(job){
   if(!live(job))return;
-  const voice=choose(synth,job.locale);
-  if(!voice){
-   if(nativeAvailable&&voiceCatalog(synth).length===0){
-    // Android often populates getVoices only after the first interaction.
-    // Retain this exact request; voiceschanged resumes it without a reload.
+  let selection=nativeChoice(job.locale);
+  if(!selection&&nativeAvailable&&!hasCatalog()&&job.locale==='en-US'){
+   // The locale is explicitly English; try the OS voice immediately
+   // while the user gesture is still active. Never do this for Nepali.
+   selection={entry:engines[0],voice:null};
+  }
+  if(!selection){
+   if(nativeAvailable&&!hasCatalog()&&!job.waitedForVoices){
+    job.waitedForVoices=true;
     status(job.scope,'Loading voices… · आवाज लोड हुँदैछ…');
     clearTimer(voiceTimer);
     voiceTimer=later(()=>{
-     if(!live(job))return;
-     if(choose(synth,job.locale))nativePlay(job);
-     else{missing(job.scope,job.locale);finish(job,'language-unavailable');}
-    },2500);
+     voiceTimer=null;
+     if(live(job))nativePlay(job);
+    },2000);
    }else{missing(job.scope,job.locale);finish(job,'language-unavailable');}
    return;
   }
+  const {entry,voice}=selection;
   clearTimer(voiceTimer);voiceTimer=null;
   const segment=++job.segment;
   const activeSegment=()=>live(job)&&job.segment===segment;
-  const utterance=new view.SpeechSynthesisUtterance(job.parts[job.index]);
-  utterance.lang=job.locale;utterance.voice=voice;utterance.pitch=1;
-  utterance.rate=job.rate;job.utterance.lang=job.locale;job.utterance.voice=voice;
+  const utterance=new entry.host.SpeechSynthesisUtterance(job.parts[job.index]);
+  utterance.lang=job.locale;if(voice)utterance.voice=voice;utterance.pitch=1;
+  utterance.rate=job.rate;job.utterance.lang=job.locale;
+  // Keep a strong reference until completion (Safari may collect queued objects).
+  job.nativeUtterance=utterance;
   job.segmentStarted=false;
   utterance.onstart=()=>{if(activeSegment()){job.segmentStarted=true;started(job);}};
   utterance.onend=()=>{if(activeSegment())next(job);};
@@ -234,8 +267,8 @@ function install(doc){
   if(job.handlers.boundary)utterance.onboundary=event=>job.handlers.boundary.call(job.utterance,event);
   try{
    // Keep speak synchronous with the user's click when voices are ready.
-   if(synth.paused)synth.resume?.();
-   originalSpeak.call(synth,utterance);
+   if(entry.engine.paused)entry.engine.resume?.();
+   entry.speak.call(entry.engine,utterance);
    job.startTimer=later(()=>{
     if(!activeSegment()||job.segmentStarted)return;
     retry(job.scope,'Tap Play if you cannot hear audio. · आवाज नसुनिएमा थिच्नुहोस्।',()=>{
@@ -245,7 +278,7 @@ function install(doc){
     });
    },2500);
    job.endTimer=later(()=>{
-    if(activeSegment()){try{originalCancel?.call(synth);}catch(_){}fail(job,'timeout');}
+    if(activeSegment()){fail(job,'timeout');cancelNative();}
    },45000);
   }catch(_){fail(job,'synthesis-failed');}
  }
@@ -253,7 +286,10 @@ function install(doc){
   const segment=++job.segment;
   const activeSegment=()=>live(job)&&job.segment===segment;
   status(job.scope,'Preparing audio… · आवाज तयार हुँदैछ…');
-  Promise.resolve().then(()=>owner.sikauNaturalSpeech({text:job.parts[job.index],lang:job.locale})).then(result=>{
+  // A hung request must not block every later Listen button.
+  const deadline=new Promise((_,reject)=>{job.startTimer=later(()=>reject(Error('cloud timeout')),23000);});
+  Promise.race([Promise.resolve().then(()=>owner.sikauNaturalSpeech({text:job.parts[job.index],lang:job.locale})),deadline]).then(result=>{
+   clearTimer(job.startTimer);
    if(!activeSegment())return;
    if(!['audio/mpeg','audio/wav'].includes(result?.mime)||
       typeof result.audioBase64!=='string'||result.audioBase64.length>1900000)
@@ -274,6 +310,7 @@ function install(doc){
    };
    start();
   }).catch(()=>{
+   clearTimer(job.startTimer);
    if(!activeSegment())return;
    // Use only the same requested locale if the optional service is offline.
    job.useNative=true;nativePlay(job);
@@ -294,8 +331,7 @@ function install(doc){
   const locale=infer(utterance.text,utterance.lang);
   if(!locale)return originalSpeak?.call(synth,utterance);
   if(replace)stop();
-  if(!naturalService(locale)&&(!nativeAvailable||
-      (voiceCatalog(synth).length>0&&!choose(synth,locale)))){missing(scope,locale);return false;}
+  if(!naturalService(locale)&&!nativeAvailable){missing(scope,locale);return false;}
   const parts=split(utterance.text,locale);if(!parts.length)return false;
   queue.push({utterance,scope,locale,parts,index:0,epoch,segment:0,
    rate:Math.min(1.2,Math.max(0.65,Number(utterance.rate)||1)),
@@ -306,15 +342,17 @@ function install(doc){
   const locale=infer(text,lang);
   if(!text||!locale)return false;
   active=scope;
-  const utterance=nativeAvailable?new view.SpeechSynthesisUtterance(String(text)):{text:String(text)};
+  const utterance=typeof view.SpeechSynthesisUtterance==='function'?new view.SpeechSynthesisUtterance(String(text)):{text:String(text)};
   utterance.lang=locale;utterance.rate=options.rate||1;
   return play(utterance,scope,true);
  };
  // Prime the catalog at installation and resume a pending request once only.
- voiceCatalog(synth);
- synth?.addEventListener?.('voiceschanged',()=>{
-  if(current&&voiceTimer!=null&&choose(synth,current.locale))nativePlay(current);
- });
+ for(const entry of engines){
+  voiceCatalog(entry.engine);
+  entry.engine.addEventListener?.('voiceschanged',()=>{
+   if(current&&voiceTimer!=null&&nativeChoice(current.locale))nativePlay(current);
+  });
+ }
  // Keep old native speech calls in Reading, Speaking, Coach and games
  // routed through the same voice service when the property is writable.
  let patched=false;
@@ -404,11 +442,11 @@ function install(doc){
  view.__sikauNepaliVoiceInstalled=true;
  view.__sikauNepaliVoice={
   speakText,speakNepali:(text,scope='tr')=>speakText(text,'ne-NP',scope),
-  chooseEnglish:()=>choose(synth,'en-US'),chooseNepali:()=>choose(synth,'ne-NP'),
-  voices:()=>({english:candidates(synth,'en-US').map(v=>v.name),
-    nepali:candidates(synth,'ne-NP').map(v=>v.name)}),
+  chooseEnglish:()=>nativeChoice('en-US')?.voice||null,chooseNepali:()=>nativeChoice('ne-NP')?.voice||null,
+  voices:()=>({english:[...new Set(engines.flatMap(e=>candidates(e.engine,'en-US').map(v=>v.name)))],
+    nepali:[...new Set(engines.flatMap(e=>candidates(e.engine,'ne-NP').map(v=>v.name)))]}),
   removeGenderControls:retireLegacyVoiceUi,patched,stop,
-  naturalSpeechAvailable:()=>!!naturalService()
+  naturalSpeechAvailable:(locale)=>!!naturalService(locale)
  };
  view.__sikauSpeech=speakText;
  return true;
