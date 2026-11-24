@@ -1,0 +1,199 @@
+/* English Sikau — foldable iPhone / iPhone Duo responsive layer.
+   Loaded in the public account shell and injected into the authenticated
+   classroom iframe. Layout-only: no authentication, payment, progress,
+   navigation identity, or lesson content is changed. */
+
+/* iOS Safari viewport and safe-area resilience. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  scroll-padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#protected,
+#protected #bar,
+#protected iframe {
+  min-width: 0;
+}
+#protected iframe {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#protected #bar.student-topbar {
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+}
+#shell,
+#panel,
+#panel > .hero,
+#panel > .content {
+  min-width: 0;
+}
+#panel :is(button, input, select, textarea) {
+  touch-action: manipulation;
+}
+#panel :is(input, select, textarea) {
+  max-width: 100%;
+}
+
+/* Closed Duo: keep the sign-in and payment screens comfortable on the
+   compact outer display, including the camera/safe-area corners. */
+@media (max-width: 420px) and (pointer: coarse) {
+  #shell:has(#panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"],[data-mode="payment"])) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  #panel:is([data-mode="signin"],[data-mode="signup"],[data-mode="welcome"],[data-mode="payment"]) {
+    width: 100%;
+    max-width: none;
+    border-radius: 0;
+  }
+  #panel:is([data-mode="signin"],[data-mode="signup"]) > .hero {
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  }
+  #panel:is([data-mode="signin"],[data-mode="signup"]) > .content {
+    padding-left: max(14px, env(safe-area-inset-left, 0px));
+    padding-right: max(14px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  }
+  #panel[data-mode="payment"] > .content {
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  }
+  #panel[data-mode="payment"] .payment-entry .field input,
+  #panel:is([data-mode="signin"],[data-mode="signup"]) .field input {
+    min-height: 52px;
+    font-size: 16px;
+  }
+  #panel :is(.primary, .secondary, .auth-email-btn, .trial-button, .submit-payment, .approval-button) {
+    min-height: 48px;
+  }
+}
+
+/* Open Duo / compact tablet portrait: reclaim width from the narrow icon rail
+   while retaining the existing bottom dock on phone-sized viewports. */
+@media (min-width: 700px) and (max-width: 1023px) and (pointer: coarse) {
+  html.sikau-refresh.sikau-classroom {
+    --classroom-rail: 126px !important;
+    --classroom-gutter: clamp(14px, 2.6vw, 25px) !important;
+  }
+  html.sikau-refresh.sikau-classroom body {
+    padding-left: var(--classroom-rail) !important;
+    padding-right: env(safe-area-inset-right, 0px) !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav {
+    width: var(--classroom-rail) !important;
+    padding: 10px 7px !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    min-height: 48px !important;
+    padding: 6px 7px !important;
+    text-align: left !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified > i {
+    flex: 0 0 29px !important;
+    width: 29px !important;
+    height: 29px !important;
+    font-size: 18px !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .sikau-nav-word {
+    min-width: 0 !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 3px !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .sikau-nav-word strong {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .sikau-nav-word small {
+    display: block !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+  html.sikau-refresh.sikau-classroom :is(#sikauHomeScreen, section[id] > .content) {
+    min-width: 0 !important;
+    max-width: 1600px !important;
+  }
+  html.sikau-refresh.sikau-classroom :is(textarea, input, select, button) {
+    touch-action: manipulation;
+  }
+}
+
+/* Open Duo in landscape: make the student chrome one calm row and give the
+   lesson canvas maximum usable height. Keep all controls reachable. */
+@media (min-width: 700px) and (max-width: 1023px) and (max-height: 650px) and (orientation: landscape) and (pointer: coarse) {
+  #protected #bar.student-topbar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 56px !important;
+    padding-top: max(5px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 5px !important;
+  }
+  #protected .student-topbar-brand {
+    flex: 0 0 auto;
+    gap: 7px;
+    min-width: 0;
+  }
+  #protected .student-brand-flag {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+  #protected .student-topbar-brand strong {
+    font-size: 15px;
+  }
+  #protected .student-topbar-brand small,
+  #protected .student-access-tag {
+    display: none !important;
+  }
+  #protected .student-topbar-welcome {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 38%;
+    padding: 5px 8px;
+    gap: 6px;
+  }
+  #protected #studentTopGreeting {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
+  #protected .student-top-actions {
+    flex: 0 0 auto;
+    gap: 5px;
+    margin-left: auto;
+  }
+  #protected .student-top-actions :is(button, #sikauThemeProtected) {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  #protected #cloudStoryProgress {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+}
+
+/* Reduce accidental selection/zoom double-taps without disabling pinch zoom. */
+@media (hover: none) and (pointer: coarse) {
+  #protected #bar button,
+  html.sikau-refresh.sikau-classroom #mobileModes.nav button,
+  html.sikau-refresh.sikau-classroom button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
