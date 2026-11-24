@@ -11,7 +11,7 @@
  const answers=document.getElementById('chat-choices');
  if(!view||!thread||!answers)return;
 
- const mobile=window.matchMedia('(max-width:620px)');
+ const mobile=window.matchMedia('(max-width:760px)');
  const toggle=document.createElement('button');
  toggle.type='button';
  toggle.id='sikauChatHistoryToggle';
