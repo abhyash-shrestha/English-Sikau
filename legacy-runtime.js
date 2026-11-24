@@ -1216,7 +1216,7 @@ function enhanceLearningHome(doc,firstName){
     // Migrate a legacy home screen nested inside a course section.
     doc.body.insertBefore(home,doc.body.querySelector(':scope > section[id]:not(#sikauHomeScreen)')||nav);
   }
-  const title=home.querySelector('h2');
+  const title=home.querySelector('.sikau-home-intro h2');
   if(title && title.textContent!=='🎉 Nepali Festivals · नेपाली चाडपर्व')
     title.textContent='🎉 Nepali Festivals · नेपाली चाडपर्व';
   let homeTab=nav.querySelector('.sikau-home-nav');
