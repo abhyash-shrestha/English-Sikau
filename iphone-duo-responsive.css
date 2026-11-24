@@ -75,7 +75,7 @@ html {
 
 /* Open Duo / compact tablet portrait: reclaim width from the narrow icon rail
    while retaining the existing bottom dock on phone-sized viewports. */
-@media (min-width: 700px) and (max-width: 1023px) and (pointer: coarse) {
+@media (min-width: 768px) and (max-width: 1023px) and (pointer: coarse) {
   html.sikau-refresh.sikau-classroom {
     --classroom-rail: 126px !important;
     --classroom-gutter: clamp(14px, 2.6vw, 25px) !important;
@@ -131,7 +131,7 @@ html {
 
 /* Open Duo in landscape: make the student chrome one calm row and give the
    lesson canvas maximum usable height. Keep all controls reachable. */
-@media (min-width: 700px) and (max-width: 1023px) and (max-height: 650px) and (orientation: landscape) and (pointer: coarse) {
+@media (min-width: 768px) and (max-width: 1023px) and (max-height: 650px) and (orientation: landscape) and (pointer: coarse) {
   #protected #bar.student-topbar {
     display: flex !important;
     flex-wrap: nowrap !important;
@@ -195,5 +195,127 @@ html {
   html.sikau-refresh.sikau-classroom #mobileModes.nav button,
   html.sikau-refresh.sikau-classroom button {
     -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Duo r2 — WebKit Safari 27.1 published viewport widths:
+   outer 382 / 594, inner 669 / 951, side-by-side 385 CSS px.
+   Keep the existing 768px dock/rail contract. Adapt by available width,
+   never by user agent or experimental device posture flags. */
+
+/* Touch keyboard and safe areas: reserve space in the outer document;
+   keep the existing iframe/dock visibility controls and lesson state. */
+@media (max-width: 767px) {
+  #panel > .content :is(input:not([type="checkbox"]):not([type="radio"]),textarea,select) {
+    font-size:16px!important;
+  }
+  #panel > .hero #sikauThemeAuth {
+    top:max(10px,env(safe-area-inset-top,0px));
+    right:max(10px,env(safe-area-inset-right,0px));
+  }
+  #panel[data-mode="payment"] > .content {
+    padding-inline: max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px));
+  }
+  html.sikau-refresh.sikau-classroom :is(#coach,#tr,#words,#hw,#rd,#learn,#game,#sp,#pg) > .content {
+    min-width:0!important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav:not([data-sikau-dock-open="true"]) {
+    width:100%!important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > #sikauDockMore {
+    min-width:0!important;
+    white-space:normal!important;
+  }
+}
+@media (max-width: 1023px) and (pointer: coarse) {
+  html.sikau-refresh.sikau-classroom :is(textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select) {
+    font-size:16px!important;
+    max-width:100%;
+    scroll-margin-block:12px;
+  }
+  html.sikau-refresh.sikau-classroom #rd :is(.sikau-practice-listen,.sikau-practice-translation-fallback) {
+    min-height:44px!important;
+  }
+}
+
+/* Inner portrait at 669px: retain the bottom dock and use the full width
+   for the classroom. English and Nepali become facing columns. */
+@media (min-width: 620px) and (max-width: 767px) {
+  html.sikau-refresh.sikau-classroom {
+    --classroom-gutter:clamp(14px,2.5vw,20px);
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav {
+    width:100%!important;
+    padding-inline:12px!important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified .sikau-nav-word strong {
+    font-size:12px!important;
+  }
+  html.sikau-refresh.sikau-classroom #tr.sikau-studio-v4 .ttx-workspace {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  html.sikau-refresh.sikau-classroom #tr.sikau-studio-v4 .ttx-side {
+    grid-column:1/-1!important;
+  }
+  html.sikau-refresh.sikau-classroom #tr.sikau-studio-v4 :is(.ttx-topic-grid,.ttx-examples-grid,.ttx-quick-grid) {
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  html.sikau-refresh.sikau-classroom #learn .course-chapters {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 .story-book-list {
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 .sikau-practice-pair,
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-exact .storybook-pair {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-items:start;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 .sikau-practice-english {
+    border-bottom:0!important;
+    border-inline-end:1px solid var(--classroom-line)!important;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 :is(.sikau-practice-english,.sikau-practice-nepali) {
+    padding:14px!important;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 .sikau-practice-bilingual-heading {
+    flex-direction:row!important;
+    align-items:baseline!important;
+  }
+}
+
+/* Short outer landscape (594 x 368): keep forms and classroom content
+   usable without hiding any account or learning actions. */
+@media (max-width: 767px) and (max-height: 490px) and (orientation: landscape) {
+  #protected.sikau-classroom-ready #bar.student-topbar {
+    padding-block:3px!important;
+    gap:2px 6px!important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav[data-sikau-dock-open="true"] {
+    max-height:60dvh!important;
+  }
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > button.sikau-nav-unified,
+  html.sikau-refresh.sikau-classroom #mobileModes.nav > #sikauDockMore {
+    min-height:44px!important;
+  }
+  html.sikau-refresh.sikau-classroom .app-header {
+    margin-bottom:6px!important;
+    padding-block:7px!important;
+  }
+}
+
+/* Inner landscape (951px): two useful work panes, rather than three cramped
+   panels; the existing scrollable sidebar keeps every tab accessible. */
+@media (min-width: 860px) and (max-width: 1023px) and (pointer: coarse) {
+  html.sikau-refresh.sikau-classroom #tr.sikau-studio-v4 .ttx-workspace {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  html.sikau-refresh.sikau-classroom #tr.sikau-studio-v4 .ttx-side {
+    grid-column:1/-1!important;
+  }
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-v2 .sikau-practice-pair,
+  html.sikau-refresh.sikau-classroom #rd.sikau-read-exact .storybook-pair {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
 }
