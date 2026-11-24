@@ -734,7 +734,7 @@ async function loadSDK(){let sdk=window.Appwrite;if(!sdk){for(const url of ['htt
 /* Optional authenticated speech service. Keep speechAI null until the actual
    Appwrite deployment and provider have passed live audio checks. No provider
    key, learner recording, or session token belongs in public source. */
-let sikauSpeechReady={tts:false,transcription:false,jadoo:false};
+let sikauSpeechReady={tts:false,transcription:false,jadoo:false,jadooEnglish:false};
 let sikauSpeechCapabilityLoad=null;
 const sikauSpeechCache=new Map();
 let sikauSpeechCacheBytes=0;
@@ -763,18 +763,18 @@ function sikauRefreshSpeechCapabilities(){
  const generic=CFG.speechAI?sikauSpeechCall({action:'capabilities'}).catch(()=>null):Promise.resolve(null);
  const jadoo=CFG.jadooSpeech?sikauSpeechCall({action:'capabilities'},CFG.jadooSpeech).catch(()=>null):Promise.resolve(null);
  sikauSpeechCapabilityLoad=Promise.all([generic,jadoo]).then(([result,ne])=>{
-  if(version===readNumber)sikauSpeechReady={tts:result?.tts===true,transcription:result?.transcription===true,jadoo:ne?.tts===true&&ne?.languages?.includes('ne-NP')===true&&ne?.voice==='SAHARA'};
+  if(version===readNumber)sikauSpeechReady={tts:result?.tts===true,transcription:result?.transcription===true,jadoo:ne?.tts===true&&ne?.languages?.includes('ne-NP')===true&&ne?.voice==='SAHARA',jadooEnglish:ne?.tts===true&&ne?.languages?.includes('en-US')===true&&ne?.voice==='SAHARA'};
  });
  return sikauSpeechCapabilityLoad;
 }
-window.sikauNaturalSpeechAvailable=(lang)=>!!(openedAccess&&user&&(lang==='ne-NP'?(sikauSpeechReady.jadoo||sikauSpeechReady.tts):lang?sikauSpeechReady.tts:(sikauSpeechReady.jadoo||sikauSpeechReady.tts)));
+window.sikauNaturalSpeechAvailable=(lang)=>!!(openedAccess&&user&&(lang==='ne-NP'?(sikauSpeechReady.jadoo||sikauSpeechReady.tts):lang==='en-US'?(sikauSpeechReady.jadooEnglish||sikauSpeechReady.tts):lang?sikauSpeechReady.tts:(sikauSpeechReady.jadoo||sikauSpeechReady.jadooEnglish||sikauSpeechReady.tts)));
 window.sikauTranscriptionAvailable=()=>!!(openedAccess&&user&&sikauSpeechReady.transcription);
 window.sikauNaturalSpeech=async({text,lang})=>{
  if(!openedAccess||!user)throw Error('Active student session required');
- if(lang!=='ne-NP'||!sikauSpeechReady.jadoo)return sikauSpeechCall({text,lang});
+ if(!(lang==='ne-NP'&&sikauSpeechReady.jadoo)&&!(lang==='en-US'&&sikauSpeechReady.jadooEnglish))return sikauSpeechCall({text,lang});
  const normalized=String(text||'').normalize('NFC').trim();
- if(!normalized||[...normalized].length>220)throw Error('Nepali audio segment exceeds limit');
- const key=normalized;
+ if(!normalized||[...normalized].length>220)throw Error('Audio segment exceeds limit');
+ const key=lang+'\u0000'+normalized;
  if(sikauSpeechCache.has(key)){
   const cached=sikauSpeechCache.get(key);sikauSpeechCache.delete(key);sikauSpeechCache.set(key,cached);return cached;
  }
@@ -2009,7 +2009,7 @@ function killLessons(){
    view?.__sikauSpeechInput?.cancel();view?.__sikauNepaliVoice?.stop();
   }catch(_){}
   readNumber++;
-  sikauSpeechReady={tts:false,transcription:false,jadoo:false};sikauSpeechCapabilityLoad=null;sikauClearSpeechCache();
+  sikauSpeechReady={tts:false,transcription:false,jadoo:false,jadooEnglish:false};sikauSpeechCapabilityLoad=null;sikauClearSpeechCache();
   openedAccess=null;
   lessonOpening=false;
   clearInterval(trialInterval);trialInterval=null;
