@@ -4,6 +4,9 @@ import handler,{prepareText,validWav,activeTrial} from './main.js';
 test('Nepali text is bounded and normalized',()=>{
  assert.equal(prepareText('  नमस्ते  नेपाल।  '),'नमस्ते नेपाल।');
  assert.equal(prepareText('hello'),null);
+ assert.equal(prepareText('Hello, how are you?','en-US'),'Hello, how are you?');
+ assert.equal(prepareText('नमस्ते','en-US'),null);
+ assert.equal(prepareText('Hello','fr-FR'),null);
  assert.equal(prepareText('क'.repeat(221)),null);
  assert.equal(prepareText('नमस्ते\x00'),null);
 });
