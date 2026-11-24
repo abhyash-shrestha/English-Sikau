@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "none",
+    "strict": true,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "noEmitOnError": true,
+    "outDir": "build-typescript",
+    "skipLibCheck": true
+  },
+  "files": [
+    "src/mobile-bar-handles.ts"
+  ]
+}
