@@ -36,8 +36,10 @@ const candidates=(synth,locale)=>voiceCatalog(synth).filter(v=>{
 const quality=(v,locale)=>{
  const name=String(v?.name||'')+' '+String(v?.voiceURI||'');
  let score=0;
- if(/\b(?:natural|neural|premium|enhanced|online)\b/i.test(name))score+=95;
- if(/\b(?:compact|novelty|robot|espeak|synthesizer)\b/i.test(name))score-=75;
+ if(/\b(?:natural|neural|premium)\b/i.test(name))score+=180;
+ else if(/\benhanced\b/i.test(name))score+=140;
+ else if(/\bonline\b/i.test(name))score+=75;
+ if(/\b(?:compact|novelty|robot|espeak|synthesizer)\b/i.test(name))score-=150;
  if(locale==='en-US'){
   // High-quality US voices known on common Windows, macOS and Android.
   if(/\b(?:ava|jenny|aria|samantha|allison|google us english|zoe|karen)\b/i.test(name))score+=25;
@@ -114,7 +116,12 @@ function install(doc){
  const engines=[topEngine,frameEngine].filter(Boolean);
  const nativeAvailable=engines.length>0;
  const nativeChoice=locale=>{
-  for(const entry of engines){const voice=choose(entry.engine,locale);if(voice)return {entry,voice};}
+  let best=null;
+  for(const entry of engines){
+   const voice=choose(entry.engine,locale);
+   if(voice&&(!best||quality(voice,locale)>quality(best.voice,locale)))best={entry,voice};
+  }
+  if(best)return best;
   // Generic English voices are not silently used for Nepali. If Safari
   // has not enumerated any voices, let the OS try en-US on an explicit tap.
   return null;
@@ -174,7 +181,7 @@ function install(doc){
   button.addEventListener('click',action);node.appendChild(button);
  };
  const split=(value,locale)=>{
-  const max=locale==='ne-NP'?180:260;
+  const max=180; // Both JADOO languages share a 220-character gateway limit.
   let rest=String(value||'').replace(/\s+/g,' ').trim();const parts=[];
   while(rest.length>max){
    const sample=rest.slice(0,max+1);
