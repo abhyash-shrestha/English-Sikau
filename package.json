@@ -1,0 +1,26 @@
+{
+  "name": "english-sikau-modern",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsc --noEmit && vite build --config modern/vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test modern/tests/*.test.ts",
+    "preview": "vite --host 127.0.0.1 --config modern/vite.config.ts"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/node": "^22.15.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.0"
+  }
+}

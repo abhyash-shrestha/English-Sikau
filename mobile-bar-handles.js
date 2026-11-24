@@ -116,7 +116,8 @@
   const launchSub=doc.createElement('p');
   launchSub.className='sikau-launch-sub';launchSub.textContent='सिक्न सुरु गर्नुहोस् · Choose what to practice today';
   const launchGrid=doc.createElement('div');launchGrid.className='sikau-launch-grid';
-  launcher.append(launchHeading,launchSub,launchGrid);
+  const modernHost=doc.createElement('div');modernHost.id='sikauModernLauncherHost';
+  launcher.append(launchHeading,launchSub,launchGrid,modernHost);
   const tiles=new Map();
   for(const [selector,emoji,en,ne] of launchSpecs){
    const tile=doc.createElement('button');tile.type='button';tile.className='sikau-launch-tile';
@@ -135,6 +136,7 @@
     tile.hidden=!target||target.disabled||target.hidden;
     tile.disabled=!!target?.disabled;
    }
+   try{window.sikauModernLauncher?.mount({host:modernHost,nav,fallback:launchGrid});}catch(error){launchGrid.style.removeProperty('display');console.warn('Modern launcher unavailable:',error);}
   }
   const scrim=doc.createElement('div');scrim.className='sikau-phone-scrim';
   scrim.setAttribute('aria-hidden','true');scrim.hidden=true;doc.body.append(scrim);
@@ -203,6 +205,9 @@
    if(!phone.matches&&open)setOpen(false);
   }
 
+  window.addEventListener('sikau-modern-ready',updateLauncher);
+  const languageObserver=new win.MutationObserver(updateLauncher);
+  languageObserver.observe(root,{attributes:true,attributeFilter:['data-sikau-display-language']});
   nav.addEventListener('click',choose,true);
   doc.addEventListener('keydown',escape);
   phone.addEventListener('change',resize);
@@ -213,7 +218,9 @@
   });
   observer.observe(nav,{subtree:true,childList:true,attributes:true,attributeFilter:['aria-current','class']});
   controllers.set(doc,{nav,render,dispose(){
-   observer.disconnect();phone.removeEventListener('change',resize);
+   observer.disconnect();languageObserver.disconnect();window.removeEventListener('sikau-modern-ready',updateLauncher);
+   window.sikauModernLauncher?.unmount(modernHost);
+   phone.removeEventListener('change',resize);
    nav.removeEventListener('click',choose,true);doc.removeEventListener('keydown',escape);
    title.remove();more.remove();hide.remove();show.remove();menuHeading.remove();scrim.remove();launcher.remove();
    root.classList.remove('sikau-phone-menu-open');
