@@ -1,6 +1,6 @@
 # JADOO voice integration — English Sikau
 
-This adapter is intentionally fail-closed. It connects the existing Listen controls to the existing JADOO private-beta gateway, uses SAHARA (provider voice ID maya) for Nepali only, and keeps US English, browser fallback, existing accounts and curriculum. No extra tab or student login. No voice cloning or recordings are transmitted. Text sent for synthesis may include student-entered phrases; provide a privacy notice and obtain appropriate consent before activating.
+This adapter is intentionally fail-closed. It connects the existing Listen controls to the existing JADOO private-beta gateway, uses SAHARA (provider voice ID maya) for Nepali, optionally supports English after owner verification, and keeps US English fallback, browser fallback, existing accounts and curriculum. No extra tab or student login. No voice cloning or recordings are transmitted. Text sent for synthesis may include student-entered phrases; provide a privacy notice and obtain appropriate consent before activating.
 
 ## Deployment (owner-authorized Appwrite console)
 1. Verify the JADOO Cloudflare production /api/status and generate a sample through the private beta. Configuration readiness is not GPU verification. Keep Modal proxy credentials in Cloudflare and enforce a workspace spending limit.
@@ -10,3 +10,6 @@ This adapter is intentionally fail-closed. It connects the existing Listen contr
 5. A synchronous Appwrite SDK call has a 30-second limit; cold GPU requests may take longer. The adapter aborts the gateway request after 18 seconds and falls back to an exact-language device voice if available. Cold-start mitigation/pre-generated static lesson audio or a properly authorized async job API is needed for reliable full-scale service. No Hindi substitution. The capability endpoint is configuration-only, not a live inference check.
 
 Tests: node --test main.test.js. Frontend uses bounded session-memory audio cache cleared with lesson session, and prefers JADOO only for Nepali when the capability check succeeds. If the function has not been deployed, existing native audio remains in use.
+
+## English audio quality
+English cloud synthesis stays disabled by default. Only after listening to JADOO's actual output for conversational American English, set JADOO_ENGLISH_VERIFIED=true in the Appwrite function. If the accent is not suitable for teaching US English, leave it off and use a separate approved neural English provider. Browser fallback now ranks Enhanced/Premium/Natural voices across both document contexts. No browser voice can be promised to sound identical on all devices.
