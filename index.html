@@ -1181,6 +1181,7 @@ html[data-sikau-theme="dark"] .auth-field-hint{color:#d4bfd1}
 <iframe id="lessonFrame" title="English Sikau learning app" referrerpolicy="no-referrer"></iframe></section>
 <script src="./festival-stories.js?v=20261030-nepali-r2"></script>
 <script src="./festival-dashboard-preview.js?v=20261030-nepali-r2"></script>
+<script src="./header-language.js?v=20261124-ts1"></script>
 <script src="./mobile-bar-handles.js?v=20261124-festival-fix-r4"></script>
 <script src="./coach-store-story.js?v=20261028-dialogue-only-r9"></script>
 <script src="./coach-topic-catalog-1.js?v=20261028-175topics-r1"></script>
@@ -2053,6 +2054,27 @@ function sikauCurrentDisplayLanguage(){
 }
 function sikauApplyOuterDisplayLanguage(selected){
  if(!openedAccess||!user)return;
+ // Use the typed production language model when loaded; retain identical
+ // legacy behavior if the asset is unavailable during a network interruption.
+ if(window.sikauHeaderLanguage){
+  const copy=window.sikauHeaderLanguage.copy(selected,studentFirstName(),sikauTheme==='dark');
+  const greeting=$('studentTopGreeting');
+  if(greeting)greeting.textContent=copy.greeting;
+  const exit=$('exit');
+  if(exit&&exit.firstChild?.nodeType===Node.TEXT_NODE){
+   const compact=window.matchMedia?.('(max-width:767px)')?.matches;
+   exit.firstChild.nodeValue=compact?'Sign out ':copy.signout;
+   exit.setAttribute('aria-label',copy.signout.trim());
+   exit.title=copy.signout.trim();
+  }
+  const theme=$('sikauThemeProtected');
+  if(theme){
+   const word=theme.querySelector('.sikau-theme-word');
+   if(word)word.textContent=copy.themeLabel;
+   theme.setAttribute('aria-label',copy.themeAria);
+  }
+  return;
+ }
  const mode=['en-ne','en-roman','all','en'].includes(selected)?selected:'en-ne';
  const first=studentFirstName();
  const greetings={
