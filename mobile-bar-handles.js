@@ -4,7 +4,7 @@
  const TOP_KEY='sikau-mobile-top-hidden-v1';
  const BOTTOM_KEY='sikau-mobile-bottom-hidden-v1';
  const SHEET_URL=new URL('./mobile-bar-handles.css?v=20261106-adaptive-r2',document.baseURI).href;
- const DUO_SHEET_URL=new URL('./iphone-duo-responsive.css?v=20261123-duo-r1',document.baseURI).href;
+ const DUO_SHEET_URL=new URL('./iphone-duo-responsive.css?v=20261124-duo-r2',document.baseURI).href;
  const QUICK='.sikau-home-nav,.sikau-visa-nav,[data-t="coach"],[data-t="rd"]';
  const controllers=new WeakMap();
 
