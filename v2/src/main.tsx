@@ -20,6 +20,7 @@ function App(){
  useEffect(()=>{let active=true;currentProfile().then(p=>{if(active)setProfile(p)}).catch(()=>{});return()=>{active=false}},[]);
  useEffect(()=>{let active=true;setProgress(null);if(profile?.paid)readProgress(profile).then(p=>{if(active)setProgress(p)}).catch(()=>{if(active)setMessage('Existing progress could not be loaded.')});return()=>{active=false}},[profile]);
  useEffect(()=>{if(!more)return;const handler=(event:KeyboardEvent)=>{if(event.key==='Escape')setMore(false)};window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler)},[more]);
+ useEffect(()=>{const mq=matchMedia('(min-width:768px)');const close=()=>{if(mq.matches)setMore(false)};mq.addEventListener('change',close);return()=>mq.removeEventListener('change',close)},[]);
  function go(id:Tab){setTab(id);setMore(false);window.scrollTo({top:0,behavior:'auto'})}
  function complete(){setDone(d=>d.includes(tab)?d:[...d,tab])}
  async function login(e:React.FormEvent<HTMLFormElement>){e.preventDefault();if(busy)return;const data=new FormData(e.currentTarget);setBusy(true);setMessage('');try{setProfile(await signIn(String(data.get('email')),String(data.get('password'))));setAccountOpen(false)}catch{setMessage('Unable to sign in. Check your details or use the existing website.')}finally{setBusy(false)}}
