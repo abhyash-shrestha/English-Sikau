@@ -1,0 +1,27 @@
+name: English Sikau V2 preview checks
+on:
+  push:
+    branches: [english-sikau-v2-from-scratch]
+  pull_request:
+    branches: [main]
+    paths: ['v2/**', '.github/workflows/v2-rebuild-checks.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: english-sikau-v2-preview
+          path: v2/dist/
