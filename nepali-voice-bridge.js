@@ -113,10 +113,10 @@ function install(doc){
   }
   label.textContent=message;
  };
- const naturalService=()=>{
+ const naturalService=(locale)=>{
   try{
    const owner=view.parent||view;
-   return owner.sikauNaturalSpeechAvailable?.()===true?owner:null;
+   return owner.sikauNaturalSpeechAvailable?.(locale)===true?owner:null;
   }catch(_){return null;}
  };
  const missing=(scope,locale)=>{
@@ -146,14 +146,15 @@ function install(doc){
   button.style.cssText='font:inherit;margin:6px;min-height:44px;padding:8px 14px;border-radius:10px;cursor:pointer;';
   button.addEventListener('click',action);node.appendChild(button);
  };
- const split=value=>{
+ const split=(value,locale)=>{
+  const max=locale==='ne-NP'?180:260;
   let rest=String(value||'').replace(/\s+/g,' ').trim();const parts=[];
-  while(rest.length>260){
-   const sample=rest.slice(0,261);
+  while(rest.length>max){
+   const sample=rest.slice(0,max+1);
    const stops=[...sample.matchAll(/[.!?।](?:\s|$)/gu)];
    let at=stops.length?stops.at(-1).index+1:sample.lastIndexOf(' ');
    if(at<65)at=sample.lastIndexOf(' ');
-   if(at<1)at=260;
+   if(at<1)at=max;
    parts.push(rest.slice(0,at).trim());rest=rest.slice(at).trim();
   }
   if(rest)parts.push(rest);return parts;
@@ -280,7 +281,7 @@ function install(doc){
  }
  function run(job){
   if(!live(job))return;
-  const owner=!job.useNative&&naturalService();
+  const owner=!job.useNative&&naturalService(job.locale);
   if(owner&&typeof view.Audio==='function')cloudPlay(job,owner);
   else nativePlay(job);
  }
@@ -293,9 +294,9 @@ function install(doc){
   const locale=infer(utterance.text,utterance.lang);
   if(!locale)return originalSpeak?.call(synth,utterance);
   if(replace)stop();
-  if(!naturalService()&&(!nativeAvailable||
+  if(!naturalService(locale)&&(!nativeAvailable||
       (voiceCatalog(synth).length>0&&!choose(synth,locale)))){missing(scope,locale);return false;}
-  const parts=split(utterance.text);if(!parts.length)return false;
+  const parts=split(utterance.text,locale);if(!parts.length)return false;
   queue.push({utterance,scope,locale,parts,index:0,epoch,segment:0,
    rate:Math.min(1.2,Math.max(0.65,Number(utterance.rate)||1)),
    handlers:{start:utterance.onstart,end:utterance.onend,error:utterance.onerror,boundary:utterance.onboundary}});
