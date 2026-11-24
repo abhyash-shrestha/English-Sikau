@@ -4,7 +4,7 @@
  const TOP_KEY='sikau-mobile-top-hidden-v1';
  const BOTTOM_KEY='sikau-mobile-bottom-hidden-v1';
  const SHEET_URL=new URL('./mobile-bar-handles.css?v=20261106-adaptive-r2',document.baseURI).href;
- const DUO_SHEET_URL=new URL('./iphone-duo-responsive.css?v=20261124-native-r3',document.baseURI).href;
+ const DUO_SHEET_URL=new URL('./iphone-duo-responsive.css?v=20261124-festival-fix-r4',document.baseURI).href;
  const QUICK='.sikau-home-nav,.sikau-visa-nav,[data-t="coach"],[data-t="rd"]';
  const controllers=new WeakMap();
 
@@ -95,47 +95,9 @@
   const phone=win.matchMedia('(max-width:767px)');
   const tabs=()=>Array.from(nav.querySelectorAll(':scope > button.sikau-nav-unified'));
   let open=false;
-  // Mobile Home shortcuts use the exact existing navigation button. No
-  // duplicate route, private content, or independent lesson state.
-  const launchSpecs=[
-   ['[data-t="coach"]','💬','Coach','कुराकानी'],
-   ['[data-t="tr"]','🔄','Translate','अनुवाद'],
-   ['[data-t="rd"]','📖','Read','पढ्नुहोस्'],
-   ['[data-t="words"]','🔤','Words','शब्दहरू'],
-   ['[data-t="hw"]','✍️','Write','लेखन'],
-   ['[data-t="sp"]','🎙️','Speak','बोल्नुहोस्'],
-   ['.sikau-visa-nav','🛂','US Visa','अमेरिकी भिसा'],
-   ['[data-t="game"]','🎮','Game','खेल'],
-   ['[data-t="pg"]','📈','Progress','प्रगति']
-  ];
-  const launcher=doc.createElement('section');
-  launcher.id='sikauPhoneLauncher';
-  launcher.setAttribute('aria-label','Start learning · सिक्न सुरु गर्नुहोस्');
-  const launchHeading=doc.createElement('h2');
-  launchHeading.className='sikau-launch-heading';launchHeading.textContent='Start learning';
-  const launchSub=doc.createElement('p');
-  launchSub.className='sikau-launch-sub';launchSub.textContent='सिक्न सुरु गर्नुहोस् · Choose what to practice today';
-  const launchGrid=doc.createElement('div');launchGrid.className='sikau-launch-grid';
-  launcher.append(launchHeading,launchSub,launchGrid);
-  const tiles=new Map();
-  for(const [selector,emoji,en,ne] of launchSpecs){
-   const tile=doc.createElement('button');tile.type='button';tile.className='sikau-launch-tile';
-   const icon=doc.createElement('span');icon.className='sikau-launch-icon';icon.textContent=emoji;icon.setAttribute('aria-hidden','true');
-   const name=doc.createElement('strong');name.textContent=en;
-   const translation=doc.createElement('small');translation.lang='ne';translation.textContent=ne;
-   tile.append(icon,name,translation);tile.hidden=true;
-   tile.addEventListener('click',()=>{const target=nav.querySelector(selector);if(target&&!target.disabled)target.click();});
-   launchGrid.append(tile);tiles.set(selector,tile);
-  }
-  function updateLauncher(){
-   const home=doc.getElementById('sikauHomeScreen');
-   if(home&&launcher.parentElement!==home)home.prepend(launcher);
-   for(const [selector,tile] of tiles){
-    const target=nav.querySelector(selector);
-    tile.hidden=!target||target.disabled||target.hidden;
-    tile.disabled=!!target?.disabled;
-   }
-  }
+  // #sikauHomeScreen is the dedicated Nepali Festivals destination.
+  // Never insert generic learning shortcuts into it.
+  doc.getElementById('sikauPhoneLauncher')?.remove();
   const scrim=doc.createElement('div');scrim.className='sikau-phone-scrim';
   scrim.setAttribute('aria-hidden','true');scrim.hidden=true;doc.body.append(scrim);
   const menuHeading=doc.createElement('div');menuHeading.className='sikau-phone-menu-heading';
@@ -149,7 +111,6 @@
    if(toolbar&&title.parentElement!==toolbar)toolbar.prepend(title);
    if(menuHeading.parentElement!==nav)nav.prepend(menuHeading);
    if(more.parentElement!==nav||hide.parentElement!==nav)nav.append(more,hide);
-   updateLauncher();
    const active=tabs().find(tab=>tab.getAttribute('aria-current')==='page')||
     tabs().find(tab=>tab.classList.contains('on'));
    const label=active?.querySelector('strong')?.textContent?.trim()||'';
@@ -215,7 +176,7 @@
   controllers.set(doc,{nav,render,dispose(){
    observer.disconnect();phone.removeEventListener('change',resize);
    nav.removeEventListener('click',choose,true);doc.removeEventListener('keydown',escape);
-   title.remove();more.remove();hide.remove();show.remove();menuHeading.remove();scrim.remove();launcher.remove();
+   title.remove();more.remove();hide.remove();show.remove();menuHeading.remove();scrim.remove();
    root.classList.remove('sikau-phone-menu-open');
   }});
  }
