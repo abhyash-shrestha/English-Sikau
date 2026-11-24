@@ -4,6 +4,7 @@
  const TOP_KEY='sikau-mobile-top-hidden-v1';
  const BOTTOM_KEY='sikau-mobile-bottom-hidden-v1';
  const SHEET_URL=new URL('./mobile-bar-handles.css?v=20261106-adaptive-r2',document.baseURI).href;
+ const DUO_SHEET_URL=new URL('./iphone-duo-responsive.css?v=20261123-duo-r1',document.baseURI).href;
  const QUICK='.sikau-home-nav,.sikau-visa-nav,[data-t="coach"],[data-t="rd"]';
  const controllers=new WeakMap();
 
@@ -65,6 +66,15 @@
    const css=doc.createElement('link');
    css.id='sikauMobileBarHandleStyle';css.rel='stylesheet';css.href=SHEET_URL;
    doc.head.append(css);
+  }
+  // Apply the same foldable-aware layout to the authenticated classroom.
+  // This stylesheet contains presentation rules only; lesson state and access
+  // checks remain owned by the private Appwrite application.
+  if(!doc.getElementById('sikauIphoneDuoResponsiveStyle')){
+   const duoCss=doc.createElement('link');
+   duoCss.id='sikauIphoneDuoResponsiveStyle';
+   duoCss.rel='stylesheet';duoCss.href=DUO_SHEET_URL;
+   doc.head.append(duoCss);
   }
   root.classList.add('sikau-classroom');
   nav.setAttribute('aria-label','Learning tabs · सिकाइका ट्याबहरू');
