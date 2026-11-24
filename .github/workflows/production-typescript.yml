@@ -2,7 +2,7 @@ name: Existing site TypeScript verification
 on:
   push:
     branches: [main]
-    paths: ['src/mobile-bar-handles.ts','mobile-bar-handles.js','tsconfig.production.json','.github/workflows/production-typescript.yml']
+    paths: ['src/**','header-language.js','mobile-bar-handles.js','tests/production-header-language.mjs','tsconfig.production.json','.github/workflows/production-typescript.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,6 +17,7 @@ jobs:
       - run: npm exec --yes --package=typescript@5.9.3 -- tsc --project tsconfig.production.json
       - run: node --check build-typescript/mobile-bar-handles.js
       - run: node --check mobile-bar-handles.js
+      - run: node tests/production-header-language.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: production-typescript-runtime
