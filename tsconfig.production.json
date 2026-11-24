@@ -12,6 +12,7 @@
     "skipLibCheck": true
   },
   "files": [
-    "src/mobile-bar-handles.ts"
+    "src/mobile-bar-handles.ts",
+    "src/header-language.ts"
   ]
 }
