@@ -7,10 +7,10 @@ const GATEWAY='https://jadoo-voice-studio.pages.dev/api/speak';
 const STATUS='https://jadoo-voice-studio.pages.dev/api/status';
 const MAX_AUDIO=1400000;
 const fail=(res,status,message)=>res.json({status:'error',error:message},status);
-export function prepareText(value){
+export function prepareText(value,lang='ne-NP'){
  if(typeof value!=='string')return null;
  const text=value.normalize('NFC').replace(/[\r\n\t ]+/g,' ').trim();
- if(!text||[...text].length>220||!/[\u0900-\u097f]/u.test(text)||/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/u.test(text))return null;
+ if(!text||[...text].length>220||!(['ne-NP','en-US'].includes(lang))||(lang==='ne-NP'?!/[\u0900-\u097f]/u.test(text):(!/[a-z]/i.test(text)||/[\u0900-\u097f]/u.test(text)))||/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/u.test(text))return null;
  return text;
 }
 export function validWav(bytes){
@@ -71,12 +71,12 @@ export default async ({req,res})=>{
   if(body.action==='capabilities'){
    const response=await fetch(STATUS,{redirect:'error',signal:AbortSignal.timeout(3500)});
    const status=response.ok?await response.json():null;
-   return res.json({status:'ok',tts:status?.ready===true,transcription:false,languages:['ne-NP'],voice:'SAHARA'});
+   return res.json({status:'ok',tts:status?.ready===true,transcription:false,languages:process.env.JADOO_ENGLISH_VERIFIED==='true'?['ne-NP','en-US']:['ne-NP'],voice:'SAHARA'});
   }
   if(body.action&&body.action!=='tts')return fail(res,400,'Unsupported speech action');
-  if(body.lang!=='ne-NP')return fail(res,400,'Only Nepali speech is supported');
-  const text=prepareText(body.text);
-  if(!text)return fail(res,400,'Enter 1–220 characters of Nepali text');
+  if(body.lang!=='ne-NP'&&!(body.lang==='en-US'&&process.env.JADOO_ENGLISH_VERIFIED==='true'))return fail(res,400,'Requested speech language is not enabled');
+  const text=prepareText(body.text,body.lang);
+  if(!text)return fail(res,400,'Enter 1–220 characters in the requested language');
   // Keep existing JADOO quota enforcement and provider secrets server-side.
   // Appwrite synchronous execution is limited to 30 seconds; do not resubmit
   // on timeout. The native locale fallback handles slow GPU cold starts.
